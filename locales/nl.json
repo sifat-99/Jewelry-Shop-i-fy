@@ -1,0 +1,27 @@
+{
+  "general": {
+    "search": {
+      "placeholder": "Search our jewelry collection...",
+      "submit": "Search"
+    }
+  },
+  "accessibility": {
+    "skip_to_text": "Skip to content",
+    "close": "Close"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to Cart",
+      "sold_out": "Sold out",
+      "unavailable": "Unavailable",
+      "choose_options": "Choose options"
+    }
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "subtotal": "Subtotal",
+    "checkout": "Proceed to Checkout",
+    "empty": "Your shopping cart is empty",
+    "continue_shopping": "Continue Shopping"
+  }
+}
