@@ -1,0 +1,330 @@
+<style data-shopify>
+:root {
+/* ================ Layout Variables ================ */
+
+
+
+
+
+
+--LAYOUT-WIDTH: 1600px;
+--LAYOUT-GUTTER: 24px;
+--LAYOUT-GUTTER-OFFSET: -24px;
+--NAV-GUTTER: 15px;
+--LAYOUT-OUTER: 50px;
+
+/* ================ Product video ================ */
+
+--COLOR-VIDEO-BG: #f2f2f2;
+
+
+/* ================ Color Variables ================ */
+
+/* === Backgrounds ===*/
+--COLOR-BG: #ffffff;
+--COLOR-BG-ACCENT: #f7f5f4;
+
+/* === Text colors ===*/
+--COLOR-TEXT-DARK: #000000;
+--COLOR-TEXT: #000000;
+--COLOR-TEXT-LIGHT: #2b2622;
+
+/* === Bright color ===*/
+--COLOR-PRIMARY: #000000;
+--COLOR-PRIMARY-HOVER: #000000;
+--COLOR-PRIMARY-FADE: rgba(0, 0, 0, 0.05);
+--COLOR-PRIMARY-FADE-HOVER: rgba(0, 0, 0, 0.1);--COLOR-PRIMARY-OPPOSITE: #ffffff;
+
+/* === Secondary/link Color ===*/
+--COLOR-SECONDARY: #000000;
+--COLOR-SECONDARY-HOVER: #000000;
+--COLOR-SECONDARY-FADE: rgba(0, 0, 0, 0.05);
+--COLOR-SECONDARY-FADE-HOVER: rgba(0, 0, 0, 0.1);--COLOR-SECONDARY-OPPOSITE: #ffffff;
+
+/* === Shades of grey ===*/
+--COLOR-A5:  rgba(0, 0, 0, 0.05);
+--COLOR-A10: rgba(0, 0, 0, 0.1);
+--COLOR-A20: rgba(0, 0, 0, 0.2);
+--COLOR-A35: rgba(0, 0, 0, 0.35);
+--COLOR-A50: rgba(0, 0, 0, 0.5);
+--COLOR-A80: rgba(0, 0, 0, 0.8);
+--COLOR-A90: rgba(0, 0, 0, 0.9);
+--COLOR-A95: rgba(0, 0, 0, 0.95);
+
+
+/* ================ Inverted Color Variables ================ */
+
+--INVERSE-BG: #000000;
+--INVERSE-BG-ACCENT: #000000;
+
+/* === Text colors ===*/
+--INVERSE-TEXT-DARK: #ffffff;
+--INVERSE-TEXT: #ffffff;
+--INVERSE-TEXT-LIGHT: #b3b3b3;
+
+/* === Bright color ===*/
+--INVERSE-PRIMARY: #d2815f;
+--INVERSE-PRIMARY-HOVER: #c35121;
+--INVERSE-PRIMARY-FADE: rgba(210, 129, 95, 0.05);
+--INVERSE-PRIMARY-FADE-HOVER: rgba(210, 129, 95, 0.1);--INVERSE-PRIMARY-OPPOSITE: #000000;
+
+
+/* === Second Color ===*/
+--INVERSE-SECONDARY: #748cab;
+--INVERSE-SECONDARY-HOVER: #3f6493;
+--INVERSE-SECONDARY-FADE: rgba(116, 140, 171, 0.05);
+--INVERSE-SECONDARY-FADE-HOVER: rgba(116, 140, 171, 0.1);--INVERSE-SECONDARY-OPPOSITE: #ffffff;
+
+
+/* === Shades of grey ===*/
+--INVERSE-A5:  rgba(255, 255, 255, 0.05);
+--INVERSE-A10: rgba(255, 255, 255, 0.1);
+--INVERSE-A20: rgba(255, 255, 255, 0.2);
+--INVERSE-A35: rgba(255, 255, 255, 0.3);
+--INVERSE-A80: rgba(255, 255, 255, 0.8);
+--INVERSE-A90: rgba(255, 255, 255, 0.9);
+--INVERSE-A95: rgba(255, 255, 255, 0.95);
+
+
+/* ================ Bright Color Variables ================ */
+
+--BRIGHT-BG: #f7f5f0;
+--BRIGHT-BG-ACCENT: #f7f5f0;
+
+/* === Text colors ===*/
+--BRIGHT-TEXT-DARK: #404040;
+--BRIGHT-TEXT: #000000;
+--BRIGHT-TEXT-LIGHT: #4a4a48;
+
+/* === Bright color ===*/
+--BRIGHT-PRIMARY: #f7f5f0;
+--BRIGHT-PRIMARY-HOVER: #e5d8b5;
+--BRIGHT-PRIMARY-FADE: rgba(247, 245, 240, 0.05);
+--BRIGHT-PRIMARY-FADE-HOVER: rgba(247, 245, 240, 0.1);--BRIGHT-PRIMARY-OPPOSITE: #020101;
+
+
+/* === Second Color ===*/
+--BRIGHT-SECONDARY: #f7f5f0;
+--BRIGHT-SECONDARY-HOVER: #e5d8b5;
+--BRIGHT-SECONDARY-FADE: rgba(247, 245, 240, 0.05);
+--BRIGHT-SECONDARY-FADE-HOVER: rgba(247, 245, 240, 0.1);--BRIGHT-SECONDARY-OPPOSITE: #020101;
+
+
+/* === Shades of grey ===*/
+--BRIGHT-A5:  rgba(0, 0, 0, 0.05);
+--BRIGHT-A10: rgba(0, 0, 0, 0.1);
+--BRIGHT-A20: rgba(0, 0, 0, 0.2);
+--BRIGHT-A35: rgba(0, 0, 0, 0.3);
+--BRIGHT-A80: rgba(0, 0, 0, 0.8);
+--BRIGHT-A90: rgba(0, 0, 0, 0.9);
+--BRIGHT-A95: rgba(0, 0, 0, 0.95);
+
+
+/* === Account Bar ===*/
+--COLOR-ANNOUNCEMENT-BG: #f7f5f0;
+--COLOR-ANNOUNCEMENT-TEXT: #000000;
+
+/* === Nav and dropdown link background ===*/
+--COLOR-NAV: #ffffff;
+--COLOR-NAV-TEXT: #000000;
+--COLOR-NAV-TEXT-DARK: #000000;
+--COLOR-NAV-TEXT-LIGHT: #4d4d4d;
+--COLOR-NAV-BORDER: #000000;
+--COLOR-NAV-A10: rgba(0, 0, 0, 0.1);
+--COLOR-NAV-A50: rgba(0, 0, 0, 0.5);
+--COLOR-HIGHLIGHT-LINK: #ff0000;
+
+/* === Site Footer ===*/
+--COLOR-FOOTER-BG: #f7f5f0;
+--COLOR-FOOTER-TEXT: #000000;
+--COLOR-FOOTER-A5: rgba(0, 0, 0, 0.05);
+--COLOR-FOOTER-A15: rgba(0, 0, 0, 0.15);
+--COLOR-FOOTER-A90: rgba(0, 0, 0, 0.9);
+
+/* === Sub-Footer ===*/
+--COLOR-SUB-FOOTER-BG: #f7f5f0;
+--COLOR-SUB-FOOTER-TEXT: #000000;
+--COLOR-SUB-FOOTER-A5: rgba(0, 0, 0, 0.05);
+--COLOR-SUB-FOOTER-A15: rgba(0, 0, 0, 0.15);
+--COLOR-SUB-FOOTER-A90: rgba(0, 0, 0, 0.9);
+
+/* === Products ===*/
+--PRODUCT-GRID-ASPECT-RATIO: 100%;
+
+/* === Product badges ===*/
+--COLOR-BADGE: #000000;
+--COLOR-BADGE-TEXT: #ffffff;
+--COLOR-BADGE-TEXT-DARK: #d9d9d9;
+--COLOR-BADGE-TEXT-HOVER: #ffffff;
+--COLOR-BADGE-HAIRLINE: #0d0d0d;
+
+/* === Product item slider ===*/--COLOR-PRODUCT-SLIDER: #000000;--COLOR-PRODUCT-SLIDER-OPPOSITE: rgba(255, 255, 255, 0.06);/* === disabled form colors ===*/
+--COLOR-DISABLED-BG: #e6e6e6;
+--COLOR-DISABLED-TEXT: #a6a6a6;
+
+--INVERSE-DISABLED-BG: #1a1a1a;
+--INVERSE-DISABLED-TEXT: #595959;
+
+
+/* === Tailwind RGBA Palette ===*/
+--RGB-CANVAS: 255 255 255;
+--RGB-CONTENT: 0 0 0;
+--RGB-PRIMARY: 0 0 0;
+--RGB-SECONDARY: 0 0 0;
+
+--RGB-DARK-CANVAS: 0 0 0;
+--RGB-DARK-CONTENT: 255 255 255;
+--RGB-DARK-PRIMARY: 210 129 95;
+--RGB-DARK-SECONDARY: 116 140 171;
+
+--RGB-BRIGHT-CANVAS: 247 245 240;
+--RGB-BRIGHT-CONTENT: 0 0 0;
+--RGB-BRIGHT-PRIMARY: 247 245 240;
+--RGB-BRIGHT-SECONDARY: 247 245 240;
+
+--RGB-PRIMARY-CONTRAST: 255 255 255;
+--RGB-SECONDARY-CONTRAST: 255 255 255;
+
+--RGB-DARK-PRIMARY-CONTRAST: 0 0 0;
+--RGB-DARK-SECONDARY-CONTRAST: 255 255 255;
+
+--RGB-BRIGHT-PRIMARY-CONTRAST: 2 1 1;
+--RGB-BRIGHT-SECONDARY-CONTRAST: 2 1 1;
+
+
+/* === Button Radius === */
+--BUTTON-RADIUS: 2px;
+
+
+/* === Icon Stroke Width === */
+--ICON-STROKE-WIDTH: 2px;
+
+
+/* ================ Typography ================ */
+
+--FONT-STACK-BODY: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+--FONT-STYLE-BODY: normal;
+--FONT-WEIGHT-BODY: 500;
+--FONT-WEIGHT-BODY-BOLD: 700;
+--FONT-ADJUST-BODY: 1.0;
+
+  --FONT-BODY-TRANSFORM: none;
+  --FONT-BODY-LETTER-SPACING: 0.01em;
+
+
+--FONT-STACK-HEADING: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+--FONT-STYLE-HEADING: normal;
+--FONT-WEIGHT-HEADING: 600;
+--FONT-WEIGHT-HEADING-BOLD: 700;
+--FONT-ADJUST-HEADING: 1.0;
+
+  --FONT-HEADING-TRANSFORM: uppercase;
+  --FONT-HEADING-LETTER-SPACING: 0.08em;
+
+--FONT-STACK-ACCENT: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+--FONT-STYLE-ACCENT: normal;
+--FONT-WEIGHT-ACCENT: 600;
+--FONT-WEIGHT-ACCENT-BOLD: 700;
+--FONT-ADJUST-ACCENT: 1.1;
+
+  --FONT-ACCENT-TRANSFORM: uppercase;
+  --FONT-ACCENT-LETTER-SPACING: 0.09em;
+
+--TYPE-STACK-NAV: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+--TYPE-STYLE-NAV: normal;
+--TYPE-ADJUST-NAV: 1.15;
+--TYPE-WEIGHT-NAV: 600;
+
+  --FONT-NAV-TRANSFORM: uppercase;
+  --FONT-NAV-LETTER-SPACING: 0.09em;
+
+--TYPE-STACK-BUTTON: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+--TYPE-STYLE-BUTTON: normal;
+--TYPE-ADJUST-BUTTON: 1.1;
+--TYPE-WEIGHT-BUTTON: 600;
+
+  --FONT-BUTTON-TRANSFORM: uppercase;
+  --FONT-BUTTON-LETTER-SPACING: 0.1em;
+
+--TYPE-STACK-KICKER: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+--TYPE-STYLE-KICKER: normal;
+--TYPE-ADJUST-KICKER: 1.15;
+--TYPE-WEIGHT-KICKER: 600;
+
+  --FONT-KICKER-TRANSFORM: uppercase;
+  --FONT-KICKER-LETTER-SPACING: 0.1em;
+
+
+--ICO-SELECT: url('//le-velair.nl/cdn/shop/t/5/assets/ico-select.svg?v=36999314594700400811726910207');
+
+/* ================ Photo correction ================ */
+--PHOTO-CORRECTION: 100%;
+
+
+
+}
+
+
+/* ================ Typography ================ */
+/* ================ type-scale.com ============ */
+
+/* 1.16 base 13 */
+:root {
+ --font-1: 10px;
+ --font-2: 11.3px;
+ --font-3: 12px;
+ --font-4: 13px;
+ --font-5: 15.5px;
+ --font-6: 17px;
+ --font-7: 20px;
+ --font-8: 23.5px;
+ --font-9: 27px;
+ --font-10:32px;
+ --font-11:37px;
+ --font-12:43px;
+ --font-13:49px;
+ --font-14:57px;
+ --font-15:67px;
+}
+
+/* 1.175 base 13.5 */
+@media only screen and (min-width: 480px) and (max-width: 1099px) {
+  :root {
+    --font-1: 10px;
+    --font-2: 11.5px;
+    --font-3: 12.5px;
+    --font-4: 13.5px;
+    --font-5: 16px;
+    --font-6: 18px;
+    --font-7: 21px;
+    --font-8: 25px;
+    --font-9: 29px;
+    --font-10:34px;
+    --font-11:40px;
+    --font-12:47px;
+    --font-13:56px;
+    --font-14:65px;
+   --font-15:77px;
+  }
+}
+/* 1.22 base 14.5 */
+@media only screen and (min-width: 1100px) {
+  :root {
+    --font-1: 10px;
+    --font-2: 11.5px;
+    --font-3: 13px;
+    --font-4: 14.5px;
+    --font-5: 17.5px;
+    --font-6: 22px;
+    --font-7: 26px;
+    --font-8: 32px;
+    --font-9: 39px;
+    --font-10:48px;
+    --font-11:58px;
+    --font-12:71px;
+    --font-13:87px;
+    --font-14:106px;
+    --font-15:129px;
+ }
+}
+</style>

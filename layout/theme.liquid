@@ -1,0 +1,429 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <link rel="canonical" href="{{ canonical_url }}">
+
+  {%- if settings.favicon != blank -%}
+    <link rel="shortcut icon" href="{{ settings.favicon | image_url: width: 32, height: 32 }}" type="image/png">
+  {%- else -%}
+    <link rel="shortcut icon" href="{{ 'favicon.png' | asset_url }}" type="image/png">
+  {%- endif -%}
+
+  <title>
+    {{ page_title }}
+    {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+    {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+    {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+  </title>
+
+  {%- if page_description -%}
+    <meta name="description" content="{{ page_description | escape }}">
+  {%- endif -%}
+
+  {% render 'social-meta-tags' %}
+
+  <!-- Fonts & Stylesheets -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  {{ 'font-settings.css' | asset_url | stylesheet_tag }}
+  {% render 'css-variables' %}
+  {{ 'theme.css' | asset_url | stylesheet_tag }}
+
+  <style>
+    body {
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #000000;
+      background-color: #ffffff;
+      -webkit-font-smoothing: antialiased;
+      margin: 0;
+      padding: 0;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* === Dynamic Online Store 2.0 Color Schemes === */
+    {% for scheme in settings.color_schemes -%}
+      {% if forloop.index == 1 -%}
+        :root,
+      {%- endif %}
+      .color-{{ scheme.id }} {
+        --color-background: {{ scheme.settings.background.red }},{{ scheme.settings.background.green }},{{ scheme.settings.background.blue }};
+        {% if scheme.settings.background_gradient != empty and scheme.settings.background_gradient != blank %}
+          --gradient-background: {{ scheme.settings.background_gradient }};
+        {% else %}
+          --gradient-background: {{ scheme.settings.background }};
+        {% endif %}
+        --color-foreground: {{ scheme.settings.text.red }},{{ scheme.settings.text.green }},{{ scheme.settings.text.blue }};
+        --color-button: {{ scheme.settings.button.red }},{{ scheme.settings.button.green }},{{ scheme.settings.button.blue }};
+        --color-button-text: {{ scheme.settings.button_label.red }},{{ scheme.settings.button_label.green }},{{ scheme.settings.button_label.blue }};
+        --color-secondary-button-text: {{ scheme.settings.secondary_button_label.red }},{{ scheme.settings.secondary_button_label.green }},{{ scheme.settings.secondary_button_label.blue }};
+        --color-shadow: {{ scheme.settings.shadow.red }},{{ scheme.settings.shadow.green }},{{ scheme.settings.shadow.blue }};
+
+        /* Theme variable overrides */
+        --page-width: {{ settings.page_width | default: 1600 }}px;
+        --LAYOUT-WIDTH: {{ settings.page_width | default: 1600 }}px;
+        --spacing-sections: {{ settings.spacing_sections | default: 30 }}px;
+        --grid-horizontal-space: {{ settings.grid_horizontal_space | default: 20 }}px;
+        --grid-vertical-space: {{ settings.grid_vertical_space | default: 24 }}px;
+        --BUTTON-RADIUS: {{ settings.button_border_radius | default: 0 }}px;
+        --btn-radius: {{ settings.button_border_radius | default: 0 }}px;
+        --btn-animation-duration: {% if settings.enable_hover_animations == false %}0ms{% else %}{{ settings.button_hover_speed | default: 450 }}ms{% endif %};
+        --btn-ease: cubic-bezier(0.65, 0, 0.35, 1);
+        --btn-border-thickness: {{ settings.button_border_thickness | default: 1 }}px;
+        --input-radius: {{ settings.input_border_radius | default: 0 }}px;
+        --card-radius: {{ settings.card_border_radius | default: 0 }}px;
+        --badge-radius: {{ settings.badge_corner_radius | default: 2 }}px;
+        --product-gallery-radius: {{ settings.product_gallery_radius | default: 0 }}px;
+        --product-thumb-radius: {{ settings.product_thumb_radius | default: settings.product_gallery_radius | default: 0 }}px;
+        --media-radius: {{ settings.media_border_radius | default: settings.card_border_radius | default: 0 }}px;
+        --cart-image-radius: {{ settings.media_border_radius | default: settings.card_border_radius | default: 0 }}px;
+        --bg: {{ scheme.settings.background }};
+        --bg-accent: {{ scheme.settings.background }};
+        --text: {{ scheme.settings.text }};
+        --text-dark: {{ scheme.settings.text }};
+        --text-light: rgba({{ scheme.settings.text.red }}, {{ scheme.settings.text.green }}, {{ scheme.settings.text.blue }}, 0.88);
+        --contrast: {{ scheme.settings.text }};
+        --border: {{ scheme.settings.shadow }};
+        --hairline: rgba({{ scheme.settings.shadow.red }}, {{ scheme.settings.shadow.green }}, {{ scheme.settings.shadow.blue }}, 0.22);
+        --primary: {{ scheme.settings.button }};
+        --secondary: {{ scheme.settings.secondary_button_label }};
+        --COLOR-ANNOUNCEMENT-BG: {{ scheme.settings.background }};
+        --COLOR-ANNOUNCEMENT-TEXT: {{ scheme.settings.text }};
+        --COLOR-FOOTER-BG: {{ scheme.settings.background }};
+        --COLOR-FOOTER-TEXT: {{ scheme.settings.text }};
+
+        --lv-accent: {{ settings.brand_accent | default: '#9b7c53' }};
+
+        /* Universal Round Button Color Variables (Online Store 2.0 Color Schemes) */
+        --round-btn-bg: {{ settings.round_button_bg | default: scheme.settings.background }};
+        --round-btn-text: {{ settings.round_button_text | default: scheme.settings.text }};
+        --round-btn-border: rgba({{ scheme.settings.text.red }}, {{ scheme.settings.text.green }}, {{ scheme.settings.text.blue }}, 0.14);
+        --round-btn-hover-bg: {{ settings.btn_hover_bg | default: scheme.settings.button }};
+        --round-btn-hover-text: {{ settings.btn_hover_text | default: scheme.settings.button_label }};
+        --round-btn-hover-border: {{ settings.btn_hover_bg | default: scheme.settings.button }};
+        --round-btn-shadow: rgba({{ scheme.settings.shadow.red }}, {{ scheme.settings.shadow.green }}, {{ scheme.settings.shadow.blue }}, 0.16);
+
+        /* Universal Regular (Square/Rectangular) Button Color Variables (Online Store 2.0 Color Schemes) */
+        --btn-regular-bg: {{ settings.button_bg | default: scheme.settings.button }};
+        --btn-regular-text: {{ settings.button_text | default: scheme.settings.button_label }};
+        --btn-regular-border: {{ settings.button_border_color | default: settings.button_bg | default: scheme.settings.button }};
+        --btn-regular-hover-bg: {{ settings.btn_hover_bg | default: scheme.settings.text }};
+        --btn-regular-hover-text: {{ settings.btn_hover_text | default: scheme.settings.background }};
+        --btn-regular-hover-border: {{ settings.btn_hover_border_color | default: settings.btn_hover_bg | default: scheme.settings.text }};
+
+        /* Soft / Muted Button Variables */
+        --btn-soft-bg: var(--btn-regular-bg);
+        --btn-soft-text: var(--btn-regular-text);
+        --btn-soft-border: var(--btn-regular-border);
+        --btn-soft-hover-bg: var(--btn-regular-hover-bg);
+        --btn-soft-hover-text: var(--btn-regular-hover-text);
+        --btn-soft-hover-border: var(--btn-regular-hover-border);
+
+        /* Outline Button Variables */
+        --btn-outline-bg: var(--btn-regular-bg);
+        --btn-outline-text: var(--btn-regular-text);
+        --btn-outline-border: var(--btn-regular-border);
+        --btn-outline-hover-bg: var(--btn-regular-hover-bg);
+        --btn-outline-hover-text: var(--btn-regular-hover-text);
+        --btn-outline-hover-border: var(--btn-regular-hover-border);
+
+        /* Global Universal Button Setting Overrides (theme settings) */
+        background-color: {{ scheme.settings.background }};
+        color: {{ scheme.settings.text }};
+      }
+      .color-{{ scheme.id }} .btn--primary,
+      .color-{{ scheme.id }} .btn--soft {
+        background-color: {{ scheme.settings.button }};
+        color: {{ scheme.settings.button_label }};
+        border-color: {{ scheme.settings.button }};
+      }
+      .color-{{ scheme.id }} .btn--primary:hover,
+      .color-{{ scheme.id }} .btn--soft:hover,
+      .color-{{ scheme.id }} .btn:hover {
+        color: var(--btn-regular-hover-text) !important;
+      }
+      .color-{{ scheme.id }} .btn--primary:hover *,
+      .color-{{ scheme.id }} .btn--soft:hover *,
+      .color-{{ scheme.id }} .btn:hover * {
+        color: var(--btn-regular-hover-text) !important;
+      }
+      .color-{{ scheme.id }} .text-black {
+        color: {{ scheme.settings.text }};
+      }
+      .color-{{ scheme.id }} .text-gray-500,
+      .color-{{ scheme.id }} .text-gray-600 {
+        color: rgba({{ scheme.settings.text.red }}, {{ scheme.settings.text.green }}, {{ scheme.settings.text.blue }}, 0.85);
+      }
+      .color-{{ scheme.id }} .border-gray-100,
+      .color-{{ scheme.id }} .border-gray-200 {
+        border-color: rgba({{ scheme.settings.shadow.red }}, {{ scheme.settings.shadow.green }}, {{ scheme.settings.shadow.blue }}, 0.25);
+      }
+    {% endfor %}
+
+    /* ==========================================================================
+       Anti-Fade High-Contrast Typography
+       Fixes washed-out / faded titles, headings, nav, and body text
+       ========================================================================== */
+    /* Universal Headings & Titles: Sharp, Rich, High-Contrast */
+    h1, h2, h3, h4, h5, h6,
+    .h1, .h2, .h3, .h4, .h5, .h6,
+    .hero__title,
+    .section__title,
+    .standard__heading,
+    .standard__heading p,
+    .tile__title,
+    [class*="heading-size-"] {
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-weight: 600 !important;
+      color: var(--text, #111111) !important;
+      opacity: 1 !important;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Subheadings, Kickers & Flourishes */
+    .kicker-flourished {
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-size: clamp(20px, 2.4vw, 28px) !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.15em !important;
+      text-transform: uppercase !important;
+      color: var(--text, #111111) !important;
+      opacity: 1 !important;
+      padding-bottom: 14px !important;
+      text-align: center;
+    }
+    .kicker-flourished:after {
+      opacity: 0.85 !important;
+      background-color: var(--text, #111111) !important;
+      height: 2px !important;
+      width: 38px !important;
+    }
+
+    /* Header Navigation Items: Deep crisp black, bold & legible */
+    .navlink,
+    .navlink--toplevel,
+    .navlink--toplevel .navtext,
+    .navtext {
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-size: {{ settings.nav_font_size | default: 13 }}px !important;
+      font-weight: {{ settings.nav_font_weight | default: 600 }} !important;
+      letter-spacing: 0.09em !important;
+      color: #111111 !important;
+      opacity: 1 !important;
+      text-transform: {% if settings.nav_uppercase %}uppercase{% else %}none{% endif %} !important;
+    }
+    .header__menu__inner .menu__item .navlink--toplevel {
+      opacity: 1 !important;
+      color: #111111 !important;
+    }
+    .header__menu__inner:hover .menu__item:not(:hover) .navlink--toplevel {
+      opacity: 0.72 !important;
+    }
+    .header__menu__inner .menu__item:hover .navlink--toplevel {
+      opacity: 1 !important;
+      color: #000000 !important;
+    }
+    .header__desktop__button svg,
+    .header__mobile__button svg {
+      color: #111111 !important;
+      stroke-width: 2px !important;
+      opacity: 1 !important;
+    }
+
+    /* Global Button and Form Radius & Styling */
+    .btn, .btn--primary, .btn--outline, .btn--soft, .btn--white, .btn--full, .btn--large, .btn--hero, .btn--neutral, .btn--add-to-cart, .btn-sliding-hover, .hero__btn, button.btn {
+      border-radius: {{ settings.button_border_radius | default: 0 }}px !important;
+      border-width: {{ settings.button_border_thickness | default: 1 }}px !important;
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-size: {{ settings.button_font_size | default: 12 }}px !important;
+      font-weight: {{ settings.button_font_weight | default: 600 }} !important;
+      letter-spacing: {{ settings.button_letter_spacing | default: 14 | divided_by: 100.0 }}em !important;
+      {% if settings.button_uppercase %}
+        text-transform: uppercase !important;
+      {% else %}
+        text-transform: none !important;
+      {% endif %}
+    }
+    input[type="text"], input[type="email"], input[type="password"], input[type="search"], textarea, select {
+      border-radius: {{ settings.input_border_radius | default: 0 }}px !important;
+      border-width: {{ settings.input_border_thickness | default: 1 }}px !important;
+    }
+
+    /* Announcement Bar Ticker */
+    .announcement,
+    .announcement [data-ticker-text],
+    .announcement [data-ticker-text] p,
+    .announcement [data-ticker-text] strong,
+    .announcement [data-ticker-text] a {
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-size: 12.5px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.12em !important;
+      color: #111111 !important;
+      opacity: 1 !important;
+    }
+
+    /* Rich text & body paragraphs */
+    body, p, li, .rte, .rte p {
+      color: var(--text, #1a1a1a);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .rte p {
+      font-weight: 500;
+    }
+    .text-muted, .text-gray-500, .text-gray-600 {
+      color: #3b3632 !important;
+    }
+
+    /* Product Grid Card Typography */
+    .product__grid__title {
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      color: #111111 !important;
+      letter-spacing: 0.08em !important;
+      opacity: 1 !important;
+    }
+    .price-item--regular {
+      font-weight: 600 !important;
+      opacity: 1 !important;
+    }
+
+    /* Split Section Hero Titles & Subtitles */
+    .collection-split__block .hero__title {
+      font-size: clamp(24px, 3.2vw, 38px) !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.1em !important;
+      color: #ffffff !important;
+      opacity: 1 !important;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+    }
+    .collection-split__block .hero__subtitle {
+      font-size: 13.5px !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.06em !important;
+      color: #ffffff !important;
+      opacity: 1 !important;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    /* Footer Typography */
+    .footer__title {
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.12em !important;
+      text-transform: uppercase !important;
+      color: #111111 !important;
+      opacity: 1 !important;
+    }
+    .footer__quicklinks a {
+      font-family: 'Quicksand', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      color: #222222 !important;
+      opacity: 1 !important;
+    }
+    .footer__quicklinks a:hover {
+      color: #000000 !important;
+    }
+  </style>
+
+  {% render 'custom-button-animations' %}
+  {% render 'loading-states' %}
+  {% render 'policy-page-css' %}
+  {%- if settings.button_fill_slide %}{% render 'button-fill-slide' %}{% endif %}
+  {% render 'sale-badge-css' %}
+  {% render 'card-mini-add-assets' %}
+
+  <script>
+    document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+    document.documentElement.classList.add('aos-initialized');
+    let root = '{{ routes.root_url }}';
+    if (root[root.length - 1] !== '/') {
+      root = `${root}/`;
+    }
+    var theme = {
+      routes: {
+        root_url: root,
+        cart: '{{ routes.cart_url }}',
+        cart_add_url: '{{ routes.cart_add_url }}',
+        cart_change_url: '{{ routes.cart_change_url }}',
+        product_recommendations_url: '{{ routes.product_recommendations_url }}',
+        account_addresses_url: '{{ routes.account_addresses_url }}',
+        predictive_search_url: '{{ routes.predictive_search_url }}'
+      },
+      state: {
+        cartOpen: null,
+      },
+      sizes: {
+        small: 480,
+        medium: 768,
+        large: 1100,
+        widescreen: 1400
+      },
+      assets: {
+        photoswipe: '{{ "photoswipe.js" | asset_url }}',
+        smoothscroll: '{{ "smoothscroll.js" | asset_url }}',
+        swatches: '{{ "swatches.json" | asset_url }}',
+        base: '{{ "" | asset_url }}'
+      },
+      strings: {
+        swatchesKey: "Colour",
+        addToCart: {{ 'products.product.add_to_cart' | t | json }},
+        soldOut: {{ 'products.product.sold_out' | t | json }},
+        unavailable: {{ 'products.product.unavailable' | t | json }},
+        free: "Free",
+        from: "From"
+      },
+      settings: {
+        badge_sale_type: {{ settings.sale_badge_type | default: "percentage" | json }},
+        animate_hover: {{ settings.enable_hover_animations | default: true | json }},
+        animate_scroll: {{ settings.enable_scroll_animations | default: true | json }},
+        currency_code_enable: {{ settings.currency_code_enabled | default: false | json }}
+      },
+      currency: {{ shop.currency | json }},
+      currencyCode: {{ cart.currency.iso_code | default: shop.currency | json }},
+      moneyFormat: {{ shop.money_format | json }}
+    };
+    let windowInnerHeight = window.innerHeight;
+    document.documentElement.style.setProperty('--full-screen', `${windowInnerHeight}px`);
+  </script>
+
+  {%- if settings.custom_css != blank -%}
+    <style id="ThemeCustomCSS">
+      {{ settings.custom_css }}
+    </style>
+  {%- endif -%}
+
+  {{ content_for_header }}
+  
+  <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+</head>
+<body id="{{ page_title | handle }}" class="template-{{ template.name | handle }}">
+  {% sections 'header-group' %}
+
+  <main id="MainContent" class="main-content" role="main">
+    {{ content_for_layout }}
+  </main>
+
+  {% sections 'footer-group' %}
+
+  <div class="search--popdown">
+    {% render 'search-predictive', style: 'search-popdown' %}
+  </div>
+
+  {% render 'cart-drawer' %}
+  {% render 'quick-view-modal' %}
+</body>
+</html>
