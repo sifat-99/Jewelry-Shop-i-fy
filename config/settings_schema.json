@@ -1,0 +1,1497 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Jewelry Shop",
+    "theme_author": "Antigravity",
+    "theme_version": "2.0.0",
+    "theme_documentation_url": "https://le-velair.nl",
+    "theme_support_url": "https://le-velair.nl"
+  },
+  {
+    "name": "Logo & Favicon (Global)",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Universal Store Logo"
+      },
+      {
+        "type": "paragraph",
+        "content": "This logo applies across your Desktop Header, Mobile Header, Drawer Menu, Footer, and Password Page. Note: Shopify Checkout & Hosted Customer Login pages pull their logo from Shopify Admin > Settings > Brand. To sync everything seamlessly with 1 click, enable 'Use Shopify Brand Logo' below or upload the logo in Admin > Settings > Brand."
+      },
+      {
+        "type": "checkbox",
+        "id": "use_brand_logo",
+        "label": "Use Shopify Brand Logo (from Admin > Settings > Brand)",
+        "default": false,
+        "info": "When enabled, the theme prioritizes your primary brand logo from Shopify Admin > Settings > Brand, ensuring Header, Footer, Password Page, Checkout, and Customer Accounts match 100%."
+      },
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Custom Theme Logo (Optional)",
+        "info": "Upload here to use a custom logo for the theme. Leave blank to automatically use the Shopify Brand Logo."
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "min": 50,
+        "max": 300,
+        "step": 5,
+        "unit": "px",
+        "label": "Desktop logo width",
+        "default": 150
+      },
+      {
+        "type": "range",
+        "id": "logo_width_mobile",
+        "min": 40,
+        "max": 200,
+        "step": 5,
+        "unit": "px",
+        "label": "Mobile logo width",
+        "default": 110
+      },
+      {
+        "type": "select",
+        "id": "mobile_logo_alignment",
+        "label": "Mobile logo alignment",
+        "options": [
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "left",
+            "label": "Left (Next to Menu)"
+          }
+        ],
+        "default": "center",
+        "info": "Choose whether the logo is centered or on the left in the mobile header."
+      },
+      {
+        "type": "range",
+        "id": "footer_logo_width",
+        "min": 50,
+        "max": 300,
+        "step": 5,
+        "unit": "px",
+        "label": "Footer logo width",
+        "default": 170
+      },
+      {
+        "type": "header",
+        "content": "Favicon"
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon image",
+        "info": "Will be scaled down to 32 x 32px"
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color_scheme_group",
+        "id": "color_schemes",
+        "definition": [
+          {
+            "type": "color",
+            "id": "background",
+            "label": "Background"
+          },
+          {
+            "type": "color_background",
+            "id": "background_gradient",
+            "label": "Background gradient"
+          },
+          {
+            "type": "color",
+            "id": "text",
+            "label": "Text"
+          },
+          {
+            "type": "color",
+            "id": "button",
+            "label": "Solid button background"
+          },
+          {
+            "type": "color",
+            "id": "button_label",
+            "label": "Solid button label"
+          },
+          {
+            "type": "color",
+            "id": "secondary_button_label",
+            "label": "Secondary button label"
+          },
+          {
+            "type": "color",
+            "id": "shadow",
+            "label": "Border / Shadow"
+          }
+        ],
+        "role": {
+          "text": "text",
+          "background": {
+            "solid": "background",
+            "gradient": "background_gradient"
+          },
+          "links": "secondary_button_label",
+          "icons": "text",
+          "primary_button": "button",
+          "on_primary_button": "button_label",
+          "primary_button_border": "button",
+          "secondary_button": "background",
+          "on_secondary_button": "secondary_button_label",
+          "secondary_button_border": "secondary_button_label"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Headings & Titles"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_header_font",
+        "label": "Heading font",
+        "default": "assistant_n4"
+      },
+      {
+        "type": "range",
+        "id": "heading_scale",
+        "min": 80,
+        "max": 140,
+        "step": 5,
+        "unit": "%",
+        "label": "Heading size scale",
+        "default": 100
+      },
+      {
+        "type": "select",
+        "id": "heading_text_transform",
+        "label": "Heading text transform",
+        "options": [
+          {
+            "value": "uppercase",
+            "label": "Uppercase"
+          },
+          {
+            "value": "capitalize",
+            "label": "Capitalize"
+          },
+          {
+            "value": "none",
+            "label": "None"
+          }
+        ],
+        "default": "uppercase"
+      },
+      {
+        "type": "header",
+        "content": "Body Text"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "label": "Body font",
+        "default": "assistant_n4"
+      },
+      {
+        "type": "range",
+        "id": "body_scale",
+        "min": 80,
+        "max": 120,
+        "step": 5,
+        "unit": "%",
+        "label": "Body size scale",
+        "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Header Navigation Menu"
+      },
+      {
+        "type": "range",
+        "id": "nav_font_size",
+        "min": 11,
+        "max": 16,
+        "step": 1,
+        "unit": "px",
+        "label": "Menu font size",
+        "default": 13
+      },
+      {
+        "type": "select",
+        "id": "nav_font_weight",
+        "label": "Menu font weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Regular (400)"
+          },
+          {
+            "value": "500",
+            "label": "Medium (500)"
+          },
+          {
+            "value": "600",
+            "label": "Semi-Bold (600)"
+          },
+          {
+            "value": "700",
+            "label": "Bold (700)"
+          }
+        ],
+        "default": "600"
+      },
+      {
+        "type": "checkbox",
+        "id": "nav_uppercase",
+        "label": "Uppercase navigation menu",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "min": 1200,
+        "max": 1800,
+        "step": 50,
+        "unit": "px",
+        "label": "Maximum page width",
+        "default": 1600
+      },
+      {
+        "type": "range",
+        "id": "spacing_sections",
+        "min": 0,
+        "max": 80,
+        "step": 5,
+        "unit": "px",
+        "label": "Vertical spacing between sections",
+        "default": 30
+      },
+      {
+        "type": "range",
+        "id": "grid_horizontal_space",
+        "min": 8,
+        "max": 40,
+        "step": 4,
+        "unit": "px",
+        "label": "Horizontal grid spacing",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "grid_vertical_space",
+        "min": 8,
+        "max": 40,
+        "step": 4,
+        "unit": "px",
+        "label": "Vertical grid spacing",
+        "default": 24
+      }
+    ]
+  },
+  {
+    "name": "Breadcrumbs",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Breadcrumbs (all pages)"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_breadcrumbs",
+        "label": "Show breadcrumbs",
+        "default": true,
+        "info": "Applies to collection, product, and content pages."
+      },
+      {
+        "type": "select",
+        "id": "breadcrumb_separator",
+        "label": "Separator",
+        "options": [
+          {
+            "value": "/",
+            "label": "/  Slash"
+          },
+          {
+            "value": ">",
+            "label": ">  Arrow"
+          },
+          {
+            "value": "·",
+            "label": "·  Dot"
+          },
+          {
+            "value": "—",
+            "label": "—  Dash"
+          }
+        ],
+        "default": "/"
+      },
+      {
+        "type": "range",
+        "id": "breadcrumb_font_size",
+        "min": 10,
+        "max": 16,
+        "step": 1,
+        "unit": "px",
+        "label": "Text size",
+        "default": 12
+      },
+      {
+        "type": "checkbox",
+        "id": "breadcrumb_uppercase",
+        "label": "Uppercase text",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "breadcrumb_space_above",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "label": "Space above",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "breadcrumb_space_below",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "label": "Space below",
+        "default": 16
+      }
+    ]
+  },
+  {
+    "name": "Loading & skeleton",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Skeleton (product cards)"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_skeleton",
+        "label": "Show skeleton while product images load",
+        "default": true,
+        "info": "Colours are taken from your theme text/background colours."
+      },
+      {
+        "type": "select",
+        "id": "skeleton_style",
+        "label": "Skeleton animation",
+        "options": [
+          {
+            "value": "shimmer",
+            "label": "Shimmer"
+          },
+          {
+            "value": "pulse",
+            "label": "Pulse"
+          }
+        ],
+        "default": "shimmer"
+      },
+      {
+        "type": "header",
+        "content": "Product page loader"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_product_loader",
+        "label": "Show animated loader while product images load",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "loader_size",
+        "min": 32,
+        "max": 120,
+        "step": 4,
+        "unit": "px",
+        "label": "Loader size",
+        "default": 64
+      },
+      {
+        "type": "color",
+        "id": "loader_color_a",
+        "label": "Loader corner colour (dark)",
+        "default": "#8d6e63"
+      },
+      {
+        "type": "color",
+        "id": "loader_color_b",
+        "label": "Loader corner colour (light)",
+        "default": "#d7b8a6"
+      },
+      {
+        "type": "color",
+        "id": "loader_color_c",
+        "label": "Loader centre colour",
+        "default": "#3b2a26"
+      }
+    ]
+  },
+  {
+    "name": "Animations",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "enable_hover_animations",
+        "label": "Enable hover transitions & button animations",
+        "default": true,
+        "info": "When disabled, hover states appear instantly without transitions or shadows."
+      },
+      {
+        "type": "range",
+        "id": "button_hover_speed",
+        "min": 200,
+        "max": 900,
+        "step": 50,
+        "unit": "ms",
+        "label": "Button hover speed",
+        "default": 450,
+        "info": "How long the colour fill takes on buttons. Higher = slower and softer. Needs \"Enable hover transitions & button animations\" turned on."
+      },
+      {
+        "type": "checkbox",
+        "id": "button_fill_slide",
+        "label": "Sliding fill animation on hover",
+        "default": false,
+        "info": "Off: the hover colour fades in smoothly. On: it slides in from the left. Applies to buttons, not to the variant/size option buttons."
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_image_zoom",
+        "label": "Enable subtle image zoom on hover",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_scroll_animations",
+        "label": "Enable reveal animations on scroll",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Buttons & Controls",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Button Styles"
+      },
+      {
+        "type": "select",
+        "id": "global_button_style",
+        "label": "Universal button style",
+        "options": [
+          {
+            "value": "solid",
+            "label": "Solid fill"
+          },
+          {
+            "value": "outline",
+            "label": "Outline"
+          },
+          {
+            "value": "soft",
+            "label": "Soft"
+          },
+          {
+            "value": "minimal",
+            "label": "Minimal text"
+          }
+        ],
+        "default": "solid",
+        "info": "Sets the base appearance for storefront buttons. Mega-menu card styles remain controlled in Header settings."
+      },
+      {
+        "type": "range",
+        "id": "button_border_radius",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "label": "Button corner radius",
+        "default": 0
+      },
+      {
+        "type": "color",
+        "id": "brand_accent",
+        "label": "Brand accent color (gold)",
+        "default": "#9b7c53",
+        "info": "Used for highlights such as the engraving card."
+      },
+      {
+        "type": "color",
+        "id": "button_bg",
+        "label": "Universal button background",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "id": "button_text",
+        "label": "Universal button text color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "button_border_color",
+        "label": "Universal button border color",
+        "info": "Leave empty to match the button background (or text color for Outline style)."
+      },
+      {
+        "type": "range",
+        "id": "button_border_thickness",
+        "min": 1,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "label": "Button border thickness",
+        "default": 1
+      },
+      {
+        "type": "checkbox",
+        "id": "button_uppercase",
+        "label": "Uppercase button text",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "btn_hover_bg",
+        "label": "Universal button hover background",
+        "default": "#2b2622"
+      },
+      {
+        "type": "color",
+        "id": "btn_hover_border_color",
+        "label": "Universal button hover border color",
+        "info": "Leave empty to match the hover background."
+      },
+      {
+        "type": "color",
+        "id": "btn_hover_text",
+        "label": "Universal button hover text color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "range",
+        "id": "button_font_size",
+        "min": 10,
+        "max": 18,
+        "step": 1,
+        "unit": "px",
+        "label": "Button text size",
+        "default": 12
+      },
+      {
+        "type": "select",
+        "id": "button_font_weight",
+        "label": "Button text weight",
+        "options": [
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semi-bold"
+          },
+          {
+            "value": "700",
+            "label": "Bold"
+          }
+        ],
+        "default": "600"
+      },
+      {
+        "type": "range",
+        "id": "button_letter_spacing",
+        "min": 0,
+        "max": 30,
+        "step": 2,
+        "label": "Button letter spacing",
+        "default": 14,
+        "info": "In hundredths of an em (14 = 0.14em)."
+      },
+      {
+        "type": "header",
+        "content": "Round buttons (wishlist, quick view, close...)"
+      },
+      {
+        "type": "color",
+        "id": "round_button_bg",
+        "label": "Round button background",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "round_button_text",
+        "label": "Round button icon color",
+        "default": "#000000",
+        "info": "Hover colors come from the Universal button hover colors above, so square and round buttons always match."
+      }
+    ]
+  },
+  {
+    "name": "Inputs & Form Controls",
+    "settings": [
+      {
+        "type": "range",
+        "id": "input_border_radius",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "label": "Input field corner radius",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "input_border_thickness",
+        "min": 1,
+        "max": 3,
+        "step": 1,
+        "unit": "px",
+        "label": "Input field border thickness",
+        "default": 1
+      }
+    ]
+  },
+  {
+    "name": "Product Card",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Card Visuals"
+      },
+      {
+        "type": "select",
+        "id": "product_card_aspect_ratio",
+        "label": "Image aspect ratio",
+        "options": [
+          {
+            "value": "square",
+            "label": "Square (1:1)"
+          },
+          {
+            "value": "portrait",
+            "label": "Portrait (3:4)"
+          },
+          {
+            "value": "adapt",
+            "label": "Adapt to image"
+          }
+        ],
+        "default": "square"
+      },
+      {
+        "type": "select",
+        "id": "product_card_text_alignment",
+        "label": "Text alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          }
+        ],
+        "default": "left"
+      },
+      {
+        "type": "range",
+        "id": "card_border_radius",
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "label": "Card border radius",
+        "default": 0
+      },
+      {
+        "type": "select",
+        "id": "card_hover_effect",
+        "label": "Hover animation",
+        "options": [
+          {
+            "value": "zoom_lift",
+            "label": "Soft zoom + lift"
+          },
+          {
+            "value": "zoom",
+            "label": "Soft zoom (image only)"
+          },
+          {
+            "value": "lift",
+            "label": "Lift + shadow (card)"
+          },
+          {
+            "value": "none",
+            "label": "None"
+          }
+        ],
+        "default": "zoom_lift",
+        "info": "Subtle animation when hovering a product card (desktop / mouse only)."
+      },
+      {
+        "type": "checkbox",
+        "id": "show_secondary_image",
+        "label": "Show second image on hover",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_vendor",
+        "label": "Show product vendor / brand",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "show_rating",
+        "label": "Show product star rating",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Interactive Actions"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_quick_add",
+        "label": "Enable Quick Add to Cart button",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Compact add button (phones, 450px and below)"
+      },
+      {
+        "type": "select",
+        "id": "card_mini_add_position",
+        "label": "Button side",
+        "options": [
+          {
+            "value": "right",
+            "label": "Bottom right"
+          },
+          {
+            "value": "left",
+            "label": "Bottom left"
+          }
+        ],
+        "default": "right",
+        "info": "Below 450px the full \"Add to cart\" bar becomes a small square button (follows the global button radius). Tap it to pick a size/variant, or add directly if there is only one."
+      },
+      {
+        "type": "range",
+        "id": "card_mini_add_size",
+        "min": 30,
+        "max": 52,
+        "step": 2,
+        "unit": "px",
+        "label": "Button size",
+        "default": 38
+      },
+      {
+        "type": "select",
+        "id": "card_mini_add_popup",
+        "label": "Variant popup style",
+        "options": [
+          {
+            "value": "bottom",
+            "label": "Slides up from the bottom"
+          },
+          {
+            "value": "side",
+            "label": "Slides in from the side"
+          },
+          {
+            "value": "button",
+            "label": "Small popup above the button"
+          },
+          {
+            "value": "product",
+            "label": "Over the product image"
+          }
+        ],
+        "default": "bottom",
+        "info": "How the size/variant picker opens when the compact button is tapped."
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_quickview",
+        "label": "Enable Quick View modal",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_wishlist",
+        "label": "Enable Wishlist button",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_arrows",
+        "label": "Enable image navigation arrows on desktop",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_arrows_mobile",
+        "label": "Show navigation arrows on mobile",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Image Navigation Arrow Styling"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_arrows_always_visible",
+        "label": "Always show arrows on desktop",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "card_arrow_background_enabled",
+        "label": "Show arrow button background",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "card_arrow_hover_effect",
+        "label": "Arrow hover effect",
+        "options": [
+          {
+            "value": "circle_fill",
+            "label": "Circle fill"
+          },
+          {
+            "value": "color_change",
+            "label": "Color change"
+          },
+          {
+            "value": "none",
+            "label": "None"
+          }
+        ],
+        "default": "circle_fill"
+      },
+      {
+        "type": "range",
+        "id": "card_arrow_button_size",
+        "min": 24,
+        "max": 64,
+        "step": 2,
+        "unit": "px",
+        "label": "Desktop button size",
+        "default": 40
+      },
+      {
+        "type": "range",
+        "id": "card_arrow_icon_size",
+        "min": 10,
+        "max": 32,
+        "step": 1,
+        "unit": "px",
+        "label": "Desktop arrow size",
+        "default": 18
+      },
+      {
+        "type": "range",
+        "id": "card_arrow_button_size_mobile",
+        "min": 24,
+        "max": 52,
+        "step": 2,
+        "unit": "px",
+        "label": "Mobile button size",
+        "default": 34
+      },
+      {
+        "type": "range",
+        "id": "card_arrow_icon_size_mobile",
+        "min": 10,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "label": "Mobile arrow size",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "card_arrow_vertical_position",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Arrow vertical position",
+        "default": 50
+      },
+      {
+        "type": "range",
+        "id": "card_arrow_horizontal_inset",
+        "min": 0,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "label": "Desktop edge spacing",
+        "default": 8
+      },
+      {
+        "type": "range",
+        "id": "card_arrow_horizontal_inset_mobile",
+        "min": 0,
+        "max": 24,
+        "step": 2,
+        "unit": "px",
+        "label": "Mobile edge spacing",
+        "default": 4
+      },
+      {
+        "type": "range",
+        "id": "card_arrow_border_width",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "label": "Arrow border width",
+        "default": 1
+      },
+      {
+        "type": "color",
+        "id": "card_arrow_background",
+        "label": "Arrow background color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "card_arrow_icon_color",
+        "label": "Arrow color",
+        "default": "#111111"
+      },
+      {
+        "type": "color",
+        "id": "card_arrow_border_color",
+        "label": "Arrow border color",
+        "default": "#d8d4ce"
+      },
+      {
+        "type": "color",
+        "id": "card_arrow_hover_background",
+        "label": "Arrow hover background color",
+        "default": "#2b2622"
+      },
+      {
+        "type": "color",
+        "id": "card_arrow_hover_icon_color",
+        "label": "Arrow hover color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "card_arrow_hover_border_color",
+        "label": "Arrow hover border color",
+        "default": "#2b2622"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_arrow_show_shadow",
+        "label": "Show arrow button shadow",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Reviews",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Customer reviews"
+      },
+      {
+        "type": "text",
+        "id": "reviews_api_url",
+        "label": "Reviews API URL",
+        "default": "https://le-velair-reviews-api.vercel.app/api/review",
+        "info": "Where 'Write a review' forms send reviews (your Vercel endpoint)."
+      }
+    ]
+  },
+  {
+    "name": "Engraving",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Engraving / personalization"
+      },
+      {
+        "type": "select",
+        "id": "engraving_mode",
+        "label": "Engraving field",
+        "options": [
+          {
+            "value": "auto",
+            "label": "Auto - only on engravable products"
+          },
+          {
+            "value": "always",
+            "label": "Show on every product"
+          },
+          {
+            "value": "never",
+            "label": "Never show"
+          }
+        ],
+        "default": "auto",
+        "info": "Auto shows it when the product title, type, tags or an option name contains a keyword below."
+      },
+      {
+        "type": "select",
+        "id": "engraving_card_action",
+        "label": "Add button on product cards",
+        "options": [
+          {
+            "value": "popup",
+            "label": "Open a popup (engraving + options)"
+          },
+          {
+            "value": "page",
+            "label": "Go to the product page"
+          }
+        ],
+        "default": "popup",
+        "info": "For engravable products only. Applies to the hover bar on desktop and the \"+\" button on phones.",
+        "visible_if": "{{ settings.engraving_mode != 'never' }}"
+      },
+      {
+        "type": "text",
+        "id": "engraving_card_label",
+        "label": "Card hover button text",
+        "default": "Personalise",
+        "info": "Shown on the card hover bar instead of the size options.",
+        "visible_if": "{{ settings.engraving_mode != 'never' }}"
+      },
+      {
+        "type": "text",
+        "id": "engraving_keywords",
+        "label": "Engravable keywords",
+        "default": "engrav, graver, personali",
+        "info": "Comma separated. Matches English and Dutch (e.g. 'graveerbare ring' tag).",
+        "visible_if": "{{ settings.engraving_mode == 'auto' }}"
+      },
+      {
+        "type": "text",
+        "id": "engraving_label",
+        "label": "Field label",
+        "default": "Engraving",
+        "visible_if": "{{ settings.engraving_mode != 'never' }}"
+      },
+      {
+        "type": "text",
+        "id": "engraving_placeholder",
+        "label": "Placeholder",
+        "default": "e.g. Sarah, 14.02 or initials",
+        "visible_if": "{{ settings.engraving_mode != 'never' }}"
+      },
+      {
+        "type": "range",
+        "id": "engraving_max",
+        "min": 6,
+        "max": 40,
+        "step": 2,
+        "label": "Max characters",
+        "default": 12,
+        "visible_if": "{{ settings.engraving_mode != 'never' }}"
+      },
+      {
+        "type": "checkbox",
+        "id": "engraving_required",
+        "label": "Engraving text is required",
+        "default": true,
+        "visible_if": "{{ settings.engraving_mode != 'never' }}"
+      },
+      {
+        "type": "text",
+        "id": "engraving_property",
+        "label": "Order property name",
+        "default": "Engraving",
+        "info": "How the text appears on the order / cart line.",
+        "visible_if": "{{ settings.engraving_mode != 'never' }}"
+      }
+    ]
+  },
+  {
+    "name": "Product Page & Media",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Product Gallery Corner Radius"
+      },
+      {
+        "type": "range",
+        "id": "product_gallery_radius",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px",
+        "label": "Product gallery image radius",
+        "default": 0,
+        "info": "Corner radius for main product images in product details page and quick view modal"
+      },
+      {
+        "type": "range",
+        "id": "product_thumb_radius",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "px",
+        "label": "Product thumbnail corner radius",
+        "default": 0,
+        "info": "Corner radius for gallery thumbnail images"
+      },
+      {
+        "type": "header",
+        "content": "Universal Media & Cards"
+      },
+      {
+        "type": "range",
+        "id": "media_border_radius",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px",
+        "label": "Universal media corner radius",
+        "default": 0,
+        "info": "Universal corner radius for cart thumbnails, modals, and auxiliary media"
+      }
+    ]
+  },
+  {
+    "name": "Price & Badges",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "currency_code_enabled",
+        "label": "Show currency codes (e.g. USD, EUR, BDT)",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Sale Badge"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_discount_badge",
+        "label": "Enable Sale badge",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "sale_badge_type",
+        "label": "Sale badge style",
+        "options": [
+          {
+            "value": "percentage",
+            "label": "Percentage off (% OFF)"
+          },
+          {
+            "value": "text",
+            "label": "Text (SALE)"
+          }
+        ],
+        "default": "percentage"
+      },
+      {
+        "type": "color",
+        "id": "sale_badge_bg",
+        "label": "Sale badge background",
+        "default": "#8c2b3f"
+      },
+      {
+        "type": "color",
+        "id": "sale_badge_text",
+        "label": "Sale badge text color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "header",
+        "content": "Sold Out Badge"
+      },
+      {
+        "type": "color",
+        "id": "sold_out_badge_bg",
+        "label": "Sold out badge background",
+        "default": "#666666"
+      },
+      {
+        "type": "color",
+        "id": "sold_out_badge_text",
+        "label": "Sold out badge text color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "range",
+        "id": "badge_corner_radius",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "label": "Badge corner radius",
+        "default": 2
+      }
+    ]
+  },
+  {
+    "name": "Collection Card",
+    "settings": [
+      {
+        "type": "select",
+        "id": "collection_card_image_ratio",
+        "label": "Collection image ratio",
+        "options": [
+          {
+            "value": "square",
+            "label": "Square (1:1)"
+          },
+          {
+            "value": "portrait",
+            "label": "Portrait (3:4)"
+          },
+          {
+            "value": "landscape",
+            "label": "Landscape (4:3)"
+          }
+        ],
+        "default": "square"
+      },
+      {
+        "type": "select",
+        "id": "collection_card_text_alignment",
+        "label": "Text alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          }
+        ],
+        "default": "center"
+      },
+      {
+        "type": "range",
+        "id": "collection_card_radius",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "label": "Corner radius",
+        "default": 0
+      }
+    ]
+  },
+  {
+    "name": "Cart & Drawer",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "Cart type",
+        "options": [
+          {
+            "value": "drawer",
+            "label": "Slide-out drawer"
+          },
+          {
+            "value": "page",
+            "label": "Dedicated cart page"
+          }
+        ],
+        "default": "drawer"
+      },
+      {
+        "type": "select",
+        "id": "cart_checkout_position",
+        "label": "Checkout button position (drawer)",
+        "options": [
+          {
+            "value": "bottom",
+            "label": "Fixed at the bottom of the drawer"
+          },
+          {
+            "value": "after_items",
+            "label": "Right after the last product"
+          }
+        ],
+        "default": "bottom",
+        "info": "Fixed keeps the button always visible. After products moves it (with the shipping note and payment icons) under the last item, so it follows the list as products are added."
+      },
+      {
+        "type": "checkbox",
+        "id": "show_cart_note",
+        "label": "Enable cart notes / special instructions",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Free Shipping Bar"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_free_shipping_bar",
+        "label": "Enable free shipping progress bar",
+        "default": true
+      },
+      {
+        "type": "number",
+        "id": "free_shipping_threshold",
+        "label": "Free shipping threshold amount (€)",
+        "default": 39
+      },
+      {
+        "type": "header",
+        "content": "Checkout Verification"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_terms_checkbox",
+        "label": "Require Terms & Conditions checkbox before checkout",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "Search & Predictive Search",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "predictive_search_enabled",
+        "label": "Enable predictive live search",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "search_show_vendor",
+        "label": "Show vendor in search results",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "search_show_price",
+        "label": "Show price in search results",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "search_show_articles",
+        "label": "Include blog posts & articles",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_instagram_link",
+        "label": "Instagram",
+        "info": "https://instagram.com/your-brand"
+      },
+      {
+        "type": "text",
+        "id": "social_tiktok_link",
+        "label": "TikTok",
+        "info": "https://tiktok.com/@your-brand"
+      },
+      {
+        "type": "text",
+        "id": "social_facebook_link",
+        "label": "Facebook"
+      },
+      {
+        "type": "text",
+        "id": "social_pinterest_link",
+        "label": "Pinterest"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube_link",
+        "label": "YouTube"
+      },
+      {
+        "type": "text",
+        "id": "social_twitter_link",
+        "label": "X (formerly Twitter)"
+      },
+      {
+        "type": "text",
+        "id": "social_whatsapp_link",
+        "label": "WhatsApp"
+      },
+      {
+        "type": "text",
+        "id": "social_linkedin_link",
+        "label": "LinkedIn"
+      }
+    ]
+  },
+  {
+    "name": "Brand Information",
+    "settings": [
+      {
+        "type": "text",
+        "id": "brand_headline",
+        "label": "Brand headline",
+        "default": "Jewelry Shop"
+      },
+      {
+        "type": "richtext",
+        "id": "brand_description",
+        "label": "Brand description",
+        "default": "<p>Timeless fine jewelry crafted with elegance and personal meaning.</p>"
+      },
+      {
+        "type": "image_picker",
+        "id": "brand_image",
+        "label": "Brand image"
+      }
+    ]
+  },
+  {
+    "name": "Custom CSS",
+    "settings": [
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS",
+        "info": "Add custom CSS rules that will be applied throughout your store."
+      }
+    ]
+  }
+]

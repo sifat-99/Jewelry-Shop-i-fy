@@ -1,0 +1,195 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "current": {
+    "use_brand_logo": true,
+    "logo": "shopify://shop_images/aurelle_fine_jewelry_logo_transparent.png",
+    "logo_width": 150,
+    "logo_width_mobile": 110,
+    "footer_logo_width": 170,
+    "favicon": "shopify://shop_images/android-chrome-192x192.png",
+    "heading_scale": 100,
+    "heading_text_transform": "uppercase",
+    "body_scale": 100,
+    "nav_font_size": 13,
+    "nav_font_weight": "600",
+    "nav_uppercase": true,
+    "page_width": 1600,
+    "spacing_sections": 30,
+    "grid_horizontal_space": 20,
+    "grid_vertical_space": 24,
+    "breadcrumb_uppercase": true,
+    "enable_hover_animations": true,
+    "button_hover_speed": 400,
+    "enable_image_zoom": false,
+    "enable_scroll_animations": true,
+    "global_button_style": "solid",
+    "button_border_radius": 0,
+    "button_bg": "#FFFFFF",
+    "button_text": "#000000",
+    "button_border_color": "#D1D1D1",
+    "button_border_thickness": 1,
+    "button_uppercase": true,
+    "btn_hover_bg": "#000000",
+    "btn_hover_text": "#ffffff",
+    "input_border_radius": 0,
+    "product_card_aspect_ratio": "square",
+    "product_card_text_alignment": "left",
+    "card_border_radius": 0,
+    "card_hover_effect": "zoom",
+    "show_secondary_image": true,
+    "show_vendor": false,
+    "show_rating": false,
+    "card_show_quick_add": true,
+    "card_mini_add_popup": "button",
+    "card_show_quickview": false,
+    "card_show_wishlist": false,
+    "card_show_arrows": true,
+    "card_show_arrows_mobile": false,
+    "card_arrows_always_visible": false,
+    "card_arrow_background_enabled": false,
+    "card_arrow_hover_effect": "color_change",
+    "card_arrow_button_size": 40,
+    "card_arrow_icon_size": 32,
+    "card_arrow_button_size_mobile": 34,
+    "card_arrow_icon_size_mobile": 16,
+    "card_arrow_vertical_position": 50,
+    "card_arrow_horizontal_inset": 6,
+    "card_arrow_horizontal_inset_mobile": 4,
+    "card_arrow_border_width": 0,
+    "card_arrow_background": "#ffffff",
+    "card_arrow_icon_color": "#000000",
+    "card_arrow_border_color": "#000000",
+    "card_arrow_hover_background": "#000000",
+    "card_arrow_hover_icon_color": "#ffffff",
+    "card_arrow_hover_border_color": "#FFFFFF",
+    "card_arrow_show_shadow": false,
+    "engraving_card_action": "page",
+    "product_gallery_radius": 0,
+    "product_thumb_radius": 0,
+    "media_border_radius": 0,
+    "currency_code_enabled": true,
+    "card_show_discount_badge": true,
+    "sale_badge_type": "percentage",
+    "sale_badge_bg": "#8c2b3f",
+    "sale_badge_text": "#ffffff",
+    "sold_out_badge_bg": "#666666",
+    "sold_out_badge_text": "#ffffff",
+    "badge_corner_radius": 0,
+    "collection_card_image_ratio": "square",
+    "collection_card_text_alignment": "center",
+    "collection_card_radius": 0,
+    "cart_type": "drawer",
+    "cart_checkout_position": "after_items",
+    "show_cart_note": true,
+    "enable_free_shipping_bar": true,
+    "free_shipping_threshold": 39,
+    "show_terms_checkbox": false,
+    "predictive_search_enabled": true,
+    "search_show_vendor": true,
+    "search_show_price": true,
+    "search_show_articles": true,
+    "social_instagram_link": "https://www.instagram.com/",
+    "social_tiktok_link": "https://www.tiktok.com/",
+    "brand_headline": "Jewelry Shop",
+    "brand_description": "<p>Timeless fine jewelry crafted with elegance and personal meaning.</p>",
+    "color_bg": "#ffffff",
+    "color_text": "#000000",
+    "color_primary": "#000000",
+    "color_accent": "#fbf9f8",
+    "content_for_index": [],
+    "blocks": {
+      "15683396631634586217": {
+        "type": "shopify://apps/inbox/blocks/chat/841fc607-4181-4ad1-842d-e24d7f8bad6b",
+        "disabled": false,
+        "settings": {
+          "greeting_message": "",
+          "show_featured_products": true,
+          "featured_products": [
+            "engraved-name-ring-6426536",
+            "custom-child-silhouette-keychain-d9032fa",
+            "black-fingerprint-cast-forever-sealed-memorial-keychain-0f6c0c5"
+          ],
+          "background_color": "#ffffff",
+          "font_color": "#000000",
+          "agent_invert_activator_colors": true,
+          "button_color": "#000000",
+          "launcher_style": "button",
+          "button_icon": "question_mark",
+          "button_text": "help",
+          "button_horizontal_position": "bottom_right",
+          "button_vertical_position": "lowest",
+          "agent_inherit_fonts": true,
+          "agent_font": "system_ui_n4",
+          "agent_font_size": 14,
+          "agent_activator_font_size": 16,
+          "agent_border_radius": 0
+        }
+      }
+    },
+    "color_schemes": {
+      "scheme-1": {
+        "settings": {
+          "background": "#ffffff",
+          "background_gradient": "",
+          "text": "#000000",
+          "button": "#000000",
+          "button_label": "#ffffff",
+          "secondary_button_label": "#000000",
+          "shadow": "#e5e5e5"
+        }
+      },
+      "scheme-2": {
+        "settings": {
+          "background": "#f7f5f0",
+          "background_gradient": "",
+          "text": "#1a1a1a",
+          "button": "#000000",
+          "button_label": "#ffffff",
+          "secondary_button_label": "#1a1a1a",
+          "shadow": "#e6e2d8"
+        }
+      },
+      "scheme-3": {
+        "settings": {
+          "background": "#f2ece4",
+          "background_gradient": "",
+          "text": "#262322",
+          "button": "#262322",
+          "button_label": "#f2ece4",
+          "secondary_button_label": "#262322",
+          "shadow": "#ded4c7"
+        }
+      },
+      "scheme-4": {
+        "settings": {
+          "background": "#fbf8f2",
+          "background_gradient": "",
+          "text": "#2c2518",
+          "button": "#b48a4c",
+          "button_label": "#ffffff",
+          "secondary_button_label": "#8a6730",
+          "shadow": "#e8ddc9"
+        }
+      },
+      "scheme-5": {
+        "settings": {
+          "background": "#111111",
+          "background_gradient": "",
+          "text": "#ffffff",
+          "button": "#ffffff",
+          "button_label": "#111111",
+          "secondary_button_label": "#e5e5e5",
+          "shadow": "#2c2c2c"
+        }
+      }
+    }
+  }
+}
