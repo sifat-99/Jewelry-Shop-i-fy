@@ -1,0 +1,180 @@
+<!-- /sections/announcement.liquid -->
+<style>
+  .announcement {
+    background-color: var(--COLOR-ANNOUNCEMENT-BG, #f7f5f0);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  .announcement [data-ticker-text],
+  .announcement [data-ticker-text] p,
+  .announcement [data-ticker-text] strong,
+  .announcement [data-ticker-text] a {
+    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.12em !important;
+    color: #111111 !important;
+    text-transform: uppercase !important;
+  }
+</style>
+<div
+  class="announcement color-{{ section.settings.color_scheme | default: 'scheme-2' }} relative z-[5500] overflow-hidden"
+  style="
+    --PT: {{ section.settings.padding_top | default: 8 }}px;
+    --PB: {{ section.settings.padding_bottom | default: 8 }}px;
+    --underline: calc(var(--font-2) * var(--FONT-ADJUST-ACCENT));
+  "
+  data-announcement-bar
+  data-section-id="{{ section.id }}"
+  data-section-type="announcement"
+  x-data="announcement()"
+>
+  <div
+    class="accent-size-2"
+    x-data="announcementSlider({{ section.settings.speed | default: 5000 }})"
+  >
+    {%- for block in section.blocks -%}
+      <div 
+        x-ref="{{ block.id }}"
+        class="section-padding items-center flex text-center w-full"
+        {{ block.shopify_attributes }}
+      >
+        <div
+          class="w-full px-[--outer] text-[0] overflow-hidden"
+          data-ticker-frame
+          x-data="announcementTicker({ waitForSlider: true })"
+        >
+          <div
+            class="inline-flex items-center transition-opacity duration-500 ease-linear ticker--unloaded"
+            data-ticker-scale
+          >
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}" class="rte--lock-font rte--lock-size px-r6 flex flex-row items-center accent-size-2 hover:underline" data-ticker-text>
+                {{ block.settings.text }}
+              </a>
+            {%- else -%}
+              <div
+                class="rte--lock-font rte--lock-size px-r6 flex flex-row items-center accent-size-2"
+                data-ticker-text
+              >
+                {{ block.settings.text }}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    {%- else -%}
+      <div 
+        class="section-padding items-center flex text-center w-full"
+      >
+        <div
+          class="w-full px-[--outer] text-[0] overflow-hidden"
+          data-ticker-frame
+          x-data="announcementTicker({ waitForSlider: true })"
+        >
+          <div
+            class="inline-flex items-center transition-opacity duration-500 ease-linear ticker--unloaded"
+            data-ticker-scale
+          >
+            <div
+              class="rte--lock-font rte--lock-size px-r6 flex flex-row items-center accent-size-2"
+              data-ticker-text
+            >
+              <p><strong>CYBER MONDAY WEEK SALE 20% OFF ~ CODE: CYBER20</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#f7f5f0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 3000,
+      "max": 8000,
+      "step": 500,
+      "unit": "ms",
+      "label": "Slide speed",
+      "default": 5000
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 4,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 4,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 8
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p><strong>CYBER MONDAY WEEK SALE 20% OFF ~ CODE: CYBER20</strong></p>"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "text",
+        "settings": {
+          "text": "<p><strong>CYBER MONDAY WEEK SALE 20% OFF ~ CODE: CYBER20</strong></p>"
+        }
+      },
+      {
+        "type": "text",
+        "settings": {
+          "text": "<p><strong>Free shipping from €39</strong></p>"
+        }
+      }
+    ]
+  }
+}
+{% endschema %}

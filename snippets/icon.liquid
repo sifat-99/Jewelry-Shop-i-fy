@@ -1,0 +1,33 @@
+{% comment %}
+  Renders an SVG icon.
+  Usage:
+  {% render 'icon', icon: 'bag' %}
+{% endcomment %}
+{%- case icon -%}
+  {%- when 'hamburger' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-hamburger" viewBox="0 0 24 24"><g fill="none" fill-rule="evenodd" stroke-linecap="square" stroke-width="2"><path d="M16 6H3M23 12H3M11 18H3"/></g></svg>
+  {%- when 'bag' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-bag" viewBox="0 0 24 24"><path class="icon-cart-full" d="M7 11h10v8H7z"/><path d="M4 6h16v16H4z"/><path d="M9 9V2h6v7"/></svg>
+  {%- when 'user' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-user" viewBox="0 0 24 24"><path d="m1 22 3.3-4h15.4l3.3 4M17.996 8.242a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
+  {%- when 'search' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-search" viewBox="0 0 24 24"><path stroke-linecap="square" d="M10.1 17.7a7.6 7.6 0 1 0 0-15.2 7.6 7.6 0 0 0 0 15.2Zm11.4 3.8-5.7-5.7"/></svg>
+  {%- when 'close' or 'x' or 'core-x' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  {%- when 'chevron-right' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+  {%- when 'chevron-left' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+  {%- when 'chevron-down' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+  {%- when 'truck' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+  {%- when 'shield-check' or 'waterproof' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+  {%- when 'refresh' or 'return' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+  {%- when 'sparkles' or 'jewelry' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"></path></svg>
+  {%- when 'star' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#E6A540" stroke="#E6A540" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+{%- endcase -%}
