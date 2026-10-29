@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 220" width="100%" height="100%">
+  <defs>
+    <!-- Luxury Gold Gradient -->
+    <linearGradient id="luxuryGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E5C278" />
+      <stop offset="35%" stop-color="#D4AF37" />
+      <stop offset="65%" stop-color="#F3E5AB" />
+      <stop offset="100%" stop-color="#AA7C11" />
+    </linearGradient>
+    <filter id="subtleGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Diamond / Jewel Facet Monogram Emblem -->
+  <g transform="translate(300, 52)" text-anchor="middle" filter="url(#subtleGlow)">
+    <!-- Outer Diamond Contour -->
+    <polygon points="0,-36 32,0 0,36 -32,0" fill="none" stroke="url(#luxuryGold)" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- Inner Facets -->
+    <polygon points="0,-24 22,0 0,24 -22,0" fill="none" stroke="url(#luxuryGold)" stroke-width="1.2" stroke-dasharray="2,2"/>
+    <line x1="0" y1="-36" x2="0" y2="36" stroke="url(#luxuryGold)" stroke-width="1.2"/>
+    <line x1="-32" y1="0" x2="32" y2="0" stroke="url(#luxuryGold)" stroke-width="1.2"/>
+    
+    <!-- Center 'LV' Stylized Initial -->
+    <text x="0" y="7" font-family="'Cinzel', 'Playfair Display', 'Didot', 'Baskerville', serif" font-size="20" font-weight="600" fill="url(#luxuryGold)" letter-spacing="1">LV</text>
+  </g>
+
+  <!-- Main Brand Name: LÈ VELAIR -->
+  <text x="300" y="142" 
+        text-anchor="middle" 
+        font-family="'Playfair Display', 'Didot', 'Cinzel', 'Baskerville', serif" 
+        font-size="34" 
+        font-weight="600" 
+        letter-spacing="9" 
+        fill="#111111">
+    LÈ VELAIR
+  </text>
+
+  <!-- Thin Accent Rule -->
+  <line x1="220" y1="162" x2="380" y2="162" stroke="url(#luxuryGold)" stroke-width="1" opacity="0.8"/>
+  <circle cx="300" cy="162" r="2.5" fill="url(#luxuryGold)"/>
+
+  <!-- Subtitle: FINE JEWELRY -->
+  <text x="300" y="184" 
+        text-anchor="middle" 
+        font-family="'Montserrat', 'Helvetica Neue', 'Futura', sans-serif" 
+        font-size="11" 
+        font-weight="400" 
+        letter-spacing="7" 
+        fill="#555555">
+    FINE JEWELRY
+  </text>
+</svg>
