@@ -1,0 +1,233 @@
+<!-- /snippets/header-mega-menu.liquid -->
+{%- liquid
+  assign style = 'columns'
+  assign cols_count = link.links.size | at_least: 1 | at_most: 6
+  assign image_ratio = '1/1'
+  assign card_radius = section.settings.dropdown_card_radius | default: 0
+  assign overlay_opacity = 0
+  assign btn_style = section.settings.dropdown_button_style | default: 'solid'
+  assign menu_gap = section.settings.dropdown_gap | default: 24
+  assign menu_bg = section.settings.dropdown_global_bg | default: '#ffffff'
+  assign menu_text = section.settings.dropdown_global_text | default: '#111111'
+  assign menu_border = section.settings.dropdown_global_border | default: '#e8e2d9'
+  assign menu_radius = section.settings.dropdown_global_radius | default: 0
+  assign menu_theme = 'light'
+  assign promo_img = blank
+  assign featured_products = blank
+
+  if custom_block != blank
+    assign style = custom_block.settings.dropdown_style | default: 'columns'
+    assign cols_count = custom_block.settings.cols | default: cols_count
+    assign image_ratio = custom_block.settings.image_ratio | default: '1/1'
+    assign overlay_opacity = custom_block.settings.overlay_opacity | default: 0
+    assign btn_style = custom_block.settings.button_style | default: btn_style
+    assign menu_gap = custom_block.settings.card_gap | default: menu_gap
+    assign menu_theme = custom_block.settings.menu_theme | default: 'light'
+    assign promo_img = custom_block.settings.promo_image
+    assign featured_products = custom_block.settings.featured_products
+    if menu_theme == 'dark'
+      assign menu_bg = '#171614'
+      assign menu_text = '#ffffff'
+      assign menu_border = '#34312d'
+    endif
+    assign menu_bg = custom_block.settings.dropdown_background | default: menu_bg
+    assign menu_text = custom_block.settings.dropdown_text | default: menu_text
+    assign menu_border = custom_block.settings.dropdown_border | default: menu_border
+  endif
+
+  case image_ratio
+    when '1/1'
+      assign aspect_ratio_css = '1 / 1'
+    when '4/5'
+      assign aspect_ratio_css = '4 / 5'
+    when '3/4'
+      assign aspect_ratio_css = '3 / 4'
+    when '16/9'
+      assign aspect_ratio_css = '16 / 9'
+    when 'adapt'
+      assign aspect_ratio_css = '4 / 5'
+    else
+      assign aspect_ratio_css = '1 / 1'
+  endcase
+-%}
+
+<div class="header__dropdown lv-header-dropdown lv-dropdown--{{ style }} lv-dropdown-theme--{{ menu_theme }}"
+  data-hover-disclosure
+  id="{{ item_id }}"
+  style="--lv-dd-bg: {{ menu_bg }};
+         --lv-dd-text: {{ menu_text }};
+         --lv-dd-border: {{ menu_border }};
+         --lv-dd-radius: {{ menu_radius }}px;
+         --lv-dd-card-radius: {{ card_radius }}px;
+         --lv-dd-product-ratio: {{ aspect_ratio_css }};
+         --lv-dd-cols: {{ cols_count }};
+         --lv-dd-gap: {{ menu_gap }}px;">
+  <div class="header__dropdown__wrapper wrapper">
+    {%- if style == 'cards' or style == 'carousel' -%}
+      <div class="header__dropdown__inner lv-header-dropdown__inner{% if style == 'carousel' %} lv-header-dropdown__inner--carousel{% endif %}">
+        {%- for child_link in link.links -%}
+          {%- liquid
+            assign child_image = blank
+            assign child_collection = child_link.object
+            if child_collection == blank and child_link.type == 'collection_link'
+              assign child_collection = collections[child_link.handle]
+            endif
+            assign card_block = blank
+            assign current_parent = link.title | downcase | strip
+            assign current_child = child_link.title | downcase | strip
+            for configured_card in section.blocks
+              if configured_card.type == 'mega_menu_card'
+                assign configured_parent = configured_card.settings.menu_item | downcase | strip
+                assign configured_child = configured_card.settings.navigation_item | downcase | strip
+                if configured_parent == current_parent and configured_child == current_child
+                  assign child_image = configured_card.settings.image
+                  if configured_card.settings.collection != blank
+                    assign child_collection = configured_card.settings.collection
+                  endif
+                  if child_image == blank and child_collection != blank
+                    assign child_image = child_collection.image
+                  endif
+                  assign card_block = configured_card
+                  break
+                endif
+              endif
+            endfor
+          -%}
+          <div class="lv-dropdown-col"{% if card_block != blank %} {{ card_block.shopify_attributes }}{% endif %}>
+            <div class="lv-dropdown-card">
+              <a href="{{ child_link.url }}" class="lv-dropdown-img-link" aria-label="{{ child_link.title | escape }}">
+                <div class="lv-dropdown-img-wrap" style="aspect-ratio: {{ aspect_ratio_css }}; border-radius: {{ card_radius }}px;">
+                  {%- if child_image != blank -%}
+                    {{ child_image | image_url: width: 1000 | image_tag: alt: child_link.title, widths: '320, 480, 700, 1000', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy', class: 'lv-dropdown-img' }}
+                  {%- endif -%}
+                  {%- if overlay_opacity > 0 and child_image != blank -%}
+                    <div class="lv-dropdown-overlay" style="background-color: rgba(0, 0, 0, {{ overlay_opacity | divided_by: 100.0 }}); border-radius: {{ card_radius }}px;"></div>
+                  {%- endif -%}
+                </div>
+              </a>
+              <div class="lv-dropdown-actions">
+                <a href="{{ child_link.url }}" class="lv-dropdown-btn lv-dropdown-btn--{{ btn_style }}">
+                  <span class="lv-dropdown-btn-text">{{ child_link.title }}</span>
+                  {%- if btn_style == 'arrow_link' -%}<span class="lv-dropdown-arrow" aria-hidden="true">&rarr;</span>{%- endif -%}
+                </a>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+
+    {%- elsif style == 'editorial' -%}
+      <div class="lv-dropdown-editorial">
+        <div class="lv-dropdown-editorial__copy">
+          {%- if link.links.size > 0 -%}
+            <ul class="lv-dropdown-editorial__links">
+              {%- for child_link in link.links -%}
+                <li><a href="{{ child_link.url }}">{{ child_link.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+        <a href="{{ link.url }}" class="lv-dropdown-editorial__image" aria-label="{{ link.title | escape }}" style="aspect-ratio: {{ aspect_ratio_css }};">
+          {%- if promo_img != blank -%}
+            {{ promo_img | image_url: width: 1600 | image_tag: alt: link.title, widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 55vw, 100vw', loading: 'lazy' }}
+          {%- endif -%}
+        </a>
+      </div>
+
+    {%- elsif style == 'products' -%}
+      <div class="lv-dropdown-products">
+        {%- for product in featured_products limit: 8 -%}
+          <a href="{{ product.url }}" class="lv-dropdown-product">
+            <span class="lv-dropdown-product__image">
+              {%- if product.featured_image != blank -%}
+                {{ product.featured_image | image_url: width: 700 | image_tag: alt: product.featured_image.alt, widths: '240, 360, 480, 700', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy' }}
+              {%- endif -%}
+            </span>
+            <span class="lv-dropdown-product__title">{{ product.title }}</span>
+            <span class="lv-dropdown-product__price">{{ product.price | money }}</span>
+          </a>
+        {%- endfor -%}
+      </div>
+
+    {%- elsif style == 'split' -%}
+      <div class="lv-split-dropdown__inner">
+        <div class="lv-split-links-grid" style="--lv-split-cols: {{ cols_count | minus: 1 | at_least: 2 }};">
+          {%- for child_link in link.links -%}
+            <div class="dropdown__family dropdown__family--grandchild">
+              <a href="{{ child_link.url }}" class="navlink navlink--child{% if child_link.active %} navlink--active{% endif %}">
+                <span class="navtext">{{ child_link.title }}</span>
+              </a>
+              {%- for grandchild_link in child_link.links -%}
+                <a href="{{ grandchild_link.url }}" class="navlink navlink--grandchild{% if grandchild_link.active %} navlink--active{% endif %}">
+                  <span class="navtext">{{ grandchild_link.title }}</span>
+                </a>
+              {%- endfor -%}
+            </div>
+          {%- endfor -%}
+        </div>
+        <div class="lv-split-promo-wrap">
+          <a href="{{ link.url }}" class="lv-dropdown-editorial__image" aria-label="{{ link.title | escape }}" style="aspect-ratio: {{ aspect_ratio_css }};">
+            {%- if promo_img != blank -%}
+              {{ promo_img | image_url: width: 1000 | image_tag: alt: link.title, widths: '320, 480, 700, 1000', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy', class: 'lv-dropdown-img' }}
+            {%- endif -%}
+          </a>
+        </div>
+      </div>
+
+    {%- elsif style == 'columns' -%}
+      <div class="header__dropdown__inner" style="display: grid; grid-template-columns: repeat({{ cols_count }}, minmax(0, 1fr)); gap: {{ menu_gap }}px; max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+        {%- for child_link in link.links -%}
+          {%- liquid
+            assign child_image = blank
+            assign child_collection = child_link.object
+            if child_collection == blank and child_link.type == 'collection_link'
+              assign child_collection = collections[child_link.handle]
+            endif
+            assign current_parent = link.title | downcase | strip
+            assign current_child = child_link.title | downcase | strip
+            for configured_card in section.blocks
+              if configured_card.type == 'mega_menu_card'
+                assign configured_parent = configured_card.settings.menu_item | downcase | strip
+                assign configured_child = configured_card.settings.navigation_item | downcase | strip
+                if configured_parent == current_parent and configured_child == current_child
+                  assign child_image = configured_card.settings.image
+                  if configured_card.settings.collection != blank
+                    assign child_collection = configured_card.settings.collection
+                  endif
+                  break
+                endif
+              endif
+            endfor
+            if child_image == blank and child_collection != blank
+              assign child_image = child_collection.image
+            endif
+          -%}
+          <div class="dropdown__family dropdown__family--grandchild">
+            {%- if child_image != blank -%}
+              <a href="{{ child_link.url }}" class="lv-dropdown-collection-image" aria-label="{{ child_link.title | escape }}" style="aspect-ratio: {{ aspect_ratio_css }}; border-radius: {{ card_radius }}px;">
+                {{ child_image | image_url: width: 800 | image_tag: alt: child_link.title, widths: '240, 360, 540, 800', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy', class: 'lv-dropdown-img' }}
+              </a>
+            {%- endif -%}
+            <a href="{{ child_link.url }}" class="navlink navlink--child{% if child_link.active %} navlink--active{% endif %}">
+              <span class="navtext">{{ child_link.title }}</span>
+            </a>
+            {%- for grandchild_link in child_link.links -%}
+              <a href="{{ grandchild_link.url }}" class="navlink navlink--grandchild{% if grandchild_link.active %} navlink--active{% endif %}">
+                <span class="navtext">{{ grandchild_link.title }}</span>
+              </a>
+            {%- endfor -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+    {%- else -%}
+      <div class="header__dropdown__inner" style="display: flex; flex-direction: column; gap: 8px; max-width: 320px; margin: 0 auto; padding: 0 16px;">
+        {%- for child_link in link.links -%}
+          <a href="{{ child_link.url }}" class="navlink navlink--child{% if child_link.active %} navlink--active{% endif %}">
+            <span class="navtext">{{ child_link.title }}</span>
+          </a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
