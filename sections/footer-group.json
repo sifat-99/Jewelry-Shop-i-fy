@@ -1,0 +1,71 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "Footer Group",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "logo_width": 170,
+        "footer_menu": "footer",
+        "show_social_column": true,
+        "social_column_title": "Social",
+        "padding_top": 50,
+        "padding_bottom": 40
+      }
+    },
+    "subfooter": {
+      "type": "subfooter",
+      "settings": {
+        "color_scheme": "scheme-2",
+        "layout_align": "between",
+        "show_border_top": true,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "show_logo": false,
+        "logo_width": 90,
+        "logo_link": "",
+        "copyright_text": "© {year} AURELLE. All rights reserved.",
+        "copyright_link": "",
+        "show_powered_by": true,
+        "additional_text": "<p>Developed by <a href=\"https://bssoln.com/\" target=\"_blank\"><strong>Bangladesh Software Solution</strong></a></p>",
+        "show_payment_icons": true,
+        "payment_icons_mode": "custom",
+        "custom_payment_image_width": 240,
+        "payment_visa": true,
+        "payment_mastercard": true,
+        "payment_amex": false,
+        "payment_apple_pay": false,
+        "payment_google_pay": false,
+        "payment_paypal": true,
+        "payment_shop_pay": true,
+        "payment_maestro": true,
+        "payment_ideal": true,
+        "payment_bancontact": true,
+        "payment_blik": true,
+        "payment_mobilepay": true,
+        "payment_klarna": false,
+        "payment_cod": false,
+        "payment_bkash": false,
+        "show_trust_badges": false,
+        "trust_badge_1_link": "",
+        "trust_badge_2_link": "",
+        "trust_badge_3_link": "",
+        "trust_badges_height": 24
+      }
+    }
+  },
+  "order": [
+    "footer",
+    "subfooter"
+  ]
+}
