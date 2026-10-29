@@ -1,0 +1,1360 @@
+<!-- /sections/header.liquid -->
+{%- liquid
+  if settings.use_brand_logo and shop.brand.logo != blank
+    assign global_logo = shop.brand.logo
+  elsif settings.logo != blank
+    assign global_logo = settings.logo
+  else
+    assign global_logo = shop.brand.logo
+  endif
+  assign header_logo = section.settings.logo | default: global_logo
+  assign header_logo_width = section.settings.logo_width | default: settings.logo_width | default: 140
+  assign header_padding = section.settings.padding_vertical | default: 8
+  assign logo_ratio = header_logo.aspect_ratio | default: 2.5
+  assign mobile_logo_align = section.settings.mobile_logo_alignment | default: settings.mobile_logo_alignment | default: 'center'
+  assign mobile_logo_w = settings.logo_width_mobile | default: 110
+  assign sticky_mode = section.settings.sticky_header_type
+  if sticky_mode == blank
+    if section.settings.sticky_header == false or section.settings.sticky_header == 'none'
+      assign sticky_mode = 'none'
+    elsif section.settings.sticky_header == 'scroll_up'
+      assign sticky_mode = 'scroll_up'
+    else
+      assign sticky_mode = 'always'
+    endif
+  endif
+-%}
+<style data-shopify>
+  :root {
+    --COLOR-NAV-TEXT-TRANSPARENT: #ffffff;
+    --COLOR-HEADER-TRANSPARENT-GRADIENT: rgba(0, 0, 0, 0.2);
+    --LOGO-PADDING: {{ header_padding }}px;
+    --menu-backfill-height: 0px;
+  }
+  {%- if sticky_mode == 'always' -%}
+    #shopify-section-{{ section.id }} {
+      position: -webkit-sticky !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 6000 !important;
+      width: 100% !important;
+      background-color: var(--bg, #ffffff) !important;
+    }
+    #shopify-section-{{ section.id }} .header__wrapper {
+      position: relative !important;
+      top: auto !important;
+      background-color: var(--bg, #ffffff) !important;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06) !important;
+    }
+    #shopify-section-{{ section.id }} .theme__header,
+    #shopify-section-{{ section.id }} .js__header__stuck--animated .theme__header {
+      transform: none !important;
+      transition: none !important;
+    }
+  {%- elsif sticky_mode == 'scroll_up' -%}
+    #shopify-section-{{ section.id }} {
+      position: -webkit-sticky !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 6000 !important;
+      width: 100% !important;
+      background-color: var(--bg, #ffffff) !important;
+      transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+    }
+    #shopify-section-{{ section.id }}.lv-header--hidden {
+      transform: translateY(-100%) !important;
+    }
+    #shopify-section-{{ section.id }} .header__wrapper {
+      position: relative !important;
+      top: auto !important;
+      background-color: var(--bg, #ffffff) !important;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06) !important;
+    }
+    #shopify-section-{{ section.id }} .theme__header,
+    #shopify-section-{{ section.id }} .js__header__stuck--animated .theme__header {
+      transform: none !important;
+    }
+  {%- else -%}
+    #shopify-section-{{ section.id }} {
+      position: static !important;
+    }
+    #shopify-section-{{ section.id }} .header__wrapper {
+      position: relative !important;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06) !important;
+    }
+  {%- endif -%}
+  .theme__header {
+    position: relative !important;
+    border-bottom: 1px solid var(--border, #f0f0f0);
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    transform: none !important;
+  }
+  /* Desktop Header vs Mobile Header visibility */
+  @media only screen and (min-width: 990px) {
+    .header__mobile {
+      display: none !important;
+    }
+    .header__desktop {
+      display: flex !important;
+      padding-top: {{ header_padding }}px !important;
+      padding-bottom: {{ header_padding }}px !important;
+      min-height: auto !important;
+    }
+  }
+
+  @media only screen and (max-width: 989px) {
+    .header__desktop {
+      display: none !important;
+    }
+    .header__mobile {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      position: relative !important;
+      width: 100% !important;
+      padding-top: {{ header_padding }}px !important;
+      padding-bottom: {{ header_padding }}px !important;
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+      min-height: auto !important;
+      box-sizing: border-box !important;
+    }
+  }
+
+  .js__show__mobile .header__desktop,
+  [data-header-style="drawer"] .header__desktop {
+    display: none !important;
+  }
+  .js__show__mobile .header__mobile,
+  [data-header-style="drawer"] .header__mobile {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    position: relative !important;
+    width: 100% !important;
+    padding-top: {{ header_padding }}px !important;
+    padding-bottom: {{ header_padding }}px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    min-height: auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .header__mobile__left,
+  .header__mobile__right {
+    display: flex !important;
+    align-items: center !important;
+    min-width: 44px !important;
+    z-index: 5 !important;
+  }
+  .header__mobile__left {
+    justify-content: flex-start !important;
+  }
+  .header__mobile__right {
+    justify-content: flex-end !important;
+  }
+  .header__mobile .header__logo {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: 4 !important;
+  }
+  .header__mobile .header__logo__link {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: auto !important;
+    max-width: 100% !important;
+  }
+  .header__mobile .header__logo__link img {
+    max-width: {{ mobile_logo_w }}px !important;
+    max-height: 44px !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+  }
+  {%- if mobile_logo_align == 'left' -%}
+    .header__mobile {
+      justify-content: flex-start !important;
+      gap: 12px !important;
+    }
+    .header__mobile .header__logo {
+      justify-content: flex-start !important;
+      flex: 1 !important;
+      position: static !important;
+      transform: none !important;
+    }
+    .header__mobile .header__logo__link {
+      justify-content: flex-start !important;
+    }
+    .header__mobile__right {
+      margin-left: auto !important;
+    }
+  {%- else -%}
+    .header__mobile .header__logo {
+      position: absolute !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      justify-content: center !important;
+      max-width: calc(100% - 120px) !important;
+      pointer-events: auto !important;
+    }
+    .header__mobile .header__logo__link {
+      justify-content: center !important;
+    }
+  {%- endif -%}
+  .header__desktop .header__logo {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .header__desktop .header__logo__link {
+    display: flex !important;
+    align-items: center;
+  }
+  .header__desktop .header__logo__link img {
+    max-height: 52px;
+    width: auto;
+    object-fit: contain;
+  }
+  .header__drawer .drawer__top {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 14px 18px !important;
+    border-bottom: 1px solid var(--border, #f0f0f0) !important;
+  }
+  .header__drawer .drawer__top__center {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    text-align: center !important;
+  }
+  /* Drawer top bar: equal side columns so the logo is truly centred */
+  .header__drawer .drawer__top {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+    gap: 8px;
+    padding: 8px 12px !important;
+    height: auto !important;
+    min-height: 60px;
+    box-sizing: border-box !important;
+  }
+  .header__drawer .drawer__top__left,
+  .header__drawer .drawer__top .drawer__close {
+    box-sizing: border-box !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .header__drawer .drawer__top__left { justify-self: start; }
+  .header__drawer .drawer__top .drawer__close { justify-self: end; }
+  .header__drawer .drawer__account {
+    box-sizing: border-box !important;
+    width: 44px !important;
+    height: 44px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: inherit;
+  }
+  .header__drawer .drawer__account svg,
+  .header__drawer .drawer__top .drawer__close svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .header__drawer .drawer__logo__link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .header__backfill {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
+  /* High-Contrast Luxury Header Navigation */
+  .navlink--toplevel {
+    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.09em !important;
+    color: #111111 !important;
+    opacity: 1 !important;
+    text-transform: uppercase !important;
+  }
+  .navlink--toplevel .navtext {
+    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.09em !important;
+    color: #111111 !important;
+  }
+  .header__menu__inner .menu__item .navlink--toplevel {
+    opacity: 1 !important;
+  }
+  .header__menu__inner:hover .menu__item:not(:hover) .navlink--toplevel {
+    opacity: 0.72 !important;
+  }
+  .header__menu__inner .menu__item:hover .navlink--toplevel {
+    opacity: 1 !important;
+    color: #000000 !important;
+  }
+  .header__desktop__button .navlink,
+  .header__mobile__button {
+    color: #111111 !important;
+    opacity: 1 !important;
+  }
+  .header__desktop__button svg,
+  .header__mobile__button svg {
+    color: #111111 !important;
+    stroke: #111111 !important;
+  }
+
+  /* Icon buttons (account / search / cart): the link itself is a 44px circle, so the hover background can never be clipped */
+  .header__desktop__buttons--icons .header__desktop__button {
+    display: flex;
+    align-items: center;
+    margin-right: 0 !important;
+  }
+  .header__desktop__buttons--icons .header__desktop__button .navlink {
+    position: relative;
+    box-sizing: border-box;
+    min-width: 44px;
+    height: 44px !important;
+    padding: 0 !important;
+    margin: 0 2px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    overflow: visible !important;
+    border-radius: 999px;
+    background-color: transparent;
+    transition: background-color 0.25s ease;
+  }
+  .header__desktop__buttons--icons .header__desktop__button .navlink:after,
+  .header__desktop__buttons--icons .header__desktop__button:last-child > a:after {
+    display: none !important;
+    content: none !important;
+  }
+  /* The (empty) cart status text must not take flex space, or the icon sits off-center */
+  .header__desktop__buttons--icons .header__cart__status {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .header__desktop__buttons--icons .header__desktop__button .navlink svg {
+    flex: 0 0 auto;
+    margin: 0 !important;
+  }
+  .header__desktop__buttons--icons .header__desktop__button .navlink:hover,
+  .header__desktop__buttons--icons .header__desktop__button .navlink:focus-visible {
+    background-color: rgba(var(--color-foreground, 17, 17, 17), 0.08);
+  }
+
+  /* =============================================================
+     Universal Header Dropdown Customization & Styling
+     ============================================================= */
+  :root {
+    --lv-dd-global-bg: {{ section.settings.dropdown_global_bg | default: '#ffffff' }};
+    --lv-dd-global-text: {{ section.settings.dropdown_global_text | default: '#111111' }};
+    --lv-dd-global-hover: {{ section.settings.dropdown_global_hover | default: '#666666' }};
+    --lv-dd-global-border: {{ section.settings.dropdown_global_border | default: '#e8e2d9' }};
+    --lv-dd-global-radius: {{ section.settings.dropdown_global_radius | default: 0 }}px;
+    --lv-dd-pad-y: {{ section.settings.dropdown_padding_y | default: 24 }}px;
+    --lv-dd-link-size: {{ section.settings.dropdown_link_size | default: 12 }}px;
+    --lv-dd-heading-size: {{ section.settings.dropdown_heading_size | default: 13 }}px;
+    --lv-dd-font-weight: {{ section.settings.dropdown_font_weight | default: '500' }};
+    --lv-dd-text-transform: {{ section.settings.dropdown_text_transform | default: 'uppercase' }};
+    {%- case section.settings.dropdown_global_shadow -%}
+      {%- when 'none' -%}
+        --lv-dd-global-shadow: none;
+      {%- when 'subtle' -%}
+        --lv-dd-global-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      {%- when 'medium' -%}
+        --lv-dd-global-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
+      {%- when 'deep' -%}
+        --lv-dd-global-shadow: 0 20px 50px rgba(0, 0, 0, 0.16);
+      {%- else -%}
+        --lv-dd-global-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    {%- endcase -%}
+  }
+
+  .header__dropdown {
+    background-color: var(--lv-dd-bg, var(--lv-dd-global-bg, #ffffff)) !important;
+    color: var(--lv-dd-text, var(--lv-dd-global-text, #111111)) !important;
+    border: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, #e8e2d9)) !important;
+    box-shadow: var(--lv-dd-global-shadow, 0 10px 30px rgba(0, 0, 0, 0.05)) !important;
+    border-radius: var(--lv-dd-radius, var(--lv-dd-global-radius, 0px)) !important;
+    padding-top: var(--lv-dd-pad-y, 24px) !important;
+    padding-bottom: var(--lv-dd-pad-y, 24px) !important;
+    box-sizing: border-box !important;
+  }
+  .header__dropdown .navlink,
+  .header__dropdown .navlink--child,
+  .header__dropdown .navlink--grandchild {
+    color: var(--lv-dd-text, var(--lv-dd-global-text, #111111)) !important;
+    font-size: var(--lv-dd-link-size, 12px) !important;
+    font-weight: var(--lv-dd-font-weight, 500) !important;
+    text-transform: var(--lv-dd-text-transform, uppercase) !important;
+    letter-spacing: 0.08em !important;
+    transition: color 0.2s ease, opacity 0.2s ease !important;
+  }
+  .header__dropdown .navlink:hover,
+  .header__dropdown .navlink--child:hover,
+  .header__dropdown .navlink--grandchild:hover,
+  .header__dropdown .navlink:hover .navtext,
+  .header__dropdown .navlink--child:hover .navtext,
+  .header__dropdown .navlink--grandchild:hover .navtext {
+    color: var(--lv-dd-global-hover, #666666) !important;
+  }
+  .header__dropdown .dropdown__family--grandchild .navlink--child {
+    font-size: var(--lv-dd-heading-size, 13px) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.12em !important;
+    margin-bottom: 10px !important;
+    padding-bottom: 6px !important;
+    border-bottom: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, #e8e2d9)) !important;
+    display: inline-block !important;
+  }
+  .header__dropdown .dropdown__family--grandchild .navlink--grandchild {
+    display: block !important;
+    padding: 4px 0 !important;
+    font-size: var(--lv-dd-link-size, 12px) !important;
+    font-weight: 500 !important;
+  }
+  .menu__item.parent .header__dropdown {
+    width: auto !important;
+    min-width: 220px !important;
+    left: auto !important;
+    border: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, #e8e2d9)) !important;
+    border-radius: var(--lv-dd-radius, var(--lv-dd-global-radius, 0px)) !important;
+    box-shadow: var(--lv-dd-global-shadow, 0 10px 30px rgba(0, 0, 0, 0.08)) !important;
+    padding: var(--lv-dd-pad-y, 24px) 0 !important;
+  }
+  .menu__item.parent .header__dropdown .header__dropdown__wrapper {
+    max-width: none !important;
+    padding: 0 16px !important;
+  }
+  .menu__item.parent .header__dropdown .header__dropdown__inner {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  .menu__item.parent .header__dropdown .navlink--child {
+    padding: 6px 12px !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    display: block !important;
+  }
+  .menu__item.parent .header__dropdown .navlink--child:hover {
+    background-color: color-mix(in srgb, var(--lv-dd-text, #111111) 8%, transparent) !important;
+  }
+
+  /* Split Layout */
+  .lv-split-dropdown__inner {
+    display: grid !important;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) !important;
+    gap: var(--lv-dd-gap, 24px) !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    align-items: start !important;
+  }
+  .lv-split-links-grid {
+    display: grid !important;
+    grid-template-columns: repeat(var(--lv-split-cols, 3), minmax(0, 1fr)) !important;
+    gap: var(--lv-dd-gap, 24px) !important;
+  }
+  .lv-split-promo-wrap {
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+  }
+
+  /* =============================================================
+     Bestsellers & Promotional Mega Dropdown Cards & Buttons
+     ============================================================= */
+  .lv-header-dropdown {
+    background-color: var(--lv-dd-bg, var(--lv-dd-global-bg, #ffffff)) !important;
+    color: var(--lv-dd-text, var(--lv-dd-global-text, #111111)) !important;
+    border: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, #e8e2d9)) !important;
+    border-radius: var(--lv-dd-radius, var(--lv-dd-global-radius, 0px)) !important;
+    padding: var(--lv-dd-pad-y, 24px) 0 !important;
+    box-shadow: var(--lv-dd-global-shadow, 0 8px 24px rgba(0, 0, 0, 0.06)) !important;
+    width: 100% !important;
+    left: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .lv-header-dropdown > .header__dropdown__wrapper {
+    width: 100% !important;
+    max-width: 1240px !important;
+    margin: 0 auto !important;
+    padding: 0 20px !important;
+    box-sizing: border-box !important;
+  }
+  .lv-header-dropdown__inner {
+    display: grid !important;
+    grid-template-columns: repeat(var(--lv-dd-cols, 4), minmax(0, 1fr)) !important;
+    gap: var(--lv-dd-gap, 24px) !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .lv-header-dropdown.lv-dropdown--columns .header__dropdown__inner {
+    grid-template-columns: repeat(var(--lv-dd-cols, 4), minmax(0, 1fr)) !important;
+    gap: var(--lv-dd-gap, 24px) !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .lv-header-dropdown.lv-dropdown--simple .header__dropdown__inner {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+  .lv-header-dropdown__inner--carousel {
+    display: grid !important;
+    grid-auto-flow: column !important;
+    grid-auto-columns: minmax(220px, 1fr) !important;
+    grid-template-columns: none !important;
+    overflow-x: auto !important;
+    overscroll-behavior-x: contain !important;
+    scroll-snap-type: x mandatory !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 8px !important;
+  }
+  .lv-header-dropdown__inner--carousel::-webkit-scrollbar {
+    display: none;
+  }
+  .lv-header-dropdown__inner--carousel > .lv-dropdown-col {
+    scroll-snap-align: start;
+  }
+  .lv-dropdown-editorial {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(24px, 5vw, 72px);
+    align-items: center;
+    width: 100%;
+  }
+  .lv-dropdown-editorial__copy {
+    max-width: 420px;
+    padding: 8px 0;
+  }
+  .lv-dropdown-editorial__copy h3 {
+    margin: 0 0 14px;
+    color: var(--lv-dd-text, #111111);
+    font-family: 'Quicksand', sans-serif;
+    font-size: clamp(22px, 2vw, 32px);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+  }
+  .lv-dropdown-editorial__description,
+  .lv-dropdown-promo-description {
+    margin: 0 0 18px;
+    color: var(--lv-dd-text, #111111);
+    font-size: 13px;
+    line-height: 1.65;
+    opacity: 0.78;
+  }
+  .lv-dropdown-editorial__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin: 18px 0 22px;
+    padding: 0;
+    list-style: none;
+  }
+  .lv-dropdown-editorial__links a {
+    color: var(--lv-dd-text, #111111);
+    font-size: 12px;
+    text-decoration: none;
+  }
+  .lv-dropdown-editorial__links a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .lv-dropdown-editorial__image {
+    display: block;
+    width: 100%;
+    max-height: min(48vh, 440px);
+    overflow: hidden;
+    border-radius: var(--lv-dd-card-radius, 0px);
+    background: transparent;
+  }
+  .lv-dropdown-editorial__image img,
+  .lv-dropdown-editorial__image svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-height: min(48vh, 440px);
+    object-fit: cover;
+  }
+  .lv-dropdown-products {
+    display: grid;
+    grid-template-columns: repeat(var(--lv-dd-cols, 4), minmax(0, 1fr));
+    gap: var(--lv-dd-gap, 24px);
+  }
+  .lv-dropdown-product {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    color: var(--lv-dd-text, #111111);
+    text-decoration: none;
+  }
+  .lv-dropdown-product__image {
+    display: block;
+    width: 100%;
+    aspect-ratio: var(--lv-dd-product-ratio, 4 / 5);
+    overflow: hidden;
+    border-radius: var(--lv-dd-card-radius, 0px);
+    background: transparent;
+  }
+  .lv-dropdown-product__image img,
+  .lv-dropdown-product__image svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 350ms ease;
+  }
+  .lv-dropdown-product:hover .lv-dropdown-product__image img {
+    transform: scale(1.035);
+  }
+  .lv-dropdown-product__title,
+  .lv-dropdown-product__price {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .lv-dropdown-product__price {
+    opacity: 0.68;
+  }
+  .lv-dropdown-empty {
+    grid-column: 1 / -1;
+    padding: 18px;
+    color: var(--lv-dd-text, #111111);
+    font-size: 13px;
+    text-align: center;
+  }
+  @media (max-width: 989px) {
+    .lv-header-dropdown__inner {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 16px !important;
+    }
+    .lv-header-dropdown__inner--carousel {
+      grid-auto-columns: minmax(200px, 42vw) !important;
+    }
+    .lv-dropdown-editorial {
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .lv-dropdown-products {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 767px) {
+    .lv-dropdown-editorial {
+      grid-template-columns: 1fr;
+    }
+    .lv-dropdown-editorial__image {
+      grid-row: 1;
+      max-height: 280px;
+    }
+    .lv-dropdown-editorial__image img,
+    .lv-dropdown-editorial__image svg {
+      max-height: 280px;
+    }
+    .lv-dropdown-products {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .lv-dropdown-col {
+    position: relative;
+    width: 100%;
+  }
+  .lv-dropdown-collection-image {
+    display: block;
+    width: 100%;
+    margin: 0 0 12px;
+    overflow: hidden;
+    border-radius: var(--lv-dd-card-radius, 0px);
+  }
+  .lv-dropdown-collection-image .lv-dropdown-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .lv-dropdown-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+  }
+  .lv-dropdown-img-link {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-decoration: none;
+  }
+  .lv-dropdown-img-wrap {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background-color: transparent;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+  }
+  .lv-dropdown-img-wrap:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+  .lv-dropdown-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .lv-dropdown-card:hover .lv-dropdown-img {
+    transform: scale(1.05);
+  }
+  .lv-dropdown-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .lv-dropdown-actions {
+    padding-top: 14px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .lv-dropdown-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    text-decoration: none !important;
+    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+    transition: all 0.25s ease-in-out !important;
+    box-sizing: border-box !important;
+    line-height: 1.2 !important;
+  }
+  /* Outline Luxury Button (Default - Clean & NOT black) */
+  .lv-dropdown-btn--outline {
+    background-color: var(--lv-dd-btn-bg, #ffffff) !important;
+    color: var(--lv-dd-btn-text, #111111) !important;
+    border: 1px solid var(--lv-dd-btn-border, #111111) !important;
+    padding: 9px 24px !important;
+    border-radius: var(--lv-dd-btn-radius, 0px) !important;
+  }
+  .lv-dropdown-btn--outline:hover {
+    background-color: var(--lv-dd-btn-hover-bg, #111111) !important;
+    color: var(--lv-dd-btn-hover-text, #ffffff) !important;
+    border-color: var(--lv-dd-btn-hover-bg, #111111) !important;
+  }
+  /* Solid Button */
+  .lv-dropdown-btn--solid {
+    background-color: var(--lv-dd-btn-bg, #111111) !important;
+    color: var(--lv-dd-btn-text, #ffffff) !important;
+    border: 1px solid var(--lv-dd-btn-border, #111111) !important;
+    padding: 9px 24px !important;
+    border-radius: var(--lv-dd-btn-radius, 0px) !important;
+  }
+  .lv-dropdown-btn--solid:hover {
+    background-color: var(--lv-dd-btn-hover-bg, #333333) !important;
+    color: var(--lv-dd-btn-hover-text, #ffffff) !important;
+    border-color: var(--lv-dd-btn-hover-bg, #333333) !important;
+  }
+  /* Pill Button */
+  .lv-dropdown-btn--pill {
+    background-color: var(--lv-dd-btn-bg, #ffffff) !important;
+    color: var(--lv-dd-btn-text, #111111) !important;
+    border: 1px solid var(--lv-dd-btn-border, #111111) !important;
+    padding: 9px 26px !important;
+    border-radius: 9999px !important;
+  }
+  .lv-dropdown-btn--pill:hover {
+    background-color: var(--lv-dd-btn-hover-bg, #111111) !important;
+    color: var(--lv-dd-btn-hover-text, #ffffff) !important;
+  }
+  /* Minimalist Arrow Link (Zero background) */
+  .lv-dropdown-btn--arrow_link {
+    background-color: transparent !important;
+    background: transparent !important;
+    color: var(--lv-dd-btn-text, #111111) !important;
+    border: none !important;
+    padding: 6px 0 !important;
+    border-radius: 0 !important;
+  }
+  .lv-dropdown-btn--arrow_link:hover {
+    background-color: transparent !important;
+    background: transparent !important;
+    color: var(--lv-dd-btn-hover-bg, #000000) !important;
+  }
+  .lv-dropdown-btn--arrow_link .lv-dropdown-arrow {
+    display: inline-block;
+    transition: transform 0.25s ease;
+  }
+  .lv-dropdown-btn--arrow_link:hover .lv-dropdown-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Mega-menu CTAs share the global button settings and sliding fill. */
+  .lv-header-dropdown .lv-dropdown-btn {
+    position: relative !important;
+    isolation: isolate !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    padding: 9px 24px !important;
+    border: 1px solid var(--btn-regular-border, #000000) !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    background: var(--btn-regular-bg, #000000) !important;
+    color: var(--btn-regular-text, #ffffff) !important;
+    transition: border-color var(--btn-animation-duration, 350ms) ease-in-out, box-shadow var(--btn-animation-duration, 350ms) ease-in-out !important;
+  }
+  .lv-header-dropdown .lv-dropdown-btn::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    border-radius: inherit !important;
+    background: var(--btn-regular-hover-bg, #2b2622) !important;
+    opacity: 0 !important;
+    transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+    pointer-events: none !important;
+  }
+  .lv-header-dropdown .lv-dropdown-btn:hover::before {
+    opacity: 1 !important;
+  }
+  .lv-header-dropdown .lv-dropdown-btn:hover {
+    border-color: var(--btn-regular-hover-border, #2b2622) !important;
+    color: var(--btn-regular-hover-text, #ffffff) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+  .lv-header-dropdown .lv-dropdown-btn > *,
+  .lv-header-dropdown .lv-dropdown-btn:hover > * {
+    position: relative !important;
+    z-index: 1 !important;
+    color: inherit !important;
+    transition: color var(--btn-animation-duration, 350ms) ease-in-out !important;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="header__wrapper color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
+  data-header-wrapper
+  style="--bar-opacity: 0; --bar-width: 0; --bar-left: 0;"
+  data-header-transparent="false"
+  data-underline-current="true"
+  data-header-sticky="{% if sticky_mode == 'none' %}none{% else %}sticky{% endif %}"
+  data-header-style="menu_center"
+  data-section-id="sections--22414136049929__header"
+  data-section-type="header">
+  <header class="theme__header" data-header-height>
+
+
+    <div class="header__inner"
+
+data-header-cart-full="false"
+>
+      <div class="wrapper--full">
+        <div class="header__mobile">
+
+    <div class="header__mobile__left">
+      <button class="header__mobile__button"
+        data-drawer-toggle="hamburger"
+        aria-label="Open menu"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="header-menu">
+        <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-hamburger" viewBox="0 0 24 24"><g fill="none" fill-rule="evenodd" stroke-linecap="square" stroke-width="2"><path d="M16 6H3M23 12H3M11 18H3"/></g></svg>
+      </button>
+    </div>
+
+    <div class="header__logo header__logo--image header__logo--mobile">
+      <a class="header__logo__link"
+        href="{{ routes.root_url }}"
+        aria-label="{{ shop.name | escape }}"
+      >
+        {%- if header_logo != blank -%}
+          {%- assign mobile_logo_w_2x = mobile_logo_w | times: 2 -%}
+          {%- assign mobile_logo_w_3x = mobile_logo_w | times: 3 -%}
+          <img src="{{ header_logo | image_url: width: mobile_logo_w_2x }}"
+            srcset="{{ header_logo | image_url: width: mobile_logo_w }} 1x, {{ header_logo | image_url: width: mobile_logo_w_2x }} 2x, {{ header_logo | image_url: width: mobile_logo_w_3x }} 3x"
+            alt="{{ header_logo.alt | default: shop.name | escape }}"
+            width="{{ mobile_logo_w }}"
+            height="{{ mobile_logo_w | divided_by: logo_ratio | round }}"
+            loading="eager" class="logo__img logo__img--color"
+            style="max-width: {{ mobile_logo_w }}px; height: auto; -webkit-backface-visibility: hidden; image-rendering: -webkit-optimize-contrast;">
+        {%- else -%}
+          <img src="{{ 'aurelle_fine_jewelry_logo_transparent.png' | asset_url }}" alt="{{ shop.name | escape }}" width="{{ mobile_logo_w }}" height="{{ mobile_logo_w | divided_by: 4.1 | round }}" loading="eager" class="logo__img logo__img--color" style="max-width: {{ mobile_logo_w }}px; height: auto;">
+        {%- endif -%}
+      </a>
+    </div>
+
+    <div class="header__mobile__right">
+      <a class="header__mobile__button"
+       data-drawer-toggle="drawer-cart"
+        href="{{ routes.cart_url }}">
+        <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-bag" viewBox="0 0 24 24"><path class="icon-cart-full" d="M7 11h10v8H7z"/><path d="M4 6h16v16H4z"/><path d="M9 9V2h6v7"/></svg>
+        <span class="visually-hidden">Shopping cart</span>
+
+  <span class="header__cart__status">
+    <span data-header-cart-price="{{ cart.total_price }}">
+      {{ cart.total_price | money }}
+    </span>
+    <span data-header-cart-count="{{ cart.item_count }}">
+      ({{ cart.item_count }})
+    </span>
+    <span
+
+data-header-cart-full="false"
+></span>
+  </span>
+
+      </a>
+    </div>
+
+        </div>
+
+        <div data-header-desktop class="header__desktop header__desktop--menu_center"><div  data-takes-space class="header__desktop__bar__l">
+    <div class="header__logo header__logo--image">
+      <a class="header__logo__link"
+        href="{{ routes.root_url }}"
+        style="--LOGO-WIDTH: {{ header_logo_width }}px"
+        aria-label="{{ shop.name | escape }}"
+      >
+        {%- if header_logo != blank -%}
+          {%- assign header_logo_width_2x = header_logo_width | times: 2 -%}
+          {%- assign header_logo_width_3x = header_logo_width | times: 3 -%}
+          <img src="{{ header_logo | image_url: width: header_logo_width_2x }}"
+            srcset="{{ header_logo | image_url: width: header_logo_width }} 1x, {{ header_logo | image_url: width: header_logo_width_2x }} 2x, {{ header_logo | image_url: width: header_logo_width_3x }} 3x"
+            alt="{{ header_logo.alt | default: shop.name | escape }}"
+            width="{{ header_logo_width }}"
+            height="{{ header_logo_width | divided_by: logo_ratio | round }}"
+            loading="eager" class="logo__img logo__img--color"
+            style="max-width: {{ header_logo_width }}px; height: auto; -webkit-backface-visibility: hidden; image-rendering: -webkit-optimize-contrast;">
+        {%- else -%}
+          <img src="{{ 'aurelle_fine_jewelry_logo_transparent.png' | asset_url }}" alt="{{ shop.name | escape }}" width="{{ header_logo_width }}" height="{{ header_logo_width | divided_by: 4.1 | round }}" loading="eager" class="logo__img logo__img--color" style="max-width: {{ header_logo_width }}px; height: auto;">
+        {%- endif -%}
+      </a>
+    </div>
+</div>
+              <div  data-takes-space class="header__desktop__bar__c">
+  <nav class="header__menu">
+    <div class="header__menu__inner" data-text-items-wrapper>
+      {%- assign menu_handle = section.settings.main_menu_link_list | default: 'main-menu' -%}
+      {%- assign main_menu = linklists[menu_handle] -%}
+      {%- if main_menu != blank and main_menu.links.size > 0 -%}
+        {%- for link in main_menu.links -%}
+          {% render 'nav-item', link: link, link_index: forloop.index, section: section %}
+        {%- endfor -%}
+      {%- endif -%}
+      <div class="hover__bar"></div>
+      <div class="hover__bg"></div>
+    </div>
+  </nav>
+</div>
+              <div  data-takes-space class="header__desktop__bar__r">
+<div class="header__desktop__buttons header__desktop__buttons--icons" ><div class="header__desktop__button " >
+        <a href="{{ routes.account_url }}" class="navlink"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-user" viewBox="0 0 24 24"><path d="m1 22 3.3-4h15.4l3.3 4M17.996 8.242a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
+            <span class="visually-hidden">My Account</span></a>
+      </div>
+
+
+
+      <div class="header__desktop__button " >
+        <a href="{{ routes.search_url }}" class="navlink" data-popdown-toggle="search-popdown">
+
+            <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-search" viewBox="0 0 24 24"><path stroke-linecap="square" d="M10.1 17.7a7.6 7.6 0 1 0 0-15.2 7.6 7.6 0 0 0 0 15.2Zm11.4 3.8-5.7-5.7"/></svg>
+            <span class="visually-hidden">Search</span>
+
+        </a>
+      </div>
+
+
+    <div class="header__desktop__button " >
+      <a href="{{ routes.cart_url }}"
+        class="navlink navlink--cart"
+        data-drawer-toggle="drawer-cart">
+
+          <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-bag" viewBox="0 0 24 24"><path class="icon-cart-full" d="M7 11h10v8H7z"/><path d="M4 6h16v16H4z"/><path d="M9 9V2h6v7"/></svg>
+          <span class="visually-hidden">Shopping cart</span>
+
+  <span class="header__cart__status">
+    <span data-header-cart-price="{{ cart.total_price }}">
+      {{ cart.total_price | money }}
+    </span>
+    <span data-header-cart-count="{{ cart.item_count }}">
+      ({{ cart.item_count }})
+    </span>
+    <span
+
+data-header-cart-full="false"
+></span>
+  </span>
+
+
+      </a>
+    </div>
+
+  </div>
+</div></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="drawer header__drawer display-none"
+    data-drawer="hamburger"
+    aria-label="Main menu"
+    id="header-menu">
+    <div class="drawer__content">
+      <div class="drawer__top">
+        <div class="drawer__top__left">
+          <a class="drawer__account" href="{{ routes.account_url }}">
+            <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-user" viewBox="0 0 24 24"><path d="m1 22 3.3-4h15.4l3.3 4M17.996 8.242a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
+            <span class="visually-hidden">My Account</span>
+          </a>
+        </div>
+
+        <div class="drawer__top__center">
+          <a href="{{ routes.root_url }}" class="drawer__logo__link" aria-label="{{ shop.name | escape }}">
+            {%- if header_logo != blank -%}
+              {%- assign drawer_logo_w = settings.logo_width_mobile | default: 110 -%}
+              {%- assign drawer_logo_w_2x = drawer_logo_w | times: 2 -%}
+              {%- assign drawer_logo_w_3x = drawer_logo_w | times: 3 -%}
+              <img src="{{ header_logo | image_url: width: drawer_logo_w_2x }}"
+                srcset="{{ header_logo | image_url: width: drawer_logo_w }} 1x, {{ header_logo | image_url: width: drawer_logo_w_2x }} 2x, {{ header_logo | image_url: width: drawer_logo_w_3x }} 3x"
+                alt="{{ header_logo.alt | default: shop.name | escape }}"
+                width="{{ drawer_logo_w }}"
+                height="{{ drawer_logo_w | divided_by: logo_ratio | round }}"
+                loading="lazy"
+                style="max-width: {{ drawer_logo_w }}px; max-height: 42px; width: auto; object-fit: contain; -webkit-backface-visibility: hidden; image-rendering: -webkit-optimize-contrast;">
+            {%- else -%}
+              <img src="{{ 'aurelle_fine_jewelry_logo_transparent.png' | asset_url }}" alt="{{ shop.name | escape }}" width="110" height="27" loading="lazy" style="max-width: {{ settings.logo_width_mobile | default: 110 }}px; max-height: 38px; width: auto; object-fit: contain;">
+            {%- endif -%}
+          </a>
+        </div>
+
+        <button class="drawer__button drawer__close"
+          data-first-focus
+          data-drawer-toggle="hamburger"
+          aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="drawer__inner" data-drawer-scrolls>
+
+          <div class="drawer__search" data-drawer-search>
+            {% render 'search-predictive', style: 'search-drawer' %}
+          </div>
+
+
+
+<div class="drawer__menu" data-stagger-animation data-sliderule-pane="0">
+  {%- if main_menu != blank and main_menu.links.size > 0 -%}
+    {%- for link in main_menu.links -%}
+      {% render 'nav-item-mobile', link: link, link_index: forloop.index %}
+    {%- endfor -%}
+  {%- endif -%}
+        </div>
+      </div>
+    </div>
+
+    <span class="drawer__underlay" data-drawer-underlay>
+      <span class="drawer__underlay__fill"></span>
+      <span class="drawer__underlay__blur"></span>
+    </span>
+  </nav>
+
+  <div data-product-add-popdown-wrapper class="product-add-popdown"></div>
+</div>
+
+
+<div class="header__backfill"
+  data-header-backfill
+  aria-hidden="true"
+  style="display: none; height: 0; overflow: hidden;">
+</div>
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": {{ shop.name | json }},
+  {%- assign schema_logo = settings.logo | default: shop.brand.logo | default: section.settings.logo -%}
+  {%- if schema_logo != blank -%}
+    "logo": {{ schema_logo | image_url: width: 500 | prepend: "https:" | json }},
+  {%- endif -%}
+  "sameAs": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "url": "https:\/\/le-velair.nl"
+}
+</script>
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "WebSite",
+      "name": "Jewelry Shop",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https:\/\/le-velair.nl\/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "url": "https:\/\/le-velair.nl"
+    }
+  </script>
+
+
+
+
+
+<script>
+  (function() {
+    // Header dropdown hover enhancement
+    var menuItems = document.querySelectorAll('.header__menu .menu__item');
+    menuItems.forEach(function(item) {
+      item.addEventListener('mouseenter', function() {
+        var dropdown = item.querySelector('.header__dropdown');
+        if (dropdown) {
+          dropdown.style.display = 'block';
+          dropdown.style.opacity = '1';
+          dropdown.style.pointerEvents = 'auto';
+        }
+      });
+      item.addEventListener('mouseleave', function() {
+        var dropdown = item.querySelector('.header__dropdown');
+        if (dropdown) {
+          dropdown.style.display = '';
+          dropdown.style.opacity = '';
+          dropdown.style.pointerEvents = '';
+        }
+      });
+    });
+
+    // Mobile menu toggle
+    var mobileTrigger = document.querySelector('[data-drawer-toggle="hamburger"]');
+    var mobileDrawer = document.getElementById('header-menu');
+    var closeButtons = document.querySelectorAll('#header-menu [data-drawer-toggle="hamburger"], #header-menu .drawer__close');
+
+    if (mobileTrigger && mobileDrawer) {
+      mobileTrigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        mobileDrawer.classList.toggle('is-open');
+        document.body.classList.toggle('drawer-open');
+      });
+    }
+
+    closeButtons.forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (mobileDrawer) {
+          mobileDrawer.classList.remove('is-open');
+          document.body.classList.remove('drawer-open');
+        }
+      });
+    });
+
+    // Cart drawer toggle (Header buttons only)
+    var cartTriggers = document.querySelectorAll('.header__mobile__button[data-drawer-toggle="drawer-cart"], .navlink--cart');
+    cartTriggers.forEach(function(trigger) {
+      trigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (typeof window.openCartDrawer === 'function') {
+          window.openCartDrawer();
+        }
+      });
+    });
+
+    // Search popdown toggle
+    var searchTriggers = document.querySelectorAll('[data-popdown-toggle="search-popdown"]');
+    searchTriggers.forEach(function(trigger) {
+      trigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        var popdown = document.getElementById('search-popdown');
+        var underlay = document.querySelector('[data-search-underlay]');
+        if (popdown) {
+          popdown.classList.add('is-visible');
+          if (underlay) underlay.classList.add('underlay--visible');
+          var searchInput = popdown.querySelector('input[type="search"]');
+          if (searchInput) {
+            setTimeout(function() { searchInput.focus(); }, 100);
+          }
+        }
+      });
+    });
+
+    var searchCloseButtons = document.querySelectorAll('#search-popdown [data-close-popdown], [data-search-underlay]');
+    searchCloseButtons.forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var popdown = document.getElementById('search-popdown');
+        var underlay = document.querySelector('[data-search-underlay]');
+        if (popdown) popdown.classList.remove('is-visible');
+        if (underlay) underlay.classList.remove('underlay--visible');
+      });
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        var popdown = document.getElementById('search-popdown');
+        var underlay = document.querySelector('[data-search-underlay]');
+        if (popdown && popdown.classList.contains('is-visible')) {
+          popdown.classList.remove('is-visible');
+          if (underlay) underlay.classList.remove('underlay--visible');
+        }
+      }
+    });
+  })();
+</script>
+
+{%- if sticky_mode == 'scroll_up' -%}
+  <script>
+    (function() {
+      var headerSec = document.getElementById('shopify-section-{{ section.id }}');
+      if (!headerSec) return;
+      var lastScroll = window.scrollY;
+      var threshold = 90;
+      window.addEventListener('scroll', function() {
+        var current = window.scrollY;
+        if (current > threshold && current > lastScroll) {
+          headerSec.classList.add('lv-header--hidden');
+        } else {
+          headerSec.classList.remove('lv-header--hidden');
+        }
+        lastScroll = current;
+      }, { passive: true });
+    })();
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "image_picker", "id": "logo", "label": "Logo image", "info": "Leave blank to use the global logo from Theme Settings > Logo" },
+    { "type": "range", "id": "logo_width", "min": 50, "max": 300, "step": 5, "unit": "px", "label": "Custom logo width", "default": 140 },
+    { "type": "select", "id": "mobile_logo_alignment", "label": "Mobile logo alignment", "options": [ { "value": "center", "label": "Center" }, { "value": "left", "label": "Left (Next to Menu)" } ], "default": "center" },
+    { "type": "range", "id": "padding_vertical", "min": 0, "max": 30, "step": 2, "unit": "px", "label": "Header vertical padding", "default": 8 },
+    { "type": "header", "content": "Sticky Header" },
+    { "type": "select", "id": "sticky_header_type", "label": "Sticky header behavior", "options": [ { "value": "always", "label": "Always sticky (Fixed at top)" }, { "value": "scroll_up", "label": "Sticky on scroll up" }, { "value": "none", "label": "Disabled (Normal scroll)" } ], "default": "always" },
+    { "type": "link_list", "id": "main_menu_link_list", "label": "Navigation menu", "default": "main-menu", "info": "Choose the menu to display in the header from Online Store > Navigation" },
+    { "type": "header", "content": "Global Dropdown Styling" },
+    { "type": "color", "id": "dropdown_global_bg", "label": "Dropdown background", "default": "#ffffff" },
+    { "type": "color", "id": "dropdown_global_text", "label": "Dropdown text color", "default": "#111111" },
+    { "type": "color", "id": "dropdown_global_hover", "label": "Dropdown hover color", "default": "#666666" },
+    { "type": "color", "id": "dropdown_global_border", "label": "Dropdown border color", "default": "#e8e2d9" },
+    { "type": "range", "id": "dropdown_global_radius", "min": 0, "max": 24, "step": 1, "unit": "px", "label": "Dropdown corner radius", "default": 0 },
+    { "type": "select", "id": "dropdown_global_shadow", "label": "Dropdown shadow", "options": [ { "value": "none", "label": "None" }, { "value": "subtle", "label": "Subtle shadow" }, { "value": "medium", "label": "Medium shadow" }, { "value": "deep", "label": "Deep shadow" } ], "default": "subtle" },
+    { "type": "range", "id": "dropdown_padding_y", "min": 16, "max": 60, "step": 2, "unit": "px", "label": "Dropdown vertical padding", "default": 24 },
+    { "type": "range", "id": "dropdown_link_size", "min": 11, "max": 16, "step": 1, "unit": "px", "label": "Dropdown link font size", "default": 12 },
+    { "type": "range", "id": "dropdown_heading_size", "min": 11, "max": 18, "step": 1, "unit": "px", "label": "Dropdown heading font size", "default": 13 },
+    { "type": "select", "id": "dropdown_font_weight", "label": "Dropdown link font weight", "options": [ { "value": "400", "label": "Regular" }, { "value": "500", "label": "Medium" }, { "value": "600", "label": "Semi-bold" } ], "default": "500" },
+    { "type": "select", "id": "dropdown_text_transform", "label": "Dropdown link text style", "options": [ { "value": "uppercase", "label": "Uppercase" }, { "value": "capitalize", "label": "Capitalize" }, { "value": "none", "label": "None" } ], "default": "uppercase" },
+    { "type": "select", "id": "dropdown_button_style", "label": "Menu card link style", "options": [ { "value": "outline", "label": "Outline" }, { "value": "solid", "label": "Solid" }, { "value": "pill", "label": "Pill" }, { "value": "arrow_link", "label": "Text with arrow" } ], "default": "solid" },
+    { "type": "select", "id": "dropdown_image_ratio", "label": "Menu image ratio", "options": [ { "value": "1/1", "label": "Square (1:1)" }, { "value": "4/5", "label": "Portrait (4:5)" }, { "value": "3/4", "label": "Tall (3:4)" }, { "value": "16/9", "label": "Landscape (16:9)" }, { "value": "adapt", "label": "Adapt to image" } ], "default": "1/1" },
+    { "type": "range", "id": "dropdown_card_radius", "min": 0, "max": 30, "step": 1, "unit": "px", "label": "Menu image radius", "default": 0 },
+    { "type": "range", "id": "dropdown_overlay_opacity", "min": 0, "max": 80, "step": 5, "unit": "%", "label": "Menu image overlay", "default": 0 },
+    { "type": "range", "id": "dropdown_gap", "min": 8, "max": 40, "step": 4, "unit": "px", "label": "Menu item spacing", "default": 24 }
+  ],
+  "blocks": [
+    {
+      "type": "custom_mega_menu",
+      "name": "Custom Mega Menu",
+      "settings": [
+        { "type": "text", "id": "menu_item", "label": "Top-level Shopify menu item", "info": "Enter the exact top-level title from the selected Shopify Navigation menu." },
+        { "type": "select", "id": "dropdown_style", "label": "Dropdown style", "options": [ { "value": "cards", "label": "Image cards" }, { "value": "split", "label": "Split links and image" }, { "value": "columns", "label": "Multi-column links" }, { "value": "simple", "label": "Simple vertical links" }, { "value": "editorial", "label": "Editorial image and links" }, { "value": "carousel", "label": "Horizontal image cards" }, { "value": "products", "label": "Featured products" } ], "default": "columns" },
+        { "type": "select", "id": "menu_theme", "label": "Dropdown theme", "options": [ { "value": "light", "label": "Light" }, { "value": "dark", "label": "Dark" } ], "default": "light" },
+        { "type": "color", "id": "dropdown_background", "label": "Background override" },
+        { "type": "color", "id": "dropdown_text", "label": "Text color override" },
+        { "type": "color", "id": "dropdown_border", "label": "Border color override" },
+        { "type": "range", "id": "cols", "min": 2, "max": 6, "step": 1, "label": "Columns / cards per row", "default": 4 },
+        { "type": "range", "id": "card_gap", "min": 8, "max": 40, "step": 4, "unit": "px", "label": "Item spacing", "default": 24 },
+        { "type": "select", "id": "image_ratio", "label": "Menu image ratio", "options": [ { "value": "1/1", "label": "Square (1:1)" }, { "value": "4/5", "label": "Portrait (4:5)" }, { "value": "3/4", "label": "Tall (3:4)" }, { "value": "16/9", "label": "Landscape (16:9)" }, { "value": "adapt", "label": "Adapt to image" } ], "default": "1/1" },
+        { "type": "range", "id": "overlay_opacity", "min": 0, "max": 80, "step": 5, "unit": "%", "label": "Image overlay", "default": 0 },
+        { "type": "select", "id": "button_style", "label": "Card link style", "options": [ { "value": "arrow_link", "label": "Text with arrow" }, { "value": "outline", "label": "Outline" }, { "value": "solid", "label": "Solid" }, { "value": "pill", "label": "Pill" } ], "default": "solid" },
+        { "type": "image_picker", "id": "promo_image", "label": "Optional featured image for split/editorial layouts" },
+        { "type": "product_list", "id": "featured_products", "label": "Featured products", "limit": 8 }
+      ]
+    },
+    {
+      "type": "mega_menu_card",
+      "name": "Navigation Item Image",
+      "settings": [
+        { "type": "text", "id": "menu_item", "label": "Top-level Shopify menu item", "info": "Exact title from the selected Shopify Navigation menu." },
+        { "type": "text", "id": "navigation_item", "label": "Child Shopify menu item", "info": "Exact title of the child item whose card image you are setting." },
+        { "type": "image_picker", "id": "image", "label": "Menu item image" },
+        { "type": "collection", "id": "collection", "label": "Collection image source", "info": "Used when no menu item image is selected. The selected collection's own image is shown; if it has no image, the card stays blank." }
+      ]
+    }
+  ]
+}
+{% endschema %}
