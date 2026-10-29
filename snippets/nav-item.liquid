@@ -1,0 +1,39 @@
+<!-- /snippets/nav-item.liquid -->
+{%- liquid
+  assign item_index = link_index | default: forloop.index | default: 1
+  assign item_id = 'dropdown-' | append: link.handle | append: '-' | append: item_index
+  assign downcase_title = link.title | downcase | strip
+  assign matched_block = nil
+
+  for block in section.blocks
+    if block.type == 'custom_mega_menu' and block.settings.menu_item != blank
+      assign trigger = block.settings.menu_item | downcase | strip
+      if downcase_title == trigger
+        assign matched_block = block
+        break
+      endif
+    endif
+  endfor
+-%}
+
+{%- if link.links.size == 0 -%}
+  <div class="menu__item child{% if link.active %} main-menu--active{% endif %}" data-main-menu-text-item>
+    <a href="{{ link.url }}" data-top-link class="navlink navlink--toplevel{% if link.active %} navlink--active{% endif %}">
+      <span class="navtext">{{ link.title }}</span>
+    </a>
+  </div>
+{%- else -%}
+  <div class="menu__item grandparent kids-{{ link.links.size }} blocks-{{ link.links.size }}{% if link.active or link.child_active %} main-menu--active{% endif %}"
+    data-main-menu-text-item
+    role="button"
+    aria-haspopup="true"
+    aria-expanded="false"
+    data-hover-disclosure-toggle="{{ item_id }}"
+    aria-controls="{{ item_id }}"
+    {% if matched_block != nil %}{{ matched_block.shopify_attributes }}{% endif %}>
+    <a href="{{ link.url }}" data-top-link class="navlink navlink--toplevel">
+      <span class="navtext">{{ link.title }}</span>
+    </a>
+    {% render 'header-mega-menu', section: section, link: link, item_id: item_id, custom_block: matched_block %}
+  </div>
+{%- endif -%}

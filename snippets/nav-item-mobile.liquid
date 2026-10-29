@@ -1,0 +1,92 @@
+<!-- /snippets/nav-item-mobile.liquid -->
+{%- liquid
+  assign has_dropdown = false
+  if link.links.size > 0
+    assign has_dropdown = true
+  endif
+  assign item_index = link_index | default: forloop.index | default: 1
+  assign panel_id = 'sliderule-' | append: link.handle | append: '-' | append: item_index
+-%}
+
+{%- if has_dropdown == false -%}
+  <div class="sliderule__wrapper">
+    <div class="sliderow" data-animates="0">
+      <a class="sliderow__title{% if link.active %} active{% endif %}" href="{{ link.url }}">{{ link.title }}</a>
+    </div>
+  </div>
+{%- else -%}
+  <div class="sliderule__wrapper">
+    <button class="sliderow"
+      data-animates="0"
+      data-sliderule-open="{{ panel_id }}">
+      <span class="sliderow__title">{{ link.title }}</span>
+      <span class="sliderule__chevron--right">
+        <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+        <span class="visually-hidden">Expand menu</span>
+      </span>
+    </button>
+
+    <div class="mobile__menu__dropdown sliderule__panel"
+      data-sliderule
+      id="{{ panel_id }}">
+      <div class="sliderow sliderow__back" data-animates="1">
+        <button class="drawer__button"
+          data-sliderule-close="{{ panel_id }}">
+          <span class="sliderule__chevron--left">
+            <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+            <span class="visually-hidden">Hide menu</span>
+          </span>
+        </button>
+        <a class="sliderow__title" href="{{ link.url }}">{{ link.title }}</a>
+      </div>
+      <div class="sliderow__links" data-links>
+        {%- for child_link in link.links -%}
+          {%- if child_link.links.size == 0 -%}
+            <div class="sliderule__wrapper">
+              <div class="sliderow" data-animates="1">
+                <a class="sliderow__title{% if child_link.active %} active{% endif %}" href="{{ child_link.url }}">{{ child_link.title }}</a>
+              </div>
+            </div>
+          {%- else -%}
+            {%- assign sub_panel_id = 'sliderule-' | append: child_link.handle | append: '-' | append: item_index | append: '-' | append: forloop.index -%}
+            <div class="sliderule__wrapper">
+              <button class="sliderow"
+                data-animates="1"
+                data-sliderule-open="{{ sub_panel_id }}">
+                <span class="sliderow__title">{{ child_link.title }}</span>
+                <span class="sliderule__chevron--right">
+                  <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                  <span class="visually-hidden">Expand menu</span>
+                </span>
+              </button>
+
+              <div class="mobile__menu__dropdown sliderule__panel"
+                data-sliderule
+                id="{{ sub_panel_id }}">
+                <div class="sliderow sliderow__back" data-animates="2">
+                  <button class="drawer__button"
+                    data-sliderule-close="{{ sub_panel_id }}">
+                    <span class="sliderule__chevron--left">
+                      <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+                      <span class="visually-hidden">Hide menu</span>
+                    </span>
+                  </button>
+                  <a class="sliderow__title" href="{{ child_link.url }}">{{ child_link.title }}</a>
+                </div>
+                <div class="sliderow__links" data-links>
+                  {%- for grandchild_link in child_link.links -%}
+                    <div class="sliderule__wrapper">
+                      <div class="sliderow" data-animates="2">
+                        <a class="sliderow__title{% if grandchild_link.active %} active{% endif %}" href="{{ grandchild_link.url }}">{{ grandchild_link.title }}</a>
+                      </div>
+                    </div>
+                  {%- endfor -%}
+                </div>
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
