@@ -1,0 +1,256 @@
+<!-- /sections/section-icons.liquid -->
+<style>
+  .icons-section-wrap {
+    padding-top: var(--PT, 40px);
+    padding-bottom: var(--PB, 40px);
+    background-color: var(--bg);
+    color: var(--text);
+    border-top: 1px solid var(--border, rgba(0,0,0,0.06));
+    border-bottom: 1px solid var(--border, rgba(0,0,0,0.06));
+    box-sizing: border-box;
+  }
+  .icons-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+  @media (min-width: 1024px) {
+    .icons-grid {
+      grid-template-columns: repeat(var(--icons-count, 4), 1fr);
+      gap: 32px;
+    }
+  }
+  .icon-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .icon-svg-wrap {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+  }
+  .icon-svg-wrap img {
+    max-width: 36px;
+    max-height: 36px;
+    object-fit: contain;
+  }
+  .icon-box h4 {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 6px 0;
+    color: #111111;
+  }
+  .icon-box p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #2b2622;
+    margin: 0;
+    line-height: 1.5;
+  }
+</style>
+
+{%- assign icons_count = section.blocks.size | default: 4 -%}
+{%- if icons_count > 4 -%}{%- assign icons_count = 4 -%}{%- endif -%}
+
+<div class="icons-section-wrap color-{{ section.settings.color_scheme | default: 'scheme-2' }}"
+  data-section-id="{{ section.id }}"
+  style="--PT: {{ section.settings.padding_top | default: 36 }}px; --PB: {{ section.settings.padding_bottom | default: 36 }}px; --icons-count: {{ icons_count }};">
+  <div class="icons-grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="icon-box" {{ block.shopify_attributes }}>
+          <div class="icon-svg-wrap">
+            {%- if block.settings.custom_icon != blank -%}
+              <img src="{{ block.settings.custom_icon | image_url: width: 88 }}" alt="{{ block.settings.title | default: 'Icon' | escape }}" width="44" height="44" loading="lazy">
+            {%- else -%}
+              {%- case block.settings.icon_name -%}
+                {%- when 'waterproof' -%}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                {%- when 'engraving' -%}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                {%- when 'returns' -%}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                {%- when 'star' -%}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                {%- when 'heart' -%}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                {%- when 'diamond' -%}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h12l4 6-10 12L2 9z"></path><path d="M2 9h20"></path></svg>
+                {%- when 'shield' -%}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                {%- else -%}
+                  <!-- Shipping Default -->
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+              {%- endcase -%}
+            {%- endif -%}
+          </div>
+          {%- if block.settings.title != blank -%}
+            <h4>{{ block.settings.title }}</h4>
+          {%- endif -%}
+          {%- if block.settings.text != blank -%}
+            <p>{{ block.settings.text }}</p>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <!-- Default 4 trust icons if no blocks added -->
+      <div class="icon-box">
+        <div class="icon-svg-wrap">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+        </div>
+        <h4>Free Shipping from €39</h4>
+        <p>Fast dispatch within 24-48 hours</p>
+      </div>
+      <div class="icon-box">
+        <div class="icon-svg-wrap">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+        </div>
+        <h4>100% Waterproof</h4>
+        <p>Stainless steel, never discolors or tarnishes</p>
+      </div>
+      <div class="icon-box">
+        <div class="icon-svg-wrap">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+        </div>
+        <h4>Personal Touch</h4>
+        <p>Custom engraving crafted with precision</p>
+      </div>
+      <div class="icon-box">
+        <div class="icon-svg-wrap">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+        </div>
+        <h4>14 Days Returns</h4>
+        <p>Hassle-free return policy</p>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Trust icons",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 35
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 35
+    }
+  ],
+  "blocks": [
+    {
+      "type": "trust_item",
+      "name": "Trust item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_name",
+          "label": "Icon",
+          "options": [
+            { "value": "shipping", "label": "Shipping truck" },
+            { "value": "waterproof", "label": "Water droplet (Waterproof)" },
+            { "value": "engraving", "label": "Pen (Custom engraving)" },
+            { "value": "returns", "label": "Return arrow (14 Days Returns)" },
+            { "value": "star", "label": "Star" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "diamond", "label": "Diamond" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "custom", "label": "Custom image (below)" }
+          ],
+          "default": "shipping"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Custom icon image (optional)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Trust feature"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Description",
+          "default": "Short explanation of the feature"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trust icons",
+      "blocks": [
+        {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "shipping",
+            "title": "Free Shipping from €39",
+            "text": "Fast dispatch within 24-48 hours"
+          }
+        },
+        {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "waterproof",
+            "title": "100% Waterproof",
+            "text": "Stainless steel, never discolors or tarnishes"
+          }
+        },
+        {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "engraving",
+            "title": "Personal Touch",
+            "text": "Custom engraving crafted with precision"
+          }
+        },
+        {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "returns",
+            "title": "14 Days Returns",
+            "text": "Hassle-free return policy"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
