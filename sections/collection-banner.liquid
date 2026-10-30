@@ -1,0 +1,468 @@
+<!-- /sections/collection-banner.liquid  (Catalog banner: 3:1 image / video, desktop + mobile, sits above the product grid) -->
+{%- liquid
+  assign section_id = section.id
+  assign tone = section.settings.text_tone | default: 'dark'
+  assign is_contained = false
+  if section.settings.layout_width == 'contained'
+    assign is_contained = true
+  endif
+
+  assign use_video = false
+  if section.settings.media_type == 'video'
+    if section.settings.video != blank or section.settings.video_mobile != blank
+      assign use_video = true
+    endif
+  endif
+
+  assign collection_img = nil
+  if section.settings.use_collection_image and collection.image != blank and use_video == false
+    assign collection_img = collection.image
+  endif
+
+  if section.settings.desktop_ratio == 'adapt'
+    if use_video
+      assign desktop_ratio_val = section.settings.video.aspect_ratio | default: section.settings.video_mobile.aspect_ratio | default: 3
+    elsif collection_img != blank
+      assign desktop_ratio_val = collection_img.aspect_ratio
+    elsif section.settings.image != blank
+      assign desktop_ratio_val = section.settings.image.aspect_ratio
+    else
+      assign desktop_ratio_val = '3 / 1'
+    endif
+  else
+    assign desktop_ratio_val = section.settings.desktop_ratio | default: '3 / 1'
+  endif
+
+  if section.settings.mobile_ratio == 'adapt'
+    if use_video
+      assign mobile_ratio_val = section.settings.video_mobile.aspect_ratio | default: section.settings.video.aspect_ratio | default: 1
+    elsif section.settings.image_mobile != blank
+      assign mobile_ratio_val = section.settings.image_mobile.aspect_ratio
+    elsif collection_img != blank
+      assign mobile_ratio_val = collection_img.aspect_ratio
+    elsif section.settings.image != blank
+      assign mobile_ratio_val = section.settings.image.aspect_ratio
+    else
+      assign mobile_ratio_val = '1 / 1'
+    endif
+  else
+    assign mobile_ratio_val = section.settings.mobile_ratio | default: '1 / 1'
+  endif
+
+  assign heading_text = ''
+  case section.settings.heading_source
+    when 'collection_title'
+      assign heading_text = collection.title
+    when 'custom'
+      assign heading_text = section.settings.custom_heading
+  endcase
+
+  assign description_text = ''
+  if section.settings.show_description and collection.description != blank
+    assign description_text = collection.description | strip_html | strip_newlines | truncate: 180
+  endif
+
+  assign has_media = false
+  if use_video or collection_img != blank or section.settings.image != blank or section.settings.image_mobile != blank
+    assign has_media = true
+  endif
+
+  assign has_text = false
+  if heading_text != blank or description_text != blank or section.settings.button_label != blank
+    assign has_text = true
+  endif
+-%}
+
+{%- comment -%} Nothing uploaded (and no collection image): render nothing on the storefront, show a placeholder in the theme editor only {%- endcomment -%}
+{%- if has_media or request.design_mode -%}
+{{ 'banner.css' | asset_url | stylesheet_tag }}
+
+<div class="collection-banner collection-banner-{{ section_id }} color-{{ section.settings.color_scheme | default: 'scheme-1' }} banner--tone-{{ tone }}"
+  data-section-id="{{ section_id }}"
+  data-section-type="collection-banner">
+
+  <style>
+    .collection-banner-{{ section_id }} {
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+      padding-top: {{ section.settings.padding_top | default: 0 }}px;
+      padding-bottom: {{ section.settings.padding_bottom | default: 0 }}px;
+    }
+    .collection-banner-{{ section_id }} .collection-banner__inner {
+      width: 100%;
+      {%- if is_contained %}
+      max-width: var(--page-width, 1600px);
+      margin: 0 auto;
+      padding: 0 var(--outer, 20px);
+      box-sizing: border-box;
+      {%- endif %}
+    }
+    .collection-banner-{{ section_id }} .collection-banner__frame {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      aspect-ratio: {{ mobile_ratio_val }};
+      {%- if is_contained %}
+      border-radius: {{ section.settings.corner_radius | default: 0 }}px;
+      {%- endif %}
+    }
+    @media (min-width: 768px) {
+      .collection-banner-{{ section_id }} .collection-banner__frame {
+        aspect-ratio: {{ desktop_ratio_val }};
+      }
+    }
+  </style>
+
+  <div class="collection-banner__inner">
+    <div class="collection-banner__frame"
+      data-mobile-fit="{{ section.settings.mobile_fit | default: 'cover' }}"
+      style="--banner-fit-bg: {{ section.settings.fit_background | default: '#ffffff' }};">
+
+      {%- if section.settings.button_link != blank and section.settings.button_label == blank -%}
+        <a href="{{ section.settings.button_link }}" class="banner__link-overlay" aria-label="{{ heading_text | default: collection.title | default: shop.name | escape }}"></a>
+      {%- endif -%}
+
+      {%- render 'banner-media',
+        settings: section.settings,
+        alt: collection.title,
+        eager: true,
+        fallback: 'hero_banner_2.png',
+        image_override: collection_img
+      -%}
+
+      {%- render 'banner-overlay',
+        opacity: section.settings.overlay_opacity,
+        style: section.settings.overlay_style,
+        position: section.settings.text_position
+      -%}
+
+      {%- if has_text -%}
+        <div class="banner__content-wrapper banner__content--{{ section.settings.text_position | default: 'middle-center' | replace: 'middle-', '' }}">
+          <div class="banner__content" style="{%- render 'banner-text-style', settings: section.settings -%}">
+            {%- if heading_text != blank -%}
+              <h2 class="banner__title">{{ heading_text | escape }}</h2>
+            {%- endif -%}
+            {%- if description_text != blank -%}
+              <p class="banner__text">{{ description_text }}</p>
+            {%- endif -%}
+            {%- if section.settings.button_label != blank -%}
+              <a href="{{ section.settings.button_link | default: routes.all_products_collection_url }}" class="btn--soft btn--hero banner__button btn-sliding-hover">
+                <span class="btn__text-content">{{ section.settings.button_label }}</span>
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+    </div>
+  </div>
+</div>
+
+<script src="{{ 'banner.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Collection banner",
+  "tag": "section",
+  "class": "section-banner",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "select",
+      "id": "media_type",
+      "label": "Media type",
+      "options": [
+        { "value": "image", "label": "Image" },
+        { "value": "video", "label": "Video" }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Desktop image (3:1)",
+      "info": "Recommended: 2400 x 800px (3:1).",
+      "visible_if": "{{ section.settings.media_type == 'image' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Mobile image",
+      "info": "Optional. Recommended: 1080 x 1350px (4:5). Falls back to the desktop image.",
+      "visible_if": "{{ section.settings.media_type == 'image' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_collection_image",
+      "label": "Use each collection's own image",
+      "default": false,
+      "info": "When a collection has an image (Admin > Collections), it replaces the desktop image above, so every collection can have its own banner.",
+      "visible_if": "{{ section.settings.media_type == 'image' }}"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Desktop video",
+      "info": "Upload an MP4 (H.264), ideally under 8 MB. Plays muted and looped.",
+      "visible_if": "{{ section.settings.media_type == 'video' }}"
+    },
+    {
+      "type": "video",
+      "id": "video_mobile",
+      "label": "Mobile video",
+      "info": "Optional. Falls back to the desktop video.",
+      "visible_if": "{{ section.settings.media_type == 'video' }}"
+    },
+    {
+      "type": "select",
+      "id": "video_focus",
+      "label": "Video focus",
+      "options": [
+        { "value": "center", "label": "Center" },
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center",
+      "info": "Which part of the video stays visible when it is cropped.",
+      "visible_if": "{{ section.settings.media_type == 'video' }}"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout_width",
+      "label": "Banner width",
+      "options": [
+        { "value": "full", "label": "Full width" },
+        { "value": "contained", "label": "Contained (page width)" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "corner_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Corner radius",
+      "default": 0,
+      "visible_if": "{{ section.settings.layout_width == 'contained' }}"
+    },
+    {
+      "type": "select",
+      "id": "desktop_ratio",
+      "label": "Desktop banner ratio",
+      "options": [
+        { "value": "3 / 1", "label": "3:1 (Standard banner - Recommended)" },
+        { "value": "4 / 1", "label": "4:1 (Slim)" },
+        { "value": "2 / 1", "label": "2:1 (Tall)" },
+        { "value": "16 / 9", "label": "16:9 (Widescreen)" },
+        { "value": "adapt", "label": "Adapt to desktop media" }
+      ],
+      "default": "3 / 1"
+    },
+    {
+      "type": "select",
+      "id": "mobile_ratio",
+      "label": "Mobile banner ratio",
+      "options": [
+        { "value": "adapt", "label": "Adapt to mobile media (Recommended)" },
+        { "value": "1 / 1", "label": "1:1 (Square)" },
+        { "value": "4 / 5", "label": "4:5 (Vertical)" },
+        { "value": "3 / 2", "label": "3:2 (Landscape)" },
+        { "value": "3 / 1", "label": "3:1 (Same as desktop)" }
+      ],
+      "default": "adapt"
+    },
+    {
+      "type": "select",
+      "id": "mobile_fit",
+      "label": "Mobile media fit",
+      "options": [
+        { "value": "cover", "label": "Fill banner (crop edges)" },
+        { "value": "contain", "label": "Show whole media (no crop)" }
+      ],
+      "default": "cover",
+      "info": "Use 'Show whole media' with a fixed mobile ratio to avoid cropping; empty space gets the color below."
+    },
+    {
+      "type": "color",
+      "id": "fit_background",
+      "label": "Empty space color (mobile)",
+      "default": "#ffffff",
+      "visible_if": "{{ section.settings.mobile_fit == 'contain' }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "Space above",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "Space below",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "select",
+      "id": "heading_source",
+      "label": "Heading",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "collection_title", "label": "Collection title" },
+        { "value": "custom", "label": "Custom text" }
+      ],
+      "default": "none",
+      "info": "The collection grid below already shows the title, so this is off by default."
+    },
+    {
+      "type": "text",
+      "id": "custom_heading",
+      "label": "Custom heading",
+      "visible_if": "{{ section.settings.heading_source == 'custom' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show collection description",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Banner / button link",
+      "info": "If the button label is empty, the whole banner becomes a link."
+    },
+    {
+      "type": "select",
+      "id": "text_position",
+      "label": "Text position",
+      "options": [
+        { "value": "top-left", "label": "Top left" },
+        { "value": "top-center", "label": "Top center" },
+        { "value": "top-right", "label": "Top right" },
+        { "value": "middle-left", "label": "Middle left" },
+        { "value": "middle-center", "label": "Middle center" },
+        { "value": "middle-right", "label": "Middle right" },
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-center", "label": "Bottom center" },
+        { "value": "bottom-right", "label": "Bottom right" }
+      ],
+      "default": "middle-center"
+    },
+    {
+      "type": "header",
+      "content": "Content colors"
+    },
+    {
+      "type": "select",
+      "id": "text_tone",
+      "label": "Text colors",
+      "options": [
+        { "value": "dark", "label": "Dark text" },
+        { "value": "light", "label": "Light text (for dark images / video)" },
+        { "value": "scheme", "label": "Use color scheme text color" },
+        { "value": "custom", "label": "Custom colors" }
+      ],
+      "default": "light",
+      "info": "Button colors follow the color scheme below unless you choose Custom colors."
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#ffffff",
+      "visible_if": "{{ section.settings.text_tone == 'custom' }}"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Description color",
+      "default": "#ffffff",
+      "visible_if": "{{ section.settings.text_tone == 'custom' }}"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button background",
+      "default": "#ffffff",
+      "visible_if": "{{ section.settings.text_tone == 'custom' }}"
+    },
+    {
+      "type": "color",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "#111111",
+      "info": "On hover the button colors swap.",
+      "visible_if": "{{ section.settings.text_tone == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "Overlay style",
+      "options": [
+        { "value": "full", "label": "Full banner" },
+        { "value": "gradient", "label": "Smooth gradient behind the content only" }
+      ],
+      "default": "full",
+      "info": "Gradient is strongest on the side where the text is (follows Text position) and fades to clear."
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay darkness",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection banner"
+    }
+  ]
+}
+{% endschema %}
