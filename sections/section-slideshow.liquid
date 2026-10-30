@@ -1,0 +1,640 @@
+<!-- /sections/section-slideshow.liquid  (Homepage banner: image / video, desktop + mobile, full-screen or classic) -->
+{%- liquid
+  assign section_id = section.id
+  assign layout_mode = section.settings.banner_layout | default: 'fullscreen'
+  assign is_fullscreen = false
+  if layout_mode == 'fullscreen'
+    assign is_fullscreen = true
+  endif
+  assign min_h = section.settings.min_height | default: 480
+  assign scroll_mode = section.settings.scroll_behavior | default: 'smooth_snap'
+-%}
+
+{{ 'banner.css' | asset_url | stylesheet_tag }}
+
+<div class="section-slideshow section-slideshow-{{ section_id }} color-{{ section.settings.color_scheme | default: 'scheme-1' }}{% if is_fullscreen %} section-slideshow--fullscreen{% endif %}"
+  data-section-id="{{ section_id }}"
+  data-section-type="slideshow"
+  {% if is_fullscreen %}
+    data-banner-fullscreen
+    data-banner-scroll="{{ scroll_mode }}"
+    style="--banner-min-height: {{ min_h }}px;"
+  {% else %}
+    style="--PT: {{ section.settings.padding_top | default: 0 }}px; --PB: {{ section.settings.padding_bottom | default: 0 }}px;"
+  {% endif %}>
+
+  <style>
+    .section-slideshow-{{ section_id }} {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    .section-slideshow-{{ section_id }} .slideshow__slide {
+      width: 100%;
+      position: relative;
+    }
+    .section-slideshow-{{ section_id }} .slideshow__banner-frame {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      display: block;
+      aspect-ratio: var(--mobile-ratio, 1 / 1);
+    }
+    @media (min-width: 768px) {
+      .section-slideshow-{{ section_id }} .slideshow__banner-frame {
+        aspect-ratio: var(--desktop-ratio, 3 / 1);
+      }
+    }
+    {%- if is_fullscreen -%}
+    /* Full-screen hero: header + banner fill exactly one screen (no 100vw => no horizontal scroll) */
+    .section-slideshow-{{ section_id }} .slideshow__banner-frame {
+      aspect-ratio: auto;
+      height: calc(100vh - var(--banner-offset, 120px));
+      height: calc(100svh - var(--banner-offset, 120px));
+      min-height: var(--banner-min-height, 480px);
+    }
+    @media (max-width: 767px) {
+      /* Mobile: banner height follows an aspect ratio instead of filling the screen */
+      .section-slideshow-{{ section_id }} .slideshow__banner-frame[data-m-height="ratio"] {
+        aspect-ratio: var(--mobile-ratio, 1 / 1);
+        height: auto;
+        min-height: 0;
+      }
+    }
+    {%- endif -%}
+    .section-slideshow-{{ section_id }} .flickity-page-dots {
+      bottom: 20px;
+      right: 24px;
+      z-index: 10;
+    }
+    @media (max-width: 767px) {
+      .section-slideshow-{{ section_id }} .flickity-page-dots {
+        bottom: 12px;
+        right: 16px;
+      }
+    }
+  </style>
+
+  <div class="wrapper--none{% unless is_fullscreen %} section-padding{% endunless %}">
+    <div class="slideshow__wrapper js-overflow-container flickity-badge-dots"
+      data-slideshow-wrapper
+      data-slideshow-autoplay="{{ section.settings.autoplay | default: true }}"
+      data-slideshow-slides="{{ section.blocks.size | default: 1 }}"
+      data-slideshow-speed="{{ section.settings.autoplay_speed | default: 4500 }}">
+
+      {%- if section.blocks.size > 0 -%}
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign slide_index = forloop.index0
+            assign tone = block.settings.text_tone | default: 'dark'
+            assign has_text = false
+            if block.settings.heading != blank or block.settings.subheading != blank or block.settings.button_label != blank
+              assign has_text = true
+            endif
+
+            assign use_video = false
+            if block.settings.media_type == 'video'
+              if block.settings.video != blank or block.settings.video_mobile != blank
+                assign use_video = true
+              endif
+            endif
+
+            if section.settings.desktop_ratio == 'adapt'
+              if use_video
+                assign desktop_ratio_val = block.settings.video.aspect_ratio | default: block.settings.video_mobile.aspect_ratio | default: 3
+              elsif block.settings.image != blank
+                assign desktop_ratio_val = block.settings.image.aspect_ratio
+              else
+                assign desktop_ratio_val = '3 / 1'
+              endif
+            else
+              assign desktop_ratio_val = section.settings.desktop_ratio | default: '3 / 1'
+            endif
+
+            if section.settings.mobile_ratio == 'adapt'
+              if use_video
+                assign mobile_ratio_val = block.settings.video_mobile.aspect_ratio | default: block.settings.video.aspect_ratio | default: 1
+              elsif block.settings.image_mobile != blank
+                assign mobile_ratio_val = block.settings.image_mobile.aspect_ratio
+              elsif block.settings.image != blank
+                assign mobile_ratio_val = block.settings.image.aspect_ratio
+              else
+                assign mobile_ratio_val = '1 / 1'
+              endif
+            else
+              assign mobile_ratio_val = section.settings.mobile_ratio | default: '1 / 1'
+            endif
+
+            comment
+              Full-screen mobile layout, resolved per slide:
+              m_height = full (fills the screen) | ratio (banner height follows an aspect ratio)
+              m_fit    = cover (crop to fill)    | contain (whole media visible, empty space coloured)
+            endcomment
+            assign m_height = 'full'
+            assign m_fit = 'cover'
+            if is_fullscreen
+              assign m_layout = section.settings.mobile_layout | default: 'auto'
+              assign mobile_dedicated = false
+              if use_video
+                if block.settings.video_mobile != blank
+                  assign mobile_dedicated = true
+                endif
+              elsif block.settings.image_mobile != blank
+                assign mobile_dedicated = true
+              endif
+
+              if m_layout == 'auto'
+                if mobile_dedicated
+                  assign m_layout = 'fill'
+                else
+                  assign m_layout = 'original'
+                endif
+              endif
+
+              if m_layout == 'contain'
+                assign m_fit = 'contain'
+              elsif m_layout == 'original'
+                assign m_height = 'ratio'
+                if use_video
+                  assign mobile_ratio_val = block.settings.video_mobile.aspect_ratio | default: block.settings.video.aspect_ratio | default: 1.7778
+                elsif block.settings.image_mobile != blank
+                  assign mobile_ratio_val = block.settings.image_mobile.aspect_ratio
+                elsif block.settings.image != blank
+                  assign mobile_ratio_val = block.settings.image.aspect_ratio
+                else
+                  assign mobile_ratio_val = 3
+                endif
+              elsif m_layout != 'fill'
+                assign m_height = 'ratio'
+                assign mobile_ratio_val = m_layout
+              endif
+            endif
+          -%}
+
+          <div class="slideshow__slide section--image banner--tone-{{ tone }} color-{{ block.settings.color_scheme | default: section.settings.color_scheme | default: 'scheme-1' }}"
+            data-overlay-header
+            id="slide--{{ block.id }}"
+            data-slideshow-index="{{ slide_index }}"
+            {{ block.shopify_attributes }}>
+
+            <div class="slideshow__banner-frame"
+              data-m-height="{{ m_height }}"
+              data-mobile-fit="{{ m_fit }}"
+              style="--desktop-ratio: {{ desktop_ratio_val }}; --mobile-ratio: {{ mobile_ratio_val }}; --banner-fit-bg: {{ section.settings.fit_background | default: '#ffffff' }};">
+
+              {%- if block.settings.button_link != blank and block.settings.button_label == blank -%}
+                <a href="{{ block.settings.button_link }}" class="banner__link-overlay" aria-label="{{ block.settings.heading | default: shop.name | escape }}"></a>
+              {%- endif -%}
+
+              {%- render 'banner-media',
+                settings: block.settings,
+                alt: block.settings.heading,
+                eager: forloop.first,
+                fallback: 'hero_banner_2.png'
+              -%}
+
+              {%- assign slide_overlay = block.settings.overlay_opacity | default: section.settings.overlay_opacity | default: 0 -%}
+              {%- render 'banner-overlay',
+                opacity: slide_overlay,
+                style: block.settings.overlay_style,
+                position: block.settings.text_position
+              -%}
+
+              {%- if has_text -%}
+                <div class="banner__content-wrapper banner__content--{{ block.settings.text_position | default: 'center' | replace: 'middle-', '' }}">
+                  <div class="banner__content js-overflow-content" style="{%- render 'banner-text-style', settings: block.settings -%}">
+                    {%- if block.settings.subheading != blank -%}
+                      <p class="banner__subheading">{{ block.settings.subheading }}</p>
+                    {%- endif -%}
+                    {%- if block.settings.heading != blank -%}
+                      <h2 class="banner__title">{{ block.settings.heading }}</h2>
+                    {%- endif -%}
+                    {%- if block.settings.button_label != blank -%}
+                      <a href="{{ block.settings.button_link | default: routes.all_products_collection_url }}" class="btn--soft btn--hero banner__button btn-sliding-hover">
+                        <span class="btn__text-content">{{ block.settings.button_label }}</span>
+                      </a>
+                    {%- endif -%}
+                  </div>
+                </div>
+              {%- endif -%}
+
+              {%- if section.blocks.size > 1 -%}
+                <div data-slide-custom-prev class="custom-prev-next-button previous" aria-label="Previous slide" role="button"></div>
+                <div data-slide-custom-next class="custom-prev-next-button next" aria-label="Next slide" role="button"></div>
+              {%- endif -%}
+
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        <!-- Fallback if no blocks -->
+        <div class="slideshow__slide section--image" data-slideshow-index="0">
+          <div class="slideshow__banner-frame" style="--desktop-ratio: 3 / 1; --mobile-ratio: 1 / 1;">
+            {%- render 'banner-media', settings: section.settings, alt: shop.name, eager: true, fallback: 'hero_banner_2.png' -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+    </div>
+  </div>
+
+  {%- if is_fullscreen and section.settings.show_scroll_cue -%}
+    <button type="button" class="banner__scroll-cue{% if section.settings.scroll_cue_devices != 'all' %} banner__scroll-cue--desktop-only{% endif %}" data-banner-scroll-cue aria-label="Scroll to next section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+  {%- endif -%}
+
+  {%- if is_fullscreen -%}
+    {%- comment -%} Size the hero synchronously so there is no layout jump before assets/banner.js runs {%- endcomment -%}
+    <script>
+      (function () {
+        var r = document.currentScript.parentNode;
+        var w = r.closest('.shopify-section') || r;
+        r.style.setProperty('--banner-offset', Math.round(w.getBoundingClientRect().top + (window.pageYOffset || 0)) + 'px');
+      })();
+    </script>
+  {%- endif -%}
+</div>
+
+<script src="{{ 'banner.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Homepage banner",
+  "tag": "section",
+  "class": "section-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "banner_layout",
+      "label": "Banner layout",
+      "options": [
+        { "value": "fullscreen", "label": "Full screen (header + banner fill the screen)" },
+        { "value": "classic", "label": "Classic (fixed aspect ratio)" }
+      ],
+      "default": "fullscreen",
+      "info": "Full screen = 100% of the screen height below the header, no page scroll inside the banner."
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "min": 300,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "label": "Minimum height",
+      "default": 480,
+      "info": "Stops the banner getting too short on landscape phones or small windows.",
+      "visible_if": "{{ section.settings.banner_layout == 'fullscreen' }}"
+    },
+    {
+      "type": "select",
+      "id": "scroll_behavior",
+      "label": "Scrolling",
+      "options": [
+        { "value": "smooth_snap", "label": "Smooth glide to next section" },
+        { "value": "normal", "label": "Normal page scroll" }
+      ],
+      "default": "smooth_snap",
+      "info": "Smooth glide: one scroll/swipe moves from the banner straight to the next section. Disabled inside the theme editor.",
+      "visible_if": "{{ section.settings.banner_layout == 'fullscreen' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll_cue",
+      "label": "Show scroll-down arrow",
+      "default": true,
+      "visible_if": "{{ section.settings.banner_layout == 'fullscreen' }}"
+    },
+    {
+      "type": "select",
+      "id": "scroll_cue_devices",
+      "label": "Show arrow on",
+      "options": [
+        { "value": "desktop", "label": "Desktop only (above 960px)" },
+        { "value": "all", "label": "All screen sizes" }
+      ],
+      "default": "desktop",
+      "visible_if": "{{ section.settings.banner_layout == 'fullscreen' and section.settings.show_scroll_cue }}"
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "options": [
+        { "value": "auto", "label": "Auto - no crop if no mobile media (Recommended)" },
+        { "value": "fill", "label": "Full screen - crop to fill" },
+        { "value": "contain", "label": "Full screen - show whole media (no crop)" },
+        { "value": "original", "label": "Original ratio of the media (no crop)" },
+        { "value": "16 / 9", "label": "16:9 landscape" },
+        { "value": "4 / 3", "label": "4:3 landscape" },
+        { "value": "1 / 1", "label": "1:1 square" },
+        { "value": "4 / 5", "label": "4:5 portrait" },
+        { "value": "3 / 4", "label": "3:4 portrait" },
+        { "value": "9 / 16", "label": "9:16 tall portrait" }
+      ],
+      "default": "auto",
+      "info": "Auto: full screen when a mobile image/video is uploaded, otherwise the desktop media keeps its own ratio so nothing is cropped. Try the other options to compare. 'Show whole media' keeps the banner full screen and fills the empty space with the color below.",
+      "visible_if": "{{ section.settings.banner_layout == 'fullscreen' }}"
+    },
+    {
+      "type": "color",
+      "id": "fit_background",
+      "label": "Empty space color (mobile)",
+      "default": "#ffffff",
+      "visible_if": "{{ section.settings.banner_layout == 'fullscreen' and section.settings.mobile_layout == 'contain' }}"
+    },
+    {
+      "type": "select",
+      "id": "desktop_ratio",
+      "label": "Desktop banner ratio",
+      "options": [
+        { "value": "3 / 1", "label": "3:1 (Standard Banner - Recommended)" },
+        { "value": "adapt", "label": "Adapt to desktop media" },
+        { "value": "16 / 9", "label": "16:9 (Widescreen)" },
+        { "value": "2.35 / 1", "label": "2.35:1 (Ultra-wide)" }
+      ],
+      "default": "3 / 1",
+      "info": "Choose 3:1 for regular banner dimensions (e.g. 1800 x 600px).",
+      "visible_if": "{{ section.settings.banner_layout == 'classic' }}"
+    },
+    {
+      "type": "select",
+      "id": "mobile_ratio",
+      "label": "Mobile banner ratio",
+      "options": [
+        { "value": "adapt", "label": "Adapt to mobile media (Recommended)" },
+        { "value": "1 / 1", "label": "1:1 (Square)" },
+        { "value": "4 / 5", "label": "4:5 (Vertical banner)" },
+        { "value": "3 / 2", "label": "3:2 (Landscape)" },
+        { "value": "3 / 1", "label": "3:1 (Same as desktop)" }
+      ],
+      "default": "adapt",
+      "info": "Controls the aspect ratio on mobile screens.",
+      "visible_if": "{{ section.settings.banner_layout == 'classic' }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 0,
+      "visible_if": "{{ section.settings.banner_layout == 'classic' }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 0,
+      "visible_if": "{{ section.settings.banner_layout == 'classic' }}"
+    },
+    {
+      "type": "header",
+      "content": "Slideshow"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Auto-rotate slides",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 2000,
+      "max": 9000,
+      "step": 500,
+      "unit": "ms",
+      "label": "Change slides every",
+      "default": 4500
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Default slide dark overlay",
+      "default": 0,
+      "info": "Global dark overlay opacity for all slides (0% = pure bright image). Can also be adjusted per slide block."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Media"
+        },
+        {
+          "type": "select",
+          "id": "media_type",
+          "label": "Media type",
+          "options": [
+            { "value": "image", "label": "Image" },
+            { "value": "video", "label": "Video" }
+          ],
+          "default": "image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Desktop image",
+          "info": "Full screen: 1920 x 1080px (16:9). Classic: 1800 x 600px (3:1).",
+          "visible_if": "{{ block.settings.media_type == 'image' }}"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Mobile image",
+          "info": "Optional. Full screen: 1080 x 1920px (9:16). Falls back to the desktop image.",
+          "visible_if": "{{ block.settings.media_type == 'image' }}"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Desktop video",
+          "info": "Upload an MP4 (H.264), ideally under 10 MB. Plays muted and looped.",
+          "visible_if": "{{ block.settings.media_type == 'video' }}"
+        },
+        {
+          "type": "video",
+          "id": "video_mobile",
+          "label": "Mobile video",
+          "info": "Optional. Falls back to the desktop video. Use a vertical (9:16) video for phones.",
+          "visible_if": "{{ block.settings.media_type == 'video' }}"
+        },
+        {
+          "type": "select",
+          "id": "video_focus",
+          "label": "Video focus",
+          "options": [
+            { "value": "center", "label": "Center" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "center",
+          "info": "Which part of the video stays visible when it is cropped to fit the screen.",
+          "visible_if": "{{ block.settings.media_type == 'video' }}"
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Slide / Button link",
+          "info": "If button label is empty, clicking the whole slide opens this link"
+        },
+        {
+          "type": "select",
+          "id": "text_position",
+          "label": "Text position",
+          "options": [
+            { "value": "top-left", "label": "Top left" },
+            { "value": "top-center", "label": "Top center" },
+            { "value": "top-right", "label": "Top right" },
+            { "value": "middle-left", "label": "Middle left" },
+            { "value": "middle-center", "label": "Middle center" },
+            { "value": "middle-right", "label": "Middle right" },
+            { "value": "bottom-left", "label": "Bottom left" },
+            { "value": "bottom-center", "label": "Bottom center" },
+            { "value": "bottom-right", "label": "Bottom right" }
+          ],
+          "default": "middle-center"
+        },
+        {
+          "type": "header",
+          "content": "Content colors"
+        },
+        {
+          "type": "select",
+          "id": "text_tone",
+          "label": "Text colors",
+          "options": [
+            { "value": "dark", "label": "Dark text" },
+            { "value": "light", "label": "Light text (for dark images / video)" },
+            { "value": "scheme", "label": "Use color scheme text color" },
+            { "value": "custom", "label": "Custom colors" }
+          ],
+          "default": "dark",
+          "info": "Button colors follow the color scheme below unless you choose Custom colors."
+        },
+        {
+          "type": "color",
+          "id": "heading_color",
+          "label": "Heading color",
+          "default": "#ffffff",
+          "visible_if": "{{ block.settings.text_tone == 'custom' }}"
+        },
+        {
+          "type": "color",
+          "id": "subheading_color",
+          "label": "Subheading color",
+          "default": "#ffffff",
+          "visible_if": "{{ block.settings.text_tone == 'custom' }}"
+        },
+        {
+          "type": "color",
+          "id": "button_bg",
+          "label": "Button background",
+          "default": "#ffffff",
+          "visible_if": "{{ block.settings.text_tone == 'custom' }}"
+        },
+        {
+          "type": "color",
+          "id": "button_text",
+          "label": "Button text",
+          "default": "#111111",
+          "info": "On hover the button colors swap.",
+          "visible_if": "{{ block.settings.text_tone == 'custom' }}"
+        },
+        {
+          "type": "header",
+          "content": "Appearance"
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "label": "Color scheme",
+          "default": "scheme-1"
+        },
+        {
+          "type": "select",
+          "id": "overlay_style",
+          "label": "Overlay style",
+          "options": [
+            { "value": "full", "label": "Full banner" },
+            { "value": "gradient", "label": "Smooth gradient behind the content only" }
+          ],
+          "default": "full",
+          "info": "Gradient is strongest on the side where the text is (follows Text position) and fades to clear."
+        },
+        {
+          "type": "range",
+          "id": "overlay_opacity",
+          "min": 0,
+          "max": 80,
+          "step": 5,
+          "unit": "%",
+          "label": "Overlay darkness",
+          "default": 0
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Homepage banner",
+      "blocks": [
+        {
+          "type": "slide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
