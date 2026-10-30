@@ -1,0 +1,52 @@
+{%- comment -%}
+  Renders a single Shopify-hosted background <video> for banners.
+  Accepts: video (Shopify video object), device (all | desktop | mobile), focus, target_width, alt
+
+  - Picks ONE mp4 rendition closest to target_width (smallest that is >= target, else the largest),
+    so mobile never downloads a 4K file.
+  - preload="none" + poster: nothing is downloaded until assets/banner.js decides this video is visible,
+    matches the breakpoint and the slide is active. Without JS the poster image is shown.
+{%- endcomment -%}
+{%- liquid
+  assign best_url = ''
+  assign best_type = ''
+  assign best_w = 0
+  for source in video.sources
+    if source.format == 'mp4'
+      assign w = source.width | default: 0
+      assign take = false
+      if best_url == ''
+        assign take = true
+      elsif best_w < target_width and w > best_w
+        assign take = true
+      elsif best_w >= target_width and w >= target_width and w < best_w
+        assign take = true
+      endif
+      if take
+        assign best_url = source.url
+        assign best_type = source.mime_type
+        assign best_w = w
+      endif
+    endif
+  endfor
+-%}
+<video class="banner-media__video banner-media__video--{{ device }}"
+  data-banner-video
+  data-banner-device="{{ device }}"
+  muted
+  loop
+  playsinline
+  preload="none"
+  disablepictureinpicture
+  aria-label="{{ alt | escape }}"
+  tabindex="-1"
+  style="object-position: {% case focus %}{% when 'top' %}50% 0%{% when 'bottom' %}50% 100%{% when 'left' %}0% 50%{% when 'right' %}100% 50%{% else %}50% 50%{% endcase %};"
+  {% if video.preview_image != blank %}poster="{{ video.preview_image | image_url: width: target_width }}"{% endif %}>
+  {%- if best_url != '' -%}
+    <source src="{{ best_url }}" type="{{ best_type }}">
+  {%- else -%}
+    {%- for source in video.sources -%}
+      <source src="{{ source.url }}" type="{{ source.mime_type }}">
+    {%- endfor -%}
+  {%- endif -%}
+</video>

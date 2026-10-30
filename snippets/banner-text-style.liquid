@@ -1,0 +1,14 @@
+{%- comment -%}
+  Inline CSS variables for the banner text when "Text color" = Custom colors.
+  Accepts: settings (block.settings or section.settings)
+  Button colours go through the theme's --btn-base-* / --btn-regular-hover-* variables (see snippets/custom-button-animations.liquid).
+{%- endcomment -%}
+{%- if settings.text_tone == 'custom' -%}
+  {%- liquid
+    assign c_heading = settings.heading_color | default: '#ffffff'
+    assign c_sub = settings.subheading_color | default: '#ffffff'
+    assign c_btn_bg = settings.button_bg | default: '#ffffff'
+    assign c_btn_text = settings.button_text | default: '#111111'
+  -%}
+  --banner-heading-color: {{ c_heading }}; --banner-sub-color: {{ c_sub }}; --btn-base-bg: {{ c_btn_bg }}; --btn-base-text: {{ c_btn_text }}; --btn-base-border: {{ c_btn_bg }}; --btn-regular-hover-bg: {{ c_btn_text }}; --btn-regular-hover-text: {{ c_btn_bg }}; --btn-regular-hover-border: {{ c_btn_text }};
+{%- endif -%}

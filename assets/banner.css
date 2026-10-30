@@ -1,0 +1,166 @@
+/* ==========================================================================
+   Banner module (homepage banner + collection banner)
+   Shared media / text / scroll-cue styles. Section-specific sizing lives in
+   each section's own <style> block.
+   ========================================================================== */
+
+.banner-media__picture,
+.banner-media__video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.banner-media__img,
+.banner-media__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  background: transparent;
+}
+
+/* Desktop / mobile video switching (the right one is played by assets/banner.js) */
+.banner-media__video--mobile { display: none; }
+@media (max-width: 767px) {
+  .banner-media__video--desktop { display: none; }
+  .banner-media__video--mobile { display: block; }
+}
+
+/* Mobile "show whole media" mode: nothing is cropped, empty space gets a background colour */
+@media (max-width: 767px) {
+  [data-mobile-fit="contain"] { background-color: var(--banner-fit-bg, #ffffff); }
+  [data-mobile-fit="contain"] .banner-media__img,
+  [data-mobile-fit="contain"] .banner-media__video { object-fit: contain; }
+}
+
+/* Hide the scroll cue when the banner is shorter than the screen (e.g. mobile ratio layouts) */
+[data-banner-short] .banner__scroll-cue { display: none; }
+@media (max-width: 960px) { .banner__scroll-cue--desktop-only { display: none !important; } }
+
+/* Overlay + whole-banner link */
+.banner__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.banner__link-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: block;
+}
+
+/* Content layer */
+.banner__content-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  padding: clamp(20px, 4vw, 60px);
+  pointer-events: none;
+  box-sizing: border-box;
+}
+.banner__content {
+  pointer-events: auto;
+  max-width: 640px;
+}
+.banner__content--center { align-items: center; justify-content: center; text-align: center; }
+.banner__content--left { align-items: center; justify-content: flex-start; text-align: left; }
+.banner__content--right { align-items: center; justify-content: flex-end; text-align: right; }
+.banner__content--top-left { align-items: flex-start; justify-content: flex-start; text-align: left; }
+.banner__content--top-center { align-items: flex-start; justify-content: center; text-align: center; }
+.banner__content--top-right { align-items: flex-start; justify-content: flex-end; text-align: right; }
+.banner__content--bottom-left { align-items: flex-end; justify-content: flex-start; text-align: left; padding-bottom: clamp(30px, 6vw, 80px); }
+.banner__content--bottom-center { align-items: flex-end; justify-content: center; text-align: center; padding-bottom: clamp(30px, 6vw, 80px); }
+.banner__content--bottom-right { align-items: flex-end; justify-content: flex-end; text-align: right; padding-bottom: clamp(30px, 6vw, 80px); }
+
+.banner__subheading {
+  font-size: clamp(11px, 1.2vw, 14px);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+.banner__title {
+  font-size: clamp(22px, 3.5vw, 44px);
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.banner__text {
+  font-size: clamp(13px, 1.3vw, 15px);
+  line-height: 1.6;
+  margin: 0 0 12px;
+  font-weight: 500;
+}
+.banner__button {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 12px 28px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Text tone. !important is needed because layout/theme.liquid forces heading colours. */
+.banner--tone-dark .banner__title,
+.banner--tone-dark .banner__subheading,
+.banner--tone-dark .banner__text { color: #111111 !important; text-shadow: none; }
+.banner--tone-light .banner__title,
+.banner--tone-light .banner__subheading,
+.banner--tone-light .banner__text { color: #ffffff !important; text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35); }
+
+/* Text follows the colour scheme's text colour */
+.banner--tone-scheme .banner__title,
+.banner--tone-scheme .banner__subheading,
+.banner--tone-scheme .banner__text { color: rgb(var(--color-foreground)) !important; text-shadow: none; }
+
+/* Custom colours (values come from inline variables set by snippets/banner-text-style.liquid) */
+.banner--tone-custom .banner__title { color: var(--banner-heading-color, #ffffff) !important; text-shadow: none; }
+.banner--tone-custom .banner__subheading,
+.banner--tone-custom .banner__text { color: var(--banner-sub-color, #ffffff) !important; text-shadow: none; }
+
+/* Scroll cue (full-screen homepage banner) */
+.banner__scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 6;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  background: rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  color: #ffffff;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+}
+.banner--tone-dark .banner__scroll-cue { color: #111111; }
+.banner__scroll-cue:hover { background: rgba(255, 255, 255, 0.9); color: #111111; }
+.banner__scroll-cue svg {
+  width: 18px;
+  height: 18px;
+  animation: bannerCueBounce 1.8s ease-in-out infinite;
+}
+@keyframes bannerCueBounce {
+  0%, 100% { transform: translateY(-2px); }
+  50% { transform: translateY(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .banner__scroll-cue svg { animation: none; }
+}

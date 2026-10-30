@@ -1,0 +1,87 @@
+{%- comment -%}
+  Shared banner media renderer (image OR video, desktop + mobile versions).
+  Used by: sections/section-slideshow.liquid, sections/collection-banner.liquid
+
+  Accepts:
+    - settings    : the settings object holding the media fields (block.settings or section.settings)
+    - alt         : alt text fallback
+    - eager       : true for the first / above-the-fold banner (eager load + high fetch priority)
+    - fallback    : asset filename shown when nothing is uploaded
+    - image_override : optional image object that replaces desktop + mobile images (e.g. collection.image)
+
+  Settings read from `settings`:
+    media_type (image | video), image, image_mobile, video, video_mobile, video_focus
+{%- endcomment -%}
+{%- liquid
+  assign media_type = settings.media_type | default: 'image'
+  assign desktop_image = settings.image
+  assign mobile_image = settings.image_mobile
+  if image_override != blank
+    assign desktop_image = image_override
+    assign mobile_image = settings.image_mobile | default: image_override
+  endif
+
+  assign desktop_video = settings.video | default: settings.video_mobile
+  assign mobile_video = settings.video_mobile | default: settings.video
+  assign use_video = false
+  if media_type == 'video' and desktop_video != blank
+    assign use_video = true
+  endif
+
+  assign focus = settings.video_focus | default: 'center'
+  assign alt_text = alt | default: shop.name
+  assign fetch_priority = 'auto'
+  assign loading_mode = 'lazy'
+  if eager
+    assign fetch_priority = 'high'
+    assign loading_mode = 'eager'
+  endif
+-%}
+
+{%- if use_video -%}
+  {%- comment -%} Same file for both breakpoints: render once. Different files: render both, JS plays the matching one. {%- endcomment -%}
+  {%- if desktop_video.id == mobile_video.id -%}
+    {%- render 'banner-video', video: desktop_video, device: 'all', focus: focus, target_width: 1920, alt: alt_text -%}
+  {%- else -%}
+    {%- render 'banner-video', video: desktop_video, device: 'desktop', focus: focus, target_width: 1920, alt: alt_text -%}
+    {%- render 'banner-video', video: mobile_video, device: 'mobile', focus: focus, target_width: 1080, alt: alt_text -%}
+  {%- endif -%}
+{%- else -%}
+  <picture class="banner-media__picture">
+    {%- if mobile_image != blank -%}
+      <source media="(max-width: 767px)"
+        srcset="{{ mobile_image | image_url: width: 750 }} 750w, {{ mobile_image | image_url: width: 1080 }} 1080w, {{ mobile_image | image_url: width: 1500 }} 1500w"
+        sizes="100vw">
+    {%- endif -%}
+    {%- if desktop_image != blank -%}
+      <source media="(min-width: 768px)"
+        srcset="{{ desktop_image | image_url: width: 1400 }} 1400w, {{ desktop_image | image_url: width: 1920 }} 1920w, {{ desktop_image | image_url: width: 2560 }} 2560w, {{ desktop_image | image_url: width: 3000 }} 3000w"
+        sizes="100vw">
+      <img src="{{ desktop_image | image_url: width: 1920 }}"
+        alt="{{ desktop_image.alt | default: alt_text | escape }}"
+        width="{{ desktop_image.width }}"
+        height="{{ desktop_image.height }}"
+        loading="{{ loading_mode }}"
+        fetchpriority="{{ fetch_priority }}"
+        class="banner-media__img"
+        style="object-position: {{ desktop_image.presentation.focal_point | default: '50% 50%' }};">
+    {%- elsif mobile_image != blank -%}
+      <img src="{{ mobile_image | image_url: width: 1500 }}"
+        alt="{{ mobile_image.alt | default: alt_text | escape }}"
+        width="{{ mobile_image.width }}"
+        height="{{ mobile_image.height }}"
+        loading="{{ loading_mode }}"
+        fetchpriority="{{ fetch_priority }}"
+        class="banner-media__img"
+        style="object-position: {{ mobile_image.presentation.focal_point | default: '50% 50%' }};">
+    {%- else -%}
+      <img src="{{ fallback | default: 'hero_banner_2.png' | asset_url }}"
+        alt="{{ alt_text | escape }}"
+        width="1920"
+        height="640"
+        loading="{{ loading_mode }}"
+        fetchpriority="{{ fetch_priority }}"
+        class="banner-media__img">
+    {%- endif -%}
+  </picture>
+{%- endif -%}

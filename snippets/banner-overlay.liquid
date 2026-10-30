@@ -1,0 +1,49 @@
+{%- comment -%}
+  Banner dark overlay.
+  Accepts:
+    - opacity  : 0-80 (percent strength)
+    - style    : 'full' (flat overlay over the whole banner) | 'gradient' (smooth fade only behind the text)
+    - position : text position value (e.g. bottom-center, middle-left) - decides where the gradient is strongest
+{%- endcomment -%}
+{%- liquid
+  assign overlay_bg = ''
+  assign strength = opacity | default: 0 | times: 1
+  if strength > 0
+    assign a = strength | divided_by: 100.0
+    if style == 'gradient'
+      assign pos = position | default: 'middle-center'
+      assign s0 = a | times: 1.0 | round: 3
+      assign s1 = a | times: 0.87 | round: 3
+      assign s2 = a | times: 0.68 | round: 3
+      assign s3 = a | times: 0.46 | round: 3
+      assign s4 = a | times: 0.26 | round: 3
+      assign s5 = a | times: 0.11 | round: 3
+      assign s6 = a | times: 0.03 | round: 3
+      # Eased (non-linear) stops => no visible banding / hard edge
+      if pos contains 'bottom'
+        assign dir = 'to top'
+      elsif pos contains 'top'
+        assign dir = 'to bottom'
+      elsif pos contains 'left'
+        assign dir = 'to right'
+      elsif pos contains 'right'
+        assign dir = 'to left'
+      else
+        assign dir = 'radial'
+      endif
+      capture stops
+        echo 'rgba(0,0,0,' | append: s0 | append: ') 0%, rgba(0,0,0,' | append: s1 | append: ') 10%, rgba(0,0,0,' | append: s2 | append: ') 21%, rgba(0,0,0,' | append: s3 | append: ') 32%, rgba(0,0,0,' | append: s4 | append: ') 43%, rgba(0,0,0,' | append: s5 | append: ') 54%, rgba(0,0,0,' | append: s6 | append: ') 65%, rgba(0,0,0,0) 75%'
+      endcapture
+      if dir == 'radial'
+        assign overlay_bg = 'radial-gradient(ellipse 75% 85% at 50% 50%, ' | append: stops | append: ')'
+      else
+        assign overlay_bg = 'linear-gradient(' | append: dir | append: ', ' | append: stops | append: ')'
+      endif
+    else
+      assign overlay_bg = 'rgba(0,0,0,' | append: a | append: ')'
+    endif
+  endif
+-%}
+{%- if overlay_bg != blank -%}
+  <div class="banner__overlay" style="background: {{ overlay_bg }};"></div>
+{%- endif -%}
