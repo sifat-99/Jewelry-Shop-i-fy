@@ -1,0 +1,816 @@
+<!-- /sections/section-mosaic.liquid -->
+{%- liquid
+  assign tile_count = section.blocks.size
+  assign chosen_layout = section.settings.layout_style | default: 'auto'
+
+  if chosen_layout == 'auto'
+    if tile_count == 2
+      assign active_layout = 'cols_2'
+    elsif tile_count == 3
+      assign active_layout = 'mosaic_right'
+    elsif tile_count == 4
+      assign active_layout = 'grid_2x2'
+    elsif tile_count == 1
+      assign active_layout = 'single'
+    else
+      assign active_layout = 'cols_3'
+    endif
+  else
+    assign active_layout = chosen_layout
+  endif
+
+  assign mobile_mode = section.settings.mobile_layout | default: 'stacked'
+
+  assign setting_aspect = section.settings.tile_aspect_ratio | default: '3_2'
+  if setting_aspect == 'fixed'
+    assign section_ratio = 'none'
+  elsif setting_aspect == 'adapt'
+    assign section_ratio = 'adapt'
+  elsif setting_aspect == '16_9'
+    assign section_ratio = '16 / 9'
+  elsif setting_aspect == '1_1'
+    assign section_ratio = '1 / 1'
+  elsif setting_aspect == '4_5'
+    assign section_ratio = '4 / 5'
+  elsif setting_aspect == '2_3'
+    assign section_ratio = '2 / 3'
+  else
+    assign section_ratio = '3 / 2'
+  endif
+-%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --mosaic-gap: {{ section.settings.grid_gap | default: 14 }}px;
+    --mosaic-radius: {{ section.settings.tile_radius | default: 0 }}px;
+    --section-mosaic-height: 520px;
+  }
+  {% case section.settings.grid_height %}
+    {% when 'small' %}
+      #shopify-section-{{ section.id }} { --section-mosaic-height: 420px; }
+    {% when 'large' %}
+      #shopify-section-{{ section.id }} { --section-mosaic-height: 640px; }
+    {% when 'adapt' %}
+      #shopify-section-{{ section.id }} { --section-mosaic-height: auto; }
+  {% endcase %}
+
+  #shopify-section-{{ section.id }} .lv-mosaic-wrap {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  #shopify-section-{{ section.id }} .lv-mosaic-container {
+    display: grid;
+    width: 100%;
+    gap: var(--mosaic-gap);
+    box-sizing: border-box;
+  }
+
+  {%- if section_ratio != 'none' -%}
+    #shopify-section-{{ section.id }} .lv-mosaic-container {
+      height: auto !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--single,
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--cols_2,
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--cols_3,
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--cols_4,
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--grid_2x2 {
+      height: auto !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-tile {
+      height: auto !important;
+      aspect-ratio: var(--tile-aspect-ratio, 3 / 2) !important;
+    }
+    @media (max-width: 767px) {
+      #shopify-section-{{ section.id }} .lv-mosaic-tile,
+      #shopify-section-{{ section.id }} .lv-mobile--stacked .lv-mosaic-tile,
+      #shopify-section-{{ section.id }} .lv-mobile--grid_2 .lv-mosaic-tile {
+        height: auto !important;
+        aspect-ratio: var(--tile-aspect-ratio-mobile, var(--tile-aspect-ratio, 3 / 2)) !important;
+      }
+      #shopify-section-{{ section.id }} .lv-mobile--scroll .lv-mosaic-tile {
+        height: auto !important;
+        flex: 0 0 85vw !important;
+        aspect-ratio: var(--tile-aspect-ratio-mobile, var(--tile-aspect-ratio, 3 / 2)) !important;
+      }
+    }
+  {%- endif -%}
+
+  /* -------------------------------------------------------------
+     Desktop Grid Layout Styles
+     ------------------------------------------------------------- */
+  @media (min-width: 768px) {
+    /* 1. Single Banner */
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--single {
+      grid-template-columns: 1fr;
+      height: var(--section-mosaic-height);
+    }
+
+    /* 2. Two Equal Columns (50/50 Side by Side) */
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--cols_2 {
+      grid-template-columns: repeat(2, 1fr);
+      height: var(--section-mosaic-height);
+    }
+
+    /* 3. Three Equal Columns (1/3 each) */
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--cols_3 {
+      grid-template-columns: repeat(3, 1fr);
+      height: var(--section-mosaic-height);
+    }
+
+    /* 4. Four Equal Columns in 1 Row */
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--cols_4 {
+      grid-template-columns: repeat(4, 1fr);
+      height: var(--section-mosaic-height);
+    }
+
+    /* 5. 4 Grid (2x2 Quad Grid) */
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--grid_2x2 {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: 1fr 1fr;
+      height: calc(var(--section-mosaic-height) * 1.15);
+    }
+
+    /* 6. Mosaic Right (2 Short Left, 1 Tall Right) */
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_right {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      height: var(--section-mosaic-height);
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_right > .lv-mosaic-tile:nth-child(1) {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_right > .lv-mosaic-tile:nth-child(2) {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_right > .lv-mosaic-tile:nth-child(3) {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+
+    /* 7. Mosaic Left (1 Tall Left, 2 Short Right) */
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_left {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      height: var(--section-mosaic-height);
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_left > .lv-mosaic-tile:nth-child(1) {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_left > .lv-mosaic-tile:nth-child(2) {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_left > .lv-mosaic-tile:nth-child(3) {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    /* 8. Mosaic 4 Featured (1 Large Featured + 3 Stacked) */
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_4_featured {
+      grid-template-columns: 1.35fr 1fr;
+      grid-template-rows: repeat(3, 1fr);
+      height: calc(var(--section-mosaic-height) * 1.25);
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_4_featured > .lv-mosaic-tile:nth-child(1) {
+      grid-column: 1;
+      grid-row: 1 / span 3;
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_4_featured > .lv-mosaic-tile:nth-child(2) {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_4_featured > .lv-mosaic-tile:nth-child(3) {
+      grid-column: 2;
+      grid-row: 2;
+    }
+    #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_4_featured > .lv-mosaic-tile:nth-child(4) {
+      grid-column: 2;
+      grid-row: 3;
+    }
+  }
+
+  /* -------------------------------------------------------------
+     Individual Tile Card Styles
+     ------------------------------------------------------------- */
+  #shopify-section-{{ section.id }} .lv-mosaic-tile {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--mosaic-radius);
+    background-color: #f7f5f2;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #shopify-section-{{ section.id }} .lv-mosaic-tile:hover .lv-tile-img {
+    transform: scale(1.04);
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  #shopify-section-{{ section.id }} .lv-mosaic-tile--clickable {
+    cursor: pointer;
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap {
+    position: absolute;
+    inset: 0;
+    padding: 24px;
+    display: flex;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 6;
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-center {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-bottom_center {
+    align-items: flex-end;
+    justify-content: center;
+    text-align: center;
+    padding-bottom: 28px;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-bottom_left {
+    align-items: flex-end;
+    justify-content: flex-start;
+    text-align: left;
+    padding-bottom: 28px;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-middle_left {
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-top_left {
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-content {
+    pointer-events: none;
+    max-width: 90%;
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-subheading {
+    font-family: 'Quicksand', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.16em !important;
+    text-transform: uppercase !important;
+    color: #ffffff !important;
+    margin: 0 0 6px 0;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-title {
+    font-family: 'Quicksand', sans-serif !important;
+    font-size: clamp(16px, 1.8vw, 24px) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: #ffffff !important;
+    margin: 0;
+    line-height: 1.25 !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-btn-wrap {
+    margin-top: 14px;
+    pointer-events: auto;
+    position: relative;
+    z-index: 7;
+    display: inline-block;
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-btn {
+    display: inline-flex !important;
+    padding: 8px 24px !important;
+    font-family: 'Quicksand', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.15em !important;
+    text-transform: uppercase !important;
+    text-decoration: none !important;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-clickable-link {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    display: block;
+    cursor: pointer;
+  }
+
+  /* -------------------------------------------------------------
+     Mobile Display Options
+     ------------------------------------------------------------- */
+  @media (max-width: 767px) {
+    #shopify-section-{{ section.id }} .lv-mosaic-container {
+      height: auto !important;
+    }
+
+    /* 1. Stacked Mode (1 tile per row) */
+    #shopify-section-{{ section.id }} .lv-mobile--stacked {
+      grid-template-columns: 1fr !important;
+      grid-template-rows: auto !important;
+      gap: 12px !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mobile--stacked .lv-mosaic-tile {
+      {%- if section_ratio != 'none' -%}
+        height: auto !important;
+        aspect-ratio: var(--tile-aspect-ratio-mobile, var(--tile-aspect-ratio, 1)) !important;
+      {%- else -%}
+        height: 260px !important;
+      {%- endif -%}
+      grid-column: auto !important;
+      grid-row: auto !important;
+    }
+
+    /* 2. 2 Columns Mode on Mobile */
+    #shopify-section-{{ section.id }} .lv-mobile--grid_2 {
+      grid-template-columns: repeat(2, 1fr) !important;
+      grid-template-rows: auto !important;
+      gap: 8px !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mobile--grid_2 .lv-mosaic-tile {
+      {%- if section_ratio != 'none' -%}
+        height: auto !important;
+        aspect-ratio: var(--tile-aspect-ratio-mobile, var(--tile-aspect-ratio, 1)) !important;
+      {%- else -%}
+        height: 180px !important;
+      {%- endif -%}
+      grid-column: auto !important;
+      grid-row: auto !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mobile--grid_2 .lv-tile-title {
+      font-size: 13px !important;
+      letter-spacing: 0.08em !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mobile--grid_2 .lv-tile-btn {
+      padding: 5px 14px !important;
+      font-size: 9.5px !important;
+    }
+
+    /* 3. Mobile Mosaic (For 3 tiles: 2 short + 1 tall) */
+    #shopify-section-{{ section.id }} .lv-mobile--mosaic {
+      grid-template-columns: 1fr 1fr !important;
+      grid-template-rows: 140px 140px !important;
+      gap: 8px !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mobile--mosaic > .lv-mosaic-tile:nth-child(1) {
+      grid-column: 1 !important;
+      grid-row: 1 !important;
+      height: 100% !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mobile--mosaic > .lv-mosaic-tile:nth-child(2) {
+      grid-column: 1 !important;
+      grid-row: 2 !important;
+      height: 100% !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mobile--mosaic > .lv-mosaic-tile:nth-child(3) {
+      grid-column: 2 !important;
+      grid-row: 1 / span 2 !important;
+      height: 100% !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mobile--mosaic .lv-tile-title {
+      font-size: 13px !important;
+      letter-spacing: 0.08em !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mobile--mosaic .lv-tile-btn {
+      padding: 5px 14px !important;
+      font-size: 9.5px !important;
+    }
+
+    /* 4. Horizontal Scroll Mode */
+    #shopify-section-{{ section.id }} .lv-mobile--scroll {
+      display: flex !important;
+      overflow-x: auto !important;
+      scroll-snap-type: x mandatory !important;
+      -webkit-overflow-scrolling: touch !important;
+      padding-bottom: 8px;
+      gap: 10px !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mobile--scroll .lv-mosaic-tile {
+      flex: 0 0 78vw !important;
+      {%- if section_ratio != 'none' -%}
+        height: auto !important;
+        aspect-ratio: var(--tile-aspect-ratio-mobile, var(--tile-aspect-ratio, 1)) !important;
+      {%- else -%}
+        height: 320px !important;
+      {%- endif -%}
+      scroll-snap-align: start !important;
+    }
+  }
+</style>
+
+<div class="section-mosaic color-{{ section.settings.color_scheme | default: 'scheme-1' }} section-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+  data-section-type="mosaic"
+  style="--PT: {{ section.settings.padding_top | default: 20 }}px; --PB: {{ section.settings.padding_bottom | default: 30 }}px;">
+  
+  <div class="wrapper--full section-padding">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="kicker-flourished mb-r11">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p style="text-align: center; font-family: 'Quicksand', sans-serif; font-size: 13.5px; font-weight: 500; color: #2b2622; margin: -6px auto 26px auto; letter-spacing: 0.05em; max-width: 600px; opacity: 1;">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+
+    <div class="lv-mosaic-wrap">
+      <div class="lv-mosaic-container lv-mosaic-layout--{{ active_layout }} lv-mobile--{{ mobile_mode }}">
+        {%- if section.blocks.size > 0 -%}
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign block_index = forloop.index
+              assign fallback_img = 'mosaic_' | append: block_index | append: '.jpg' | asset_url
+
+              assign has_content = false
+              if block.settings.title != blank or block.settings.subheading != blank or block.settings.button_label != blank
+                assign has_content = true
+              endif
+
+              assign overlay_val = block.settings.overlay_opacity
+              if overlay_val == blank
+                if section.settings.overlay_opacity != blank and section.settings.overlay_opacity > 0
+                  assign overlay_val = section.settings.overlay_opacity
+                elsif has_content
+                  assign overlay_val = 20
+                else
+                  assign overlay_val = 0
+                endif
+              endif
+
+              assign tile_scheme = block.settings.color_scheme | default: section.settings.color_scheme | default: 'scheme-5'
+
+              assign tile_banner_url = block.settings.banner_link
+              if tile_banner_url == blank
+                assign tile_banner_url = block.settings.link
+              endif
+              if tile_banner_url == blank
+                assign tile_banner_url = block.settings.button_link
+              endif
+
+              assign tile_button_url = block.settings.button_link
+              if tile_button_url == blank
+                assign tile_button_url = tile_banner_url
+              endif
+
+              assign block_img = block.settings.image
+              if section_ratio == 'adapt'
+                assign tile_ratio = block_img.aspect_ratio | default: 1.5
+              else
+                assign tile_ratio = section_ratio
+              endif
+
+              if block.settings.image_mobile != blank and section_ratio == 'adapt'
+                assign tile_ratio_mobile = block.settings.image_mobile.aspect_ratio | default: tile_ratio
+              else
+                assign tile_ratio_mobile = tile_ratio
+              endif
+            -%}
+
+            <div class="lv-mosaic-tile lv-tile-{{ block.id }} {% if has_content %}has-content{% else %}image-only{% endif %} color-{{ tile_scheme }}{% if tile_banner_url != blank %} lv-mosaic-tile--clickable{% endif %}"
+              style="--tile-aspect-ratio: {{ tile_ratio }}; --tile-aspect-ratio-mobile: {{ tile_ratio_mobile }};"
+              {{ block.shopify_attributes }}>
+              
+              <!-- Tile Image Media -->
+              <div class="lv-tile-media">
+                {%- if block.settings.image != blank -%}
+                  {%- if block.settings.image_mobile != blank -%}
+                    <picture class="block w-full h-full">
+                      <source media="(max-width: 767px)" srcset="{{ block.settings.image_mobile | image_url: width: 1000 }}">
+                      <img
+                        src="{{ block.settings.image | image_url: width: 1600 }}"
+                        alt="{{ block.settings.title | default: block.settings.image.alt | default: 'Mosaic item' | escape }}"
+                        width="{{ block.settings.image.width | default: 1600 }}"
+                        height="{{ block.settings.image.height | default: 1200 }}"
+                        loading="lazy"
+                        class="lv-tile-img"
+                      >
+                    </picture>
+                  {%- else -%}
+                    <img
+                      src="{{ block.settings.image | image_url: width: 1600 }}"
+                      alt="{{ block.settings.title | default: block.settings.image.alt | default: 'Mosaic item' | escape }}"
+                      width="{{ block.settings.image.width | default: 1600 }}"
+                      height="{{ block.settings.image.height | default: 1200 }}"
+                      loading="lazy"
+                      class="lv-tile-img"
+                    >
+                  {%- endif -%}
+                {%- else -%}
+                  <img
+                    src="{{ fallback_img }}"
+                    alt="{{ block.settings.title | default: 'Mosaic item' | escape }}"
+                    width="1600"
+                    height="1200"
+                    loading="lazy"
+                    class="lv-tile-img"
+                  >
+                {%- endif -%}
+
+                {%- if overlay_val > 0 -%}
+                  <div class="lv-tile-overlay" style="opacity: {{ overlay_val | divided_by: 100.0 }};"></div>
+                {%- endif -%}
+              </div>
+
+              <!-- Full Tile Clickable Banner Link -->
+              {%- if tile_banner_url != blank -%}
+                <a href="{{ tile_banner_url }}" class="lv-tile-clickable-link" aria-label="{{ block.settings.title | default: 'Mosaic banner' | escape }}"></a>
+              {%- endif -%}
+
+              <!-- Tile Text Content (Only if text or button provided) -->
+              {%- if has_content -%}
+                <div class="lv-tile-content-wrap lv-align-{{ block.settings.text_position | default: 'center' }}">
+                  <div class="lv-tile-content">
+                    {%- if block.settings.subheading != blank -%}
+                      <p class="lv-tile-subheading">{{ block.settings.subheading }}</p>
+                    {%- endif -%}
+                    {%- if block.settings.title != blank -%}
+                      <h3 class="lv-tile-title">{{ block.settings.title }}</h3>
+                    {%- endif -%}
+                    {%- if block.settings.button_label != blank -%}
+                      <div class="lv-tile-btn-wrap">
+                        {%- if tile_button_url != blank -%}
+                          <a href="{{ tile_button_url }}" class="btn btn--outline btn--white btn-sliding-hover lv-tile-btn">
+                            <span class="btn__text-content">{{ block.settings.button_label }}</span>
+                          </a>
+                        {%- else -%}
+                          <span class="btn btn--outline btn--white btn-sliding-hover lv-tile-btn">
+                            <span class="btn__text-content">{{ block.settings.button_label }}</span>
+                          </span>
+                        {%- endif -%}
+                      </div>
+                    {%- endif -%}
+                  </div>
+                </div>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Mosaic & Grid Banner",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section heading"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Section subheading"
+    },
+    {
+      "type": "select",
+      "id": "layout_style",
+      "label": "Grid layout style",
+      "options": [
+        { "value": "auto", "label": "Smart Auto (Adapts to number of tiles)" },
+        { "value": "cols_2", "label": "2 Columns (Side by Side 50/50)" },
+        { "value": "mosaic_right", "label": "Mosaic - 2 Left, 1 Tall Right (3 tiles)" },
+        { "value": "mosaic_left", "label": "Mosaic - 1 Tall Left, 2 Right (3 tiles)" },
+        { "value": "cols_3", "label": "3 Columns (Equal width)" },
+        { "value": "grid_2x2", "label": "4 Grid (2x2 Quad Grid)" },
+        { "value": "cols_4", "label": "4 Columns (Equal width in 1 row)" },
+        { "value": "mosaic_4_featured", "label": "4 Mosaic (1 Large Featured + 3 Stacked)" }
+      ],
+      "default": "auto",
+      "info": "Choose a preset layout or keep 'Smart Auto' to format automatically."
+    },
+    {
+      "type": "select",
+      "id": "grid_height",
+      "label": "Desktop grid height",
+      "options": [
+        { "value": "small", "label": "Small (420px)" },
+        { "value": "medium", "label": "Medium (520px - Recommended)" },
+        { "value": "large", "label": "Large (640px)" },
+        { "value": "adapt", "label": "Adapt to images" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "tile_aspect_ratio",
+      "label": "Aspect ratio (Desktop & Mobile)",
+      "options": [
+        { "value": "3_2", "label": "Landscape (3:2 - Recommended)" },
+        { "value": "adapt", "label": "Adapt to image (Never crops)" },
+        { "value": "16_9", "label": "Widescreen (16:9)" },
+        { "value": "1_1", "label": "Square (1:1)" },
+        { "value": "4_5", "label": "Portrait (4:5)" },
+        { "value": "2_3", "label": "Tall Portrait (2:3)" },
+        { "value": "fixed", "label": "Fixed height (Legacy)" }
+      ],
+      "default": "3_2",
+      "info": "Preserves the exact aspect ratio on all desktop and mobile devices so images never crop or distort."
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout style",
+      "options": [
+        { "value": "stacked", "label": "1 per row (Stacked)" },
+        { "value": "grid_2", "label": "2 per row (Compact Grid)" },
+        { "value": "mosaic", "label": "Mosaic (2 short + 1 tall)" },
+        { "value": "scroll", "label": "Swipeable Carousel (Horizontal scroll)" }
+      ],
+      "default": "stacked"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Spacing between tiles",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "tile_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Tile corner radius",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Default dark overlay opacity",
+      "default": 0,
+      "info": "Global dark overlay for all tiles (0% = pure bright image). Can also be customized per tile block."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Tile",
+      "settings": [
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "label": "Color scheme",
+          "default": "scheme-5"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Desktop image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Mobile image (Optional)"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading / Tagline"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading / Title"
+        },
+        {
+          "type": "url",
+          "id": "banner_link",
+          "label": "Banner link",
+          "info": "Clicking anywhere on this tile/banner will open this link"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link",
+          "info": "Link for button (Optional, defaults to banner link)"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link URL (Legacy fallback)",
+          "info": "Whole tile is clickable if link is provided"
+        },
+        {
+          "type": "select",
+          "id": "text_position",
+          "label": "Text position",
+          "options": [
+            { "value": "center", "label": "Center" },
+            { "value": "bottom_center", "label": "Bottom Center" },
+            { "value": "bottom_left", "label": "Bottom Left" },
+            { "value": "middle_left", "label": "Middle Left" },
+            { "value": "top_left", "label": "Top Left" }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "range",
+          "id": "overlay_opacity",
+          "min": 0,
+          "max": 80,
+          "step": 5,
+          "unit": "%",
+          "label": "Dark overlay opacity",
+          "default": 25,
+          "info": "Automatically 0% (clear image) if title and button are empty"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mosaic & Grid Banner",
+      "blocks": [
+        { "type": "tile" },
+        { "type": "tile" },
+        { "type": "tile" }
+      ]
+    }
+  ]
+}
+{% endschema %}
