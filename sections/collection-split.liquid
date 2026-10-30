@@ -1,0 +1,922 @@
+<!-- /sections/collection-split.liquid -->
+{%- liquid
+  assign target_collection = collections[section.settings.collection]
+  if target_collection == blank or target_collection.products_count == 0
+    assign target_collection = collections.all
+  endif
+
+  comment
+    Banner / products column widths. For "image right" the visual order is reversed (products first), so the tracks are swapped.
+  endcomment
+  assign split_ratio = section.settings.split_ratio | default: 'equal'
+  case split_ratio
+    when 'wide'
+      assign banner_fr = '1.22fr'
+    when 'narrow'
+      assign banner_fr = '0.67fr'
+    else
+      assign banner_fr = '1fr'
+  endcase
+  if section.settings.layout == 'image_right'
+    assign split_template = 'minmax(0, 1fr) minmax(0, ' | append: banner_fr | append: ')'
+  else
+    assign split_template = 'minmax(0, ' | append: banner_fr | append: ') minmax(0, 1fr)'
+  endif
+  assign banner_ratio = section.settings.banner_ratio | default: '2 / 3'
+  assign content_pad = section.settings.content_padding | default: 24
+
+  assign use_showcase = false
+  if section.settings.banner_type == 'products' and section.settings.showcase_products.size > 0
+    assign use_showcase = true
+  endif
+  assign banner_fill = true
+  if section.settings.banner_height == 'ratio'
+    assign banner_fill = false
+  endif
+-%}
+
+<div class="collection-split{% if banner_fill %} collection-split--fill{% endif %} color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
+  data-section-id="{{ section.id }}"
+  data-section-type="collection-row"
+  style="--PT: {{ section.settings.padding_top | default: 36 }}px; --PB: {{ section.settings.padding_bottom | default: 36 }}px; --card-radius: {{ section.settings.card_border_radius | default: settings.card_border_radius | default: 0 }}px; --split-template: {{ split_template }}; --split-banner-ratio: {{ banner_ratio }}; --split-pad: {{ content_pad }}px;">
+
+  {{ 'product-grid.css' | asset_url | stylesheet_tag }}
+  <style>
+    #shopify-section-{{ section.id }} .collection-split-container {
+      width: 100%;
+      padding-top: var(--PT);
+      padding-bottom: var(--PB);
+      box-sizing: border-box;
+    }
+    #shopify-section-{{ section.id }} .collection-split__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      column-gap: var(--gutter, 30px);
+      row-gap: 24px;
+      width: 100%;
+    }
+    @media only screen and (min-width: 769px) {
+      #shopify-section-{{ section.id }} .collection-split__grid {
+        grid-template-columns: var(--split-template, minmax(0, 1fr) minmax(0, 1fr));
+        row-gap: var(--gutter, 30px);
+        align-items: stretch;
+      }
+      #shopify-section-{{ section.id }} .collection-split__item--last {
+        order: 2;
+      }
+      #shopify-section-{{ section.id }} .collection-split__products {
+        padding: 0 var(--split-pad, 24px);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+      }
+    }
+    @media only screen and (min-width: 769px) and (max-width: 1024px) {
+      #shopify-section-{{ section.id }} .collection-split__products {
+        padding: 0 min(var(--split-pad, 24px), 14px);
+      }
+    }
+    @media only screen and (max-width: 768px) {
+      #shopify-section-{{ section.id }} .collection-split__products {
+        padding: 24px 16px 36px 16px !important;
+        box-sizing: border-box;
+        width: 100%;
+      }
+      #shopify-section-{{ section.id }} .collection-split__item {
+        margin: 0 !important;
+        max-width: 100% !important;
+      }
+    }
+
+    /* Products Grid inside split */
+    #shopify-section-{{ section.id }} .collection-split-products-grid {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #shopify-section-{{ section.id }} .collection-split__product {
+      margin-bottom: 0 !important;
+      width: 100%;
+    }
+    #shopify-section-{{ section.id }} .hero__title {
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-size: clamp(24px, 3.2vw, 38px) !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.1em !important;
+      text-transform: uppercase !important;
+      color: #ffffff !important;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+      line-height: 1.25 !important;
+    }
+    #shopify-section-{{ section.id }} .hero__subtitle {
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-size: 13.5px !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.06em !important;
+      color: #ffffff !important;
+      opacity: 1 !important;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4) !important;
+    }
+    #shopify-section-{{ section.id }} .collection-split__block {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+    #shopify-section-{{ section.id }} .collection-split__media-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      overflow: hidden;
+    }
+    #shopify-section-{{ section.id }} .collection-split__img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      object-position: center !important;
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: auto;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #shopify-section-{{ section.id }} .collection-split__block--clickable {
+      cursor: pointer;
+    }
+    #shopify-section-{{ section.id }} .collection-split__block--clickable:hover .collection-split__img {
+      transform: scale(1.03);
+    }
+    #shopify-section-{{ section.id }} .split-banner-full-link {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+      display: block;
+      cursor: pointer;
+    }
+    #shopify-section-{{ section.id }} .hero__btn__wrap {
+      margin-top: 16px;
+      pointer-events: auto;
+      position: relative;
+      z-index: 7;
+      display: inline-block;
+    }
+
+    /* Mobile: 1:1 aspect ratio square banner */
+    @media only screen and (max-width: 768px) {
+      #shopify-section-{{ section.id }} .collection-split__item {
+        width: 100% !important;
+        aspect-ratio: 1 / 1 !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        position: relative !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        border-radius: var(--card-radius, 0px);
+      }
+      #shopify-section-{{ section.id }} .collection-split__block {
+        position: relative !important;
+        width: 100% !important;
+        height: 100% !important;
+        aspect-ratio: 1 / 1 !important;
+        min-height: auto !important;
+        max-height: none !important;
+      }
+      #shopify-section-{{ section.id }} .collection-split__img--desktop {
+        display: none !important;
+      }
+      #shopify-section-{{ section.id }} .collection-split__img--mobile {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center !important;
+      }
+    }
+
+    @media only screen and (min-width: 769px) {
+      #shopify-section-{{ section.id }} .collection-split__grid {
+        align-items: stretch !important;
+      }
+      #shopify-section-{{ section.id }} .collection-split__item {
+        position: relative !important;
+        overflow: visible !important;
+      }
+      #shopify-section-{{ section.id }} .collection-split__block--banner {
+        position: -webkit-sticky !important;
+        position: sticky !important;
+        top: var(--split-sticky-top, var(--menu-height-sticky, var(--menu-height, 0px))) !important;
+        width: 100% !important;
+        aspect-ratio: var(--split-banner-ratio, 2 / 3) !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: calc(100svh - var(--split-sticky-top, var(--menu-height-sticky, var(--menu-height, 0px))) - 24px) !important;
+        overflow: hidden !important;
+        z-index: 3 !important;
+        border-radius: var(--card-radius, 0px);
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+      }
+      /* Fill the screen: pinned banner is exactly as tall as the visible area, so no gap appears below it */
+      #shopify-section-{{ section.id }} .collection-split--fill .collection-split__block--banner {
+        aspect-ratio: auto !important;
+        height: calc(100vh - var(--split-sticky-top, 0px)) !important;
+        height: calc(100svh - var(--split-sticky-top, 0px)) !important;
+        min-height: 420px !important;
+        max-height: none !important;
+      }
+      #shopify-section-{{ section.id }} .collection-split__img--mobile {
+        display: none !important;
+      }
+      #shopify-section-{{ section.id }} .collection-split__img--desktop {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center !important;
+      }
+    }
+
+    /* ---------- Product showcase banner (selected products + moving animation) ---------- */
+    #shopify-section-{{ section.id }} .collection-split__block--showcase .image-overlay { pointer-events: none; }
+    #shopify-section-{{ section.id }} .split-showcase { position: absolute; inset: 0; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; background: #000000; }
+    #shopify-section-{{ section.id }} .split-showcase__slide { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+    #shopify-section-{{ section.id }} .split-showcase__slide.is-active { pointer-events: auto; }
+    #shopify-section-{{ section.id }} .split-showcase__link { position: absolute; inset: 0; display: block; overflow: hidden; color: #ffffff; }
+    #shopify-section-{{ section.id }} .split-showcase__img {
+      /* overscan 2px: hides the faint edge line some product photos carry on their top/left border */
+      width: calc(100% + 4px) !important;
+      max-width: none !important;
+      height: calc(100% + 4px) !important;
+      margin: -2px !important;
+      object-fit: cover !important;
+      object-position: center !important;
+      display: block !important;
+      -webkit-user-drag: none;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: auto;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transform: translateZ(0);
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #shopify-section-{{ section.id }} .split-showcase:hover .split-showcase__img {
+      transform: scale(1.03);
+    }
+    #shopify-section-{{ section.id }} .split-showcase__shade {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 50%; z-index: 3; pointer-events: none;
+      background: linear-gradient(to top, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.35) 35%, rgba(0,0,0,0) 100%);
+    }
+    #shopify-section-{{ section.id }} .split-showcase__caption {
+      position: absolute; left: clamp(16px, 3vw, 32px); right: 90px; bottom: clamp(16px, 3vw, 30px); z-index: 4;
+      display: flex; flex-direction: column; gap: 4px; text-align: left; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.6), 0 2px 14px rgba(0,0,0,0.5);
+    }
+    #shopify-section-{{ section.id }} .split-showcase__name { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.35; color: #ffffff; }
+    #shopify-section-{{ section.id }} .split-showcase__price { font-size: 14px; font-weight: 600; letter-spacing: 0.04em; opacity: 1; color: #ffffff; }
+    #shopify-section-{{ section.id }} .split-showcase__dots {
+      position: absolute; right: clamp(14px, 3vw, 28px); bottom: clamp(18px, 3vw, 32px); z-index: 5; display: flex; gap: 8px;
+    }
+    #shopify-section-{{ section.id }} .split-showcase__dot {
+      width: 8px; height: 8px; padding: 0; border-radius: 50%; border: 1px solid #ffffff; background: transparent; cursor: pointer;
+      opacity: 0.8; transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    #shopify-section-{{ section.id }} .split-showcase__dot.is-active { background: #ffffff; transform: scale(1.25); opacity: 1; }
+
+    /* Effect 1: soft cross-fade */
+    #shopify-section-{{ section.id }} .split-showcase[data-effect="fade_zoom"] .split-showcase__slide { transition: opacity 0.8s ease; }
+    #shopify-section-{{ section.id }} .split-showcase[data-effect="fade_zoom"] .split-showcase__slide.is-active { opacity: 1; z-index: 2; }
+    /* Effect 2: slide */
+    #shopify-section-{{ section.id }} .split-showcase[data-effect="slide"] .split-showcase__slide { opacity: 1; transform: translateX(100%); transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1); }
+    #shopify-section-{{ section.id }} .split-showcase[data-effect="slide"] .split-showcase__slide.is-active { transform: translateX(0); z-index: 2; }
+    #shopify-section-{{ section.id }} .split-showcase[data-effect="slide"] .split-showcase__slide.is-prev { transform: translateX(-100%); }
+    @media (prefers-reduced-motion: reduce) {
+      #shopify-section-{{ section.id }} .split-showcase__slide,
+      #shopify-section-{{ section.id }} .split-showcase__img { transition: none !important; transform: none !important; }
+    }
+  </style>
+
+  <script>
+    (() => {
+      const section = document.querySelector('#shopify-section-{{ section.id }} .collection-split');
+      if (!section) return;
+
+      const header = document.querySelector('[data-header-height]');
+      const updateStickyOffset = () => {
+        section.style.setProperty('--split-sticky-top', `${header?.getBoundingClientRect().height || 0}px`);
+      };
+      updateStickyOffset();
+      window.addEventListener('resize', updateStickyOffset, { passive: true });
+    })();
+  </script>
+
+  {%- if use_showcase and section.settings.showcase_products.size > 1 -%}
+    <script>
+      (() => {
+        const init = () => {
+          const root = document.querySelector('#shopify-section-{{ section.id }} [data-split-showcase]');
+          if (!root || root.dataset.ready) return;
+          root.dataset.ready = '1';
+          const slides = Array.from(root.querySelectorAll('[data-showcase-slide]'));
+          const dots = Array.from(root.querySelectorAll('[data-showcase-dot]'));
+          const speed = parseInt(root.dataset.speed, 10) || 4500;
+          const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          let current = 0, timer = null, visible = true, hovering = false;
+
+          const show = (n) => {
+            const next = (n + slides.length) % slides.length;
+            if (next === current) return;
+            slides.forEach((el, i) => {
+              el.classList.toggle('is-active', i === next);
+              el.classList.toggle('is-prev', i === current);
+              const link = el.querySelector('a'); if (link) link.tabIndex = i === next ? 0 : -1;
+            });
+            dots.forEach((d, i) => d.classList.toggle('is-active', i === next));
+            current = next;
+          };
+          const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
+          const start = () => {
+            stop();
+            if (root.dataset.autoplay !== 'true' || reduced || !visible || hovering || document.hidden) return;
+            timer = setInterval(() => show(current + 1), speed);
+          };
+          dots.forEach((d) => d.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); show(parseInt(d.dataset.showcaseDot, 10)); start(); }));
+
+          /* swipe / drag */
+          let sx = 0, sy = 0, dragging = false, moved = false;
+          root.addEventListener('pointerdown', (e) => {
+            if (e.target.closest('[data-showcase-dot]') || (e.pointerType === 'mouse' && e.button !== 0)) return;
+            dragging = true; moved = false; sx = e.clientX; sy = e.clientY;
+          });
+          root.addEventListener('pointermove', (e) => {
+            if (dragging && Math.abs(e.clientX - sx) > 8) moved = true;
+          });
+          const end = (e) => {
+            if (!dragging) return;
+            dragging = false;
+            const dx = e.clientX - sx, dy = e.clientY - sy;
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { show(current + (dx < 0 ? 1 : -1)); start(); }
+          };
+          root.addEventListener('pointerup', end);
+          root.addEventListener('pointercancel', () => { dragging = false; });
+          root.addEventListener('dragstart', (e) => e.preventDefault());
+          root.addEventListener('click', (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+
+          root.addEventListener('mouseenter', () => { hovering = true; stop(); });
+          root.addEventListener('mouseleave', () => { hovering = false; start(); });
+          document.addEventListener('visibilitychange', start);
+          if ('IntersectionObserver' in window) {
+            new IntersectionObserver((e) => { visible = e[0].isIntersecting; start(); }, { threshold: 0.2 }).observe(root);
+          }
+          start();
+        };
+        /* the script sits above the markup, so wait until the banner exists */
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+        document.addEventListener('shopify:section:load', (e) => { if (e.target && e.target.id === 'shopify-section-{{ section.id }}') init(); });
+      })();
+    </script>
+  {%- endif -%}
+
+  <div class="collection-split-container">
+    <div class="collection-split__grid">
+      <div class="collection-split__item {% if section.settings.layout == 'image_right' %}collection-split__item--last{% endif %}">
+        {%- liquid
+          assign banner_url = section.settings.banner_link
+          if banner_url == blank
+            assign banner_url = section.settings.button_link
+          endif
+          if banner_url == blank
+            assign banner_url = target_collection.url
+          endif
+
+          assign button_url = section.settings.button_link
+          if button_url == blank
+            assign button_url = banner_url
+          endif
+          if button_url == blank
+            assign button_url = routes.all_products_collection_url
+          endif
+        -%}
+        <div class="collection-split__block collection-split__block--banner text--white{% if use_showcase %} collection-split__block--showcase{% elsif banner_url != blank %} collection-split__block--clickable{% endif %}">
+          {%- assign has_banner_content = false -%}
+          {%- if section.settings.title != blank or section.settings.subtitle != blank or section.settings.button_label != blank -%}
+            {%- assign has_banner_content = true -%}
+          {%- endif -%}
+
+          {%- if banner_url != blank and use_showcase == false -%}
+            <a href="{{ banner_url }}" class="split-banner-full-link" aria-label="{{ section.settings.title | default: target_collection.title | default: 'Collection' | escape }}"></a>
+          {%- endif -%}
+
+          {%- if has_banner_content -%}
+            <div class="hero__content__wrapper align--middle-center" style="position: relative; z-index: 6; pointer-events: none;">
+              <div>
+                {%- if section.settings.title != blank -%}
+                  <h2 class="hero__title" data-aos="hero" data-aos-order="2">{{ section.settings.title }}</h2>
+                {%- endif -%}
+                {%- if section.settings.subtitle != blank -%}
+                  <p class="hero__subtitle" data-aos="hero" data-aos-order="2" style="font-family: 'Quicksand', sans-serif; font-size: 13.5px; font-weight: 500; letter-spacing: 0.06em; line-height: 1.5; margin: 10px auto 0 auto; max-width: 420px; opacity: 1;">{{ section.settings.subtitle }}</p>
+                {%- endif -%}
+                {%- if section.settings.button_label != blank -%}
+                  <div class="hero__btn__wrap">
+                    <a class="hero__btn btn btn--white btn-sliding-hover" href="{{ button_url }}" data-aos="hero" data-aos-order="3">
+                      <span class="btn__text-content">{{ section.settings.button_label }}</span>
+                    </a>
+                  </div>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- assign overlay_val = section.settings.overlay_opacity | default: 0 -%}
+          {%- if overlay_val > 0 -%}
+            <div class="image-overlay" style="--bg: #000000; opacity: {{ overlay_val | divided_by: 100.0 }}; z-index: 2;"></div>
+          {%- endif -%}
+          <div class="collection-split__media-wrapper">
+            {%- if use_showcase -%}
+              {%- assign show_caption = section.settings.showcase_show_caption -%}
+              {%- assign slide_count = section.settings.showcase_products.size -%}
+              <div class="split-showcase"
+                data-split-showcase
+                data-effect="{{ section.settings.showcase_effect | default: 'fade_zoom' }}"
+                data-autoplay="{{ section.settings.showcase_autoplay | default: true }}"
+                data-speed="{{ section.settings.showcase_speed | default: 4500 }}">
+                {%- for product in section.settings.showcase_products -%}
+                  <div class="split-showcase__slide{% if forloop.first %} is-active{% endif %}" data-showcase-slide>
+                    <a href="{{ product.url }}" class="split-showcase__link" aria-label="{{ product.title | escape }}"{% unless forloop.first %} tabindex="-1"{% endunless %}>
+                      {%- if product.featured_image != blank -%}
+                        <img src="{{ product.featured_image | image_url: width: 1200 }}"
+                          srcset="{{ product.featured_image | image_url: width: 600 }} 600w, {{ product.featured_image | image_url: width: 900 }} 900w, {{ product.featured_image | image_url: width: 1200 }} 1200w, {{ product.featured_image | image_url: width: 1600 }} 1600w, {{ product.featured_image | image_url: width: 2400 }} 2400w"
+                          sizes="(min-width: 769px) 50vw, 100vw"
+                          alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                          width="{{ product.featured_image.width }}"
+                          height="{{ product.featured_image.height }}"
+                          loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                          decoding="async"
+                          class="split-showcase__img">
+                      {%- else -%}
+                        {{ 'product-1' | placeholder_svg_tag: 'split-showcase__img' }}
+                      {%- endif -%}
+                      {%- if show_caption -%}
+                        <span class="split-showcase__shade"></span>
+                        <span class="split-showcase__caption">
+                          <span class="split-showcase__name">{{ product.title }}</span>
+                          <span class="split-showcase__price">{{ product.price | money }}</span>
+                        </span>
+                      {%- endif -%}
+                    </a>
+                  </div>
+                {%- endfor -%}
+                {%- if slide_count > 1 and section.settings.showcase_show_dots -%}
+                  <div class="split-showcase__dots" role="tablist">
+                    {%- for product in section.settings.showcase_products -%}
+                      <button type="button" class="split-showcase__dot{% if forloop.first %} is-active{% endif %}" data-showcase-dot="{{ forloop.index0 }}" aria-label="Show {{ product.title | escape }}"></button>
+                    {%- endfor -%}
+                  </div>
+                {%- endif -%}
+              </div>
+            {%- else -%}
+              {%- liquid
+                if section.settings.layout == 'image_right'
+                  assign default_banner = 'split_banner_2.jpg' | asset_url
+                else
+                  assign default_banner = 'split_banner_1.jpg' | asset_url
+                endif
+
+                if section.settings.image != blank
+                  assign desktop_img_url = section.settings.image | image_url: width: 1956
+                else
+                  assign desktop_img_url = default_banner
+                endif
+              -%}
+
+              {%- if section.settings.image_mobile != blank -%}
+                <img
+                  src="{{ section.settings.image_mobile | image_url: width: 1200 }}"
+                  srcset="{{ section.settings.image_mobile | image_url: width: 600 }} 600w, {{ section.settings.image_mobile | image_url: width: 900 }} 900w, {{ section.settings.image_mobile | image_url: width: 1200 }} 1200w, {{ section.settings.image_mobile | image_url: width: 1600 }} 1600w"
+                  sizes="100vw"
+                  alt="{{ section.settings.title | default: 'Collection split banner' | escape }}"
+                  width="{{ section.settings.image_mobile.width | default: 1200 }}"
+                  height="{{ section.settings.image_mobile.height | default: 1200 }}"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                  class="collection-split__img collection-split__img--mobile"
+                >
+                <img
+                  src="{{ desktop_img_url }}"
+                  srcset="{% if section.settings.image != blank %}{{ section.settings.image | image_url: width: 800 }} 800w, {{ section.settings.image | image_url: width: 1200 }} 1200w, {{ section.settings.image | image_url: width: 1600 }} 1600w, {{ section.settings.image | image_url: width: 2000 }} 2000w, {{ section.settings.image | image_url: width: 2400 }} 2400w{% else %}{{ desktop_img_url }} 1956w{% endif %}"
+                  sizes="(min-width: 769px) 50vw, 100vw"
+                  alt="{{ section.settings.title | default: 'Collection split banner' | escape }}"
+                  width="{{ section.settings.image.width | default: 1956 }}"
+                  height="{{ section.settings.image.height | default: 1956 }}"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                  class="collection-split__img collection-split__img--desktop"
+                >
+              {%- else -%}
+                <img
+                  src="{{ desktop_img_url }}"
+                  srcset="{% if section.settings.image != blank %}{{ section.settings.image | image_url: width: 800 }} 800w, {{ section.settings.image | image_url: width: 1200 }} 1200w, {{ section.settings.image | image_url: width: 1600 }} 1600w, {{ section.settings.image | image_url: width: 2000 }} 2000w, {{ section.settings.image | image_url: width: 2400 }} 2400w{% else %}{{ desktop_img_url }} 1956w{% endif %}"
+                  sizes="(min-width: 769px) 50vw, 100vw"
+                  alt="{{ section.settings.title | default: 'Collection split banner' | escape }}"
+                  width="{{ section.settings.image.width | default: 1956 }}"
+                  height="{{ section.settings.image.height | default: 1956 }}"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                  class="collection-split__img"
+                >
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+      
+      <div class="collection-split__products">
+        <div class="collection-split-products-grid lv-product-grid" style="{% render 'product-grid-vars', settings: section.settings, d_xl: 2, d_1024: 1, d_960: 1, d_768: 2, d_650: 1, d_mobile: 1 %}">
+          {%- if target_collection.products.size > 0 -%}
+            {%- for product in target_collection.products limit: section.settings.limit -%}
+              <div class="collection-split__product" data-item>
+                {% render 'product-grid-item', product: product, fallback_index: forloop.index, card_border_radius: section.settings.card_border_radius %}
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            {%- for i in (1..section.settings.limit) -%}
+              <div class="collection-split__product" data-item>
+                {% render 'product-grid-item', fallback_index: i, card_border_radius: section.settings.card_border_radius %}
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection split",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading"
+    },
+    {
+      "type": "header",
+      "content": "Banner"
+    },
+    {
+      "type": "select",
+      "id": "banner_type",
+      "label": "Banner content",
+      "options": [
+        {
+          "value": "image",
+          "label": "Image"
+        },
+        {
+          "value": "products",
+          "label": "Selected products (moving showcase)"
+        }
+      ],
+      "default": "image",
+      "info": "Heading, subheading and button are used in both modes."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Feature banner image (Desktop)",
+      "info": "Recommended: portrait matching the banner ratio below (e.g. 1200 x 1800 px for 2:3). Keep key content near the center.",
+      "visible_if": "{{ section.settings.banner_type == 'image' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Feature banner image (Mobile)",
+      "info": "Recommended: square 1:1 (e.g. 1200 × 1200 px). Use a separate mobile crop to keep all important content visible.",
+      "visible_if": "{{ section.settings.banner_type == 'image' }}"
+    },
+    {
+      "type": "product_list",
+      "id": "showcase_products",
+      "label": "Showcase products",
+      "limit": 8,
+      "info": "Used when Banner content = Selected products. Pick the products shown in the banner (if none are picked, the image banner is used)."
+    },
+    {
+      "type": "select",
+      "id": "showcase_effect",
+      "label": "Animation",
+      "options": [
+        {
+          "value": "fade_zoom",
+          "label": "Soft fade + slow zoom"
+        },
+        {
+          "value": "slide",
+          "label": "Slide"
+        }
+      ],
+      "default": "fade_zoom",
+      "visible_if": "{{ section.settings.banner_type == 'products' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "showcase_autoplay",
+      "label": "Auto-rotate products",
+      "default": true,
+      "visible_if": "{{ section.settings.banner_type == 'products' }}"
+    },
+    {
+      "type": "range",
+      "id": "showcase_speed",
+      "min": 2000,
+      "max": 8000,
+      "step": 500,
+      "unit": "ms",
+      "label": "Change product every",
+      "default": 4500,
+      "visible_if": "{{ section.settings.banner_type == 'products' and section.settings.showcase_autoplay }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "showcase_show_caption",
+      "label": "Show product name and price",
+      "default": true,
+      "visible_if": "{{ section.settings.banner_type == 'products' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "showcase_show_dots",
+      "label": "Show navigation dots",
+      "default": true,
+      "visible_if": "{{ section.settings.banner_type == 'products' }}"
+    },
+    {
+      "type": "url",
+      "id": "banner_link",
+      "label": "Banner link",
+      "info": "Image banner only: clicking anywhere on the banner opens this link. Defaults to button link or collection.",
+      "visible_if": "{{ section.settings.banner_type == 'image' }}"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link",
+      "info": "Link for the button. Defaults to banner link if left blank."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout style",
+      "options": [
+        {
+          "value": "image_left",
+          "label": "Image left"
+        },
+        {
+          "value": "image_right",
+          "label": "Image right"
+        }
+      ],
+      "default": "image_left"
+    },
+    {
+      "type": "select",
+      "id": "split_ratio",
+      "label": "Banner width",
+      "options": [
+        {
+          "value": "equal",
+          "label": "Equal (50 / 50)"
+        },
+        {
+          "value": "wide",
+          "label": "Wider banner (55 / 45)"
+        },
+        {
+          "value": "narrow",
+          "label": "Narrower banner (40 / 60)"
+        }
+      ],
+      "default": "equal",
+      "info": "Narrower banner gives the product cards more room."
+    },
+    {
+      "type": "select",
+      "id": "banner_height",
+      "label": "Banner height (desktop)",
+      "options": [
+        {
+          "value": "fill",
+          "label": "Fill the screen (no gap below)"
+        },
+        {
+          "value": "ratio",
+          "label": "Follow the ratio below"
+        }
+      ],
+      "default": "fill",
+      "info": "Fill keeps the pinned banner as tall as the visible screen so nothing shows underneath it."
+    },
+    {
+      "type": "select",
+      "id": "banner_ratio",
+      "label": "Banner ratio (desktop)",
+      "options": [
+        {
+          "value": "2 / 3",
+          "label": "2:3 Tall portrait"
+        },
+        {
+          "value": "3 / 4",
+          "label": "3:4 Portrait"
+        },
+        {
+          "value": "4 / 5",
+          "label": "4:5 Soft portrait"
+        },
+        {
+          "value": "1 / 1",
+          "label": "1:1 Square"
+        }
+      ],
+      "default": "2 / 3",
+      "info": "The banner stays pinned while the cards scroll beside it.",
+      "visible_if": "{{ section.settings.banner_height == 'ratio' }}"
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Space beside product cards",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 2,
+      "max": 8,
+      "step": 2,
+      "label": "Products to show",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Product grid columns"
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_desktop",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns beside banner: above 1024px",
+      "default": 2,
+      "info": "Banner and products sit side by side above 768px; below that the banner is stacked on top."
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_1024",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns beside banner: 1024px and below",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_960",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns beside banner: 960px and below",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_768",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns when stacked: 768px and below",
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "grid_columns_650",
+      "label": "Columns when stacked: 650px and below",
+      "options": [
+        { "value": "1", "label": "1 product per row" },
+        { "value": "2", "label": "2 products per row" },
+        { "value": "3", "label": "3 products per row" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "grid_columns_mobile",
+      "label": "Columns when stacked: 450px and below",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 product per row"
+        },
+        {
+          "value": "2",
+          "label": "2 products per row"
+        },
+        {
+          "value": "3",
+          "label": "3 products per row"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Card border radius",
+      "default": 0,
+      "info": "Controls corner roundness of product card images in this section"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Banner dark overlay opacity",
+      "default": 0,
+      "info": "Controls dark overlay percentage on the banner image (0% = pure bright original image)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 35
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 35
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection split"
+    }
+  ]
+}
+{% endschema %}
