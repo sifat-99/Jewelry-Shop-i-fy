@@ -1,0 +1,109 @@
+<!-- /sections/section-richtext.liquid -->
+<style>
+  #shopify-section-{{ section.id }} .standard__heading,
+  #shopify-section-{{ section.id }} .standard__heading p {
+    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: clamp(20px, 2.4vw, 28px) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: var(--text, #111111) !important;
+    margin-bottom: 12px !important;
+    line-height: 1.35 !important;
+  }
+  #shopify-section-{{ section.id }} .rte,
+  #shopify-section-{{ section.id }} .rte p {
+    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 14.5px !important;
+    font-weight: 500 !important;
+    color: #2b2622 !important;
+    line-height: 1.7 !important;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+</style>
+<section class="section-richtext color-{{ section.settings.color_scheme | default: 'scheme-2' }}"
+  data-section-id="{{ section.id }}"
+  data-section-type="rich-text"
+  style="
+    --PT: {{ section.settings.padding_top | default: 35 }}px;
+    --PB: {{ section.settings.padding_bottom | default: 25 }}px;
+    --FLEX-POSITION: center;
+    --CONTENT-WIDTH: {{ section.settings.content_width | default: 1200 }}px;">
+  <div class="wrapper--full section-padding">
+    <div class="text__standard text-center">
+      {%- if section.settings.heading != blank -%}
+        <div class="standard__heading heading-size-6" data-aos="hero" data-aos-order="1">
+          <p>{{ section.settings.heading }}</p>
+        </div>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="rte body-size-5 columns--1" data-aos="hero" data-aos-order="2">
+          {{ section.settings.text }}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Rich text",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Luxury & personal jewelry"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Discover our exclusive collection of jewelry that brings together affordability and quality. Our stainless steel jewelry is recyclable, does not discolour and continues to shine.</p>"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "min": 400,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "label": "Max width",
+      "default": 800
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 35
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 25
+    }
+  ],
+  "presets": [
+    {
+      "name": "Rich text"
+    }
+  ]
+}
+{% endschema %}
