@@ -1,0 +1,297 @@
+<!-- /sections/section-collection.liquid -->
+{%- liquid
+  assign featured_collection = collections[section.settings.collection]
+  if featured_collection == blank or featured_collection.products_count == 0
+    assign featured_collection = collections.all
+  endif
+
+  assign shuffle_enabled = section.settings.shuffle_products
+  if shuffle_enabled == nil
+    assign shuffle_enabled = true
+  endif
+
+  assign display_limit = section.settings.limit | default: 8
+  assign pool_limit = display_limit
+  if shuffle_enabled
+    assign pool_limit = 48
+  endif
+-%}
+
+{{ 'product-grid.css' | asset_url | stylesheet_tag }}
+<style>
+  #shopify-section-{{ section.id }} .lv-shuffled-hidden {
+    display: none !important;
+  }
+  {%- if section.settings.rows_by_screen -%}
+    {%- liquid
+      assign sel = '#shopify-section-' | append: section.id | append: ' .lv-product-grid > product-grid-item:nth-of-type(n+'
+      assign c_d = section.settings.grid_columns_desktop | default: 4
+      assign c_1024 = section.settings.grid_columns_1024 | default: 3 | times: 2
+      assign c_960 = section.settings.grid_columns_960 | default: 3 | times: 2
+      assign c_768 = section.settings.grid_columns_768 | default: 2 | times: 2
+      assign c_650 = section.settings.grid_columns_650 | default: 1 | times: 2
+      assign c_450 = section.settings.grid_columns_mobile | default: 1 | times: 2
+    -%}
+  @media (min-width: 1025px) { {{ sel }}{{ c_d | plus: 1 }}) { display: none !important; } }
+  @media (min-width: 961px) and (max-width: 1024px) { {{ sel }}{{ c_1024 | plus: 1 }}) { display: none !important; } }
+  @media (min-width: 769px) and (max-width: 960px) { {{ sel }}{{ c_960 | plus: 1 }}) { display: none !important; } }
+  @media (min-width: 651px) and (max-width: 768px) { {{ sel }}{{ c_768 | plus: 1 }}) { display: none !important; } }
+  @media (min-width: 451px) and (max-width: 650px) { {{ sel }}{{ c_650 | plus: 1 }}) { display: none !important; } }
+  @media (max-width: 450px) { {{ sel }}{{ c_450 | plus: 1 }}) { display: none !important; } }
+  {%- endif -%}
+</style>
+
+<div class="section-collection color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
+  data-section-id="{{ section.id }}"
+  data-section-type="collection-row"
+  style="--PT: {{ section.settings.padding_top | default: 26 }}px; --PB: {{ section.settings.padding_bottom | default: 14 }}px; --card-radius: {{ section.settings.card_border_radius | default: settings.card_border_radius | default: 4 }}px;">
+  <div class="wrapper--full section-padding">
+
+    {%- if section.settings.title != blank -%}
+      <h2 class="kicker-flourished mb-r9">{{ section.settings.title }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subtitle != blank -%}
+      <p style="text-align: center; font-family: 'Quicksand', sans-serif; font-size: 13.5px; font-weight: 500; color: #2b2622; margin: -6px auto 26px auto; letter-spacing: 0.05em; max-width: 600px; opacity: 1;">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+
+    <div class="lv-product-grid" style="{% render 'product-grid-vars', settings: section.settings %}">
+      {%- if featured_collection.products.size > 0 -%}
+        {%- for product in featured_collection.products limit: pool_limit -%}
+          {%- assign extra_cls = '' -%}
+          {%- if forloop.index > display_limit and shuffle_enabled -%}
+            {%- assign extra_cls = 'lv-shuffled-hidden' -%}
+          {%- endif -%}
+          {% render 'product-grid-item', product: product, fallback_index: forloop.index, card_border_radius: section.settings.card_border_radius, extra_class: extra_cls %}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..display_limit) -%}
+          {% render 'product-grid-item', fallback_index: i, card_border_radius: section.settings.card_border_radius %}
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+    {%- if shuffle_enabled -%}
+      <script>
+        (function() {
+          function shuffleGrid() {
+            var sectionEl = document.getElementById('shopify-section-{{ section.id }}');
+            if (!sectionEl) return;
+            var grid = sectionEl.querySelector('.lv-product-grid');
+            if (!grid) return;
+            var items = Array.prototype.slice.call(grid.querySelectorAll('product-grid-item, .product-grid-item'));
+            if (items.length <= 1) return;
+
+            var limit = {{ display_limit }};
+
+            // Fisher-Yates shuffle
+            for (var i = items.length - 1; i > 0; i--) {
+              var j = Math.floor(Math.random() * (i + 1));
+              var temp = items[i];
+              items[i] = items[j];
+              items[j] = temp;
+            }
+
+            var frag = document.createDocumentFragment();
+            for (var k = 0; k < items.length; k++) {
+              var item = items[k];
+              if (k < limit) {
+                item.classList.remove('lv-shuffled-hidden');
+                item.style.display = '';
+              } else {
+                item.classList.add('lv-shuffled-hidden');
+                item.style.display = 'none';
+              }
+              frag.appendChild(item);
+            }
+            grid.appendChild(frag);
+          }
+
+          // Run immediately inline
+          shuffleGrid();
+
+          // Also support Shopify Theme Editor changes
+          document.addEventListener('shopify:section:load', function(e) {
+            if (e.target && e.target.id === 'shopify-section-{{ section.id }}') {
+              shuffleGrid();
+            }
+          });
+        })();
+      </script>
+    {%- endif -%}
+
+    {%- if section.settings.show_view_all -%}
+      <div style="text-align: center; margin-top: 36px;">
+        <a href="{{ featured_collection.url | default: routes.all_products_collection_url }}" class="btn btn--outline btn-sliding-hover" style="display: inline-flex; padding: 12px 32px; font-family: 'Quicksand', sans-serif; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none;">
+          <span class="btn__text-content">View All Products</span>
+        </a>
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Featured collection",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "NEW ARRIVALS"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 4,
+      "max": 24,
+      "step": 4,
+      "label": "Products to show",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "shuffle_products",
+      "label": "Shuffle products randomly",
+      "default": true,
+      "info": "Randomizes the products on every page load so visitors see fresh new arrivals instead of the same serial order."
+    },
+    {
+      "type": "checkbox",
+      "id": "rows_by_screen",
+      "label": "Fit product count to columns",
+      "default": false,
+      "info": "Above 1024px: 1 row. Smaller screens: 2 rows (e.g. 4 cols = 4 products, 3 = 6, 2 = 4, 1 = 2). Set 'Products to show' to 8 or more."
+    },
+    {
+      "type": "header",
+      "content": "Product grid columns"
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_desktop",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns: above 1024px",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_1024",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns: 1024px and below",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_960",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns: 960px and below",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_768",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns: 768px and below",
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "grid_columns_650",
+      "label": "Columns: 650px and below",
+      "options": [
+        { "value": "1", "label": "1 product per row" },
+        { "value": "2", "label": "2 products per row" },
+        { "value": "3", "label": "3 products per row" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "grid_columns_mobile",
+      "label": "Columns: 450px and below",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 product per row"
+        },
+        {
+          "value": "2",
+          "label": "2 products per row"
+        },
+        {
+          "value": "3",
+          "label": "3 products per row"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show View all button",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Card border radius",
+      "default": 4,
+      "info": "Controls corner roundness of product card images in this section"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 25
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured collection"
+    }
+  ]
+}
+{% endschema %}
