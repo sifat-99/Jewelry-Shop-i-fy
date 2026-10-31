@@ -1,0 +1,24 @@
+{%- comment -%}
+  Product page corner radii. Priority: section setting > global theme setting > default.
+  Accepts: section_settings (section.settings)
+  Output (split on '~'): gallery ~ thumbnail ~ swatch ~ box
+{%- endcomment -%}
+{%- liquid
+  assign pr_gallery = section_settings.gallery_border_radius
+  if pr_gallery == nil or pr_gallery == ''
+    assign pr_gallery = settings.product_gallery_radius | default: 0
+  endif
+  assign pr_thumb = section_settings.thumbnail_border_radius
+  if pr_thumb == nil or pr_thumb == ''
+    assign pr_thumb = settings.product_thumb_radius | default: pr_gallery
+  endif
+  assign pr_swatch = section_settings.swatch_border_radius
+  if pr_swatch == nil or pr_swatch == ''
+    assign pr_swatch = 2
+  endif
+  assign pr_box = section_settings.box_border_radius
+  if pr_box == nil or pr_box == ''
+    assign pr_box = 4
+  endif
+  echo pr_gallery | append: '~' | append: pr_thumb | append: '~' | append: pr_swatch | append: '~' | append: pr_box
+-%}
