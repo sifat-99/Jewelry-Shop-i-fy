@@ -1,0 +1,27 @@
+{%- comment -%}
+  Outputs a CSS colour (or gradient) for a colour option value. English + Dutch names.
+  Accepts: value
+  Usage: {% capture dot %}{% render 'product-swatch-color', value: value %}{% endcapture %}
+{%- endcomment -%}
+{%- liquid
+  assign v = value | downcase
+  assign out = '#d9b65a'
+  if v contains 'silver' or v contains 'zilver'
+    assign out = '#c9c9cc'
+  elsif v contains 'rose' or v contains 'roze' or v contains 'pink'
+    assign out = '#e3a38c'
+  elsif v contains 'black' or v contains 'zwart'
+    assign out = '#222222'
+  elsif v contains 'white' or v contains 'wit'
+    assign out = '#ffffff'
+  elsif v contains 'blue' or v contains 'blauw'
+    assign out = '#3f5f8f'
+  elsif v contains 'green' or v contains 'groen'
+    assign out = '#4d7a5a'
+  elsif v contains 'red' or v contains 'rood'
+    assign out = '#b23a48'
+  elsif v contains 'mix' or v contains 'duo' or v contains 'two' or v contains 'combi'
+    assign out = 'linear-gradient(135deg, #d9b65a 50%, #c9c9cc 50%)'
+  endif
+  echo out
+-%}
