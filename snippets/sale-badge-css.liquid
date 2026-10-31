@@ -1,0 +1,32 @@
+<style>
+  :root {
+    --lv-badge-bg: {{ settings.sale_badge_bg | default: '#8c2b3f' }};
+    --lv-badge-text: {{ settings.sale_badge_text | default: '#ffffff' }};
+  }
+  .lv-sale-badge {
+    position: absolute; top: 10px; left: 0; z-index: 15; pointer-events: none;
+    /* soft lift: shadow sits on the wrapper because clip-path would cut it off the ribbon itself */
+    filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.28)) drop-shadow(0 1px 0 rgba(0, 0, 0, 0.18));
+  }
+  .lv-sale-badge[hidden] { display: none; }
+  .lv-sale-badge__inner {
+    display: block; position: relative;
+    padding: 6px 15px 6px 11px;
+    font-size: 11px; font-weight: 700; line-height: 1.2; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+    color: var(--lv-badge-text);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0.06) 45%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.24) 100%),
+      var(--lv-badge-bg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -2px 0 rgba(0, 0, 0, 0.22);
+    clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 50%, 100% 100%, 0 100%);
+  }
+  .lv-sale-badge--lg { top: 14px; }
+  .lv-sale-badge--lg .lv-sale-badge__inner { font-size: 12.5px; padding: 8px 18px 8px 14px; }
+  @media (max-width: 640px) {
+    .lv-sale-badge { top: 8px; }
+    .lv-sale-badge__inner { font-size: 10px; padding: 4px 11px 4px 8px; }
+    .lv-sale-badge--lg { top: 10px; }
+    .lv-sale-badge--lg .lv-sale-badge__inner { font-size: 11px; padding: 6px 14px 6px 10px; }
+  }
+</style>

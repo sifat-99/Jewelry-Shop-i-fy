@@ -1,0 +1,21 @@
+{%- comment -%}
+  Sale ribbon badge (same look on product cards and the product page).
+  Accepts: percent (number) OR price + compare (cents), extra_class (optional)
+  Style: Theme settings > Price & Badges (sale badge style / colours).
+{%- endcomment -%}
+{%- liquid
+  assign sb_percent = percent
+  if sb_percent == blank and compare > price
+    assign sb_percent = compare | minus: price | times: 100.0 | divided_by: compare | round
+  endif
+  assign sb_hidden = false
+  if sb_percent == blank
+    assign sb_hidden = true
+    assign sb_percent = 0
+  endif
+-%}
+<div class="lv-sale-badge{% if extra_class != blank %} {{ extra_class }}{% endif %}" data-lv-sale-badge{% if sb_hidden %} hidden{% endif %} data-type="{{ settings.sale_badge_type | default: 'percentage' }}">
+  <span class="lv-sale-badge__inner" data-lv-sale-text>
+    {%- if settings.sale_badge_type == 'text' -%}SALE{%- else -%}{{ sb_percent }}% OFF{%- endif -%}
+  </span>
+</div>
