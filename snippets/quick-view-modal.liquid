@@ -1,0 +1,1312 @@
+<!-- /snippets/quick-view-modal.liquid -->
+<div id="QuickViewUnderlay" class="qv-underlay" aria-hidden="true"></div>
+
+<div id="QuickViewModal" class="qv-modal" role="dialog" aria-modal="true" aria-label="Quick View" aria-hidden="true">
+  <div class="qv-modal__inner">
+    <button type="button" class="qv-close-btn" id="QuickViewClose" aria-label="Close modal">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="qv-modal__content" id="QuickViewContent">
+      <!-- Loading State -->
+      <div class="qv-loading">
+        <div class="qv-spinner"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Wishlist Toast Notification -->
+<div id="WishlistToast" class="wishlist-toast" aria-live="polite">
+  <span class="wishlist-toast__icon">♥</span>
+  <span class="wishlist-toast__msg" id="WishlistToastMsg">Added to wishlist</span>
+</div>
+
+<style>
+  /* ==========================================================================
+     QUICK VIEW MODAL
+     Fixed Left Image Gallery & Scrollable Full Product Details Right Column
+     100% Responsive & Theme-Integrated Button Animations
+     ========================================================================== */
+
+  .qv-underlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 100010;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+  .qv-underlay.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .qv-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -46%) scale(0.96);
+    width: 1040px;
+    max-width: 94vw;
+    height: 86vh;
+    max-height: 720px;
+    background: #ffffff;
+    z-index: 100011;
+    border-radius: var(--modal-radius, var(--card-radius, 0px));
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden; /* Desktop: modal does not scroll; only right column scrolls! */
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+    box-sizing: border-box;
+  }
+  .qv-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .qv-modal__inner {
+    position: relative;
+    padding: 36px 36px 36px 40px;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .qv-close-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--round-btn-bg, #ffffff);
+    border: 1px solid var(--round-btn-border, rgba(0, 0, 0, 0.14));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--round-btn-text, #111111);
+    z-index: 25;
+    transform: none !important;
+    transition: border-color 350ms ease-in-out, box-shadow 350ms ease-in-out !important;
+  }
+  .qv-close-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: var(--round-btn-hover-bg, #000000);
+    opacity: 0;
+    transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1));
+    pointer-events: none;
+    z-index: 0;
+  }
+  .qv-close-btn:hover::before {
+    opacity: 1;
+  }
+  .qv-close-btn:hover {
+    border-color: var(--round-btn-hover-border, var(--round-btn-hover-bg, #000000));
+    box-shadow: 0 4px 14px var(--round-btn-shadow, rgba(0, 0, 0, 0.25));
+  }
+  .qv-close-btn svg {
+    position: relative;
+    z-index: 1;
+    color: var(--round-btn-text, #111111);
+    stroke: currentColor;
+    transition: color 350ms ease-in-out, stroke 350ms ease-in-out, transform 350ms ease-in-out;
+  }
+  .qv-close-btn:hover svg {
+    color: var(--round-btn-hover-text, #ffffff);
+    stroke: currentColor;
+    transform: rotate(90deg);
+  }
+
+  .qv-modal__content {
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Two Column Layout */
+  .qv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.18fr;
+    gap: 40px;
+    align-items: stretch;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+  }
+
+  /* ==========================================================================
+     LEFT COLUMN: FIXED / STATIONARY PRODUCT GALLERY
+     ========================================================================== */
+  .qv-gallery {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    justify-content: flex-start;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .qv-main-image-wrap {
+    position: relative;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    background: #fbfbfb;
+    overflow: hidden;
+    border-radius: var(--product-gallery-radius, var(--card-radius, 0px));
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qv-main-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: inherit;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: auto;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    transition: opacity 0.25s ease;
+  }
+
+  .qv-thumbs-row {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 0 2px 0;
+    flex-shrink: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  }
+  .qv-thumbs-row::-webkit-scrollbar {
+    height: 4px;
+  }
+  .qv-thumbs-row::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+  .qv-thumb {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border-radius: var(--product-thumb-radius, var(--card-radius, 0px));
+    border: 2px solid transparent;
+    cursor: pointer;
+    overflow: hidden;
+    opacity: 0.55;
+    transition: all 0.22s ease;
+    background: #f8f8f8;
+    padding: 0;
+  }
+  .qv-thumb.is-active,
+  .qv-thumb:hover {
+    opacity: 1;
+    border-color: #000000;
+  }
+  .qv-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ==========================================================================
+     RIGHT COLUMN: SCROLLABLE FULL PRODUCT DETAILS
+     ========================================================================== */
+  .qv-details {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 16px;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.22) transparent;
+  }
+  .qv-details::-webkit-scrollbar {
+    width: 5px;
+  }
+  .qv-details::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .qv-details::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.22);
+    border-radius: 10px;
+  }
+  .qv-details::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  /* Meta / Breadcrumb line */
+  .qv-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #777777;
+    margin-bottom: -4px;
+  }
+  .qv-vendor {
+    color: #111111;
+  }
+  .qv-meta-dot {
+    color: #cccccc;
+  }
+  .qv-type {
+    color: #777777;
+  }
+
+  /* Product Title */
+  .qv-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111111;
+    margin: 0;
+    line-height: 1.25;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Price and Sale Tag */
+  .qv-price-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .qv-price {
+    color: #111111;
+  }
+  .qv-compare-price {
+    color: #888888;
+    text-decoration: line-through;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .qv-discount-badge {
+    background: #8c2b3f;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .qv-tax-note {
+    font-size: 11px;
+    color: #777777;
+    margin-top: -8px;
+    letter-spacing: 0.02em;
+  }
+
+  .qv-divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.08);
+    width: 100%;
+    margin: 2px 0;
+  }
+
+  /* Option Selectors (Sizes / Lengths / Colors) */
+  .qv-options-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .qv-option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .qv-option-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #444444;
+  }
+  .qv-option-current {
+    color: #111111;
+    font-weight: 800;
+  }
+  .qv-option-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .qv-pill-btn {
+    height: 36px;
+    min-width: 44px;
+    padding: 0 14px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    border-radius: var(--btn-radius, 0px);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: #111111;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  .qv-pill-btn:hover {
+    border-color: #000000;
+  }
+  .qv-pill-btn.is-selected {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
+  }
+  .qv-pill-btn.is-disabled {
+    opacity: 0.4;
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+
+  /* Quantity & Add to Cart Action Row (48px Identical Height & No Inner Borders) */
+  .qv-action-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .qv-qty-selector {
+    display: inline-flex !important;
+    align-items: center !important;
+    border: 1px solid rgba(0, 0, 0, 0.16) !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+  .qv-qty-btn {
+    width: 42px !important;
+    height: 48px !important;
+    border: none !important;
+    background: transparent !important;
+    cursor: pointer !important;
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    color: #111111 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transition: background-color 0.2s ease !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+  .qv-qty-btn:hover {
+    background-color: #f5f5f5 !important;
+  }
+  .qv-qty-input {
+    width: 44px !important;
+    height: 48px !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    text-align: center !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    color: #111111 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    -moz-appearance: textfield !important;
+  }
+  .qv-qty-input::-webkit-outer-spin-button,
+  .qv-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+  }
+
+  /* Add to Cart Button with Signature 350ms Sliding Hover Animation */
+  .qv-add-btn {
+    flex: 1 !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    font-family: 'Quicksand', -apple-system, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.15em !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    overflow: hidden !important;
+    isolation: isolate !important;
+    background-color: var(--btn-regular-bg, #000000) !important;
+    color: var(--btn-regular-text, #ffffff) !important;
+    border: 1px solid var(--btn-regular-border, #000000) !important;
+    transform: none !important;
+    transition: border-color var(--btn-animation-duration, 350ms) ease-in-out, box-shadow var(--btn-animation-duration, 350ms) ease-in-out !important;
+  }
+  .qv-add-btn:hover {
+    border-color: var(--btn-regular-hover-border, #000000) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+    transform: none !important;
+  }
+  .qv-add-btn:disabled {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  .qv-btn-spinner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @keyframes qvBtnSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .qv-btn-spinner svg {
+    animation: qvBtnSpin 0.8s linear infinite;
+    display: block;
+  }
+
+  /* Luxury Jewelry Trust Highlights */
+  .qv-highlights {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 12px 14px;
+    background: #fafafa;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-top: 2px;
+  }
+  .qv-highlight-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #222222;
+    letter-spacing: 0.02em;
+  }
+  .qv-highlight-item svg {
+    flex-shrink: 0;
+    color: #111111;
+  }
+
+  /* Quick View Accordions (Full Product Details) */
+  .qv-accordions {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    margin-top: 6px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .qv-accordion-item {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  .qv-accordion-trigger {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 14px 0;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    color: #111111;
+    box-sizing: border-box;
+    transition: color 0.2s ease;
+  }
+  .qv-accordion-trigger:hover {
+    color: #000000;
+  }
+  .qv-accordion-icon {
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 400;
+    margin-left: 8px;
+  }
+  .qv-accordion-panel {
+    padding-bottom: 14px;
+    font-size: 13px;
+    color: #444444;
+    line-height: 1.65;
+  }
+  .qv-accordion-panel p {
+    margin: 0 0 10px 0;
+  }
+  .qv-accordion-panel p:last-child {
+    margin-bottom: 0;
+  }
+  .qv-accordion-panel strong {
+    color: #111111;
+    font-weight: 600;
+  }
+  .qv-accordion-panel ul,
+  .qv-accordion-panel ol {
+    margin: 0 0 10px 0;
+    padding-left: 20px;
+  }
+  .qv-accordion-panel li {
+    margin-bottom: 4px;
+  }
+  .qv-accordion-panel img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  /* View Full Details Link */
+  .qv-view-product {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #111111;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 4px;
+    margin-bottom: 10px;
+    transition: gap 0.2s ease, opacity 0.2s ease;
+  }
+  .qv-view-product:hover {
+    gap: 10px;
+    opacity: 0.75;
+  }
+  .qv-view-product svg {
+    transition: transform 0.2s ease;
+  }
+  .qv-view-product:hover svg {
+    transform: translateX(3px);
+  }
+
+  /* Loading Spinner */
+  .qv-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 380px;
+  }
+  .qv-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top-color: #000000;
+    border-radius: 50%;
+    animation: qvSpin 0.8s linear infinite;
+  }
+  @keyframes qvSpin {
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Wishlist Toast Notification */
+  .wishlist-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #111111;
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-family: 'Quicksand', -apple-system, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    z-index: 100020;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .wishlist-toast.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+  .wishlist-toast__icon {
+    color: #e53935;
+    font-size: 14px;
+  }
+
+  /* ==========================================================================
+     MOBILE RESPONSIVE (<= 768px)
+     ========================================================================== */
+  @media screen and (max-width: 768px) {
+    .qv-modal {
+      width: 95vw;
+      max-width: 95vw;
+      height: 92vh;
+      max-height: 92vh;
+      overflow-y: auto; /* Natural vertical scrolling on mobile */
+      border-radius: 6px;
+    }
+    .qv-modal__inner {
+      padding: 24px 16px;
+      height: auto;
+      overflow: visible;
+      display: block;
+    }
+    .qv-close-btn {
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+    }
+    .qv-close-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+    .qv-modal__content {
+      height: auto;
+      overflow: visible;
+    }
+    .qv-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      height: auto;
+      min-height: auto;
+    }
+    .qv-gallery {
+      height: auto;
+      overflow: visible;
+    }
+    .qv-main-image-wrap {
+      flex: none;
+      width: 100%;
+      aspect-ratio: 1;
+      max-height: none;
+    }
+    .qv-details {
+      height: auto;
+      overflow-y: visible;
+      padding-right: 0;
+    }
+    .qv-title {
+      font-size: 19px;
+    }
+    .qv-price-row {
+      font-size: 18px;
+    }
+    .qv-highlights {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .qv-action-row {
+      flex-direction: row;
+      gap: 8px;
+    }
+    .qv-qty-selector {
+      height: 46px !important;
+      min-height: 46px !important;
+    }
+    .qv-qty-btn {
+      width: 36px !important;
+      height: 46px !important;
+    }
+    .qv-qty-input {
+      width: 38px !important;
+      height: 46px !important;
+    }
+    .qv-add-btn {
+      height: 46px !important;
+      min-height: 46px !important;
+      font-size: 11px !important;
+      letter-spacing: 0.1em !important;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    var modal = document.getElementById('QuickViewModal');
+    var underlay = document.getElementById('QuickViewUnderlay');
+    var closeBtn = document.getElementById('QuickViewClose');
+    var contentEl = document.getElementById('QuickViewContent');
+    var toast = document.getElementById('WishlistToast');
+    var toastMsg = document.getElementById('WishlistToastMsg');
+    var toastTimer = null;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatMoney(cents) {
+      if (!cents && cents !== 0) return '';
+      var num = cents / 100;
+      var formatted = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (window.theme && window.theme.moneyFormat) {
+        var fmt = window.theme.moneyFormat;
+        return fmt
+          .replace(/\{\{\s*amount_with_comma_separator\s*\}\}/, formatted.replace('.', ','))
+          .replace(/\{\{\s*amount_no_decimals_with_comma_separator\s*\}\}/, Math.round(num).toLocaleString('en-US').replace('.', ','))
+          .replace(/\{\{\s*amount_no_decimals\s*\}\}/, Math.round(num).toLocaleString('en-US'))
+          .replace(/\{\{\s*amount\s*\}\}/, formatted);
+      }
+      return '€' + formatted;
+    }
+
+    function showToast(msg) {
+      if (!toast) return;
+      if (toastTimer) clearTimeout(toastTimer);
+      if (toastMsg) toastMsg.textContent = msg;
+      toast.classList.add('is-visible');
+      toastTimer = setTimeout(function() {
+        toast.classList.remove('is-visible');
+      }, 2600);
+    }
+
+    // === Wishlist Storage Manager ===
+    window.toggleWishlist = function(productId, btn) {
+      productId = String(productId);
+      var wishlist = [];
+      try {
+        wishlist = JSON.parse(localStorage.getItem('le_velair_wishlist') || '[]');
+      } catch(e) {
+        wishlist = [];
+      }
+
+      var index = wishlist.indexOf(productId);
+      var isAdded = false;
+      if (index > -1) {
+        wishlist.splice(index, 1);
+        isAdded = false;
+      } else {
+        wishlist.push(productId);
+        isAdded = true;
+      }
+
+      try {
+        localStorage.setItem('le_velair_wishlist', JSON.stringify(wishlist));
+      } catch(e) {}
+
+      // Update buttons on page
+      document.querySelectorAll('[data-wishlist-id="' + productId + '"]').forEach(function(el) {
+        if (isAdded) {
+          el.classList.add('is-active');
+          el.setAttribute('title', 'In wishlist');
+        } else {
+          el.classList.remove('is-active');
+          el.setAttribute('title', 'Add to wishlist');
+        }
+      });
+
+      showToast(isAdded ? 'Added to wishlist' : 'Removed from wishlist');
+    };
+
+    function syncWishlistIcons() {
+      var wishlist = [];
+      try {
+        wishlist = JSON.parse(localStorage.getItem('le_velair_wishlist') || '[]');
+      } catch(e) {
+        wishlist = [];
+      }
+      wishlist.forEach(function(id) {
+        document.querySelectorAll('[data-wishlist-id="' + id + '"]').forEach(function(el) {
+          el.classList.add('is-active');
+          el.setAttribute('title', 'In wishlist');
+        });
+      });
+    }
+
+    // === Quick View Modal Open / Close Logic ===
+    function openQuickView(handle) {
+      if (!modal || !underlay || !handle) return;
+      modal.classList.add('is-open');
+      underlay.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+
+      contentEl.innerHTML = '<div class="qv-loading"><div class="qv-spinner"></div></div>';
+
+      fetch('/products/' + handle + '.js')
+        .then(function(res) { return res.json(); })
+        .then(function(product) {
+          renderQuickView(product);
+        })
+        .catch(function(err) {
+          console.error('Quick view error:', err);
+          contentEl.innerHTML = '<p style="text-align: center; padding: 40px; font-weight: 600;">Could not load product details.</p>';
+        });
+    }
+
+    function closeQuickView() {
+      if (!modal || !underlay) return;
+      modal.classList.remove('is-open');
+      underlay.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    // === Quick View Modal Content Renderer ===
+    function renderQuickView(product) {
+      var currentVariant = product.variants[0];
+      var hasDiscount = currentVariant.compare_at_price && currentVariant.compare_at_price > currentVariant.price;
+      var discountPercent = 0;
+      if (hasDiscount) {
+        discountPercent = Math.round(((currentVariant.compare_at_price - currentVariant.price) / currentVariant.compare_at_price) * 100);
+      }
+
+      var html = '<div class="qv-grid">';
+
+      // -------------------------------------------------------------
+      // 1. LEFT COLUMN: Fixed / Sticky Image Gallery
+      // -------------------------------------------------------------
+      html += '<div class="qv-gallery">';
+      var rawMainImg = (currentVariant.featured_image && currentVariant.featured_image.src) || product.featured_image || (product.images && product.images[0]) || '';
+      var mainImg = rawMainImg ? (rawMainImg.indexOf('?') > -1 ? rawMainImg + '&width=1200' : rawMainImg + '?width=1200') : '';
+      html += '  <div class="qv-main-image-wrap">';
+      html += '    <img id="QvMainImg" src="' + mainImg + '" alt="' + escapeHtml(product.title || '') + '" loading="eager">';
+      html += '  </div>';
+
+      if (product.images && product.images.length > 1) {
+        html += '<div class="qv-thumbs-row">';
+        product.images.forEach(function(img, idx) {
+          html += '<button type="button" class="qv-thumb ' + (idx === 0 ? 'is-active' : '') + '" data-img-src="' + img + '" aria-label="Thumbnail ' + (idx + 1) + '">';
+          html += '  <img src="' + img + '" alt="" loading="lazy">';
+          html += '</button>';
+        });
+        html += '</div>';
+      }
+      html += '</div>'; // End qv-gallery
+
+      // -------------------------------------------------------------
+      // 2. RIGHT COLUMN: Scrollable Full Product Details
+      // -------------------------------------------------------------
+      html += '<div class="qv-details">';
+
+      // Breadcrumb / Category Meta
+      html += '  <div class="qv-meta-row">';
+      html += '    <span class="qv-vendor">Jewelry Shop</span>';
+      html += '    <span class="qv-meta-dot">•</span>';
+      html += '    <span class="qv-type">' + escapeHtml(product.type || 'LUXURY JEWELRY') + '</span>';
+      html += '  </div>';
+
+      // Title
+      html += '  <h2 class="qv-title">' + escapeHtml(product.title) + '</h2>';
+
+      // Price Row
+      html += '  <div class="qv-price-row">';
+      html += '    <span class="qv-price" id="QvPrice">' + formatMoney(currentVariant.price) + '</span>';
+      html += '    <span class="qv-compare-price" id="QvComparePrice" style="' + (hasDiscount ? '' : 'display:none;') + '">' + formatMoney(currentVariant.compare_at_price) + '</span>';
+      html += '    <span class="qv-discount-badge" id="QvDiscountBadge" style="' + (hasDiscount && discountPercent > 0 ? '' : 'display:none;') + '">' + discountPercent + '% OFF</span>';
+      html += '  </div>';
+      html += '  <div class="qv-tax-note">Tax included. Free shipping on qualifying orders.</div>';
+
+      html += '  <div class="qv-divider"></div>';
+
+      // Variant / Category Option Selectors
+      if (product.options && product.options.length > 0 && product.options[0].name !== 'Title') {
+        html += '<div class="qv-options-wrap">';
+        product.options.forEach(function(opt, optIdx) {
+          html += '<div class="qv-option-group" data-option-index="' + optIdx + '">';
+          html += '  <div class="qv-option-header">';
+          html += '    <span class="qv-option-label">' + escapeHtml(opt.name) + ':</span>';
+          html += '    <span class="qv-option-current" id="QvOptVal_' + optIdx + '">' + escapeHtml(opt.values[0]) + '</span>';
+          html += '  </div>';
+          html += '  <div class="qv-option-values">';
+          opt.values.forEach(function(val, valIdx) {
+            html += '<button type="button" class="qv-pill-btn ' + (valIdx === 0 ? 'is-selected' : '') + '" data-opt-idx="' + optIdx + '" data-val="' + escapeHtml(val) + '">' + escapeHtml(val) + '</button>';
+          });
+          html += '  </div>';
+          html += '</div>';
+        });
+        html += '</div>';
+      }
+
+      // Quantity Selector & Add to Cart Button (Identical 48px Height & Sliding Fill)
+      html += '<div class="qv-action-row">';
+      html += '  <div class="qv-qty-selector">';
+      html += '    <button type="button" class="qv-qty-btn" id="QvQtyMinus" aria-label="Decrease quantity">−</button>';
+      html += '    <input type="number" class="qv-qty-input" id="QvQtyInput" value="1" min="1" readonly aria-label="Quantity">';
+      html += '    <button type="button" class="qv-qty-btn" id="QvQtyPlus" aria-label="Increase quantity">+</button>';
+      html += '  </div>';
+      html += '  <button type="button" class="qv-add-btn btn-sliding-hover" id="QvAddToCartBtn" data-variant-id="' + currentVariant.id + '" ' + (!currentVariant.available ? 'disabled' : '') + '>';
+      html += '    <span class="btn__text-content"><span id="QvBtnText">' + (currentVariant.available ? 'Add to Cart' : 'Sold Out') + '</span></span>';
+      html += '    <span class="qv-btn-spinner" id="QvBtnSpinner" style="display: none;">';
+      html += '      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>';
+      html += '    </span>';
+      html += '  </button>';
+      html += '</div>';
+
+      // Key Trust Highlights
+      html += '<div class="qv-highlights">';
+      html += '  <div class="qv-highlight-item">';
+      html += '    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>';
+      html += '    <span>100% Waterproof</span>';
+      html += '  </div>';
+      html += '  <div class="qv-highlight-item">';
+      html += '    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
+      html += '    <span>Lifetime Color Warranty</span>';
+      html += '  </div>';
+      html += '  <div class="qv-highlight-item">';
+      html += '    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+      html += '    <span>Hypoallergenic & Nickel-Free</span>';
+      html += '  </div>';
+      html += '  <div class="qv-highlight-item">';
+      html += '    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>';
+      html += '    <span>Fast Tracked Dispatch</span>';
+      html += '  </div>';
+      html += '</div>';
+
+      // Full Product Details Accordions
+      var cleanDescription = product.description ? product.description.trim() : '';
+      if (!cleanDescription || cleanDescription === '<p></p>' || cleanDescription === '<div></div>') {
+        cleanDescription = '<p>Crafted to perfection, the <strong>' + escapeHtml(product.title) + '</strong> embodies timeless modern elegance. Designed for comfortable everyday wear and effortless stacking.</p>' +
+          '<p><strong>• Material:</strong> Premium 316L Stainless Steel with 18K PVD Gold Plating<br>' +
+          '<strong>• Water Resistance:</strong> 100% Waterproof, Heat & Sweat Resistant<br>' +
+          '<strong>• Skin Friendly:</strong> Hypoallergenic, Lead & Nickel Free<br>' +
+          '<strong>• Warranty:</strong> Guaranteed never to fade, tarnish, or turn green</p>';
+      }
+
+      html += '<div class="qv-accordions">';
+      
+      // Tab 1: Product Description (Open by default)
+      html += '  <div class="qv-accordion-item is-open">';
+      html += '    <button type="button" class="qv-accordion-trigger" aria-expanded="true">';
+      html += '      <span>Product Description</span>';
+      html += '      <span class="qv-accordion-icon">−</span>';
+      html += '    </button>';
+      html += '    <div class="qv-accordion-panel">';
+      html += '      ' + cleanDescription;
+      html += '    </div>';
+      html += '  </div>';
+
+      // Tab 2: Shipping & Returns
+      html += '  <div class="qv-accordion-item">';
+      html += '    <button type="button" class="qv-accordion-trigger" aria-expanded="false">';
+      html += '      <span>Shipping & Returns</span>';
+      html += '      <span class="qv-accordion-icon">+</span>';
+      html += '    </button>';
+      html += '    <div class="qv-accordion-panel" style="display: none;">';
+      html += '      <p>• Orders are carefully packaged and dispatched within 24 to 48 hours.<br>';
+      html += '      • <strong>Free standard shipping</strong> is available on qualifying orders.<br>';
+      html += '      • Real-time parcel tracking provided immediately via email and SMS.<br>';
+      html += '      • 14 days easy returns and full satisfaction guarantee.</p>';
+      html += '    </div>';
+      html += '  </div>';
+
+      // Tab 3: Material & Guarantee
+      html += '  <div class="qv-accordion-item">';
+      html += '    <button type="button" class="qv-accordion-trigger" aria-expanded="false">';
+      html += '      <span>Material & Guarantee</span>';
+      html += '      <span class="qv-accordion-icon">+</span>';
+      html += '    </button>';
+      html += '    <div class="qv-accordion-panel" style="display: none;">';
+      html += '      <p>Our jewelry is crafted from surgical-grade 316L waterproof stainless steel with durable 18K PVD gold coating. 100% waterproof, nickel-free, and retains its radiant shine for a lifetime—even in water, sweat, or perfumes.</p>';
+      html += '    </div>';
+      html += '  </div>';
+
+      html += '</div>'; // End qv-accordions
+
+      // View Full Details Link
+      html += '<a href="' + (product.url || '#') + '" class="qv-view-product">';
+      html += '  <span>View Full Product Details</span>';
+      html += '  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+      html += '</a>';
+
+      html += '</div>'; // End qv-details
+      html += '</div>'; // End qv-grid
+
+      contentEl.innerHTML = html;
+
+      // -------------------------------------------------------------
+      // 3. EVENT BINDINGS
+      // -------------------------------------------------------------
+
+      // Thumbnail clicks
+      contentEl.querySelectorAll('.qv-thumb').forEach(function(thumb) {
+        thumb.addEventListener('click', function() {
+          contentEl.querySelectorAll('.qv-thumb').forEach(function(t) { t.classList.remove('is-active'); });
+          this.classList.add('is-active');
+          var src = this.getAttribute('data-img-src');
+          var mainImgEl = document.getElementById('QvMainImg');
+          if (mainImgEl && src) mainImgEl.src = src;
+        });
+      });
+
+      // Accordion trigger toggling
+      contentEl.querySelectorAll('.qv-accordion-trigger').forEach(function(trigger) {
+        trigger.addEventListener('click', function() {
+          var item = this.closest('.qv-accordion-item');
+          var panel = item.querySelector('.qv-accordion-panel');
+          var icon = this.querySelector('.qv-accordion-icon');
+          var isOpen = panel.style.display !== 'none';
+
+          if (isOpen) {
+            panel.style.display = 'none';
+            icon.textContent = '+';
+            item.classList.remove('is-open');
+            this.setAttribute('aria-expanded', 'false');
+          } else {
+            panel.style.display = 'block';
+            icon.textContent = '−';
+            item.classList.add('is-open');
+            this.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+
+      // Option Pill clicks (Variant & Category selection)
+      var selectedOptions = product.options.map(function(opt) { return opt.values[0]; });
+
+      contentEl.querySelectorAll('.qv-pill-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var optIdx = parseInt(this.getAttribute('data-opt-idx'), 10);
+          var val = this.getAttribute('data-val');
+          selectedOptions[optIdx] = val;
+
+          var group = this.closest('.qv-option-group');
+          group.querySelectorAll('.qv-pill-btn').forEach(function(b) { b.classList.remove('is-selected'); });
+          this.classList.add('is-selected');
+
+          var labelVal = document.getElementById('QvOptVal_' + optIdx);
+          if (labelVal) labelVal.textContent = val;
+
+          // Find matching variant
+          var matchedVariant = product.variants.find(function(v) {
+            return v.options.every(function(o, i) { return o === selectedOptions[i]; });
+          });
+
+          if (matchedVariant) {
+            var addBtn = document.getElementById('QvAddToCartBtn');
+            var btnText = document.getElementById('QvBtnText');
+            var priceEl = document.getElementById('QvPrice');
+            var compPriceEl = document.getElementById('QvComparePrice');
+            var discBadge = document.getElementById('QvDiscountBadge');
+
+            if (priceEl) priceEl.textContent = formatMoney(matchedVariant.price);
+            var isSale = matchedVariant.compare_at_price && matchedVariant.compare_at_price > matchedVariant.price;
+            if (compPriceEl) {
+              compPriceEl.textContent = formatMoney(matchedVariant.compare_at_price);
+              compPriceEl.style.display = isSale ? '' : 'none';
+            }
+            if (discBadge) {
+              if (isSale) {
+                var pct = Math.round(((matchedVariant.compare_at_price - matchedVariant.price) / matchedVariant.compare_at_price) * 100);
+                discBadge.textContent = pct + '% OFF';
+                discBadge.style.display = '';
+              } else {
+                discBadge.style.display = 'none';
+              }
+            }
+
+            if (addBtn && btnText) {
+              addBtn.setAttribute('data-variant-id', matchedVariant.id);
+              if (matchedVariant.available) {
+                addBtn.disabled = false;
+                btnText.textContent = 'Add to Cart';
+              } else {
+                addBtn.disabled = true;
+                btnText.textContent = 'Sold Out';
+              }
+            }
+
+            if (matchedVariant.featured_image && matchedVariant.featured_image.src) {
+              var mainImgEl = document.getElementById('QvMainImg');
+              if (mainImgEl) mainImgEl.src = matchedVariant.featured_image.src;
+              // update active thumb
+              contentEl.querySelectorAll('.qv-thumb').forEach(function(t) {
+                if (t.getAttribute('data-img-src') === matchedVariant.featured_image.src) {
+                  t.classList.add('is-active');
+                } else {
+                  t.classList.remove('is-active');
+                }
+              });
+            }
+          }
+        });
+      });
+
+      // Quantity Plus & Minus
+      var qtyInput = document.getElementById('QvQtyInput');
+      var minusBtn = document.getElementById('QvQtyMinus');
+      var plusBtn = document.getElementById('QvQtyPlus');
+      if (minusBtn && qtyInput) {
+        minusBtn.addEventListener('click', function() {
+          var val = parseInt(qtyInput.value, 10) || 1;
+          if (val > 1) qtyInput.value = val - 1;
+        });
+      }
+      if (plusBtn && qtyInput) {
+        plusBtn.addEventListener('click', function() {
+          var val = parseInt(qtyInput.value, 10) || 1;
+          qtyInput.value = val + 1;
+        });
+      }
+
+      // Add to Cart
+      var addBtn = document.getElementById('QvAddToCartBtn');
+      if (addBtn) {
+        addBtn.addEventListener('click', function() {
+          var vId = this.getAttribute('data-variant-id');
+          var qty = parseInt((qtyInput ? qtyInput.value : 1), 10) || 1;
+          var btnText = document.getElementById('QvBtnText');
+          var spinner = document.getElementById('QvBtnSpinner');
+
+          if (!vId) return;
+
+          addBtn.disabled = true;
+          if (spinner) spinner.style.display = 'inline-flex';
+          if (btnText) btnText.style.display = 'none';
+
+          function resetBtn() {
+            addBtn.disabled = false;
+            if (spinner) spinner.style.display = 'none';
+            if (btnText) {
+              btnText.style.display = 'inline';
+              btnText.textContent = 'Add to Cart';
+            }
+          }
+
+          if (typeof window.addToCartAjax === 'function') {
+            window.addToCartAjax(vId, qty)
+              .then(function() {
+                resetBtn();
+                closeQuickView();
+              })
+              .catch(function(err) {
+                console.error('AJAX add error:', err);
+                resetBtn();
+              });
+          } else {
+            fetch('/cart/add.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: vId, quantity: qty })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(item) {
+              resetBtn();
+              closeQuickView();
+              if (typeof window.openCartDrawer === 'function') {
+                window.openCartDrawer();
+              }
+              document.dispatchEvent(new CustomEvent('theme:cart:reload', { bubbles: true }));
+            })
+            .catch(function(err) {
+              console.error('Direct add error:', err);
+              resetBtn();
+            });
+          }
+        });
+      }
+    }
+
+    // === Global Click Delegations ===
+    document.addEventListener('click', function(e) {
+      // Wishlist Button click
+      var wishlistBtn = e.target.closest('.card-wishlist-btn');
+      if (wishlistBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        var pId = wishlistBtn.getAttribute('data-wishlist-id');
+        if (pId) window.toggleWishlist(pId, wishlistBtn);
+        return;
+      }
+
+      // Quick View open click
+      var qvBtn = e.target.closest('[data-quickview-handle]');
+      if (qvBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        var handle = qvBtn.getAttribute('data-quickview-handle');
+        if (handle) openQuickView(handle);
+        return;
+      }
+
+      // Floating Circular Quick Add Button
+      var quickAddBtn = e.target.closest('.card-quick-add-btn');
+      if (quickAddBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        var vId = quickAddBtn.getAttribute('data-variant-id');
+        if (vId) {
+          quickAddBtn.classList.add('is-loading');
+          if (window.addToCartAjax) {
+            window.addToCartAjax(vId, 1).then(function() {
+              quickAddBtn.classList.remove('is-loading');
+            }).catch(function() {
+              quickAddBtn.classList.remove('is-loading');
+            });
+          }
+        }
+        return;
+      }
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeQuickView);
+    if (underlay) underlay.addEventListener('click', closeQuickView);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modal && modal.classList.contains('is-open')) {
+        closeQuickView();
+      }
+    });
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', syncWishlistIcons);
+    } else {
+      syncWishlistIcons();
+    }
+  })();
+</script>
