@@ -1,0 +1,380 @@
+{%- comment -%} Global CSS + JS for the compact card add button and its variant popup (bottom sheet / side drawer / above button / over product). Rendered once from layout/theme.liquid. {%- endcomment -%}
+<style>
+  /* Smooth colour change on hover: the hover colour fades in (same speed as the main buttons, --btn-animation-duration). */
+  .lv-mini-add, .lv-msheet__opt:not(.is-selected), .search-chip, .ct-social a, .sl-cta__btn {
+    position: relative; overflow: hidden; isolation: isolate;
+    transition: color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), border-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+  .lv-mini-add { position: absolute; }
+  .lv-mini-add::before, .lv-msheet__opt:not(.is-selected)::before, .search-chip::before, .ct-social a::before, .sl-cta__btn::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit;
+    background-color: var(--fill, var(--btn-regular-hover-bg, #111));
+    opacity: 0; transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1));
+  }
+  .lv-mini-add:hover::before, .lv-mini-add:active::before, .lv-mini-add.is-active::before,
+  .lv-msheet__opt:not(.is-selected):not([disabled]):hover::before,
+  .search-chip:hover::before, .ct-social a:hover::before, .sl-cta__btn:hover::before { opacity: 1; }
+  /* keep the resting background fixed so only the sliding layer changes colour */
+  .lv-mini-add:hover, .lv-mini-add:active, .lv-mini-add.is-active { background: var(--btn-regular-bg, #fff) !important; }
+  .lv-msheet__opt:not(.is-selected):hover { background: transparent !important; }
+  .search-chip:hover, .ct-social a:hover { background: var(--bg, #fff) !important; }
+  .sl-cta__btn:hover { background: var(--bg, #fff) !important; }
+  .sl-cta__btn { --fill: var(--text, #111); }
+  .lv-mp--select .lv-msheet__opt { --fill: color-mix(in srgb, var(--text, #111) 7%, var(--bg, #fff)); }
+  .search-chip, .ct-social a { --fill: var(--text, #111); }
+  .lv-msheet__opt--cta:not(.is-selected) { --fill: var(--btn-regular-hover-bg, #111); }
+
+  /* Engravable products: the hover bar shows one text button instead of size pills */
+  .lv-card-quick-add-wrap:has(.lv-card-eng-btn) > .lv-card-action-bar:not(.lv-card-eng-btn) { display: none !important; }
+  .lv-mini-add { display: none; }
+  @media (max-width: 450px) {
+    .lv-card-media-wrap:has(.lv-mini-add) .lv-card-quick-add-wrap { display: none !important; }
+    .lv-mini-add {
+      display: inline-flex; align-items: center; justify-content: center; position: absolute; bottom: 8px; z-index: 19;
+      width: var(--mini-size, 38px); height: var(--mini-size, 38px); padding: 0; box-sizing: border-box;
+      border-radius: var(--btn-radius, 0px);
+      background: var(--btn-regular-bg, #fff); color: var(--btn-regular-text, #111);
+      border: var(--btn-border-thickness, 1px) solid var(--btn-regular-border, rgba(0,0,0,.2)); box-shadow: 0 2px 8px rgba(0,0,0,.14);
+      cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color .25s ease, color .25s ease, border-color .25s ease;
+    }
+    .lv-mini-add--right { right: 8px; }
+    .lv-mini-add--left { left: 8px; }
+    .lv-mini-add:hover, .lv-mini-add:active, .lv-mini-add.is-active { background: var(--btn-regular-hover-bg, #111); color: var(--btn-regular-hover-text, #fff); border-color: var(--btn-regular-hover-border, #111); }
+    .lv-mini-add__spin { display: inline-flex; animation: lv-mini-spin .8s linear infinite; }
+    .lv-mini-add__spin[hidden] { display: none; }
+    .lv-mini-add.is-busy > svg:first-child { display: none; }
+  }
+  @keyframes lv-mini-spin { to { transform: rotate(360deg); } }
+
+  /* ---- Shared popup content ---- */
+  .lv-mp { font-family: 'Quicksand', -apple-system, sans-serif; color: var(--text, #111); box-sizing: border-box; }
+  .lv-mp__head { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1px solid rgba(0, 0, 0, .08); }
+  .lv-mp__thumb { flex: none; width: 54px; height: 54px; object-fit: cover; border-radius: var(--btn-radius, 0px); background: color-mix(in srgb, var(--text, #111) 6%, var(--bg, #fff)); }
+  .lv-mp__meta { flex: 1; min-width: 0; }
+  .lv-mp__title { margin: 0; font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; line-height: 1.4; }
+  .lv-mp__price { margin: 3px 0 0; font-size: 13px; font-weight: 600; opacity: .75; }
+  .lv-mp__close { flex: none; align-self: flex-start; width: 28px; height: 28px; border: 0; background: transparent; color: inherit; font-size: 22px; line-height: 1; cursor: pointer; padding: 0; opacity: .6; }
+  .lv-mp__close:hover { opacity: 1; }
+  .lv-mp__label { margin: 0 0 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; opacity: .6; }
+  .lv-mp__opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .lv-msheet__opt {
+    display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-width: 52px; min-height: 42px; padding: 0 16px; box-sizing: border-box;
+    background: transparent; color: inherit; font: inherit; font-size: 12.5px; font-weight: 600; letter-spacing: .06em;
+    border: var(--btn-border-thickness, 1px) solid rgba(0, 0, 0, .22); border-radius: var(--btn-radius, 0px); cursor: pointer;
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .lv-msheet__opt:hover, .lv-msheet__opt:active { background: var(--btn-regular-hover-bg, #111); color: var(--btn-regular-hover-text, #fff); border-color: var(--btn-regular-hover-border, #111); }
+  .lv-msheet__opt[disabled] { opacity: .4; cursor: not-allowed; text-decoration: line-through; }
+  .lv-msheet__opt[disabled]:hover { background: transparent; color: inherit; border-color: rgba(0, 0, 0, .22); }
+  .lv-msheet__opt-note { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+  .lv-msheet__opt.is-busy { opacity: .6; pointer-events: none; }
+  .lv-msheet__opt-delta { margin-left: 8px; padding: 2px 7px; font-size: 11.5px; font-weight: 700; letter-spacing: .01em; background: color-mix(in srgb, var(--text, #111) 13%, var(--bg, #fff)); color: var(--text, #111); }
+  .lv-msheet__opt { flex-direction: row !important; }
+  .lv-msheet__opt.is-selected .lv-msheet__opt-delta, .lv-mp--select .lv-msheet__opt.is-selected .lv-msheet__opt-delta { background: var(--bg, #fff); color: var(--text, #111); }
+  /* Engraving popup: options as a tidy list */
+  .lv-mp--select .lv-mp__opts { flex-direction: column; flex-wrap: nowrap; gap: 8px; }
+  .lv-mp--select .lv-msheet__opt { width: 100%; justify-content: flex-start; min-height: 46px; padding: 0 14px; text-align: left; }
+  .lv-mp--select .lv-msheet__opt .lv-msheet__opt-label { display: inline-flex; align-items: center; }
+  .lv-mp--select .lv-msheet__opt .lv-msheet__opt-delta { margin-left: auto; }
+  .lv-mp--select .lv-msheet__opt:hover { background: color-mix(in srgb, var(--text, #111) 5%, var(--bg, #fff)); color: var(--text, #111); border-color: var(--text, #111); }
+  .lv-mp--select .lv-msheet__opt.is-selected,
+  .lv-mp--select .lv-msheet__opt.is-selected:hover {
+    background: color-mix(in srgb, var(--text, #111) 7%, var(--bg, #fff)); color: var(--text, #111);
+    border-color: var(--text, #111); box-shadow: inset 0 0 0 1px var(--text, #111);
+  }
+  .lv-mp--select .lv-msheet__opt.is-selected .lv-msheet__opt-label::before {
+    content: ""; display: inline-block; width: 5px; height: 9px; margin: -2px 10px 0 0; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+  .lv-mp--select .lv-msheet__opt:not(.is-selected) .lv-msheet__opt-label { padding-left: 15px; }
+  .lv-mp--select .lv-msheet__opt.is-selected .lv-msheet__opt-delta { background: var(--text, #111); color: var(--bg, #fff); }
+  .lv-mp__cta-wrap { margin-top: 18px; }
+  .lv-msheet__opt--cta { width: 100%; min-height: 46px; background: var(--btn-regular-bg, #111); color: var(--btn-regular-text, #fff); border-color: var(--btn-regular-border, #111); text-transform: uppercase; letter-spacing: .12em; font-size: 12px; }
+
+  /* Engraving field inside the popup */
+  .lv-mp__eng { margin: 0 0 18px; }
+  .lv-mp__eng-label { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 0 0 8px; font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+  .lv-mp__eng-label small { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: none; opacity: .55; white-space: nowrap; }
+  .lv-mp__eng-field { position: relative; }
+  .lv-mp__eng-input {
+    width: 100%; box-sizing: border-box; height: 46px; padding: 0 54px 0 14px; margin: 0; background: color-mix(in srgb, var(--text, #111) 3%, var(--bg, #fff)); color: var(--text, #111);
+    font: inherit; font-size: 16px; letter-spacing: .02em; border: 1px solid rgba(0, 0, 0, .18); border-radius: var(--input-radius, var(--btn-radius, 0px)); outline: none; box-shadow: none;
+    transition: border-color .2s ease, background-color .2s ease;
+  }
+  .lv-mp__eng-input::placeholder { color: color-mix(in srgb, var(--text, #111) 40%, transparent); font-size: 14px; }
+  .lv-mp__eng-input:focus { border-color: var(--text, #111); background: var(--bg, #fff); box-shadow: 0 0 0 3px color-mix(in srgb, var(--text, #111) 8%, transparent); }
+  .lv-mp__eng-count { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 600; opacity: .5; pointer-events: none; }
+  .lv-mp__eng.has-error .lv-mp__eng-input { border-color: #b3261e; }
+  .lv-mp__eng-error { margin: 8px 0 0; font-size: 12px; color: #b3261e; }
+  .lv-mp__eng-error[hidden] { display: none; }
+
+  /* ---- Bottom sheet + side drawer ---- */
+  .lv-msheet { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: flex-end; justify-content: center; visibility: hidden; pointer-events: none; }
+  .lv-msheet--side { align-items: stretch; justify-content: flex-end; }
+  .lv-msheet.is-open { visibility: visible; pointer-events: auto; }
+  .lv-msheet__overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); opacity: 0; transition: opacity .25s ease; }
+  .lv-msheet.is-open .lv-msheet__overlay { opacity: 1; }
+  .lv-msheet__panel {
+    position: relative; width: 100%; max-width: 520px; max-height: 80vh; overflow-y: auto; box-sizing: border-box;
+    background: var(--bg, #fff); padding: 20px 18px calc(22px + env(safe-area-inset-bottom));
+    border-radius: 16px 16px 0 0; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+    transform: translateY(100%); transition: transform .3s cubic-bezier(.22, .8, .3, 1);
+  }
+  .lv-msheet--side .lv-msheet__panel { width: min(360px, 88vw); max-width: none; max-height: none; height: 100%; border-radius: 0; box-shadow: -10px 0 40px rgba(0, 0, 0, 0.2); transform: translateX(100%); padding-top: 24px; }
+  .lv-msheet.is-open .lv-msheet__panel { transform: none; }
+  body.lv-msheet-lock { overflow: hidden; }
+
+  /* ---- Popover above the button ---- */
+  .lv-mpop {
+    position: fixed; z-index: 2147483000; width: min(300px, calc(100vw - 16px)); box-sizing: border-box; padding: 16px;
+    background: var(--bg, #fff); border: 1px solid rgba(0, 0, 0, .08); border-radius: calc(var(--btn-radius, 0px) + 2px);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, .22), 0 2px 8px rgba(0, 0, 0, .06); opacity: 0; transform: translateY(6px); transition: opacity .18s ease, transform .18s ease;
+  }
+  .lv-mpop.is-open { opacity: 1; transform: none; }
+  .lv-mpop::after {
+    content: ""; position: absolute; left: var(--arrow-x, 50%); width: 12px; height: 12px; margin-left: -6px; background: var(--bg, #fff);
+    transform: rotate(45deg); bottom: -6px; border-right: 1px solid rgba(0, 0, 0, .08); border-bottom: 1px solid rgba(0, 0, 0, .08);
+  }
+  .lv-mpop.is-below::after { bottom: auto; top: -6px; border: 0; border-left: 1px solid rgba(0, 0, 0, .08); border-top: 1px solid rgba(0, 0, 0, .08); }
+
+  /* ---- Overlay covering the product image ---- */
+  .lv-mover {
+    position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; justify-content: flex-end; box-sizing: border-box; padding: 14px;
+    background: color-mix(in srgb, var(--bg, #fff) 94%, transparent); backdrop-filter: blur(3px);
+    opacity: 0; visibility: hidden; transform: translateY(8px); transition: opacity .22s ease, transform .22s ease, visibility .22s;
+  }
+  .lv-mover.is-open { opacity: 1; visibility: visible; transform: none; }
+  .lv-mover .lv-mp__opts { max-height: 100%; overflow-y: auto; }
+
+  @media (prefers-reduced-motion: reduce) { .lv-msheet__panel, .lv-msheet__overlay, .lv-mpop, .lv-mover { transition: none; } }
+</style>
+<script>
+  (function () {
+    if (window.lvMiniAddInit) return;
+    window.lvMiniAddInit = true;
+    var current = null; // { kind, el, btn }
+
+    function addToCart(id, done, props) {
+      if (!id) { done(); return; }
+      if (typeof window.addToCartAjax === 'function') { window.addToCartAjax(id, 1, props).then(done, done); return; }
+      var body = { id: id, quantity: 1 };
+      if (props) body.properties = props;
+      fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+        .then(function (r) { return r.json(); })
+        .then(function () {
+          if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
+          document.dispatchEvent(new CustomEvent('theme:cart:reload', { bubbles: true }));
+          done();
+        })
+        .catch(done);
+    }
+
+    function esc(t) { var d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+
+    // Engraving length can follow the chosen option (e.g. "5 Characters")
+    function syncPrice(root) {
+      var sel = root.querySelector('.lv-msheet__opt.is-selected');
+      var p = root.querySelector('.lv-mp__price');
+      if (sel && p && sel.getAttribute('data-price')) p.textContent = sel.getAttribute('data-price');
+    }
+    function syncEngMax(root) {
+      var sel = root.querySelector('.lv-msheet__opt.is-selected .lv-msheet__opt-label');
+      var inp = root.querySelector('.lv-mp__eng-input');
+      if (!sel || !inp) return;
+      var m = /(\d+)\s*char/i.exec(sel.textContent);
+      if (!m) return;
+      var n = parseInt(m[1], 10);
+      if (!n) return;
+      inp.setAttribute('maxlength', n);
+      if (inp.value.length > n) inp.value = inp.value.slice(0, n);
+      var cnt = root.querySelector('.lv-mp__eng-count');
+      if (cnt) cnt.textContent = inp.value.length + '/' + n;
+      var small = root.querySelector('.lv-mp__eng-label small');
+      if (small) small.innerHTML = small.innerHTML.replace(/max \d+/, 'max ' + n);
+    }
+
+    function content(btn, showClose) {
+      var tpl = btn.parentNode.querySelector('template[data-lv-mini-variants]');
+      var wrap = document.createElement('div');
+      wrap.className = 'lv-mp';
+      wrap.innerHTML =
+        '<div class="lv-mp__head">' +
+        (btn.getAttribute('data-image') ? '<img class="lv-mp__thumb" alt="" src="' + esc(btn.getAttribute('data-image')) + '">' : '') +
+        '<div class="lv-mp__meta"><h3 class="lv-mp__title">' + esc(btn.getAttribute('data-title')) + '</h3>' +
+        '<p class="lv-mp__price">' + esc(btn.getAttribute('data-price')) + '</p></div>' +
+        (showClose ? '<button type="button" class="lv-mp__close" data-mp-close aria-label="Close">&times;</button>' : '') + '</div>' +
+        '<div data-mp-eng-slot></div><p class="lv-mp__label" data-mp-label>Select size / option</p><div class="lv-mp__opts"></div>';
+      if (tpl) wrap.querySelector('.lv-mp__opts').appendChild(tpl.content.cloneNode(true));
+      var single = btn.getAttribute('data-single') === 'true';
+      var label = wrap.querySelector('[data-mp-label]');
+      if (single) {
+        label.hidden = true;
+        wrap.querySelectorAll('.lv-msheet__opt').forEach(function (o) { o.classList.add('lv-msheet__opt--cta'); });
+      }
+      if (btn.getAttribute('data-eng') === 'true') {
+        var max = parseInt(btn.getAttribute('data-eng-max'), 10) || 12;
+        var req = btn.getAttribute('data-eng-required') === 'true';
+        var box = document.createElement('div');
+        box.className = 'lv-mp__eng';
+        box.innerHTML =
+          '<label class="lv-mp__eng-label"><span>' + esc(btn.getAttribute('data-eng-label') || 'Engraving') + '</span>' +
+          '<small>' + (req ? 'Required' : 'Optional') + ' &middot; max ' + max + '</small></label>' +
+          '<div class="lv-mp__eng-field"><input type="text" class="lv-mp__eng-input" maxlength="' + max + '" autocomplete="off" enterkeyhint="done">' +
+          '<span class="lv-mp__eng-count">0/' + max + '</span></div>' +
+          '<p class="lv-mp__eng-error" role="alert" hidden>Please add your engraving text.</p>';
+        box.querySelector('input').placeholder = btn.getAttribute('data-eng-placeholder') || '';
+        wrap.querySelector('[data-mp-eng-slot]').appendChild(box);
+        if (!single) {
+          label.textContent = 'Choose size / option';
+          wrap.classList.add('lv-mp--select');
+          var firstOpt = wrap.querySelector('.lv-msheet__opt:not([disabled])');
+          if (firstOpt) firstOpt.classList.add('is-selected');
+          var cw = document.createElement('div');
+          cw.className = 'lv-mp__cta-wrap';
+          cw.innerHTML = '<button type="button" class="lv-msheet__opt lv-msheet__opt--cta" data-mp-add>Add to cart</button>';
+          wrap.appendChild(cw);
+          syncEngMax(wrap);
+          syncPrice(wrap);
+        }
+      }
+      return wrap;
+    }
+
+    function close() {
+      if (!current) return;
+      var c = current; current = null;
+      c.el.classList.remove('is-open');
+      c.btn.classList.remove('is-active');
+      if (c.media) c.media.classList.remove('lv-mp-open');
+      document.body.classList.remove('lv-msheet-lock');
+      setTimeout(function () { if (c.el.parentNode) c.el.parentNode.removeChild(c.el); }, 320);
+      c.btn.focus({ preventScroll: true });
+    }
+
+    function open(btn, anchor, variantId) {
+      if (current) close();
+      var mode = btn.getAttribute('data-popup') || 'bottom';
+      var el, kind = mode;
+      if (mode === 'bottom' || mode === 'side') {
+        el = document.createElement('div');
+        el.className = 'lv-msheet' + (mode === 'side' ? ' lv-msheet--side' : '');
+        el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true');
+        el.innerHTML = '<div class="lv-msheet__overlay" data-mp-close></div><div class="lv-msheet__panel"></div>';
+        el.querySelector('.lv-msheet__panel').appendChild(content(btn, true));
+        document.body.appendChild(el);
+        document.body.classList.add('lv-msheet-lock');
+      } else if (mode === 'product') {
+        var media = btn.closest('.lv-card-media-wrap');
+        if (!media) { btn.setAttribute('data-popup', 'bottom'); return open(btn); }
+        el = document.createElement('div');
+        el.className = 'lv-mover';
+        el.appendChild(content(btn, true));
+        media.appendChild(el);
+      } else {
+        el = document.createElement('div');
+        el.className = 'lv-mpop';
+        el.setAttribute('role', 'dialog');
+        el.appendChild(content(btn, false));
+        document.body.appendChild(el);
+        var r = (anchor || btn).getBoundingClientRect(), pr = el.getBoundingClientRect();
+        var left = anchor ? r.left + r.width / 2 - pr.width / 2 : (btn.classList.contains('lv-mini-add--left') ? r.left : r.right - pr.width);
+        left = Math.max(8, Math.min(left, window.innerWidth - pr.width - 8));
+        var top = r.top - pr.height - 8;
+        if (top < 8) top = Math.min(r.bottom + 8, window.innerHeight - pr.height - 8);
+        el.style.left = left + 'px'; el.style.top = top + 'px';
+        el.style.setProperty('--arrow-x', Math.max(16, Math.min(pr.width - 16, r.left + r.width / 2 - left)) + 'px');
+        if (top >= r.bottom) el.classList.add('is-below');
+      }
+      if (variantId) {
+        var want = el.querySelector('.lv-msheet__opt[data-variant-id="' + variantId + '"]:not([disabled])');
+        if (want && el.querySelector('.lv-mp--select')) {
+          el.querySelectorAll('.lv-msheet__opt.is-selected').forEach(function (o) { o.classList.remove('is-selected'); });
+          want.classList.add('is-selected');
+          syncEngMax(el);
+          syncPrice(el);
+        }
+      }
+      var mediaWrap = (anchor || btn).closest('.lv-card-media-wrap');
+      if (mediaWrap) mediaWrap.classList.add('lv-mp-open');
+      current = { kind: kind, el: el, btn: btn, media: mediaWrap };
+      btn.classList.add('is-active');
+      requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add('is-open'); }); });
+      var first = el.querySelector('.lv-mp__eng-input') || el.querySelector('.lv-msheet__opt:not([disabled])');
+      if (first) first.focus({ preventScroll: true });
+    }
+
+    // Used by the desktop hover bar on product cards (engraving products open this popup instead of adding directly)
+    window.lvOpenMiniAdd = function (btn, anchor, variantId) { if (current && current.btn === btn) { close(); return; } open(btn, anchor, variantId); };
+
+    document.addEventListener('click', function (e) {
+      if (current) {
+        if (e.target.closest('[data-mp-close]')) { e.preventDefault(); close(); return; }
+        var opt = e.target.closest('.lv-msheet__opt');
+        if (opt && current.el.contains(opt)) {
+          e.preventDefault(); e.stopPropagation();
+          if (opt.disabled) return;
+          var isSelectMode = !!current.el.querySelector('.lv-mp--select');
+          if (isSelectMode && !opt.hasAttribute('data-mp-add')) {
+            current.el.querySelectorAll('.lv-msheet__opt.is-selected').forEach(function (o) { o.classList.remove('is-selected'); });
+            opt.classList.add('is-selected');
+            syncEngMax(current.el);
+            syncPrice(current.el);
+            return;
+          }
+          var variantId = opt.getAttribute('data-variant-id');
+          if (opt.hasAttribute('data-mp-add')) {
+            var chosen = current.el.querySelector('.lv-msheet__opt.is-selected');
+            if (!chosen) return;
+            variantId = chosen.getAttribute('data-variant-id');
+          }
+          var props = null;
+          var engBox = current.el.querySelector('.lv-mp__eng');
+          if (engBox) {
+            var inp = engBox.querySelector('.lv-mp__eng-input');
+            var text = inp.value.trim();
+            if (!text && current.btn.getAttribute('data-eng-required') === 'true') {
+              engBox.classList.add('has-error');
+              engBox.querySelector('.lv-mp__eng-error').hidden = false;
+              inp.focus();
+              return;
+            }
+            if (text) { props = {}; props[current.btn.getAttribute('data-eng-prop') || 'Engraving'] = text; }
+          }
+          opt.classList.add('is-busy');
+          addToCart(variantId, function () { opt.classList.remove('is-busy'); close(); }, props);
+          return;
+        }
+        if (current.kind === 'button' && !current.el.contains(e.target) && !e.target.closest('[data-lv-mini-add]')) close();
+        if (current.kind === 'product' && e.target === current.el) close();
+      }
+      var btn = e.target.closest('[data-lv-mini-add]');
+      if (!btn) return;
+      e.preventDefault(); e.stopPropagation();
+      if (current && current.btn === btn) { close(); return; }
+      if (btn.getAttribute('data-eng') === 'true' && btn.getAttribute('data-eng-action') === 'page' && btn.getAttribute('data-url')) { window.location.href = btn.getAttribute('data-url'); return; }
+      if (btn.getAttribute('data-multi') === 'true') { open(btn); return; }
+      var spin = btn.querySelector('.lv-mini-add__spin');
+      btn.classList.add('is-busy'); if (spin) spin.hidden = false;
+      addToCart(btn.getAttribute('data-variant-id'), function () { btn.classList.remove('is-busy'); if (spin) spin.hidden = true; });
+    }, true);
+
+    document.addEventListener('input', function (e) {
+      var inp = e.target.closest && e.target.closest('.lv-mp__eng-input');
+      if (!inp) return;
+      var box = inp.closest('.lv-mp__eng');
+      box.querySelector('.lv-mp__eng-count').textContent = inp.value.length + '/' + inp.getAttribute('maxlength');
+      box.classList.remove('has-error');
+      box.querySelector('.lv-mp__eng-error').hidden = true;
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+      if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('lv-mp__eng-input') && current) {
+        var cta = current.el.querySelector('[data-mp-add]');
+        var singleOpt = current.el.querySelectorAll('.lv-msheet__opt');
+        if (cta) { e.preventDefault(); cta.click(); }
+        else if (singleOpt.length === 1) { e.preventDefault(); singleOpt[0].click(); }
+      }
+    });
+    window.addEventListener('scroll', function () { if (current && current.kind === 'button') close(); }, { passive: true });
+    window.addEventListener('resize', function () { if (current && current.kind === 'button') close(); });
+  })();
+</script>

@@ -1,0 +1,78 @@
+{%- comment -%}
+  Compact "add" button for product cards at <=450px (see card-mini-add-assets.liquid).
+  Accepts: product (blank = demo card)
+  Setting: Theme settings > Product Card > Compact add button (position, size).
+{%- endcomment -%}
+{%- liquid
+  assign mi_side = settings.card_mini_add_position | default: 'right'
+  assign mi_size = settings.card_mini_add_size | default: 38
+  assign mi_popup = settings.card_mini_add_popup | default: 'bottom'
+  assign mi_multi = false
+  if product == blank
+    assign mi_multi = true
+  elsif product.variants.size > 1
+    assign mi_multi = true
+  endif
+  assign mi_eng = 'false'
+  if product != blank
+    capture mi_eng_raw
+      render 'engraving-info', product: product
+    endcapture
+    assign mi_eng_parts = mi_eng_raw | strip | split: '~~'
+    assign mi_eng = mi_eng_parts[0]
+    if mi_eng == 'true'
+      assign mi_multi = true
+    endif
+  endif
+-%}
+<button
+  type="button"
+  class="lv-mini-add lv-mini-add--{{ mi_side }}"
+  style="--mini-size: {{ mi_size }}px;"
+  data-lv-mini-add
+  data-popup="{{ mi_popup }}"
+  {%- if mi_eng == 'true' %}
+  data-eng="true"
+  data-eng-action="{{ settings.engraving_card_action | default: 'popup' }}"
+  data-url="{{ product.url }}"
+  data-eng-max="{{ mi_eng_parts[1] }}"
+  data-eng-prop="{{ mi_eng_parts[2] | escape }}"
+  data-eng-label="{{ mi_eng_parts[3] | escape }}"
+  data-eng-placeholder="{{ mi_eng_parts[4] | escape }}"
+  data-eng-required="{{ mi_eng_parts[5] }}"
+  {%- endif %}
+  data-multi="{{ mi_multi }}"
+  data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+  data-single="{{ product.has_only_default_variant }}"
+  data-title="{{ product.title | default: demo_title | escape }}"
+  data-image="{% if product.featured_image != blank %}{{ product.featured_image | image_url: width: 160 }}{% endif %}"
+  data-price="{% if product != blank %}{{ product.price | money }}{% else %}€{{ demo_price | default: '49.00' }}{% endif %}"
+  aria-label="Add to cart"
+  aria-haspopup="dialog"
+>
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+  <span class="lv-mini-add__spin" hidden>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+  </span>
+</button>
+{%- if mi_multi -%}
+  <template data-lv-mini-variants>
+    {%- if product != blank -%}
+      {%- assign base_price = product.variants.first.price -%}
+      {%- for v in product.variants -%}
+        <button type="button" class="lv-msheet__opt" data-variant-id="{{ v.id }}" data-price="{{ v.price | money | escape }}"{% unless v.available %} disabled{% endunless %}>
+          <span class="lv-msheet__opt-label">{% if product.has_only_default_variant %}Add to cart{% else %}{{ v.title | escape }}{% endif %}</span>
+          {%- if product.price_varies -%}
+            {%- assign delta = v.price | minus: base_price -%}
+            <span class="lv-msheet__opt-delta">{% if delta > 0 %}+{{ delta | money }}{% elsif delta < 0 %}-{{ delta | abs | money }}{% else %}+{{ 0 | money }}{% endif %}</span>
+          {%- endif -%}
+          {%- if v.available == false -%}<span class="lv-msheet__opt-note">Sold out</span>{%- endif -%}
+        </button>
+      {%- endfor -%}
+    {%- else -%}
+      <button type="button" class="lv-msheet__opt" data-variant-id=""><span class="lv-msheet__opt-label">16</span></button>
+      <button type="button" class="lv-msheet__opt" data-variant-id=""><span class="lv-msheet__opt-label">17</span></button>
+      <button type="button" class="lv-msheet__opt" data-variant-id=""><span class="lv-msheet__opt-label">18</span></button>
+    {%- endif -%}
+  </template>
+{%- endif -%}
