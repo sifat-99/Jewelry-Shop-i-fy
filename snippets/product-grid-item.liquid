@@ -1,0 +1,1292 @@
+<!-- /snippets/product-grid-item.liquid -->
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign on_sale = false
+  assign discount_percent = 0
+  if product.compare_at_price > product.price
+    assign on_sale = true
+    assign discount_amount = product.compare_at_price | minus: product.price
+    assign discount_percent = discount_amount | times: 100.0 | divided_by: product.compare_at_price | round
+  endif
+
+  assign idx = fallback_index | default: 1 | modulo: 12 | plus: 1
+
+  # Demo product (store has no products yet): title / EUR price from snippets/demo-product-data
+  assign demo_title = ''
+  assign demo_price = ''
+  assign demo_compare = ''
+  if product == blank
+    capture demo_raw
+      render 'demo-product-data', idx: idx
+    endcapture
+    assign demo_parts = demo_raw | strip | split: '|'
+    assign demo_title = demo_parts[0] | strip | append: ' | ' | append: demo_parts[1] | strip
+    assign demo_price = demo_parts[2]
+    assign demo_compare = demo_parts[3]
+    if demo_compare != blank
+      assign on_sale = true
+      assign discount_percent = demo_parts[4]
+    endif
+  endif
+
+  assign card_media = product.media
+  if card_media == blank or card_media.size == 0
+    assign card_media = product.images
+  endif
+
+  # Universal Product Card Settings (Theme Settings > Product Card)
+  assign show_quick_add = settings.card_show_quick_add
+  if show_quick_add == nil
+    assign show_quick_add = true
+  endif
+
+  assign show_wishlist = settings.card_show_wishlist
+  if show_wishlist == nil
+    assign show_wishlist = true
+  endif
+
+  assign show_quickview = settings.card_show_quickview
+  if show_quickview == nil
+    assign show_quickview = true
+  endif
+
+  assign show_arrows = settings.card_show_arrows
+  if show_arrows == nil
+    assign show_arrows = true
+  endif
+
+  assign show_arrows_mobile = settings.card_show_arrows_mobile
+  if show_arrows_mobile == nil
+    assign show_arrows_mobile = false
+  endif
+
+  assign show_discount_badge = settings.card_show_discount_badge
+  if show_discount_badge == nil
+    assign show_discount_badge = true
+  endif
+
+  # Variant & Size Detection
+  assign has_size_variants = false
+  assign size_option_index = 0
+  assign option_label = 'Option'
+
+  unless product.has_only_default_variant
+    if product.variants.size > 1
+      assign has_size_variants = true
+      for option in product.options_with_values
+        assign opt_name = option.name | downcase
+        if opt_name contains 'size' or opt_name contains 'maat' or opt_name contains 'ring' or opt_name contains 'lengte' or opt_name contains 'length' or opt_name contains 'taille' or opt_name contains 'letter' or opt_name contains 'initial' or opt_name contains 'pendant' or opt_name contains 'charm'
+          assign size_option_index = forloop.index0
+          assign option_label = option.name
+          break
+        endif
+      endfor
+      if option_label == 'Option' and product.options.size > 0
+        assign option_label = product.options[0]
+      endif
+    endif
+  endunless
+
+  if product == blank
+    assign has_size_variants = true
+    assign option_label = 'Size'
+  endif
+
+  # Calculate unique variant count for this option
+  assign unique_variant_count = 0
+  assign unique_check_str = ''
+  if product != blank and product.variants.size > 0
+    for v in product.variants
+      assign opt_val = v.options[size_option_index] | default: v.title | strip
+      assign check_tag = '||' | append: opt_val | append: '||'
+      unless unique_check_str contains check_tag
+        assign unique_check_str = unique_check_str | append: check_tag
+        assign unique_variant_count = unique_variant_count | plus: 1
+      endunless
+    endfor
+  elsif product == blank
+    assign unique_variant_count = 3
+  endif
+
+  # Card Border Radius Control (Snippet argument > Section setting > Global Theme setting > Default 4px)
+  assign card_radius = card_border_radius
+  if card_radius == nil or card_radius == ''
+    assign card_radius = section.settings.card_border_radius
+  endif
+  if card_radius == nil or card_radius == ''
+    assign card_radius = settings.card_border_radius
+  endif
+  if card_radius == nil or card_radius == ''
+    assign card_radius = 4
+  endif
+-%}
+
+<product-grid-item
+  aria-label="{{ product.title | default: demo_title | default: 'Jewelry Shop' | escape }}"
+  class="product-grid-item lv-product-card{% if extra_class != blank %} {{ extra_class }}{% endif %}"
+  data-hover="{{ settings.card_hover_effect | default: 'zoom_lift' }}"
+  style="--card-radius: {{ card_radius }}px;"
+  data-item-id="{{ product.id | default: fallback_index }}"
+  data-price="{{ product.price | divided_by: 100.0 | default: 0 }}"
+  data-title="{{ product.title | default: demo_title | downcase | escape }}"
+  data-tags="{{ product.tags | join: ',' | downcase | escape }}"
+  data-type="{{ product.type | downcase | escape }}"
+  data-options="{% for opt in product.options_with_values %}{{ opt.values | join: ',' | downcase | escape }},{% endfor %}"
+  data-variants="{% for v in product.variants %}{{ v.title | downcase | escape }},{% endfor %}"
+>
+  <style>
+    .lv-product-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .lv-card-media-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      overflow: hidden;
+      background: var(--bg-accent, var(--bg));
+      border-radius: var(--card-radius, 4px);
+      margin-bottom: 12px;
+    }
+    .lv-card-img-link {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      text-decoration: none;
+    }
+    .card-media-slider {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .card-media-slide {
+      position: absolute;
+      /* overscan 2px: hides the faint edge line some product photos carry on their top/left border */
+      inset: -2px;
+      width: calc(100% + 4px);
+      max-width: none;
+      height: calc(100% + 4px);
+      object-fit: cover;
+      object-position: center;
+      opacity: 0;
+      visibility: hidden;
+      z-index: 1;
+      pointer-events: none;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: auto;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transform: translateZ(0);
+      transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.4s ease;
+    }
+    .card-media-slide.is-active {
+      opacity: 1;
+      visibility: visible;
+      z-index: 2;
+      pointer-events: auto;
+    }
+    .lv-card-media-wrap:hover .card-media-slide.is-active {
+      transform: scale(1.03);
+    }
+
+    /* Hover animation (Theme settings > Product Card > Hover animation). Pointer devices only. */
+    @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+      .lv-product-card[data-hover*="lift"] {
+        transition: transform 0.5s cubic-bezier(0.22, 0.8, 0.3, 1);
+        will-change: transform;
+      }
+      .lv-product-card[data-hover*="lift"]:hover { transform: translateY(-5px); }
+      .lv-product-card[data-hover*="lift"] .lv-card-media-wrap { transition: box-shadow 0.5s ease; }
+      .lv-product-card[data-hover*="lift"]:hover .lv-card-media-wrap { box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.24); }
+      .lv-product-card[data-hover*="zoom"] .card-media-slide {
+        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.9s cubic-bezier(0.22, 0.8, 0.3, 1);
+      }
+      .lv-product-card[data-hover*="zoom"] .lv-card-media-wrap:hover .card-media-slide.is-active { transform: scale(1.06); }
+      .lv-product-card .product__grid__title { transition: letter-spacing 0.4s ease; }
+      .lv-product-card[data-hover*="lift"]:hover .product__grid__title { letter-spacing: 0.1em !important; }
+    }
+    .lv-product-card[data-hover="none"] .lv-card-media-wrap:hover .card-media-slide.is-active { transform: none; }
+
+    /* 1. Ribbon Discount Badge (Top-Left) */
+
+    /* ==========================================================================
+       2. RIGHT SIDE ROUND ACTION BUTTONS (Wishlist & Quick View)
+       Middle-left circular expanding fill on hover (350ms ease-in-out)
+       ========================================================================== */
+
+    .lv-card-side-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 20;
+    }
+
+    .lv-card-action-btn {
+      position: relative !important;
+      overflow: hidden !important;
+      border-radius: 50% !important;
+      isolation: isolate !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-sizing: border-box !important;
+      background-color: var(--round-btn-bg) !important;
+      color: var(--round-btn-text) !important;
+      border: 1px solid var(--round-btn-border) !important;
+      box-shadow: 0 2px 8px var(--round-btn-shadow) !important;
+      cursor: pointer !important;
+      padding: 0 !important;
+      width: 36px !important;
+      height: 36px !important;
+      transform: none !important;
+      transition: border-color 350ms ease-in-out, box-shadow 350ms ease-in-out !important;
+    }
+
+    /* Circle Expanding Fill Originating from Middle-Left (0% 50%) */
+    .lv-card-action-btn::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      border-radius: 50% !important;
+      background-color: var(--round-btn-hover-bg) !important;
+      opacity: 0 !important;
+      transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+      pointer-events: none !important;
+      z-index: 0 !important;
+    }
+
+    .lv-card-nav-arrow::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      border-radius: inherit !important;
+      background-color: {{ settings.card_arrow_hover_background | default: '#2b2622' }} !important;
+      opacity: 0 !important;
+      transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+      pointer-events: none !important;
+      z-index: 0 !important;
+    }
+
+    .lv-card-action-btn:hover::before {
+      opacity: 1 !important;
+    }
+
+    {%- if settings.card_arrow_hover_effect == 'circle_fill' -%}
+      .lv-card-nav-arrow:hover::before {
+        opacity: 1 !important;
+      }
+    {%- else -%}
+      .lv-card-nav-arrow::before {
+        display: none !important;
+      }
+    {%- endif -%}
+
+    .lv-card-action-btn:hover {
+      border-color: var(--round-btn-hover-border, var(--round-btn-hover-bg)) !important;
+      box-shadow: 0 4px 14px var(--round-btn-shadow) !important;
+      transform: none !important;
+    }
+
+    .lv-card-action-btn svg {
+      position: relative !important;
+      z-index: 1 !important;
+      color: var(--round-btn-text) !important;
+      stroke: currentColor !important;
+      transition: color 350ms ease-in-out, stroke 350ms ease-in-out, fill 350ms ease-in-out !important;
+    }
+
+    .lv-card-action-btn:hover svg {
+      color: var(--round-btn-hover-text) !important;
+      stroke: currentColor !important;
+    }
+
+    /* Wishlist Active State */
+    .card-wishlist-btn.is-active svg.icon-wishlist-solid {
+      display: block !important;
+      color: #e53935 !important;
+      stroke: #e53935 !important;
+      fill: #e53935 !important;
+    }
+    .card-wishlist-btn.is-active:hover svg.icon-wishlist-solid {
+      color: var(--round-btn-hover-text) !important;
+      stroke: var(--round-btn-hover-text) !important;
+      fill: var(--round-btn-hover-text) !important;
+    }
+
+    /* ==========================================================================
+       3. MIDDLE LEFT & RIGHT IMAGE NAVIGATION ARROWS
+       ========================================================================== */
+
+    .lv-card-nav-arrow {
+      position: absolute !important;
+      top: {{ settings.card_arrow_vertical_position | default: 50 }}% !important;
+      transform: translateY(-50%) !important;
+      width: {{ settings.card_arrow_button_size | default: 40 }}px !important;
+      height: {{ settings.card_arrow_button_size | default: 40 }}px !important;
+      overflow: hidden !important;
+      border-radius: var(--btn-radius, 0px) !important;
+      isolation: isolate !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-sizing: border-box !important;
+      background-color: {% if settings.card_arrow_background_enabled == false %}transparent{% else %}{{ settings.card_arrow_background | default: '#ffffff' }}{% endif %} !important;
+      color: {{ settings.card_arrow_icon_color | default: '#111111' }} !important;
+      border: {{ settings.card_arrow_border_width | default: 1 }}px solid {{ settings.card_arrow_border_color | default: '#d8d4ce' }} !important;
+      box-shadow: {% if settings.card_arrow_show_shadow == false %}none{% else %}0 2px 8px rgba(0, 0, 0, 0.14){% endif %} !important;
+      cursor: pointer !important;
+      padding: 0 !important;
+      z-index: 18 !important;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity var(--btn-animation-duration, 350ms) ease, visibility var(--btn-animation-duration, 350ms) ease, background-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), border-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), box-shadow var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+    }
+    .lv-card-nav-arrow svg {
+      position: relative !important;
+      z-index: 1 !important;
+      width: {{ settings.card_arrow_icon_size | default: 18 }}px !important;
+      height: {{ settings.card_arrow_icon_size | default: 18 }}px !important;
+      color: {{ settings.card_arrow_icon_color | default: '#111111' }} !important;
+      stroke: currentColor !important;
+      transition: color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), stroke var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), fill var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+    }
+    .card-nav-prev {
+      left: {{ settings.card_arrow_horizontal_inset | default: 8 }}px !important;
+    }
+    .card-nav-next {
+      right: {{ settings.card_arrow_horizontal_inset | default: 8 }}px !important;
+    }
+    .lv-card-media-wrap:hover .lv-card-nav-arrow {
+      opacity: 1;
+      visibility: visible;
+    }
+    {%- if settings.card_arrows_always_visible -%}
+      @media (min-width: 768px) {
+        .lv-card-nav-arrow {
+          opacity: 1 !important;
+          visibility: visible !important;
+        }
+      }
+    {%- endif -%}
+    {%- if settings.card_arrow_hover_effect != 'none' -%}
+      .lv-card-nav-arrow:hover {
+        border-color: {{ settings.card_arrow_hover_border_color | default: '#2b2622' }} !important;
+        box-shadow: {% if settings.card_arrow_show_shadow == false %}none{% else %}0 4px 14px rgba(0, 0, 0, 0.16){% endif %} !important;
+        transform: translateY(-50%) !important;
+        {%- if settings.card_arrow_hover_effect == 'color_change' -%}
+          background-color: {% if settings.card_arrow_background_enabled == false %}transparent{% else %}{{ settings.card_arrow_hover_background | default: '#2b2622' }}{% endif %} !important;
+        {%- endif -%}
+      }
+      .lv-card-nav-arrow:hover svg {
+        color: {{ settings.card_arrow_hover_icon_color | default: '#ffffff' }} !important;
+        stroke: currentColor !important;
+      }
+    {%- endif -%}
+
+    /* ==========================================================================
+       4. FLOATING WHITE BAR QUICK ADD & SIZE VARIANT SELECTOR
+       Matches user design (Image 1 'ADD' and Image 2 sizes '16 17 18')
+       Desktop: Slides up on card hover; transforms to size pills on bar hover
+       Mobile: Visible at bottom, tap to toggle sizes, guaranteed zero overlap
+       ========================================================================== */
+
+    .lv-card-quick-add-wrap {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 18;
+      box-sizing: border-box;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 280ms cubic-bezier(0.25, 1, 0.5, 1), transform 280ms cubic-bezier(0.25, 1, 0.5, 1);
+      pointer-events: none;
+    }
+
+    .lv-card-media-wrap:hover .lv-card-quick-add-wrap,
+    .lv-card-media-wrap:focus-within .lv-card-quick-add-wrap {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .lv-card-action-bar {
+      position: relative !important;
+      width: 100% !important;
+      height: 40px !important;
+      min-height: 40px !important;
+      background: var(--btn-regular-bg, #000000) !important;
+      color: var(--btn-regular-text, #ffffff) !important;
+      border: 1px solid var(--btn-regular-border, #000000) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+      border-radius: var(--btn-radius, 0px) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+      cursor: pointer !important;
+      box-sizing: border-box !important;
+      padding: 0 8px !important;
+      text-decoration: none !important;
+      transition: box-shadow var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), border-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+    }
+
+    /* Direct Add Button with Signature 350ms Left-to-Right Sliding Hover Animation */
+    .lv-card-direct-add-btn {
+      isolation: isolate !important;
+      background-color: var(--btn-regular-bg, #000000) !important;
+    }
+    .lv-card-direct-add-btn::before {
+      content: "" !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background-color: var(--btn-regular-hover-bg, #000000) !important;
+      border-radius: inherit !important;
+      z-index: 1 !important;
+      opacity: 0 !important;
+      transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+      pointer-events: none !important;
+    }
+    .lv-card-direct-add-btn:hover::before {
+      opacity: 1 !important;
+    }
+    .lv-card-direct-add-btn:hover {
+      border-color: var(--btn-regular-hover-border, #000000) !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+    }
+    .lv-card-direct-add-btn .lv-card-bar-label,
+    .lv-card-direct-add-btn .lv-card-bar-label span,
+    .lv-card-direct-add-btn .btn__text-content {
+      position: relative !important;
+      z-index: 2 !important;
+      color: var(--btn-regular-text, #ffffff) !important;
+      transition: color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+    }
+    .lv-card-direct-add-btn:hover .lv-card-bar-label,
+    .lv-card-direct-add-btn:hover .lv-card-bar-label span,
+    .lv-card-direct-add-btn:hover .btn__text-content,
+    .lv-card-direct-add-btn:hover span {
+      color: var(--btn-regular-hover-text, #ffffff) !important;
+    }
+
+    /* Initial 'Add to Cart' label inside bar */
+    .lv-card-bar-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #111111;
+      transition: opacity 220ms ease, transform 220ms ease, color 350ms ease-in-out;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Size Options Wrapper inside bar (Hidden initially, reveals on bar hover/active) */
+    .lv-card-bar-sizes-wrap {
+      position: absolute !important;
+      inset: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      opacity: 0 !important;
+      transform: translateY(4px) !important;
+      transition: opacity 220ms ease, transform 220ms ease !important;
+      pointer-events: none !important;
+      z-index: 3 !important;
+      background: #ffffff !important;
+      overflow: hidden !important;
+      border-radius: inherit !important;
+    }
+
+    /* On Desktop ONLY: Hovering the bar reveals sizes */
+    @media (hover: hover) {
+      .lv-card-sizes-bar:hover .lv-card-bar-label {
+        opacity: 0 !important;
+        transform: translateY(-4px) !important;
+      }
+      .lv-card-sizes-bar:hover .lv-card-bar-sizes-wrap {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+        pointer-events: auto !important;
+      }
+    }
+
+    /* On Mobile or Explicit Tap: .is-open class reveals sizes */
+    .lv-card-sizes-bar.is-open .lv-card-bar-label {
+      opacity: 0 !important;
+      transform: translateY(-4px) !important;
+    }
+    .lv-card-sizes-bar.is-open .lv-card-bar-sizes-wrap {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      pointer-events: auto !important;
+    }
+
+    /* Keep the hover bar visible while its variant popup is open (the pointer is inside the popup, not on the card) */
+    .lv-card-media-wrap.lv-mp-open .lv-card-quick-add-wrap { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .lv-card-media-wrap.lv-mp-open .lv-card-sizes-bar .lv-card-bar-label { opacity: 0 !important; transform: translateY(-4px) !important; }
+    .lv-card-media-wrap.lv-mp-open .lv-card-sizes-bar .lv-card-bar-sizes-wrap { opacity: 1 !important; transform: translateY(0) !important; pointer-events: auto !important; }
+
+    .lv-card-bar-sizes {
+      display: flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      padding: 0 8px !important;
+      width: 100% !important;
+      height: 100% !important;
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      scrollbar-width: none !important;
+      -webkit-overflow-scrolling: touch !important;
+      scroll-behavior: smooth !important;
+      box-sizing: border-box !important;
+      justify-content: flex-start !important;
+      user-select: none !important;
+      cursor: grab !important;
+    }
+    .lv-card-bar-sizes:active {
+      cursor: grabbing !important;
+    }
+    .lv-card-bar-sizes::-webkit-scrollbar {
+      display: none !important;
+    }
+    .lv-card-bar-sizes.is-centered {
+      justify-content: center !important;
+    }
+
+    /* Chevron Scroll Arrows */
+    .lv-card-size-nav {
+      position: absolute !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      width: 24px !important;
+      z-index: 6 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      cursor: pointer !important;
+      color: #111111 !important;
+      background: transparent !important;
+      transition: opacity 180ms ease, color 180ms ease !important;
+      pointer-events: auto !important;
+    }
+    .lv-card-size-nav-prev {
+      left: 0 !important;
+      background: linear-gradient(90deg, #ffffff 80%, rgba(255, 255, 255, 0)) !important;
+      padding-right: 6px !important;
+    }
+    .lv-card-size-nav-next {
+      right: 0 !important;
+      background: linear-gradient(-90deg, #ffffff 80%, rgba(255, 255, 255, 0)) !important;
+      padding-left: 6px !important;
+    }
+    .lv-card-size-nav:hover {
+      color: #000000 !important;
+    }
+    .lv-card-size-nav svg {
+      transition: transform 150ms ease !important;
+    }
+    .lv-card-size-nav:hover svg {
+      transform: scale(1.25) !important;
+    }
+    .lv-card-size-nav.is-hidden {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* Size Pill Button */
+    .lv-card-size-pill {
+      position: relative !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-width: 32px !important;
+      height: 30px !important;
+      padding: 0 8px !important;
+      margin: 0 !important;
+      background: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.16) !important;
+      border-radius: var(--btn-radius, 0px) !important;
+      color: #111111 !important;
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      box-sizing: border-box !important;
+      transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, transform 150ms ease !important;
+    }
+
+    /* High contrast black hover on size pills */
+    .lv-card-size-pill:hover,
+    .lv-card-size-pill.is-active {
+      background-color: #000000 !important;
+      color: #ffffff !important;
+      border-color: #000000 !important;
+    }
+
+    .lv-card-size-pill:active {
+      transform: scale(0.94) !important;
+    }
+
+    .lv-card-size-pill.is-sold-out {
+      opacity: 0.3 !important;
+      text-decoration: line-through !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+    }
+
+    /* Spinner Animation */
+    @keyframes lv-card-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .lv-card-size-spinner svg {
+      animation: lv-card-spin 0.8s linear infinite;
+      display: block;
+    }
+
+    /* Direct Add to Cart Hover Fill */
+    .lv-card-direct-add-btn:hover .lv-card-bar-label {
+      opacity: 1 !important;
+    }
+
+    /* ==========================================================================
+       5. MOBILE RESPONSIVE LAYOUT (Zero Overlaps Guaranteed!)
+       ========================================================================== */
+
+    @media (max-width: 767px) {
+      /* Side actions (Wishlist & Quick View) positioned at top-right */
+      .lv-card-side-actions {
+        top: 8px !important;
+        right: 8px !important;
+        flex-direction: row !important;
+        gap: 6px !important;
+        z-index: 20 !important;
+      }
+      .lv-card-action-btn {
+        width: 30px !important;
+        height: 30px !important;
+      }
+      .lv-card-action-btn svg {
+        width: 14px !important;
+        height: 14px !important;
+      }
+
+      /* Discount ribbon badge at top-left */
+
+      /* Middle image navigation arrows */
+      .lv-card-nav-arrow {
+        top: {{ settings.card_arrow_vertical_position | default: 50 }}% !important;
+        transform: translateY(-50%) !important;
+        width: {{ settings.card_arrow_button_size_mobile | default: 34 }}px !important;
+        height: {{ settings.card_arrow_button_size_mobile | default: 34 }}px !important;
+        z-index: 16 !important;
+      }
+      .lv-card-nav-arrow.card-nav-prev {
+        left: {{ settings.card_arrow_horizontal_inset_mobile | default: 4 }}px !important;
+      }
+      .lv-card-nav-arrow.card-nav-next {
+        right: {{ settings.card_arrow_horizontal_inset_mobile | default: 4 }}px !important;
+      }
+      .lv-card-nav-arrow svg {
+        width: {{ settings.card_arrow_icon_size_mobile | default: 16 }}px !important;
+        height: {{ settings.card_arrow_icon_size_mobile | default: 16 }}px !important;
+      }
+      .hide-on-mobile {
+        display: none !important;
+      }
+
+      /* Bottom Quick Add Bar - ALWAYS cleanly positioned at bottom without overlapping */
+      .lv-card-quick-add-wrap {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+        pointer-events: auto !important;
+        bottom: 8px !important;
+        left: 8px !important;
+        right: 8px !important;
+        z-index: 18 !important;
+      }
+      .lv-card-action-bar {
+        height: 34px !important;
+        min-height: 34px !important;
+        padding: 0 4px !important;
+      }
+      .lv-card-bar-label {
+        font-size: 11px !important;
+        letter-spacing: 0.1em !important;
+      }
+      .lv-card-size-pill {
+        min-width: 26px !important;
+        height: 26px !important;
+        font-size: 11px !important;
+        padding: 0 4px !important;
+      }
+    }
+  </style>
+
+  <div class="lv-card-media-wrap">
+    <!-- 1. Top-Left Ribbon Discount Badge -->
+    {%- if show_discount_badge and on_sale -%}
+      {% render 'sale-badge', percent: discount_percent %}
+    {%- endif -%}
+
+    <!-- 2. Top-Right Action Buttons: Wishlist & Quick View -->
+    {%- if show_wishlist or show_quickview -%}
+      <div class="lv-card-side-actions">
+        {%- if show_wishlist -%}
+          <!-- Wishlist Button -->
+          <button
+            type="button"
+            class="lv-card-action-btn card-wishlist-btn"
+            data-wishlist-id="{{ product.id }}"
+            title="Add to wishlist"
+            aria-label="Add to wishlist"
+          >
+            <svg class="icon-wishlist-outline" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <svg class="icon-wishlist-solid" viewBox="0 0 24 24" width="16" height="16" fill="#e53935" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+        {%- endif -%}
+
+        {%- if show_quickview -%}
+          <!-- Quick View Button -->
+          <button
+            type="button"
+            class="lv-card-action-btn card-quickview-btn"
+            data-quickview-handle="{{ product.handle }}"
+            title="Quick view"
+            aria-label="Quick view"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <!-- 3. Middle Side Image Navigation Arrows (Only if multiple images) -->
+    {%- if show_arrows and card_media.size > 1 -%}
+      <button
+        type="button"
+        class="lv-card-nav-arrow card-nav-prev {% unless show_arrows_mobile %}hide-on-mobile{% endunless %}"
+        title="Previous image"
+        aria-label="Previous image"
+      >
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="lv-card-nav-arrow card-nav-next {% unless show_arrows_mobile %}hide-on-mobile{% endunless %}"
+        title="Next image"
+        aria-label="Next image"
+      >
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+    {%- endif -%}
+
+    <!-- 4. Product Image Slider Container -->
+    <a href="{{ product.url | default: routes.all_products_collection_url }}" class="lv-card-img-link" aria-label="{{ product.title | default: demo_title | default: 'Jewelry Shop' | escape }}">
+      <div class="card-media-slider" data-current-index="0" data-total-slides="{{ card_media.size | default: 1 }}">
+        {%- if card_media.size > 0 -%}
+          {%- for item in card_media limit: 6 -%}
+            <img
+              src="{{ item | image_url: width: 900 }}"
+              srcset="{{ item | image_url: width: 360 }} 360w, {{ item | image_url: width: 540 }} 540w, {{ item | image_url: width: 720 }} 720w, {{ item | image_url: width: 900 }} 900w, {{ item | image_url: width: 1254 }} 1254w, {{ item | image_url: width: 1600 }} 1600w"
+              sizes="(min-width: 1400px) 25vw, (min-width: 990px) 33vw, (min-width: 768px) 50vw, 100vw"
+              alt="{{ product.title | escape }}"
+              width="{{ item.width | default: 900 }}"
+              height="{{ item.height | default: 900 }}"
+              loading="{% if forloop.first and fallback_index <= 4 %}eager{% else %}lazy{% endif %}"
+              decoding="async"
+              class="card-media-slide {% if forloop.first %}is-active{% endif %}"
+              data-slide-index="{{ forloop.index0 }}"
+            >
+          {%- endfor -%}
+        {%- elsif product.featured_media -%}
+          <img
+            src="{{ product.featured_media | image_url: width: 900 }}"
+            srcset="{{ product.featured_media | image_url: width: 360 }} 360w, {{ product.featured_media | image_url: width: 540 }} 540w, {{ product.featured_media | image_url: width: 720 }} 720w, {{ product.featured_media | image_url: width: 900 }} 900w, {{ product.featured_media | image_url: width: 1254 }} 1254w, {{ product.featured_media | image_url: width: 1600 }} 1600w"
+            sizes="(min-width: 1400px) 25vw, (min-width: 990px) 33vw, (min-width: 768px) 50vw, 100vw"
+            alt="{{ product.title | escape }}"
+            width="{{ product.featured_media.width | default: 900 }}"
+            height="{{ product.featured_media.height | default: 900 }}"
+            loading="lazy"
+            decoding="async"
+            class="card-media-slide is-active"
+            data-slide-index="0"
+          >
+        {%- else -%}
+          <svg
+            class="card-media-slide is-active"
+            data-slide-index="0"
+            viewBox="0 0 900 900"
+            preserveAspectRatio="xMidYMid slice"
+            role="img"
+            aria-label="{{ demo_title | default: 'Product image' | escape }}"
+            style="width:100%;height:100%;display:block;"
+          >
+            <rect width="900" height="900" fill="#ece7df"/>
+            <g fill="none" stroke="#b9ad9b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+              <circle cx="450" cy="372" r="58"/>
+              <path d="M416 322l16-28h36l16 28"/>
+            </g>
+            <text x="450" y="510" text-anchor="middle" font-family="Quicksand, sans-serif" font-size="30" letter-spacing="6" fill="#8d8272" font-weight="600">PRODUCT IMAGE</text>
+            <text x="450" y="556" text-anchor="middle" font-family="Quicksand, sans-serif" font-size="22" letter-spacing="3" fill="#a79c8b">{{ demo_title | default: 'Placeholder' | upcase | escape }}</text>
+          </svg>
+        {%- endif -%}
+      </div>
+    </a>
+
+    <!-- 5. Floating White Bar Quick Add & Size Variant Selector -->
+    {%- if show_quick_add -%}
+      {%- if product.available != false -%}{% render 'card-mini-add', product: product, demo_title: demo_title, demo_price: demo_price %}{%- endif -%}
+      <div class="lv-card-quick-add-wrap {% if has_size_variants %}has-sizes{% endif %}">
+        {% render 'card-engrave-bar', product: product %}
+        {%- if product.available != false -%}
+          {%- if has_size_variants -%}
+            <!-- Product HAS Size Variants -->
+            <div class="lv-card-action-bar lv-card-sizes-bar" data-product-handle="{{ product.handle }}">
+              <!-- Initial 'Add to Cart' State -->
+              <div class="lv-card-bar-label btn__text-content">
+                <span>Add to Cart</span>
+              </div>
+
+              <!-- Size Options State on Hover/Active with Smooth Carousel & Arrows -->
+              <div class="lv-card-bar-sizes-wrap">
+                <button type="button" class="lv-card-size-nav lv-card-size-nav-prev is-hidden" aria-label="Previous options" tabindex="-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+
+                <div class="lv-card-bar-sizes" data-scroll-track>
+                  {%- if product != blank -%}
+                    {%- assign rendered_sizes = '' -%}
+                    {%- for variant in product.variants -%}
+                      {%- assign size_val = variant.options[size_option_index] | default: variant.title | strip -%}
+                      {%- assign size_check = '||' | append: size_val | append: '||' -%}
+                      {%- unless rendered_sizes contains size_check -%}
+                        {%- assign rendered_sizes = rendered_sizes | append: size_check -%}
+                        <button
+                          type="button"
+                          class="lv-card-size-pill {% unless variant.available %}is-sold-out{% endunless %}"
+                          data-variant-id="{{ variant.id }}"
+                          data-size="{{ size_val | escape }}"
+                          {% unless variant.available %}disabled title="Sold out"{% else %}title="Add {{ size_val | escape }}"{% endunless %}
+                          aria-label="{{ size_val | escape }}"
+                        >
+                          <span class="lv-card-size-text">{{ size_val }}</span>
+                          <span class="lv-card-size-spinner" style="display: none;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+                          </span>
+                        </button>
+                      {%- endunless -%}
+                    {%- endfor -%}
+                  {%- else -%}
+                    <!-- Fallback Mock Sizes for Preview -->
+                    <button type="button" class="lv-card-size-pill" data-size="16"><span class="lv-card-size-text">16</span></button>
+                    <button type="button" class="lv-card-size-pill" data-size="17"><span class="lv-card-size-text">17</span></button>
+                    <button type="button" class="lv-card-size-pill" data-size="18"><span class="lv-card-size-text">18</span></button>
+                  {%- endif -%}
+                </div>
+
+                <button type="button" class="lv-card-size-nav lv-card-size-nav-next is-hidden" aria-label="Next options" tabindex="-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+              </div>
+            </div>
+          {%- else -%}
+            <!-- Product has NO size variants (single variant) -> Direct Add to Cart -->
+            <button
+              type="button"
+              class="lv-card-action-bar lv-card-direct-add-btn"
+              data-variant-id="{{ current_variant.id }}"
+              title="Add to cart"
+              aria-label="Add to cart"
+            >
+              <span class="lv-card-bar-label btn__text-content">
+                <span>Add to Cart</span>
+              </span>
+              <span class="lv-card-size-spinner" style="display: none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+              </span>
+            </button>
+          {%- endif -%}
+        {%- else -%}
+          <!-- Product Sold Out -->
+          <div class="lv-card-action-bar is-disabled" title="Sold out">
+            <span class="lv-card-bar-label btn__text-content" style="opacity: 0.5;">
+              <span>Sold Out</span>
+            </span>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <!-- Product Info: Title & Price -->
+  <div class="product__grid__info text-{{ settings.product_card_text_alignment | default: 'left' }}" style="text-align: {{ settings.product_card_text_alignment | default: 'left' }};">
+    <a href="{{ product.url | default: routes.all_products_collection_url }}" data-grid-link aria-label="{{ product.title | default: demo_title | default: 'Jewelry Shop' | escape }}">
+      {%- if settings.show_vendor -%}
+        <div class="product__grid__vendor" style="font-size: 10.5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-light, #555); margin-bottom: 3px;">
+          Jewelry Shop
+        </div>
+      {%- endif -%}
+
+      <div class="product__grid__title__wrapper">
+        <p class="product__grid__title" style="font-family: 'Quicksand', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 6px 0; color: var(--text);">
+          {{ product.title | default: demo_title | default: 'Jewelry Shop' }}
+        </p>
+      </div>
+
+      <div class="product__grid__price" style="display: flex; align-items: center; gap: 8px;">
+        <span class="price-item price-item--regular" style="font-family: 'Quicksand', sans-serif; font-size: 13px; font-weight: 600; color: {% if on_sale %}#8c2b3f{% else %}var(--text){% endif %};">
+          {%- if product.price -%}
+            {{ product.price | money }}
+          {%- else -%}
+            €{{ demo_price | default: '49.00' }}
+          {%- endif -%}
+        </span>
+
+        {%- if on_sale and demo_compare != blank -%}
+          <s class="price-item price-item--compare" style="font-family: 'Quicksand', sans-serif; font-size: 12px; color: #999999;">€{{ demo_compare }}</s>
+        {%- elsif on_sale and product.compare_at_price > product.price -%}
+          <s class="price-item price-item--compare" style="font-family: 'Quicksand', sans-serif; font-size: 12px; color: #999999;">
+            {{ product.compare_at_price | money }}
+          </s>
+        {%- endif -%}
+      </div>
+    </a>
+  </div>
+</product-grid-item>
+
+<script>
+  if (!window.lvCardInteractionsInitialized) {
+    window.lvCardInteractionsInitialized = true;
+
+    // Helper to add variant to cart via AJAX & open drawer
+    function lvAddToCart(variantId, callback) {
+      if (!variantId) {
+        if (callback) callback();
+        return;
+      }
+      if (typeof window.addToCartAjax === 'function') {
+        window.addToCartAjax(variantId, 1)
+          .then(function() {
+            if (callback) callback();
+          })
+          .catch(function(err) {
+            console.error('AJAX add error:', err);
+            if (callback) callback();
+          });
+      } else {
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: variantId, quantity: 1 })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(item) {
+          if (typeof window.openCartDrawer === 'function') {
+            window.openCartDrawer();
+          }
+          document.dispatchEvent(new CustomEvent('theme:cart:reload', { bubbles: true }));
+          if (callback) callback();
+        })
+        .catch(function(err) {
+          console.error('Direct add error:', err);
+          if (callback) callback();
+        });
+      }
+    }
+
+    // Helper to update navigation arrows on a sizes bar
+    function updateBarArrows(bar) {
+      if (!bar) return;
+      var track = bar.querySelector('.lv-card-bar-sizes');
+      if (!track) return;
+      var prev = bar.querySelector('.lv-card-size-nav-prev');
+      var next = bar.querySelector('.lv-card-size-nav-next');
+
+      var isOverflowing = (track.scrollWidth > track.clientWidth + 2);
+      if (isOverflowing) {
+        track.classList.remove('is-centered');
+        if (prev) {
+          if (track.scrollLeft > 4) {
+            prev.classList.remove('is-hidden');
+          } else {
+            prev.classList.add('is-hidden');
+          }
+        }
+        if (next) {
+          if (track.scrollLeft + track.clientWidth < track.scrollWidth - 4) {
+            next.classList.remove('is-hidden');
+          } else {
+            next.classList.add('is-hidden');
+          }
+        }
+      } else {
+        track.classList.add('is-centered');
+        if (prev) prev.classList.add('is-hidden');
+        if (next) next.classList.add('is-hidden');
+      }
+    }
+
+    // Drag-to-scroll variables
+    var activeDragTrack = null;
+    var dragStartX = 0;
+    var dragScrollLeft = 0;
+    var isDraggingVariant = false;
+
+    // Mouse wheel horizontal scroll conversion
+    document.addEventListener('wheel', function(e) {
+      var track = e.target.closest('.lv-card-bar-sizes');
+      if (track && track.scrollWidth > track.clientWidth) {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          e.preventDefault();
+          track.scrollLeft += e.deltaY;
+          var bar = track.closest('.lv-card-sizes-bar');
+          if (bar) updateBarArrows(bar);
+        }
+      }
+    }, { passive: false });
+
+    // Drag-to-scroll on desktop
+    document.addEventListener('mousedown', function(e) {
+      var track = e.target.closest('.lv-card-bar-sizes');
+      if (track && !e.target.closest('.lv-card-size-nav') && !e.target.closest('.lv-card-size-grid-btn')) {
+        activeDragTrack = track;
+        dragStartX = e.pageX;
+        dragScrollLeft = track.scrollLeft;
+        isDraggingVariant = false;
+      }
+    });
+
+    document.addEventListener('mousemove', function(e) {
+      if (!activeDragTrack) return;
+      var delta = e.pageX - dragStartX;
+      if (Math.abs(delta) > 5) {
+        isDraggingVariant = true;
+        activeDragTrack.scrollLeft = dragScrollLeft - delta;
+        var bar = activeDragTrack.closest('.lv-card-sizes-bar');
+        if (bar) updateBarArrows(bar);
+      }
+    });
+
+    document.addEventListener('mouseup', function(e) {
+      if (activeDragTrack) {
+        activeDragTrack = null;
+        setTimeout(function() {
+          isDraggingVariant = false;
+        }, 50);
+      }
+    });
+
+    // Update arrows on scroll inside tracks
+    document.addEventListener('scroll', function(e) {
+      if (e.target && e.target.classList && e.target.classList.contains('lv-card-bar-sizes')) {
+        var bar = e.target.closest('.lv-card-sizes-bar');
+        if (bar) updateBarArrows(bar);
+      }
+    }, true);
+
+    // Initial check on mouseover/hover
+    document.addEventListener('mouseover', function(e) {
+      var bar = e.target.closest('.lv-card-sizes-bar');
+      if (bar) {
+        updateBarArrows(bar);
+      }
+    });
+
+    // Click Delegation
+    document.addEventListener('click', function(e) {
+      // 0. Engravable products: the hover bar opens the variant + engraving popup instead of adding directly
+      var quickWrap = e.target.closest('.lv-card-quick-add-wrap');
+      if (quickWrap && !e.target.closest('.lv-card-size-nav')) {
+        var mediaWrap = quickWrap.closest('.lv-card-media-wrap');
+        var engMini = mediaWrap ? mediaWrap.querySelector('[data-lv-mini-add][data-eng="true"]') : null;
+        if (engMini && typeof window.lvOpenMiniAdd === 'function') {
+          e.preventDefault();
+          e.stopPropagation();
+          if (engMini.getAttribute('data-eng-action') === 'page' && engMini.getAttribute('data-url')) {
+            window.location.href = engMini.getAttribute('data-url');
+            return;
+          }
+          var clickedPill = e.target.closest('.lv-card-size-pill');
+          window.lvOpenMiniAdd(engMini, quickWrap, clickedPill ? clickedPill.getAttribute('data-variant-id') : null);
+          return;
+        }
+      }
+
+      // 1. Direct Add to Cart Button (Product with no size variants)
+      var directBtn = e.target.closest('.lv-card-direct-add-btn');
+      if (directBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        var variantId = directBtn.getAttribute('data-variant-id');
+        var spinner = directBtn.querySelector('.lv-card-size-spinner');
+        var label = directBtn.querySelector('.lv-card-bar-label');
+        if (spinner) spinner.style.display = 'inline-flex';
+        if (label) label.style.display = 'none';
+
+        lvAddToCart(variantId, function() {
+          if (spinner) spinner.style.display = 'none';
+          if (label) label.style.display = 'flex';
+        });
+        return;
+      }
+
+      // 2. Sizes Bar Interactions (Arrows, Size Pills, and Mobile 1st/2nd Tap)
+      var sizesBar = e.target.closest('.lv-card-sizes-bar');
+      if (sizesBar) {
+        var isOpen = sizesBar.classList.contains('is-open');
+
+        // Nav Arrows (Prev/Next)
+        var navPrev = e.target.closest('.lv-card-size-nav-prev');
+        if (navPrev) {
+          e.preventDefault();
+          e.stopPropagation();
+          var wrap = navPrev.closest('.lv-card-bar-sizes-wrap');
+          var track = wrap ? wrap.querySelector('.lv-card-bar-sizes') : null;
+          if (track) {
+            track.scrollBy({ left: -130, behavior: 'smooth' });
+            setTimeout(function() { updateBarArrows(sizesBar); }, 250);
+          }
+          return;
+        }
+
+        var navNext = e.target.closest('.lv-card-size-nav-next');
+        if (navNext) {
+          e.preventDefault();
+          e.stopPropagation();
+          var wrap = navNext.closest('.lv-card-bar-sizes-wrap');
+          var track = wrap ? wrap.querySelector('.lv-card-bar-sizes') : null;
+          if (track) {
+            track.scrollBy({ left: 130, behavior: 'smooth' });
+            setTimeout(function() { updateBarArrows(sizesBar); }, 250);
+          }
+          return;
+        }
+
+        // Check if a size pill was tapped/clicked
+        var sizePill = e.target.closest('.lv-card-size-pill');
+        if (sizePill) {
+          // If on a touch device and the bar was NOT already open, DO NOT add to cart on 1st tap!
+          // Instead, 1st tap simply opens the sizes bar to reveal all options!
+          var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.matchMedia('(hover: none)').matches;
+          if (isTouchDevice && !isOpen) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.querySelectorAll('.lv-card-sizes-bar.is-open').forEach(function(b) {
+              if (b !== sizesBar) b.classList.remove('is-open');
+            });
+            sizesBar.classList.add('is-open');
+            updateBarArrows(sizesBar);
+            return;
+          }
+
+          if (isDraggingVariant) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          e.preventDefault();
+          e.stopPropagation();
+          if (sizePill.classList.contains('is-sold-out')) return;
+
+          var variantId = sizePill.getAttribute('data-variant-id');
+          var text = sizePill.querySelector('.lv-card-size-text');
+          var spinner = sizePill.querySelector('.lv-card-size-spinner');
+          if (spinner) spinner.style.display = 'inline-flex';
+          if (text) text.style.display = 'none';
+
+          lvAddToCart(variantId, function() {
+            if (spinner) spinner.style.display = 'none';
+            if (text) text.style.display = 'inline';
+          });
+          return;
+        }
+
+        // Tap on the bar itself (1st tap to open and reveal variants)
+        if (!isOpen) {
+          e.preventDefault();
+          e.stopPropagation();
+          document.querySelectorAll('.lv-card-sizes-bar.is-open').forEach(function(b) {
+            if (b !== sizesBar) b.classList.remove('is-open');
+          });
+          sizesBar.classList.add('is-open');
+          updateBarArrows(sizesBar);
+          return;
+        }
+      }
+
+      // Close open sizes bars when tapping outside
+      if (!e.target.closest('.lv-card-sizes-bar')) {
+        document.querySelectorAll('.lv-card-sizes-bar.is-open').forEach(function(bar) {
+          bar.classList.remove('is-open');
+        });
+      }
+
+      // 7. Image Slider Arrow Navigation
+      var navArrow = e.target.closest('.lv-card-nav-arrow');
+      if (navArrow) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        var cardMedia = navArrow.closest('.lv-card-media-wrap');
+        if (!cardMedia) return;
+        var slider = cardMedia.querySelector('.card-media-slider');
+        if (!slider) return;
+        var slides = slider.querySelectorAll('.card-media-slide');
+        if (slides.length <= 1) return;
+
+        var currIdx = parseInt(slider.getAttribute('data-current-index') || '0', 10);
+        if (isNaN(currIdx)) currIdx = 0;
+        var total = slides.length;
+        var nextIdx;
+
+        if (navArrow.classList.contains('card-nav-next')) {
+          nextIdx = (currIdx + 1) % total;
+        } else {
+          nextIdx = (currIdx - 1 + total) % total;
+        }
+
+        slides.forEach(function(slide, idx) {
+          if (idx === nextIdx) {
+            slide.classList.add('is-active');
+          } else {
+            slide.classList.remove('is-active');
+          }
+        });
+
+        slider.setAttribute('data-current-index', nextIdx);
+        return;
+      }
+    });
+  }
+</script>

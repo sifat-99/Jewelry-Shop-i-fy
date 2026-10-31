@@ -1,0 +1,5 @@
+{%- comment -%}
+  Outputs the inline CSS variables for .lv-product-grid (see assets/product-grid.css).
+  Accepts: settings (section.settings). Optional defaults: d_xl, d_1024, d_960, d_768, d_650, d_mobile
+{%- endcomment -%}
+--cols-desktop: {{ settings.grid_columns_desktop | default: d_xl | default: 4 }}; --cols-1024: {{ settings.grid_columns_1024 | default: d_1024 | default: 3 }}; --cols-960: {{ settings.grid_columns_960 | default: d_960 | default: 3 }}; --cols-768: {{ settings.grid_columns_768 | default: d_768 | default: 2 }}; --cols-650: {{ settings.grid_columns_650 | default: d_650 | default: 1 }}; --cols-mobile: {{ settings.grid_columns_mobile | default: d_mobile | default: 1 }};

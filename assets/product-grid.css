@@ -1,0 +1,44 @@
+/* ==========================================================================
+   Shared responsive product-card grid
+   Used by: main-collection, section-collection (featured), collection-split, main-search
+   Columns come from per-section theme-editor settings via inline variables
+   (see snippets/product-grid-vars.liquid):
+     >1024px: --cols-desktop | <=1024: --cols-1024 | <=960: --cols-960 | <=768: --cols-768 | <=650: --cols-650 | <=450: --cols-mobile
+   !important is deliberate: theme.css ships .js-grid[data-grid-large] rules that would otherwise win.
+   ========================================================================== */
+.lv-product-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols-desktop, 4), minmax(0, 1fr)) !important;
+  gap: 28px 18px;
+}
+.lv-product-grid > * { min-width: 0; }
+
+@media (max-width: 1024px) {
+  .lv-product-grid {
+    grid-template-columns: repeat(var(--cols-1024, 3), minmax(0, 1fr)) !important;
+    gap: 24px 16px;
+  }
+}
+@media (max-width: 960px) {
+  .lv-product-grid {
+    grid-template-columns: repeat(var(--cols-960, 3), minmax(0, 1fr)) !important;
+  }
+}
+@media (max-width: 768px) {
+  .lv-product-grid {
+    grid-template-columns: repeat(var(--cols-768, 2), minmax(0, 1fr)) !important;
+    gap: 20px 14px;
+  }
+}
+@media (max-width: 650px) {
+  .lv-product-grid {
+    grid-template-columns: repeat(var(--cols-650, 1), minmax(0, 1fr)) !important;
+    gap: 18px 12px;
+  }
+}
+@media (max-width: 450px) {
+  .lv-product-grid {
+    grid-template-columns: repeat(var(--cols-mobile, 1), minmax(0, 1fr)) !important;
+    gap: 16px 12px;
+  }
+}
