@@ -1,0 +1,20 @@
+{%- comment -%}
+  Demo jewelry used by product-grid-item when the store has no products yet.
+  Usage: {% capture demo %}{% render 'demo-product-data', idx: 3 %}{% endcapture %}
+  Output: Title|price (EUR)|compare-at price (EUR, optional)|discount percent (optional)
+  Image: assets/product_<idx - 1>_1.jpg (handled by product-grid-item).
+{%- endcomment -%}
+{%- case idx -%}
+  {%- when 2 -%}Flora | Nose Stud|39.00||
+  {%- when 3 -%}Solitaire | Nose Stud|45.00|55.00|18
+  {%- when 4 -%}Petite | Nose Stud|35.00||
+  {%- when 5 -%}Teardrop | Nose Stud|49.00||
+  {%- when 6 -%}Pavé | Nose Hoop|59.00|69.00|14
+  {%- when 7 -%}Rosé | Nose Hoop|55.00||
+  {%- when 8 -%}Pendant | Nose Stud|65.00||
+  {%- when 9 -%}Luna | Ear Stud|42.00||
+  {%- when 10 -%}Papillon | Ear Stud|52.00|62.00|16
+  {%- when 11 -%}Celeste | Ear Stud|48.00||
+  {%- when 12 -%}Trinity | Ear Stud|58.00||
+  {%- else -%}Arc | Ear Climber|68.00||
+{%- endcase -%}
