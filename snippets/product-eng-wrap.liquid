@@ -1,0 +1,36 @@
+{%- comment -%}
+  Builds the engraving area on the product page: ONE box holding the count options + the text field.
+  layout: 'card'    -> "Personalise" card with its own color scheme (new look)
+          'classic' -> grey box, original pill style, no header
+  part: 'open'  -> opens the box (before the engraving option)
+        'close' -> engraving text field + closes the box (after the engraving option)
+        'fallback' -> box with only the text field, for products without an engraving option
+  Accepts: part, is_eng, on, product, sid, label, required, max, prop, placeholder, scheme, layout
+  (HTML is echoed as strings so open/close can live in separate calls)
+{%- endcomment -%}
+{%- liquid
+  assign eng_scheme = scheme | default: 'scheme-2'
+  assign eng_open = '<div class="pv-eng-card pv-eng-card--plain">'
+  if layout != 'classic'
+    assign eng_open = '<div class="pv-eng-card color-' | append: eng_scheme | append: '"><div class="pv-eng-card__head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Personalise</span></div>'
+  endif
+  if on == true and part == 'open' and is_eng
+    echo eng_open
+  elsif on == true and part == 'close' and is_eng
+    render 'product-engrave-field', sid: sid, label: label, required: required, max: max, prop: prop, placeholder: placeholder, titled: false
+    echo '</div>'
+  elsif on == true and part == 'fallback'
+    assign has_eng_opt = false
+    for o in product.options
+      assign o_dc = o | downcase
+      if o_dc contains 'engrav' or o_dc contains 'char'
+        assign has_eng_opt = true
+      endif
+    endfor
+    unless has_eng_opt
+      echo eng_open
+      render 'product-engrave-field', sid: sid, label: label, required: required, max: max, prop: prop, placeholder: placeholder, titled: true
+      echo '</div>'
+    endunless
+  endif
+-%}

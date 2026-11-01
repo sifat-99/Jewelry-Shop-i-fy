@@ -1,0 +1,55 @@
+{%- comment -%}
+  Single source of truth for engraving: used by the product page and the compact card popup.
+  Settings: Theme settings > Engraving.
+  Accepts: product
+  Output (split on '~~'): on(true|false) ~~ max chars ~~ order property ~~ label ~~ placeholder ~~ required(true|false)
+{%- endcomment -%}
+{%- liquid
+  assign ei_on = false
+  for opt in product.options_with_values
+    assign opt_name_dc = opt.name | downcase
+    if opt_name_dc contains 'engrav' or opt_name_dc contains 'char'
+      assign ei_on = true
+    endif
+  endfor
+  assign ei_mode = settings.engraving_mode | default: 'auto'
+  if ei_mode == 'always'
+    assign ei_on = true
+  elsif ei_mode == 'auto' and ei_on == false
+    assign prod_tags_str = product.tags | join: ' ' | downcase
+    assign prod_opts_str = product.options | join: ' ' | downcase
+    assign ei_hay = product.title | append: ' ' | append: product.type | downcase | append: ' ' | append: prod_tags_str | append: ' ' | append: prod_opts_str
+    assign ei_keywords = settings.engraving_keywords | default: 'engrav, graver, personali' | downcase | split: ','
+    for kw in ei_keywords
+      assign k = kw | strip
+      if k != blank and ei_hay contains k
+        assign ei_on = true
+      endif
+    endfor
+  endif
+
+  assign ei_max = settings.engraving_max | default: 12
+  for opt in product.options_with_values
+    assign opt_name_dc = opt.name | downcase
+    if opt_name_dc contains 'engrav' or opt_name_dc contains 'char'
+      assign first_val = opt.selected_value | default: opt.values.first
+      if first_val contains '3'
+        assign ei_max = 3
+      elsif first_val contains '5'
+        assign ei_max = 5
+      elsif first_val contains '7'
+        assign ei_max = 7
+      elsif first_val contains '10'
+        assign ei_max = 10
+      elsif first_val contains '12'
+        assign ei_max = 12
+      endif
+    endif
+  endfor
+
+  assign ei_required = false
+  if settings.engraving_required
+    assign ei_required = true
+  endif
+  echo ei_on | append: '~~' | append: ei_max | append: '~~' | append: settings.engraving_property | append: '~~' | append: settings.engraving_label | append: '~~' | append: settings.engraving_placeholder | append: '~~' | append: ei_required
+-%}
