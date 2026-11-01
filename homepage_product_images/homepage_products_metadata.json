@@ -1,0 +1,728 @@
+{
+  "c_new": {
+    "id": "gid://shopify/Collection/493225082959",
+    "title": "NEW",
+    "handle": "new",
+    "products": {
+      "nodes": [
+        {
+          "id": "gid://shopify/Product/15483141521487",
+          "title": "Triple | Handchain",
+          "handle": "triple-handchain",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45839962210383",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/AF761696-1E8D-465C-969B-B81C1E20A11E.jpg?v=1793039129",
+                "altText": "Triple | Handchain",
+                "width": 1825,
+                "height": 1825
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483141455951",
+          "title": "Maria | Handchain",
+          "handle": "maria-handchain-1",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45839961817167",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/DF39D646-CFDE-4361-9835-EC9D9C2E2E57.jpg?v=1793039127",
+                "altText": "Maria | Handchain",
+                "width": 1829,
+                "height": 1829
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483141423183",
+          "title": "Selena | Handchain",
+          "handle": "selena-handchain",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45839961620559",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/FullSizeRender_6c6a2138-900f-49a4-9270-b20eecbb3e64.jpg?v=1793039126",
+                "altText": "Selena | Handchain",
+                "width": 1925,
+                "height": 1925
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483141324879",
+          "title": "Aurelia | Handchain",
+          "handle": "aurelia-handchain",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45839961587791",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/FullSizeRender_aa5d3b6b-17a9-4524-9ac9-c9754e19b959.jpg?v=1793039125",
+                "altText": "Aurelia | Handchain",
+                "width": 1857,
+                "height": 1857
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483141259343",
+          "title": "Aelien | Handchain",
+          "handle": "aelien-handchain",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45839961260111",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/2A2D5062-F45C-4E62-ABC5-8E54FFBD434F.jpg?v=1793039124",
+                "altText": "Aelien | Handchain",
+                "width": 2134,
+                "height": 2134
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483141226575",
+          "title": "Triple Clover | Handchain",
+          "handle": "triple-klaver-handchain",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45839961096271",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/FullSizeRender_27f77e86-ff0b-45ea-ba80-8df40efe7a10.jpg?v=1793039123",
+                "altText": "Triple Klaver | Handchain",
+                "width": 2160,
+                "height": 2160
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483141161039",
+          "title": "Lumiere Gold | Handchain",
+          "handle": "lumiere-handchain",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45839960735823",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/FullSizeRender_7bb8fdc9-3775-4c03-a64c-3e9b2d7ce99c.jpg?v=1793039121",
+                "altText": "Lumiere Gold | Handchain",
+                "width": 1748,
+                "height": 1748
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483141095503",
+          "title": "Bloom | Handchain",
+          "handle": "bloom-handchain",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45839960408143",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/FullSizeRender_b1463f16-8aaa-430f-8d6e-c0d71c4faee3.jpg?v=1793039120",
+                "altText": "Bloom | Handchain",
+                "width": 2050,
+                "height": 2050
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "c_engravable": {
+    "id": "gid://shopify/Collection/493226655823",
+    "title": "Engravable Jewelry",
+    "handle": "engravable-jewelry",
+    "products": {
+      "nodes": [
+        {
+          "id": "gid://shopify/Product/15483180351567",
+          "title": "Initial | Necklace",
+          "handle": "initial-ketting",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840116580431",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5458.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1189,
+                "height": 1189
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116613199",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5432.jpg?v=1793039967",
+                "altText": "Initiaal | Ketting",
+                "width": 1189,
+                "height": 844
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116645967",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5433.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1110,
+                "height": 788
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116678735",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5434.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1044,
+                "height": 741
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116711503",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5435.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1082,
+                "height": 767
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116744271",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5436.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1362,
+                "height": 966
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116777039",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5437.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1162,
+                "height": 824
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116809807",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5438.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1132,
+                "height": 803
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116842575",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5439.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1208,
+                "height": 858
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116875343",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5440.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1161,
+                "height": 824
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116908111",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5441.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1194,
+                "height": 847
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116940879",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5442.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1258,
+                "height": 892
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116973647",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5443.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1241,
+                "height": 880
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840117006415",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5444.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1231,
+                "height": 873
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840117039183",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5445.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1065,
+                "height": 755
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840117071951",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5446.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1146,
+                "height": 813
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840117104719",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5447.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1151,
+                "height": 816
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840117137487",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5448.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1190,
+                "height": 844
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840117170255",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5449.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1080,
+                "height": 766
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840117203023",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_5450.jpg?v=1793039966",
+                "altText": "Initiaal | Ketting",
+                "width": 1111,
+                "height": 788
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483174289487",
+          "title": "Bracelet met Balletjes Zilverkleurig | Engravable Bracelet",
+          "handle": "armband-met-balletjes-zilverkleurig-graveerbare-sieraden",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840095051855",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/FC8605FF-711E-4570-B5F3-8D41CDB2C71F.jpg?v=1793039824",
+                "altText": "Armband met Balletjes Zilverkleurig | Graveerbare Armband",
+                "width": 1319,
+                "height": 1319
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840095084623",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/3AB4C256-DE04-4A61-8435-72DDF6CB88D1.jpg?v=1793039825",
+                "altText": "Armband met Balletjes Zilverkleurig | Graveerbare Armband",
+                "width": 1773,
+                "height": 1773
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840095117391",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/Lettertypes_overzicht_cdaafa29-fae5-4864-bd2c-e45b1040bd36.png?v=1793039824",
+                "altText": "Armband met Balletjes Zilverkleurig | Graveerbare Armband",
+                "width": 2000,
+                "height": 2000
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483174256719",
+          "title": "Engravable Bar | Engravable Bracelet",
+          "handle": "c2",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840094920783",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/82B09EB8-D2AA-4136-AA40-43128387F8EF.jpg?v=1793039823",
+                "altText": "Graveerbare Bar | Graveerbare Armband",
+                "width": 1523,
+                "height": 1523
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094953551",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/7F5DDEA3-E04B-4867-9A2B-1F025196E656.jpg?v=1793039823",
+                "altText": "Graveerbare Bar | Graveerbare Armband",
+                "width": 2032,
+                "height": 2032
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094986319",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/C60A4DA6-760F-4BBD-958E-15CAEED25420.jpg?v=1793039823",
+                "altText": "Graveerbare Bar | Graveerbare Armband",
+                "width": 1405,
+                "height": 1405
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840095019087",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/Lettertypes_overzicht_80f098e5-1e41-4d10-8b7f-fcee71c87074.png?v=1793039823",
+                "altText": "Graveerbare Bar | Graveerbare Armband",
+                "width": 2000,
+                "height": 2000
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483174125647",
+          "title": "Double Bracelet met Hearts | Engravable Bracelet",
+          "handle": "c11",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840094593103",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/FullSizeRender_15bbf246-b1d2-4a81-bfdf-d440abe4d9fd.jpg?v=1793039822",
+                "altText": "Dubbele Armband met Hartjes | Graveerbare Armband",
+                "width": 1316,
+                "height": 1316
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094625871",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/91EA5F41-2BFC-47D8-A937-46BE48C9FAF5.jpg?v=1793039822",
+                "altText": "Dubbele Armband met Hartjes | Graveerbare Armband",
+                "width": 1274,
+                "height": 1274
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094658639",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/854FD6EC-7A98-4D9D-9415-3B6A3C731D67.jpg?v=1793039822",
+                "altText": "Dubbele Armband met Hartjes | Graveerbare Armband",
+                "width": 1825,
+                "height": 1825
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094691407",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/Lettertypes_overzicht_a767edad-50b9-4a91-b96c-82a79ec7ea3b.png?v=1793039822",
+                "altText": "Dubbele Armband met Hartjes | Graveerbare Armband",
+                "width": 2000,
+                "height": 2000
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483174092879",
+          "title": "Engravable Bracelet Silver | Engravable Bracelet",
+          "handle": "c18",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840094462031",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/280DA8ED-66A0-48A9-8FF4-A7F2ED26DBF7.jpg?v=1793039821",
+                "altText": "Graveerbare Armband Zilver | Graveerbare Armband",
+                "width": 1336,
+                "height": 1336
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094494799",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/569E2678-27AD-45ED-8FED-413D77728827.jpg?v=1793039821",
+                "altText": "Graveerbare Armband Zilver | Graveerbare Armband",
+                "width": 1787,
+                "height": 1787
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094527567",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/Lettertypes_overzicht_603f1f67-cebf-4bc2-8ddb-da0a96a23ec8.png?v=1793039821",
+                "altText": "Graveerbare Armband Zilver | Graveerbare Armband",
+                "width": 2000,
+                "height": 2000
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483174060111",
+          "title": "Gevlochten Bracelet Zilverkleurig | Engravable Bracelet",
+          "handle": "balletjes-armband-zilverkleurig-graveerbare-sieraden",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840094330959",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/FA3E7E6D-5B7D-487E-AF96-03949399AF33.jpg?v=1793039820",
+                "altText": "Gevlochten Armband Zilverkleurig | Graveerbare Armband",
+                "width": 1353,
+                "height": 1353
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094363727",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/D7D03850-CD27-49D4-BC6D-A3CD3C3D503D.jpg?v=1793039820",
+                "altText": "Gevlochten Armband Zilverkleurig | Graveerbare Armband",
+                "width": 1741,
+                "height": 1741
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094396495",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/Lettertypes_overzicht_848b4ecd-ef77-4627-af07-5689c9a83e96.png?v=1793039820",
+                "altText": "Gevlochten Armband Zilverkleurig | Graveerbare Armband",
+                "width": 2000,
+                "height": 2000
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483173961807",
+          "title": "Large Hart | Engravable Necklace",
+          "handle": "grote-hart-graveerbare-sieraden",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840093904975",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/BCAB90A0-8137-4D1A-8FAB-CA6AACEA0053.jpg?v=1793039818",
+                "altText": "Grote Hart | Graveerbare Ketting",
+                "width": 1731,
+                "height": 1731
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840093937743",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/E7CAEBF6-3CE9-46FB-AC8D-181DB15740E1.jpg?v=1793039818",
+                "altText": "Grote Hart | Graveerbare Ketting",
+                "width": 2160,
+                "height": 2160
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840093970511",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/622F6245-7A42-4039-BA77-6CFE336407B7.jpg?v=1793039819",
+                "altText": "Grote Hart | Graveerbare Ketting",
+                "width": 2160,
+                "height": 2160
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094003279",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/C011DA49-DEBA-4D09-A218-1083449BA67F.jpg?v=1793039819",
+                "altText": "Grote Hart | Graveerbare Ketting",
+                "width": 1537,
+                "height": 1537
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094036047",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/53257CCC-2729-4E20-B575-8B25E368D916_53c2ab30-d66a-4ba9-b3b2-8d35aad882a3.jpg?v=1793039818",
+                "altText": "Grote Hart | Graveerbare Ketting",
+                "width": 1080,
+                "height": 1080
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840094068815",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/Lettertypes_overzicht_3a32f224-440d-4b01-9d47-b6e61127c06b.png?v=1793039819",
+                "altText": "Grote Hart | Graveerbare Ketting",
+                "width": 2000,
+                "height": 2000
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483173896271",
+          "title": "Klein Heart Goudkleurig | Engravable Necklace",
+          "handle": "klein-hartje-graveerbare-sieraden",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840093675599",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/A9A489A6-1B70-4874-899B-96FFA8B1E4DE.jpg?v=1793039817",
+                "altText": "Klein Hartje Goudkleurig | Graveerbare Ketting",
+                "width": 1568,
+                "height": 1568
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840093708367",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/FullSizeRender_67118525-0064-4715-a84a-14ea06107bb2.jpg?v=1793039817",
+                "altText": "Klein Hartje Goudkleurig | Graveerbare Ketting",
+                "width": 1535,
+                "height": 1535
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840093741135",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/2658095C-8093-4F0B-8BE8-974B74AD928E.jpg?v=1793039817",
+                "altText": "Klein Hartje Goudkleurig | Graveerbare Ketting",
+                "width": 2160,
+                "height": 2160
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840093773903",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/36B0AA01-89A8-4CED-AA71-623DBE8B1F00.jpg?v=1793039817",
+                "altText": "Klein Hartje Goudkleurig | Graveerbare Ketting",
+                "width": 2160,
+                "height": 2160
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840093806671",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/4D9813DA-BBD9-4782-9E54-0CB86E6CA42F.jpg?v=1793039817",
+                "altText": "Klein Hartje Goudkleurig | Graveerbare Ketting",
+                "width": 1187,
+                "height": 1187
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840093839439",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/Lettertypes_overzicht_1fd4d835-ba9d-44b2-9aa6-2f81498a256c.png?v=1793039817",
+                "altText": "Klein Hartje Goudkleurig | Graveerbare Ketting",
+                "width": 2000,
+                "height": 2000
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "c_rings": {
+    "id": "gid://shopify/Collection/493227114575",
+    "title": "The Ring",
+    "handle": "rings",
+    "products": {
+      "nodes": [
+        {
+          "id": "gid://shopify/Product/15483180253263",
+          "title": "Siran | Ring",
+          "handle": "siran-ring",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840116449359",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/FullSizeRender_7e44a796-bec1-4844-9948-02b6802e0b3f.jpg?v=1793039964",
+                "altText": "Siran | Ring",
+                "width": 1434,
+                "height": 1434
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483180187727",
+          "title": "Natia | Ring",
+          "handle": "natia-ring",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840116219983",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/A277FE25-8062-4D92-B895-E3BE38C7D9B2.jpg?v=1793039963",
+                "altText": "Natia | Ring",
+                "width": 1125,
+                "height": 1125
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116252751",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/63BFA693-0851-4E3C-ABC7-985CE62FCFD4.jpg?v=1793039962",
+                "altText": "Natia | Ring",
+                "width": 1697,
+                "height": 1697
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840116285519",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/76786436-D2F2-434D-A03F-08CBB2569B96.jpg?v=1793039962",
+                "altText": "Natia | Ring",
+                "width": 2160,
+                "height": 2160
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483180056655",
+          "title": "Mini Diamond Heart | Ring",
+          "handle": "mini-diamond-heart-ring",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840115892303",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/528A061F-B92E-467A-9230-971BC0C0B5C0.jpg?v=1793039961",
+                "altText": "Mini Diamond Heart | Ring",
+                "width": 1413,
+                "height": 1413
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483179991119",
+          "title": "Double Flora | Ring",
+          "handle": "double-flora-ring",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840115695695",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/FullSizeRender_51e1c7ea-fd70-4b78-aaa2-4e70a7ff1b7b.jpg?v=1793039959",
+                "altText": "Double Flora | Ring",
+                "width": 1479,
+                "height": 1479
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840115728463",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/1B7EEC22-BC2A-4A9B-93CB-08BB52316A07.jpg?v=1793039959",
+                "altText": "Double Flora | Ring",
+                "width": 2160,
+                "height": 2160
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483179860047",
+          "title": "Greco | Ring",
+          "handle": "greco-ring",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840115236943",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/19E8568B-7AE8-405D-9981-94FFA0142BBD.jpg?v=1793039956",
+                "altText": "Greco | Ring",
+                "width": 1097,
+                "height": 1097
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483179794511",
+          "title": "Matteo | Ring",
+          "handle": "matteo-ring",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840114614351",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/image_81d2d781-99c5-4be0-93ec-665d53429a2b.jpg?v=1793039954",
+                "altText": "Matteo | Ring",
+                "width": 527,
+                "height": 527
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483179106383",
+          "title": "Flora | Ring",
+          "handle": "flora",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840111796303",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_1212.jpg?v=1793039937",
+                "altText": "Flora | Ring",
+                "width": 670,
+                "height": 670
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://shopify/Product/15483178745935",
+          "title": "Karie | Ring",
+          "handle": "karie",
+          "images": {
+            "nodes": [
+              {
+                "id": "gid://shopify/ProductImage/45840110714959",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/IMG_6649.jpg?v=1793039929",
+                "altText": "Karie | Ring",
+                "width": 866,
+                "height": 866
+              },
+              {
+                "id": "gid://shopify/ProductImage/45840110747727",
+                "url": "https://cdn.shopify.com/s/files/1/0791/3111/5599/files/1FD8250A-C5EB-4E45-93D5-219DB579D7B4.jpg?v=1793039929",
+                "altText": "Karie | Ring",
+                "width": 2160,
+                "height": 2160
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
