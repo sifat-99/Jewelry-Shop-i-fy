@@ -1,0 +1,44 @@
+{%- comment -%}
+  Global breadcrumb. Style + visibility come from Theme settings > Breadcrumbs.
+  Accepts: current (text, required), parent_title / parent_url (optional middle crumb)
+  Renders: Home / [parent] / current
+{%- endcomment -%}
+{%- if settings.show_breadcrumbs != false and current != blank -%}
+  {%- liquid
+    assign bc_sep = settings.breadcrumb_separator | default: '/'
+    assign bc_size = settings.breadcrumb_font_size | default: 12
+    assign bc_below = settings.breadcrumb_space_below | default: 16
+    assign bc_above = settings.breadcrumb_space_above | default: 0
+    assign bc_tt = 'none'
+    if settings.breadcrumb_uppercase
+      assign bc_tt = 'uppercase'
+    endif
+    assign bc_ls = '0.04em'
+    if settings.breadcrumb_uppercase
+      assign bc_ls = '0.12em'
+    endif
+  -%}
+  <nav class="lv-crumbs" aria-label="Breadcrumb" style="--bc-size: {{ bc_size }}px; --bc-below: {{ bc_below }}px; --bc-above: {{ bc_above }}px; --bc-tt: {{ bc_tt }}; --bc-ls: {{ bc_ls }};">
+    <a href="{{ routes.root_url }}">Home</a>
+    <span class="lv-crumbs__sep" aria-hidden="true">{{ bc_sep }}</span>
+    {%- if parent_title != blank -%}
+      <a href="{{ parent_url }}">{{ parent_title }}</a>
+      <span class="lv-crumbs__sep" aria-hidden="true">{{ bc_sep }}</span>
+    {%- endif -%}
+    <span class="lv-crumbs__current" aria-current="page">{{ current }}</span>
+  </nav>
+  <style>
+    .lv-crumbs {
+      display: flex; align-items: center; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; scrollbar-width: none;
+      margin: var(--bc-above) 0 var(--bc-below); padding: 0;
+      font-family: inherit; font-size: var(--bc-size); line-height: 1.3; letter-spacing: var(--bc-ls); text-transform: var(--bc-tt);
+      color: var(--hero-fg, rgba(var(--color-foreground, 0, 0, 0), 0.6));
+      text-align: left; justify-content: flex-start;
+    }
+    .lv-crumbs::-webkit-scrollbar { display: none; }
+    .lv-crumbs a { color: inherit; text-decoration: none; opacity: 0.8; transition: opacity .2s ease; }
+    .lv-crumbs a:hover { opacity: 1; text-decoration: underline; }
+    .lv-crumbs__sep { margin: 0 8px; opacity: 0.5; }
+    .lv-crumbs__current { opacity: 1; font-weight: 600; color: var(--hero-fg, rgb(var(--color-foreground, 0, 0, 0))); }
+  </style>
+{%- endif -%}

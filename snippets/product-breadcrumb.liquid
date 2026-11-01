@@ -1,0 +1,12 @@
+{%- comment -%} Breadcrumb for the product page: Home / (collection or All products) / product. Accepts: product, collection {%- endcomment -%}
+{%- liquid
+  assign bc_parent = collection
+  if bc_parent == blank
+    assign bc_parent = product.collections.first
+  endif
+-%}
+{%- if bc_parent != blank -%}
+  {% render 'breadcrumb', current: product.title, parent_title: bc_parent.title, parent_url: bc_parent.url %}
+{%- else -%}
+  {% render 'breadcrumb', current: product.title, parent_title: 'All products', parent_url: routes.all_products_collection_url %}
+{%- endif -%}
