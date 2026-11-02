@@ -1,0 +1,518 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "slideshow": {
+      "type": "section-slideshow",
+      "blocks": {
+        "slide_1": {
+          "type": "slide",
+          "settings": {
+            "media_type": "video",
+            "video": "shopify://files/videos/banner video 1.mp4",
+            "video_focus": "center",
+            "subheading": "",
+            "heading": "Explore the shop",
+            "button_label": "",
+            "button_link": "/collections/bestsellers",
+            "text_position": "bottom-center",
+            "text_tone": "scheme",
+            "heading_color": "#ffffff",
+            "subheading_color": "#ffffff",
+            "button_bg": "#ffffff",
+            "button_text": "#111111",
+            "color_scheme": "scheme-5",
+            "overlay_style": "gradient",
+            "overlay_opacity": 40
+          }
+        },
+        "slide_2": {
+          "type": "slide",
+          "disabled": true,
+          "settings": {
+            "media_type": "image",
+            "image": "shopify://shop_images/Le-Velair-02-everyday-glow-desktop.webp",
+            "image_mobile": "shopify://shop_images/Le-Velair-02-everyday-glow-mobile.webp",
+            "video_focus": "center",
+            "subheading": "",
+            "heading": "",
+            "button_label": "",
+            "button_link": "/collections/graveerbare-sieraden",
+            "text_position": "middle-center",
+            "text_tone": "dark",
+            "heading_color": "#ffffff",
+            "subheading_color": "#ffffff",
+            "button_bg": "#ffffff",
+            "button_text": "#111111",
+            "color_scheme": "",
+            "overlay_style": "full",
+            "overlay_opacity": 0
+          }
+        },
+        "slide_ekyzL3": {
+          "type": "slide",
+          "disabled": true,
+          "settings": {
+            "media_type": "image",
+            "image": "shopify://shop_images/Le-Velair-03-layered-to-love-desktop.webp",
+            "image_mobile": "shopify://shop_images/Le-Velair-03-layered-to-love-mobile.webp",
+            "video_focus": "center",
+            "subheading": "",
+            "heading": "",
+            "button_label": "",
+            "button_link": "",
+            "text_position": "middle-center",
+            "text_tone": "dark",
+            "heading_color": "#ffffff",
+            "subheading_color": "#ffffff",
+            "button_bg": "#ffffff",
+            "button_text": "#111111",
+            "color_scheme": "scheme-1",
+            "overlay_style": "full",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "slide_1",
+        "slide_2",
+        "slide_ekyzL3"
+      ],
+      "settings": {
+        "banner_layout": "fullscreen",
+        "min_height": 480,
+        "scroll_behavior": "normal",
+        "show_scroll_cue": true,
+        "scroll_cue_devices": "desktop",
+        "mobile_layout": "4 / 5",
+        "fit_background": "#ffffff",
+        "desktop_ratio": "3 / 1",
+        "mobile_ratio": "adapt",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "autoplay": true,
+        "autoplay_speed": 3000,
+        "color_scheme": "",
+        "overlay_opacity": 0
+      }
+    },
+    "featured_collection": {
+      "type": "section-collection",
+      "name": "New Arrivals Section",
+      "settings": {
+        "color_scheme": "",
+        "title": "NEW ARRIVALS",
+        "subtitle": "",
+        "collection": "new",
+        "limit": 8,
+        "shuffle_products": true,
+        "rows_by_screen": false,
+        "grid_columns_desktop": 4,
+        "grid_columns_1024": 3,
+        "grid_columns_960": 3,
+        "grid_columns_768": 2,
+        "grid_columns_650": "1",
+        "grid_columns_mobile": "1",
+        "show_view_all": true,
+        "card_border_radius": 0,
+        "padding_top": 35,
+        "padding_bottom": 25
+      }
+    },
+    "richtext_intro": {
+      "type": "section-richtext",
+      "settings": {
+        "color_scheme": "",
+        "heading": "Luxury & personal jewelry",
+        "text": "<p>Discover our exclusive collection of jewelry that brings together affordability and quality. Our stainless steel jewelry is recyclable, does not discolour and continues to shine.</p>",
+        "content_width": 800,
+        "padding_top": 35,
+        "padding_bottom": 25
+      }
+    },
+    "mosaic_grid": {
+      "type": "section-mosaic",
+      "blocks": {
+        "tile_hQTqig": {
+          "type": "tile",
+          "settings": {
+            "color_scheme": "scheme-5",
+            "image": "shopify://shop_images/1-15.webp",
+            "subheading": "",
+            "title": "",
+            "banner_link": "",
+            "button_label": "",
+            "button_link": "shopify://collections/men",
+            "link": "",
+            "text_position": "center",
+            "overlay_opacity": 0
+          }
+        },
+        "tile_CQghb9": {
+          "type": "tile",
+          "settings": {
+            "color_scheme": "scheme-5",
+            "image": "shopify://shop_images/1-16.webp",
+            "subheading": "",
+            "title": "",
+            "banner_link": "",
+            "button_label": "",
+            "button_link": "shopify://collections/fingerprint-jewelry",
+            "link": "",
+            "text_position": "center",
+            "overlay_opacity": 0
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "color_scheme": "scheme-5",
+            "image": "shopify://shop_images/The_rings.webp",
+            "subheading": "",
+            "title": "",
+            "banner_link": "",
+            "button_label": "",
+            "button_link": "",
+            "link": "shopify://collections/rings",
+            "text_position": "center",
+            "overlay_opacity": 0
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "color_scheme": "scheme-5",
+            "image": "shopify://shop_images/1-8.webp",
+            "subheading": "",
+            "title": "",
+            "banner_link": "",
+            "button_label": "",
+            "button_link": "",
+            "link": "shopify://collections/handchains",
+            "text_position": "center",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "tile_hQTqig",
+        "tile_CQghb9",
+        "tile_2",
+        "tile_3"
+      ],
+      "settings": {
+        "color_scheme": "",
+        "heading": "",
+        "subheading": "",
+        "layout_style": "cols_4",
+        "grid_height": "medium",
+        "tile_aspect_ratio": "3_2",
+        "mobile_layout": "stacked",
+        "grid_gap": 14,
+        "tile_radius": 0,
+        "padding_top": 20,
+        "padding_bottom": 30,
+        "overlay_opacity": 0
+      }
+    },
+    "richtext_engraving": {
+      "type": "section-richtext",
+      "settings": {
+        "color_scheme": "",
+        "heading": "JEWELRY WITH A PERSONAL TOUCH",
+        "text": "<p>Personalized jewelry crafted to last a lifetime. Choose a name, initials, or a special date and make each piece truly yours. Perfect as a meaningful gift or cherished keepsake. Subtle, elegant, and unique.</p>",
+        "content_width": 700,
+        "padding_top": 35,
+        "padding_bottom": 25
+      }
+    },
+    "split_engravable": {
+      "type": "collection-split",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "title": "",
+        "subtitle": "",
+        "banner_type": "products",
+        "image": "shopify://shop_images/1-12.webp",
+        "showcase_products": [
+          "sterling-silver-id-tag-keyring-3861b9f",
+          "arabic-name-necklace-with-diamond-a106768",
+          "custom-silver-family-birthstone-ring-for-mom-4104c1a",
+          "alphanumeric-collarbone-necklace-9fa880b"
+        ],
+        "showcase_effect": "fade_zoom",
+        "showcase_autoplay": true,
+        "showcase_speed": 4500,
+        "showcase_show_caption": true,
+        "showcase_show_dots": true,
+        "banner_link": "",
+        "button_label": "",
+        "button_link": "shopify://collections/engravable-jewelry",
+        "collection": "engravable-jewelry",
+        "layout": "image_left",
+        "split_ratio": "narrow",
+        "banner_height": "fill",
+        "banner_ratio": "2 / 3",
+        "content_padding": 24,
+        "limit": 8,
+        "grid_columns_desktop": 2,
+        "grid_columns_1024": 1,
+        "grid_columns_960": 1,
+        "grid_columns_768": 2,
+        "grid_columns_650": "1",
+        "grid_columns_mobile": "1",
+        "card_border_radius": 0,
+        "overlay_opacity": 0,
+        "padding_top": 35,
+        "padding_bottom": 35
+      }
+    },
+    "section_richtext_PtYik4": {
+      "type": "section-richtext",
+      "settings": {
+        "color_scheme": "",
+        "heading": "RINGS WITH A STORY",
+        "text": "<p>From quiet everyday moments to life’s biggest celebrations, our rings are designed to shine with you. Beautifully crafted, comfortable to wear, and made to last.</p>",
+        "content_width": 700,
+        "padding_top": 35,
+        "padding_bottom": 25
+      }
+    },
+    "split_rings": {
+      "type": "collection-split",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "title": "",
+        "subtitle": "",
+        "banner_type": "products",
+        "image": "shopify://shop_images/1-10.webp",
+        "image_mobile": "shopify://shop_images/1-6.webp",
+        "showcase_products": [
+          "custom-silver-family-birthstone-ring-for-mom-4104c1a",
+          "seashell-dangle-belly-button-ring-designed-by-onyx-o-49bdc40",
+          "oufer-black-glitter-bat-cz-belly-button-ring-a517f31"
+        ],
+        "showcase_effect": "fade_zoom",
+        "showcase_autoplay": true,
+        "showcase_speed": 4500,
+        "showcase_show_caption": true,
+        "showcase_show_dots": true,
+        "banner_link": "",
+        "button_label": "",
+        "button_link": "shopify://collections/rings",
+        "collection": "rings",
+        "layout": "image_right",
+        "split_ratio": "narrow",
+        "banner_height": "fill",
+        "banner_ratio": "2 / 3",
+        "content_padding": 16,
+        "limit": 8,
+        "grid_columns_desktop": 2,
+        "grid_columns_1024": 1,
+        "grid_columns_960": 1,
+        "grid_columns_768": 2,
+        "grid_columns_650": "1",
+        "grid_columns_mobile": "1",
+        "card_border_radius": 0,
+        "overlay_opacity": 0,
+        "padding_top": 35,
+        "padding_bottom": 35
+      }
+    },
+    "instagram_feed": {
+      "type": "instagram-feed",
+      "blocks": {
+        "insta_1": {
+          "type": "image",
+          "settings": {
+            "link": "",
+            "alt_text": ""
+          }
+        },
+        "insta_2": {
+          "type": "image",
+          "settings": {
+            "link": "",
+            "alt_text": ""
+          }
+        },
+        "insta_3": {
+          "type": "image",
+          "settings": {
+            "link": "",
+            "alt_text": ""
+          }
+        },
+        "insta_4": {
+          "type": "image",
+          "settings": {
+            "link": "",
+            "alt_text": ""
+          }
+        },
+        "insta_5": {
+          "type": "image",
+          "settings": {
+            "link": "",
+            "alt_text": ""
+          }
+        },
+        "insta_6": {
+          "type": "image",
+          "settings": {
+            "link": "",
+            "alt_text": ""
+          }
+        }
+      },
+      "block_order": [
+        "insta_1",
+        "insta_2",
+        "insta_3",
+        "insta_4",
+        "insta_5",
+        "insta_6"
+      ],
+      "disabled": true,
+      "settings": {
+        "color_scheme": "",
+        "title": "Follow us - Jewelry Shop",
+        "link": "https://www.instagram.com/le.velair",
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "overlay_opacity": 25,
+        "image_border_radius": 0
+      }
+    },
+    "trust_icons": {
+      "type": "section-icons",
+      "blocks": {
+        "trust_1": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "shipping",
+            "title": "Free Shipping from ৳4000",
+            "text": "Fast dispatch within 24-48 hours"
+          }
+        },
+        "trust_2": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "waterproof",
+            "title": "100% Waterproof",
+            "text": "Stainless steel, never discolors or tarnishes"
+          }
+        },
+        "trust_3": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "engraving",
+            "title": "Personal Touch",
+            "text": "Custom engraving crafted with precision"
+          }
+        },
+        "trust_4": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "returns",
+            "title": "14 Days Returns",
+            "text": "Hassle-free return policy"
+          }
+        }
+      },
+      "block_order": [
+        "trust_1",
+        "trust_2",
+        "trust_3",
+        "trust_4"
+      ],
+      "settings": {
+        "color_scheme": "scheme-2",
+        "padding_top": 35,
+        "padding_bottom": 35
+      }
+    },
+    "customer_feedback_qqhYpM": {
+      "type": "customer-feedback",
+      "blocks": {
+        "review_gMgR9f": {
+          "type": "review",
+          "settings": {
+            "name": "Sarah M.",
+            "rating": 5,
+            "title": "Perfect gift",
+            "text": "Beautiful quality and it arrived beautifully packed. I get compliments every time I wear it.",
+            "product": "Heart Hand Chain",
+            "date": "",
+            "verified": true
+          }
+        },
+        "review_tbMmn8": {
+          "type": "review",
+          "settings": {
+            "name": "Anna K.",
+            "rating": 5,
+            "title": "Love the engraving",
+            "text": "The engraving is so precise and delicate. It has not tarnished after weeks of daily wear.",
+            "product": "Classic Keychain",
+            "date": "",
+            "verified": true
+          }
+        },
+        "review_6fFKL9": {
+          "type": "review",
+          "settings": {
+            "name": "Julia R.",
+            "rating": 4,
+            "title": "Great value",
+            "text": "Lovely piece for the price. Fast delivery and the gift box was a nice touch.",
+            "product": "Gold Hoop Earrings",
+            "date": "",
+            "verified": true
+          }
+        }
+      },
+      "block_order": [
+        "review_gMgR9f",
+        "review_tbMmn8",
+        "review_6fFKL9"
+      ],
+      "name": "Customer feedback",
+      "settings": {
+        "color_scheme": "",
+        "heading": "What our customers say",
+        "subheading": "Real words from people who wear Le Velair",
+        "show_summary": true,
+        "source": "auto",
+        "metaobject_type": "review",
+        "limit": 12,
+        "layout": "carousel",
+        "columns": 3,
+        "autoplay": false,
+        "autoplay_speed": 5,
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    }
+  },
+  "order": [
+    "slideshow",
+    "featured_collection",
+    "richtext_intro",
+    "mosaic_grid",
+    "richtext_engraving",
+    "split_engravable",
+    "section_richtext_PtYik4",
+    "split_rings",
+    "instagram_feed",
+    "trust_icons",
+    "customer_feedback_qqhYpM"
+  ]
+}
