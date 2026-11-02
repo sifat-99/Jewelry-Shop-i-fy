@@ -1,0 +1,27 @@
+{%- comment -%}
+  One customer feedback card (used by sections/customer-feedback.liquid).
+  Accepts: name, rating (1-5), title, body, photo (image object), product_title, verified (true/false), date
+{%- endcomment -%}
+{%- assign r = rating | plus: 0 -%}
+{%- if r > 5 -%}{%- assign r = 5 -%}{%- endif -%}
+{%- if r < 0 -%}{%- assign r = 0 -%}{%- endif -%}
+<article class="cf-card">
+  <div class="cf-stars" style="--r: {{ r }}" role="img" aria-label="Rated {{ r }} out of 5">★★★★★</div>
+  {%- if title != blank -%}<h3 class="cf-card__title">{{ title }}</h3>{%- endif -%}
+  {%- if body != blank -%}<p class="cf-card__text">{{ body }}</p>{%- endif -%}
+  <div class="cf-card__by">
+    {%- if photo != blank -%}
+      <img class="cf-card__avatar" src="{{ photo | image_url: width: 120, height: 120, crop: 'center' }}" alt="{{ name | escape }}" width="44" height="44" loading="lazy">
+    {%- else -%}
+      <span class="cf-card__avatar cf-card__avatar--initial" aria-hidden="true">{{ name | strip | slice: 0 | upcase }}</span>
+    {%- endif -%}
+    <div class="cf-card__who">
+      <p class="cf-card__name">{{ name }}
+        {%- if verified == true -%}<span class="cf-card__verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Verified buyer</span>{%- endif -%}
+      </p>
+      {%- if product_title != blank or date != blank -%}
+        <p class="cf-card__meta">{{ product_title }}{% if product_title != blank and date != blank %} &middot; {% endif %}{{ date }}</p>
+      {%- endif -%}
+    </div>
+  </div>
+</article>
