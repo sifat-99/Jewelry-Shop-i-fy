@@ -1,0 +1,239 @@
+{%- comment -%}
+  Customer feedback: testimonials / reviews with star ratings.
+  Source: Shopify metaobject entries (type "review") or manual blocks in the theme editor.
+{%- endcomment -%}
+{%- liquid
+  assign limit = section.settings.limit | default: 12
+  assign mo_type = section.settings.metaobject_type | default: 'review'
+  assign entries = shop.metaobjects[mo_type].values
+  assign src = section.settings.source | default: 'auto'
+  assign use_meta = false
+  if src == 'metaobject'
+    assign use_meta = true
+  elsif src == 'auto' and entries.size > 0
+    assign use_meta = true
+  endif
+  assign stats = ''
+  capture stats
+    render 'feedback-stats', use_meta: use_meta, entries: entries, blocks: section.blocks, limit: limit
+  endcapture
+  assign stat_parts = stats | split: '~~'
+  assign avg = stat_parts[0] | default: 0
+  assign cnt = stat_parts[1] | plus: 0
+  assign cols = section.settings.columns | default: 3
+  if cnt > 0 and cnt < cols
+    assign cols = cnt
+  endif
+  assign layout = section.settings.layout | default: 'carousel'
+-%}
+
+{%- assign api_endpoint = section.settings.form_endpoint | default: settings.reviews_api_url -%}
+{%- if api_endpoint == blank -%}
+  {%- assign api_endpoint = 'https://le-velair-reviews-api.vercel.app/api/review' -%}
+{%- endif -%}
+{%- assign form_on = false -%}
+{%- if section.settings.show_form and api_endpoint != blank -%}{%- assign form_on = true -%}{%- endif -%}
+{%- if cnt == 0 and form_on == false and request.design_mode == false -%}
+  {%- comment -%}nothing to show{%- endcomment -%}
+{%- else -%}
+<div id="cf-{{ section.id }}" class="cf color-{{ section.settings.color_scheme | default: 'scheme-1' }} cf--{{ layout }}" style="--cf-cols: {{ cols }}; --PT: {{ section.settings.padding_top | default: 48 }}px; --PB: {{ section.settings.padding_bottom | default: 48 }}px;" data-cf data-autoplay="{{ section.settings.autoplay }}" data-speed="{{ section.settings.autoplay_speed | default: 5 }}">
+  <div class="cf__inner wrapper--full section-padding">
+    {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+      <div class="cf__head">
+        {%- if section.settings.heading != blank -%}<h2 class="cf__title kicker-flourished">{{ section.settings.heading | escape }}</h2>{%- endif -%}
+        {%- if section.settings.subheading != blank -%}<p class="cf__sub">{{ section.settings.subheading | escape }}</p>{%- endif -%}
+        {%- if section.settings.show_summary and cnt > 0 -%}
+          <p class="cf__summary"><span class="cf-stars" style="--r: {{ avg }}" aria-hidden="true">★★★★★</span> <strong>{{ avg }}</strong> / 5 &middot; {{ cnt }} {% if cnt == 1 %}review{% else %}reviews{% endif %}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if cnt == 0 -%}
+      <p class="cf__empty">{% if form_on %}No reviews yet. Be the first to share your experience.{% else %}No reviews yet. Create "Review" entries under Content &gt; Metaobjects, or add Review blocks to this section.{% endif %}</p>
+    {%- else -%}
+      <div class="cf__wrap">
+        {%- if layout == 'carousel' -%}
+          <button type="button" class="cf__arrow cf__arrow--prev" data-cf-prev aria-label="Previous reviews"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
+        {%- endif -%}
+        <div class="cf__track" data-cf-track>
+          {%- if use_meta -%}
+            {%- for entry in entries limit: limit -%}
+              {%- unless entry.approved == false -%}
+                <div class="cf__item">
+                  {%- render 'feedback-card', name: entry.name, rating: entry.rating.value, title: entry.title, body: entry.body, photo: entry.photo.value, product_title: entry.product.value.title, verified: entry.verified.value, date: entry.date.value -%}
+                </div>
+              {%- endunless -%}
+            {%- endfor -%}
+          {%- else -%}
+            {%- for block in section.blocks -%}
+              <div class="cf__item" {{ block.shopify_attributes }}>
+                {%- render 'feedback-card', name: block.settings.name, rating: block.settings.rating, title: block.settings.title, body: block.settings.text, photo: block.settings.photo, product_title: block.settings.product, verified: block.settings.verified, date: block.settings.date -%}
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+        {%- if layout == 'carousel' -%}
+          <button type="button" class="cf__arrow cf__arrow--next" data-cf-next aria-label="Next reviews"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    {%- if form_on -%}
+      {%- render 'review-form', endpoint: api_endpoint, sid: section.id, product_id: product.id, product_title: product.title, button_label: section.settings.form_button_label -%}
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+  #cf-{{ section.id }} { padding: var(--PT) 0 var(--PB); background: var(--bg, #fff); color: var(--text, #111); --cf-accent: var(--lv-accent, #9b7c53); --cf-gap: 20px; --cf-line: var(--hairline, rgba(0, 0, 0, 0.14)); }
+  #cf-{{ section.id }} .cf__head { text-align: center; max-width: 680px; margin: 0 auto clamp(26px, 4vw, 44px); }
+  #cf-{{ section.id }} .cf__title { margin: 0 0 10px; font-size: clamp(22px, 3vw, 32px); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; line-height: 1.2; }
+  #cf-{{ section.id }} .cf__sub { margin: 0 0 14px; font-size: 14.5px; line-height: 1.7; opacity: .75; }
+  #cf-{{ section.id }} .cf__summary { margin: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+  #cf-{{ section.id }} .cf__summary .cf-stars { font-size: 18px; }
+  #cf-{{ section.id }} .cf__empty { text-align: center; opacity: .6; font-size: 14px; margin: 0; }
+  #cf-{{ section.id }} .cf-stars { display: inline-block; font-size: 17px; letter-spacing: 2px; line-height: 1; color: transparent; background: linear-gradient(90deg, var(--cf-accent) calc(var(--r, 5) / 5 * 100%), color-mix(in srgb, var(--text, #111) 18%, transparent) 0); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+  #cf-{{ section.id }} .cf__wrap { position: relative; }
+  #cf-{{ section.id }} .cf__track { display: flex; gap: var(--cf-gap); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; padding: 2px 0; justify-content: safe center; }
+  #cf-{{ section.id }} .cf__track::-webkit-scrollbar { display: none; }
+  #cf-{{ section.id }} .cf__item { flex: 0 0 calc((100% - var(--cf-gap) * (var(--cf-cols) - 1)) / var(--cf-cols)); min-width: 0; max-width: 620px; scroll-snap-align: start; display: flex; }
+  #cf-{{ section.id }}.cf--grid .cf__track { display: grid; grid-template-columns: repeat(var(--cf-cols), minmax(0, 1fr)); overflow: visible; scroll-snap-type: none; justify-content: center; }
+  #cf-{{ section.id }}.cf--grid .cf__item { flex: none; }
+  @media (max-width: 960px) { #cf-{{ section.id }} { --cf-cols: {% if cols > 2 %}2{% else %}{{ cols }}{% endif %}; } }
+  @media (max-width: 650px) { #cf-{{ section.id }} { --cf-cols: 1; } }
+
+  #cf-{{ section.id }} .cf-card { display: flex; flex-direction: column; gap: 12px; width: 100%; box-sizing: border-box; padding: 26px 24px 22px; background: color-mix(in srgb, var(--text, #111) 3%, var(--bg, #fff)); border: 1px solid var(--cf-line); border-radius: var(--card-radius, 0); }
+  #cf-{{ section.id }} .cf-card__title { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; line-height: 1.4; }
+  #cf-{{ section.id }} .cf-card__text { margin: 0; font-size: 14.5px; line-height: 1.75; flex: 1 1 auto; display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
+  #cf-{{ section.id }} .cf-card__by { display: flex; align-items: center; gap: 12px; margin-top: 6px; padding-top: 16px; border-top: 1px solid var(--cf-line); }
+  #cf-{{ section.id }} .cf-card__avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex: none; }
+  #cf-{{ section.id }} .cf-card__avatar--initial { display: inline-flex; align-items: center; justify-content: center; background: var(--text, #111); color: var(--bg, #fff); font-size: 16px; font-weight: 700; }
+  #cf-{{ section.id }} .cf-card__who { min-width: 0; }
+  #cf-{{ section.id }} .cf-card__name { margin: 0; font-size: 13.5px; font-weight: 700; letter-spacing: .04em; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+  #cf-{{ section.id }} .cf-card__verified { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--cf-accent); }
+  #cf-{{ section.id }} .cf-card__verified svg { width: 13px; height: 13px; }
+  #cf-{{ section.id }} .cf-card__meta { margin: 2px 0 0; font-size: 12px; opacity: .65; }
+
+  #cf-{{ section.id }} .cf__arrow { position: absolute; top: 50%; z-index: 3; width: 42px; height: 42px; transform: translateY(-50%); display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--cf-line); background: var(--bg, #fff); color: var(--text, #111); cursor: pointer; padding: 0; transition: background-color .3s ease, color .3s ease, opacity .3s ease; }
+  #cf-{{ section.id }} .cf__arrow:hover { background: var(--text, #111); color: var(--bg, #fff); }
+  #cf-{{ section.id }} .cf__arrow svg { width: 18px; height: 18px; }
+  #cf-{{ section.id }} .cf__arrow--prev { left: -18px; }
+  #cf-{{ section.id }} .cf__arrow--next { right: -18px; }
+  #cf-{{ section.id }} .cf__arrow[disabled] { opacity: 0; pointer-events: none; }
+  @media (max-width: 960px) { #cf-{{ section.id }} .cf__arrow--prev { left: 4px; } #cf-{{ section.id }} .cf__arrow--next { right: 4px; } }
+</style>
+
+<script>
+  (function () {
+    var init = function () {
+      var root = document.getElementById('cf-{{ section.id }}');
+      if (!root || root.dataset.ready) return;
+      root.dataset.ready = '1';
+      var track = root.querySelector('[data-cf-track]');
+      var prev = root.querySelector('[data-cf-prev]');
+      var next = root.querySelector('[data-cf-next]');
+      if (!track || !prev || !next) return;
+      var step = function () { var it = track.querySelector('.cf__item'); return it ? it.getBoundingClientRect().width + 20 : track.clientWidth; };
+      var sync = function () {
+        prev.disabled = track.scrollLeft <= 4;
+        next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+      };
+      prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+      next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+      track.addEventListener('scroll', function () { window.requestAnimationFrame(sync); }, { passive: true });
+      window.addEventListener('resize', sync);
+      sync();
+      if (root.dataset.autoplay === 'true' && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+        var timer = null, paused = false;
+        var tick = function () {
+          if (paused || document.hidden) return;
+          if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 4) track.scrollTo({ left: 0, behavior: 'smooth' });
+          else track.scrollBy({ left: step(), behavior: 'smooth' });
+        };
+        var start = function () { stop(); timer = setInterval(tick, (parseFloat(root.dataset.speed) || 5) * 1000); };
+        var stop = function () { if (timer) { clearInterval(timer); timer = null; } };
+        root.addEventListener('mouseenter', function () { paused = true; });
+        root.addEventListener('mouseleave', function () { paused = false; });
+        root.addEventListener('touchstart', function () { paused = true; }, { passive: true });
+        start();
+      }
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+    document.addEventListener('shopify:section:load', function (e) { if (e.target && e.target.id === 'shopify-section-{{ section.id }}') { var r = document.getElementById('cf-{{ section.id }}'); if (r) delete r.dataset.ready; init(); } });
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Customer feedback",
+  "tag": "section",
+  "class": "section-customer-feedback",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "What our customers say" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Real words from people who wear Aurelle" },
+    { "type": "checkbox", "id": "show_summary", "label": "Show average rating", "default": true },
+    { "type": "header", "content": "Reviews source" },
+    {
+      "type": "select",
+      "id": "source",
+      "label": "Source",
+      "options": [
+        { "value": "auto", "label": "Auto (metaobjects, else blocks)" },
+        { "value": "metaobject", "label": "Metaobject entries only" },
+        { "value": "manual", "label": "Blocks below only" }
+      ],
+      "default": "auto"
+    },
+    { "type": "text", "id": "metaobject_type", "label": "Metaobject type handle", "default": "review", "info": "Content > Metaobjects > the definition's handle." },
+    { "type": "range", "id": "limit", "min": 3, "max": 24, "step": 1, "label": "Max reviews", "default": 12 },
+    { "type": "header", "content": "Write a review form" },
+    { "type": "checkbox", "id": "show_form", "label": "Show 'Write a review' button", "default": true },
+    { "type": "text", "id": "form_endpoint", "label": "Reviews API URL", "default": "https://le-velair-reviews-api.vercel.app/api/review", "info": "Your Vercel endpoint, e.g. https://your-app.vercel.app/api/review" },
+    { "type": "text", "id": "form_button_label", "label": "Button label", "default": "Write a review" },
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "carousel", "label": "Carousel" },
+        { "value": "grid", "label": "Grid" }
+      ],
+      "default": "carousel"
+    },
+    { "type": "range", "id": "columns", "min": 1, "max": 4, "step": 1, "label": "Columns (desktop)", "default": 3 },
+    { "type": "checkbox", "id": "autoplay", "label": "Autoplay (carousel)", "default": false },
+    { "type": "range", "id": "autoplay_speed", "min": 3, "max": 10, "step": 1, "unit": "s", "label": "Autoplay speed", "default": 5 },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Top padding", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Bottom padding", "default": 48 }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Customer name", "default": "Sarah M." },
+        { "type": "range", "id": "rating", "min": 1, "max": 5, "step": 1, "label": "Rating", "default": 5 },
+        { "type": "text", "id": "title", "label": "Review title" },
+        { "type": "textarea", "id": "text", "label": "Review", "default": "Beautiful quality and it arrived beautifully packed. I get compliments every time I wear it." },
+        { "type": "image_picker", "id": "photo", "label": "Customer photo" },
+        { "type": "text", "id": "product", "label": "Product" },
+        { "type": "text", "id": "date", "label": "Date" },
+        { "type": "checkbox", "id": "verified", "label": "Verified buyer", "default": true }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer feedback",
+      "blocks": [
+        { "type": "review", "settings": { "name": "Sarah M.", "rating": 5, "title": "Perfect gift", "text": "Beautiful quality and it arrived beautifully packed. I get compliments every time I wear it.", "product": "Heart Hand Chain" } },
+        { "type": "review", "settings": { "name": "Anna K.", "rating": 5, "title": "Love the engraving", "text": "The engraving is so precise and delicate. It has not tarnished after weeks of daily wear.", "product": "Classic Keychain" } },
+        { "type": "review", "settings": { "name": "Julia R.", "rating": 4, "title": "Great value", "text": "Lovely piece for the price. Fast delivery and the gift box was a nice touch.", "product": "Gold Hoop Earrings" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
