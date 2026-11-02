@@ -1,0 +1,106 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "settings": {
+        "color_scheme": "",
+        "padding_top": 25,
+        "padding_bottom": 40
+      }
+    },
+    "section_icons_wV8M8P": {
+      "type": "section-icons",
+      "blocks": {
+        "trust_item_a7WbaY": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "shipping",
+            "title": "Free Shipping from €39",
+            "text": "Fast dispatch within 24-48 hours"
+          }
+        },
+        "trust_item_Gqw6JT": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "waterproof",
+            "title": "100% Waterproof",
+            "text": "Stainless steel, never discolors or tarnishes"
+          }
+        },
+        "trust_item_gAN3ag": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "engraving",
+            "title": "Personal Touch",
+            "text": "Custom engraving crafted with precision"
+          }
+        },
+        "trust_item_DGcgMe": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "returns",
+            "title": "14 Days Returns",
+            "text": "Hassle-free return policy"
+          }
+        }
+      },
+      "block_order": [
+        "trust_item_a7WbaY",
+        "trust_item_Gqw6JT",
+        "trust_item_gAN3ag",
+        "trust_item_DGcgMe"
+      ],
+      "settings": {
+        "color_scheme": "",
+        "padding_top": 35,
+        "padding_bottom": 35
+      }
+    },
+    "product_reviews": {
+      "type": "product-reviews",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "Customer reviews",
+        "initial_count": 6,
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
+    "related_products": {
+      "type": "section-collection",
+      "settings": {
+        "color_scheme": "",
+        "title": "You May Also Like",
+        "subtitle": "Complete your jewelry stack",
+        "collection": "",
+        "limit": 8,
+        "rows_by_screen": true,
+        "show_view_all": true,
+        "grid_columns_desktop": 4,
+        "grid_columns_1024": 3,
+        "grid_columns_960": 3,
+        "grid_columns_768": 2,
+        "grid_columns_650": "1",
+        "grid_columns_mobile": "1",
+        "card_border_radius": 0,
+        "padding_top": 25,
+        "padding_bottom": 25
+      }
+    }
+  },
+  "order": [
+    "main",
+    "section_icons_wV8M8P",
+    "product_reviews",
+    "related_products"
+  ]
+}
