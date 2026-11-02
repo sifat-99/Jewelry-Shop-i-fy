@@ -1,0 +1,186 @@
+{%- comment -%}
+  "Write a review" button + dialog form. Posts JSON to the reviews API (Vercel), which saves a DRAFT metaobject.
+  Accepts: endpoint (full https URL of /api/review), sid (unique id), product_id (optional), button_label
+{%- endcomment -%}
+<div class="rf" id="rf-{{ sid }}" data-endpoint="{{ endpoint | escape }}" data-product-id="{{ product_id }}">
+  <button type="button" class="btn btn--outline rf__open" data-rf-open>{{ button_label | default: 'Write a review' | escape }}</button>
+
+  <dialog class="rf__dialog" data-rf-dialog aria-labelledby="rf-title-{{ sid }}">
+    <form class="rf__form" data-rf-form novalidate>
+      <button type="button" class="rf__close" data-rf-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <h3 class="rf__title" id="rf-title-{{ sid }}">Write a review</h3>
+      <p class="rf__lead">Share your experience. Reviews appear after we approve them.</p>
+
+      <fieldset class="rf__rating">
+        <legend>Your rating</legend>
+        <div class="rf__stars">
+          {%- for i in (1..5) reversed -%}
+            <input type="radio" name="rating" id="rf-{{ sid }}-star-{{ i }}" value="{{ i }}"><label for="rf-{{ sid }}-star-{{ i }}" title="{{ i }} star{% if i > 1 %}s{% endif %}">★<span class="rf__sr">{{ i }} star{% if i > 1 %}s{% endif %}</span></label>
+          {%- endfor -%}
+        </div>
+      </fieldset>
+
+      <label class="rf__field"><span>Name</span><input type="text" name="name" maxlength="60" autocomplete="name" required></label>
+      <div class="rf__field rf__product" data-rf-product>
+        <span>Product <em>(optional)</em></span>
+        <div class="rf__pbox"><svg class="rf__psi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="text" data-rf-psearch placeholder="Search a product..." autocomplete="off" value="{{ product_title | escape }}" aria-label="Search a product" role="combobox" aria-expanded="false" aria-controls="rf-plist-{{ sid }}">
+          <button type="button" class="rf__pclear" data-rf-pclear aria-label="Clear product" hidden>&times;</button>
+          <ul class="rf__plist" id="rf-plist-{{ sid }}" data-rf-plist role="listbox" hidden></ul>
+        </div>
+      </div>
+      <label class="rf__field"><span>Review title <em>(optional)</em></span><input type="text" name="title" maxlength="80"></label>
+      <label class="rf__field"><span>Your review</span><textarea name="body" rows="5" maxlength="1500" required></textarea></label>
+      <div class="rf__hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+
+      <p class="rf__msg" data-rf-msg role="alert" hidden></p>
+      <button type="submit" class="btn btn--primary rf__submit" data-rf-submit><span class="btn__text-content">Submit review</span></button>
+    </form>
+    <div class="rf__done" data-rf-done hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
+      <h3 class="rf__title">Thank you!</h3>
+      <p class="rf__lead">Your review was received and will appear once it is approved.</p>
+      <button type="button" class="btn btn--outline" data-rf-close>Close</button>
+    </div>
+  </dialog>
+</div>
+
+<style>
+  #rf-{{ sid }} { text-align: center; margin-top: 34px; }
+  #rf-{{ sid }} .rf__open { display: inline-flex; align-items: center; justify-content: center; min-height: var(--ctl-h, 46px); padding: 0 30px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  #rf-{{ sid }} .rf__dialog { width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border: 1px solid var(--hairline, rgba(0, 0, 0, .14)); background: var(--bg, #fff); color: var(--text, #111); text-align: left; overflow: auto; }
+  #rf-{{ sid }} .rf__dialog::backdrop { background: rgba(12, 12, 12, .55); backdrop-filter: blur(3px); }
+  #rf-{{ sid }} .rf__form, #rf-{{ sid }} .rf__done { position: relative; padding: 32px 28px 28px; display: flex; flex-direction: column; gap: 16px; }
+  #rf-{{ sid }} .rf__done { align-items: center; text-align: center; gap: 12px; }
+  #rf-{{ sid }} .rf__done svg { width: 46px; height: 46px; color: var(--lv-accent, #9b7c53); }
+  #rf-{{ sid }} .rf__done[hidden], #rf-{{ sid }} .rf__form[hidden], #rf-{{ sid }} .rf__msg[hidden] { display: none; }
+  #rf-{{ sid }} .rf__title { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  #rf-{{ sid }} .rf__lead { margin: -6px 0 0; font-size: 13.5px; line-height: 1.6; opacity: .7; }
+  #rf-{{ sid }} .rf__close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: inherit; cursor: pointer; }
+  #rf-{{ sid }} .rf__close svg { width: 18px; height: 18px; }
+  #rf-{{ sid }} .rf__rating { border: 0; margin: 0; padding: 0; }
+  #rf-{{ sid }} .rf__rating legend, #rf-{{ sid }} .rf__field > span { padding: 0; margin: 0 0 8px; font-size: 11.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  #rf-{{ sid }} .rf__field > span em { font-style: normal; font-weight: 500; text-transform: none; letter-spacing: .02em; opacity: .6; }
+  #rf-{{ sid }} .rf__stars { display: inline-flex; flex-direction: row-reverse; justify-content: flex-end; gap: 4px; }
+  #rf-{{ sid }} .rf__stars input { position: absolute; opacity: 0; pointer-events: none; }
+  #rf-{{ sid }} .rf__stars label { font-size: 30px; line-height: 1; cursor: pointer; color: color-mix(in srgb, var(--text, #111) 22%, transparent); transition: color .2s ease, transform .2s ease; }
+  #rf-{{ sid }} .rf__stars label:hover, #rf-{{ sid }} .rf__stars label:hover ~ label, #rf-{{ sid }} .rf__stars input:checked ~ label { color: var(--lv-accent, #9b7c53); }
+  #rf-{{ sid }} .rf__stars input:focus-visible + label { outline: 2px solid var(--text, #111); outline-offset: 2px; }
+  #rf-{{ sid }} .rf__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  #rf-{{ sid }} .rf__field { display: flex; flex-direction: column; }
+  #rf-{{ sid }} .rf__field input, #rf-{{ sid }} .rf__field textarea { width: 100%; box-sizing: border-box; padding: 12px 14px; font: inherit; font-size: 14px; color: inherit; background: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)); border: 1px solid var(--hairline, rgba(0, 0, 0, .14)); border-radius: var(--input-radius, 0); outline: none; transition: border-color .2s ease; }
+  #rf-{{ sid }} .rf__field textarea { resize: vertical; min-height: 110px; }
+  #rf-{{ sid }} .rf__field input:focus, #rf-{{ sid }} .rf__field textarea:focus { border-color: var(--text, #111); }
+  #rf-{{ sid }} .rf__pbox { position: relative; }
+  #rf-{{ sid }} .rf__field input, #rf-{{ sid }} .rf__field textarea { margin: 0 !important; }
+  #rf-{{ sid }} .rf__pbox input { display: block; height: 48px; padding: 0 38px 0 40px; line-height: 48px; }
+  #rf-{{ sid }} .rf__psi { position: absolute; left: 14px; top: 50%; width: 16px; height: 16px; margin-top: -8px; opacity: .55; pointer-events: none; }
+  #rf-{{ sid }} .rf__pclear { position: absolute; top: 0; right: 0; width: 42px; height: 100%; border: 0; background: transparent; color: inherit; font-size: 22px; line-height: 1; cursor: pointer; opacity: .6; }
+  #rf-{{ sid }} .rf__pclear:hover { opacity: 1; }
+  #rf-{{ sid }} .rf__pclear[hidden], #rf-{{ sid }} .rf__plist[hidden] { display: none; }
+  #rf-{{ sid }} .rf__plist { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: 4px 0; list-style: none; max-height: 300px; overflow-y: auto; overscroll-behavior: contain; background: var(--bg, #fff); border: 1px solid var(--text, #111); box-shadow: 0 14px 28px -14px rgba(0, 0, 0, .35); }
+  #rf-{{ sid }} .rf__plist li { margin: 0; }
+  #rf-{{ sid }} .rf__plist li + li { border-top: 1px solid var(--hairline, rgba(0, 0, 0, .1)); }
+  #rf-{{ sid }} .rf__plist button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 14px; min-height: 56px; box-sizing: border-box; border: 0; background: transparent; color: inherit; font: inherit; font-size: 13.5px; text-align: left; cursor: pointer; }
+  #rf-{{ sid }} .rf__plist button:hover, #rf-{{ sid }} .rf__plist button:focus-visible { background: color-mix(in srgb, var(--text, #111) 6%, var(--bg, #fff)); outline: none; }
+  #rf-{{ sid }} .rf__plist img { width: 38px; height: 38px; object-fit: cover; flex: none; }
+  #rf-{{ sid }} .rf__plist .rf__pnone { padding: 10px 12px; font-size: 13px; opacity: .6; }
+  #rf-{{ sid }} .rf__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  #rf-{{ sid }} .rf__msg { margin: 0; font-size: 13px; font-weight: 600; color: #b3261e; }
+  #rf-{{ sid }} .rf__submit { width: 100%; min-height: var(--ctl-h-lg, 52px); }
+  #rf-{{ sid }} .rf__submit[disabled] { opacity: .6; cursor: wait; }
+</style>
+
+<script>
+  (function () {
+    var init = function () {
+      var root = document.getElementById('rf-{{ sid }}');
+      if (!root || root.dataset.ready) return;
+      root.dataset.ready = '1';
+      var dlg = root.querySelector('[data-rf-dialog]');
+      var form = root.querySelector('[data-rf-form]');
+      var done = root.querySelector('[data-rf-done]');
+      var msg = root.querySelector('[data-rf-msg]');
+      var btn = root.querySelector('[data-rf-submit]');
+      var open = function () { form.hidden = false; done.hidden = true; msg.hidden = true; if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); };
+      var close = function () { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); };
+      root.querySelector('[data-rf-open]').addEventListener('click', open);
+      root.querySelectorAll('[data-rf-close]').forEach(function (b) { b.addEventListener('click', close); });
+      dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
+      var fail = function (t) { msg.textContent = t; msg.hidden = false; };
+
+      /* product picker: type to search the store's products (predictive search), pick one or leave empty */
+      var psearch = root.querySelector('[data-rf-psearch]');
+      var plist = root.querySelector('[data-rf-plist]');
+      var pclear = root.querySelector('[data-rf-pclear]');
+      var pid = root.dataset.productId || '';
+      var ptimer = null, pseq = 0;
+      var syncClear = function () { pclear.hidden = !psearch.value; };
+      var hideList = function () { plist.hidden = true; psearch.setAttribute('aria-expanded', 'false'); };
+      var pick = function (id, title) { pid = String(id); psearch.value = title; hideList(); syncClear(); };
+      var render = function (items) {
+        plist.innerHTML = '';
+        if (!items.length) { var n = document.createElement('li'); n.className = 'rf__pnone'; n.textContent = 'No products found'; plist.appendChild(n); }
+        items.forEach(function (p) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.setAttribute('role', 'option');
+          if (p.image) { var im = document.createElement('img'); im.src = p.image; im.alt = ''; im.loading = 'lazy'; b.appendChild(im); }
+          var s = document.createElement('span'); s.textContent = p.title; b.appendChild(s);
+          b.addEventListener('click', function () { pick(p.id, p.title); });
+          li.appendChild(b); plist.appendChild(li);
+        });
+        plist.hidden = false; plist.scrollTop = 0; psearch.setAttribute('aria-expanded', 'true');
+      };
+      var search = function (q) {
+        var my = ++pseq;
+        fetch('/search/suggest.json?q=' + encodeURIComponent(q) + '&resources[type]=product&resources[limit]=5&resources[options][unavailable_products]=last')
+          .then(function (r) { return r.json(); })
+          .then(function (j) {
+            if (my !== pseq) return;
+            var list = (j && j.resources && j.resources.results && j.resources.results.products) || [];
+            render(list.map(function (p) { return { id: p.id, title: p.title, image: p.image || (p.featured_image && p.featured_image.url) || '' }; }));
+          })
+          .catch(function () { if (my === pseq) hideList(); });
+      };
+      psearch.addEventListener('input', function () {
+        pid = '';
+        syncClear();
+        clearTimeout(ptimer);
+        var q = psearch.value.trim();
+        if (q.length < 2) { hideList(); return; }
+        ptimer = setTimeout(function () { search(q); }, 250);
+      });
+      pclear.addEventListener('click', function () { pid = ''; psearch.value = ''; hideList(); syncClear(); psearch.focus(); });
+      document.addEventListener('click', function (e) { if (!e.target.closest('[data-rf-product]')) hideList(); });
+      syncClear();
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        msg.hidden = true;
+        var fd = new FormData(form);
+        var rating = fd.get('rating');
+        if (!rating) return fail('Please choose a star rating.');
+        if (!String(fd.get('name') || '').trim()) return fail('Please enter your name.');
+        if (String(fd.get('body') || '').trim().length < 10) return fail('Please write at least 10 characters.');
+        btn.disabled = true;
+        fetch(root.dataset.endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: fd.get('name'), rating: rating, title: fd.get('title'), body: fd.get('body'),
+            website: fd.get('website'), productId: pid
+          })
+        }).then(function (r) { return r.json().catch(function () { return {}; }); })
+          .then(function (j) {
+            btn.disabled = false;
+            if (j && j.ok) { form.reset(); form.hidden = true; done.hidden = false; }
+            else fail((j && j.error) || 'Something went wrong. Please try again.');
+          })
+          .catch(function () { btn.disabled = false; fail('Network error. Please try again.'); });
+      });
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+    document.addEventListener('shopify:section:load', init);
+  })();
+</script>
