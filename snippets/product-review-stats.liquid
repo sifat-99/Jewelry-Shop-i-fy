@@ -1,0 +1,39 @@
+{%- comment -%}
+  Rating stats for ONE product from the "review" metaobject (approved/active entries only).
+  Accepts: product_id (number)
+  Output: average ~~ count ~~ n5 ~~ n4 ~~ n3 ~~ n2 ~~ n1
+  Note: Liquid exposes the first 50 metaobject entries of a type.
+{%- endcomment -%}
+{%- liquid
+  assign sum = 0
+  assign cnt = 0
+  assign n1 = 0
+  assign n2 = 0
+  assign n3 = 0
+  assign n4 = 0
+  assign n5 = 0
+  for e in shop.metaobjects.review.values
+    if e.product.value.id == product_id and e.approved != false
+      assign r = e.rating.value | plus: 0
+      assign sum = sum | plus: r
+      assign cnt = cnt | plus: 1
+      case r
+        when 1
+          assign n1 = n1 | plus: 1
+        when 2
+          assign n2 = n2 | plus: 1
+        when 3
+          assign n3 = n3 | plus: 1
+        when 4
+          assign n4 = n4 | plus: 1
+        when 5
+          assign n5 = n5 | plus: 1
+      endcase
+    endif
+  endfor
+  assign avg = 0
+  if cnt > 0
+    assign avg = sum | times: 1.0 | divided_by: cnt | round: 1
+  endif
+  echo avg | append: '~~' | append: cnt | append: '~~' | append: n5 | append: '~~' | append: n4 | append: '~~' | append: n3 | append: '~~' | append: n2 | append: '~~' | append: n1
+-%}

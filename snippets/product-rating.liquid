@@ -1,0 +1,21 @@
+{%- comment -%}
+  Small "★★★★★ 4.8 (12)" line for a product (under the title). Links to #product-reviews.
+  Accepts: product
+{%- endcomment -%}
+{%- capture rs -%}{%- render 'product-review-stats', product_id: product.id -%}{%- endcapture -%}
+{%- assign rp = rs | split: '~~' -%}
+<a class="lv-prating" href="#product-reviews" aria-label="{{ rp[1] }} reviews, average {{ rp[0] }} out of 5">
+  <span class="lv-stars" style="--r: {{ rp[0] }}" aria-hidden="true">★★★★★</span>
+  {%- if rp[1] == '0' -%}
+    <span class="lv-prating__text">No reviews yet</span>
+  {%- else -%}
+    <strong>{{ rp[0] }}</strong><span class="lv-prating__text">({{ rp[1] }})</span>
+  {%- endif -%}
+</a>
+<style>
+  .lv-stars { display: inline-block; font-size: 16px; letter-spacing: 2px; line-height: 1; color: transparent; background: linear-gradient(90deg, var(--lv-accent, #9b7c53) calc(var(--r, 0) / 5 * 100%), color-mix(in srgb, var(--text, #111) 18%, transparent) 0); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .lv-prating { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 13px; color: inherit; text-decoration: none; }
+  .lv-prating strong { font-weight: 700; }
+  .lv-prating__text { opacity: .65; font-size: 12.5px; }
+  .lv-prating:hover .lv-prating__text { text-decoration: underline; text-underline-offset: 3px; }
+</style>
