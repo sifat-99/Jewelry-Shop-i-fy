@@ -1,0 +1,27 @@
+{%- comment -%}
+  Average rating + count for the customer feedback section.
+  Accepts: use_meta (true/false), entries (metaobject list), blocks (section.blocks), limit
+  Output: average ~~ count
+{%- endcomment -%}
+{%- liquid
+  assign sum = 0
+  assign cnt = 0
+  if use_meta
+    for e in entries limit: limit
+      unless e.approved == false
+        assign sum = sum | plus: e.rating.value
+        assign cnt = cnt | plus: 1
+      endunless
+    endfor
+  else
+    for b in blocks
+      assign sum = sum | plus: b.settings.rating
+      assign cnt = cnt | plus: 1
+    endfor
+  endif
+  assign avg = 0
+  if cnt > 0
+    assign avg = sum | times: 1.0 | divided_by: cnt | round: 1
+  endif
+  echo avg | append: '~~' | append: cnt
+-%}
