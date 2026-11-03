@@ -1,0 +1,392 @@
+<!-- /snippets/cart-drawer.liquid -->
+{%- assign checkout_after_items = false -%}
+{%- if settings.cart_checkout_position == 'after_items' -%}
+  {%- assign checkout_after_items = true -%}
+{%- endif -%}
+<section
+  data-section-id="cart-drawer"
+  data-section-type="cart-drawer"
+>
+  <style>
+    /* Free-shipping message stays visible (theme JS hides it with .cart--hidden when the cart is empty, which made it flash then vanish) */
+    .drawer__body .cart__message[data-cart-message],
+    .drawer__body .cart__message[data-cart-message].cart--hidden,
+    .drawer__body .cart__message[data-cart-message].is-hidden {
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+      pointer-events: auto !important;
+      padding: 15px var(--gutter, 20px) !important;
+      border-bottom: 1px solid var(--border, #eee) !important;
+    }
+    .cart--hidden,
+    .cart__drawer .cart--hidden,
+    [data-cart-empty].cart--hidden {
+      display: none !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      visibility: hidden !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
+    }
+
+    /* Lock buttons and animate line item while updating to prevent race conditions */
+    .cart--loading .quantity__button,
+    .cart--loading [data-remove-key],
+    .cart--loading [data-quantity-selector] button {
+      pointer-events: none !important;
+      opacity: 0.45 !important;
+      cursor: wait !important;
+    }
+    .cart--loading .cart__items__row {
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+    }
+
+    /* Checkout button placed right after the last product (setting: Cart & Drawer > Checkout button position) */
+    .drawer__body > .drawer__bottom {
+      flex: 0 0 100%;
+      width: 100%;
+      box-sizing: border-box;
+      align-self: flex-start;
+      border-top: 0;
+    }
+
+    /* Trash Icon Hover Animation */
+    .cart__items__remove a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #888888;
+      transition: color 0.2s ease, transform 0.15s ease;
+      padding: 4px;
+    }
+    .cart__items__remove a:hover {
+      color: #d32f2f;
+      transform: scale(1.15);
+    }
+    .cart__items__remove a:active {
+      transform: scale(0.95);
+    }
+  </style>
+
+  <div class="drawer cart__drawer drawer--right palette--light bg--neutral"
+    data-cart-message-container
+    data-drawer="drawer-cart"
+    id="drawer-cart">
+    <div class="drawer__content" aria-label="Shopping cart">
+      
+      <!-- Top Bar: Title & Close 'X' Button -->
+      <div class="drawer__top">
+        <div class="drawer__top__left">
+          <p class="cart__drawer__title">Shopping cart</p>
+        </div>
+
+        <button class="drawer__button drawer__close"
+          data-first-focus
+          data-drawer-toggle="drawer-cart"
+          aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Drawer Body -->
+      <div class="drawer__body" data-drawer-scrolls>
+
+        <!-- Free Shipping Progress / Message -->
+        {%- liquid
+          assign free_shipping_limit = 4000
+          if shop.currency != 'BDT'
+            assign free_shipping_limit = 39
+          endif
+          assign free_shipping_limit_cents = free_shipping_limit | times: 100
+        -%}
+        <p class="cart__message {% if cart.total_price >= free_shipping_limit_cents and cart.item_count > 0 %}is-success{% endif %}" data-cart-message="true" data-limit="{{ free_shipping_limit }}">
+          <small class="cart__graph">
+            <small class="cart__graph-dot cart__graph-dot--1"></small>
+            <small class="cart__graph-dot cart__graph-dot--2"></small>
+            <small class="cart__graph-dot cart__graph-dot--3"></small>
+            <small class="cart__graph-dot cart__graph-dot--4"></small>
+            <small class="cart__graph-dot cart__graph-dot--5"></small>
+            <small class="cart__graph-dot cart__graph-dot--6"></small>
+            <svg height="18" width="18">
+              <circle r="7" cx="9" cy="9" />
+              <circle class="cart__graph-progress" stroke-dasharray="87.96459430051421 87.96459430051421" style="stroke-dashoffset: 87.96459430051421" data-cart-progress data-percent="0" r="7" cx="9" cy="9" />
+            </svg>
+          </small>
+
+          <span class="cart__message-success">Congratulations! Your order qualifies for free shipping</span>
+
+          <span class="cart__message-default">
+            Yet 
+            <span data-left-to-spend class="strong">
+              {%- if cart.total_price < free_shipping_limit_cents -%}
+                {{ free_shipping_limit_cents | minus: cart.total_price | money }}
+              {%- else -%}
+                {{ 0 | money }}
+              {%- endif -%}
+            </span>
+            for free shipping
+          </span>
+        </p>
+
+        <div class="errors" data-form-errors style="display: none;"></div>
+
+        <!-- Empty State -->
+        <div class="{% if cart.item_count > 0 %}cart--hidden{% endif %}" data-cart-empty style="{% if cart.item_count > 0 %}display: none;{% endif %}">
+          <div class="cart__empty align--middle-center">
+            <div class="wrapper">
+              <p class="body-size-7 m-0">Your shopping cart is empty</p>
+              <div class="image-overlay" style="--overlay-opacity: 0.05;"></div>
+            </div>
+          </div>
+          <a href="{{ routes.all_products_collection_url }}" class="cart__circle__wrapper" data-drawer-toggle="drawer-cart">
+            <div class="cart__circle">
+              <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-classic-cart" viewBox="0 0 24 24"><path d="M20.5 16.5H5.715l1.082-4.195-2.126-7.456L3.715 1.5H1.5m5.22 10h11.702l3.002-6.13s.428-.87-.745-.87H4.5m2 16.986a1 1 0 1 0 2 .028 1 1 0 0 0-2-.028Zm11 .014a1 1 0 1 0 2 0 1 1 0 0 0-2 0Z"/><circle class="icon-cart-full" cx="13" cy="4.5" r="4"/></svg>
+            </div>
+            <p class="cart__continue__link">
+              Continue shopping
+            </p>
+          </a>
+        </div>
+
+        <!-- Cart Items Loading & Form -->
+        <div data-cart-form data-cart-loading class="{% if cart.item_count == 0 %}cart--hidden{% endif %}" style="{% if cart.item_count == 0 %}display: none;{% endif %}">
+          <div data-line-items>
+            {% render 'cart-line-items' %}
+          </div>
+        </div>
+
+        {%- capture drawer_checkout_html -%}
+        <div class="drawer__bottom drawer__bottom--checkout {% if cart.item_count == 0 %}cart--hidden{% endif %}" data-cart-bottom data-accordion-group style="{% if cart.item_count == 0 %}display: none;{% endif %}">
+          <p class="drawer__bottom__meta body-size-3"><em></em></p>
+
+          <div class="drawer__footer__subtotal" data-cart-subtotal style="display: none;">
+            {% render 'cart-subtotal' %}
+          </div>
+
+          <form id="cart-form" action="{{ routes.cart_url }}" method="post" novalidate class="cart">
+            <button type="submit" name="checkout" class="btn btn--primary btn--large btn--full checkout__button">
+              <span>Proceed to Checkout •</span>
+              <span data-cart-final style="margin-left: 4px;">
+                {{ cart.total_price | money }}
+              </span>
+            </button>
+          </form>
+        </div>
+        {%- endcapture -%}
+
+        {%- capture drawer_notes_html -%}
+        <!-- Free shipping notice + payment icons: always at the bottom of the drawer -->
+        <div class="drawer__bottom drawer__bottom--notes {% if cart.item_count == 0 %}cart--hidden{% endif %}" data-cart-bottom style="{% if cart.item_count == 0 %}display: none;{% endif %}">
+          <center>
+            <div style="font-weight: bold; text-transform: uppercase; margin: 10px 0; font-size: 13px; letter-spacing: 0.05em;">
+              Free shipping on orders over {{ free_shipping_limit_cents | money }}
+            </div>
+          </center>
+
+          <center>
+            <img src="https://cdn.shopify.com/s/files/1/0642/5221/5561/files/Conversie_afbeeldingen_Shopify_11.png?v=1727602721" alt="Payment Methods" style="width: 70%; padding-bottom: 5px;" width="300" height="40" loading="lazy">
+          </center>
+        </div>
+        {%- endcapture -%}
+        {%- if checkout_after_items -%}{{ drawer_checkout_html }}{%- endif -%}
+
+      </div>
+
+      {%- unless checkout_after_items -%}{{ drawer_checkout_html }}{%- endunless -%}
+      {{ drawer_notes_html }}
+
+    </div>
+
+    <!-- Backdrop Underlay -->
+    <span class="drawer__underlay" data-drawer-underlay>
+      <span class="drawer__underlay__fill"></span>
+      <span class="drawer__underlay__blur"></span>
+    </span>
+  </div>
+</section>
+
+<script>
+  (function() {
+    // Money Formatter Helper
+    function fmtMoney(cents) {
+      var moneyFormat = (typeof theme !== 'undefined' && theme.moneyFormat) ? theme.moneyFormat : "৳{{amount}}";
+      var num = (cents / 100.0).toFixed(2);
+      var parts = num.split('.');
+      var dollars = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+      return moneyFormat.replace(/\{\{\s*(\w+)\s*\}\}/, dollars + '.' + parts[1]);
+    }
+
+    // Unified UI Synchronization Engine
+    function syncCartDrawerUI(cart) {
+      if (!cart) return;
+      var emptyEl = document.querySelector('[data-cart-empty]');
+      var formEl = document.querySelector('[data-cart-form]');
+      var bottomEls = document.querySelectorAll('[data-cart-bottom]');
+      var finalPriceEls = document.querySelectorAll('[data-cart-final]');
+      var headerPriceEls = document.querySelectorAll('[data-header-cart-price]');
+      var headerCountEls = document.querySelectorAll('[data-header-cart-count]');
+      var leftToSpendEl = document.querySelector('[data-left-to-spend]');
+      var cartMsgEl = document.querySelector('[data-cart-message]');
+      var progressEl = document.querySelector('[data-cart-progress]');
+
+      var formattedTotal = fmtMoney(cart.total_price);
+
+      // 1. Update final price on checkout buttons
+      finalPriceEls.forEach(function(el) {
+        el.textContent = formattedTotal;
+      });
+
+      // 2. Update header prices & count badges
+      headerPriceEls.forEach(function(el) {
+        el.textContent = formattedTotal;
+      });
+      headerCountEls.forEach(function(el) {
+        el.textContent = '(' + cart.item_count + ')';
+      });
+
+      // 3. Strict Toggle of Empty State vs Form & Checkout Bottom
+      if (cart.item_count > 0) {
+        if (emptyEl) {
+          emptyEl.classList.add('cart--hidden');
+          emptyEl.style.display = 'none';
+        }
+        if (formEl) {
+          formEl.classList.remove('cart--hidden');
+          formEl.style.display = 'block';
+        }
+        bottomEls.forEach(function(el) {
+          el.classList.remove('cart--hidden');
+          el.style.display = 'block';
+        });
+      } else {
+        if (emptyEl) {
+          emptyEl.classList.remove('cart--hidden');
+          emptyEl.style.display = 'block';
+        }
+        if (formEl) {
+          formEl.classList.add('cart--hidden');
+          formEl.style.display = 'none';
+        }
+        bottomEls.forEach(function(el) {
+          el.classList.add('cart--hidden');
+          el.style.display = 'none';
+        });
+      }
+
+      // 4. Update Free Shipping Gauge & Text
+      var threshold = (typeof theme !== 'undefined' && theme.currency === 'BDT') ? 400000 : 3900;
+      if (cartMsgEl) {
+        if (cart.total_price >= threshold && cart.item_count > 0) {
+          cartMsgEl.classList.add('is-success');
+        } else {
+          cartMsgEl.classList.remove('is-success');
+          if (leftToSpendEl) {
+            leftToSpendEl.textContent = fmtMoney(Math.max(0, threshold - cart.total_price));
+          }
+        }
+      }
+
+      if (progressEl) {
+        var pct = Math.min(100, Math.round((cart.total_price / threshold) * 100));
+        var circumference = 28 * Math.PI;
+        var offset = circumference - (pct / 100) * (circumference / 2);
+        progressEl.style.strokeDashoffset = offset;
+      }
+    }
+
+    // Global Cart Drawer Open/Close Helpers
+    window.openCartDrawer = function() {
+      var drawer = document.getElementById('drawer-cart');
+      if (drawer) {
+        drawer.dispatchEvent(new CustomEvent('theme:drawer:open', { bubbles: false }));
+      }
+      document.dispatchEvent(new CustomEvent('theme:cart:reload', { bubbles: true }));
+      // Direct live cart fetch and UI sync
+      fetch('/cart.js')
+        .then(function(res) { return res.json(); })
+        .then(function(cart) {
+          syncCartDrawerUI(cart);
+        })
+        .catch(function(e) { console.error(e); });
+    };
+
+    window.closeCartDrawer = function() {
+      var drawer = document.getElementById('drawer-cart');
+      if (drawer) {
+        drawer.dispatchEvent(new CustomEvent('theme:drawer:close', { bubbles: false }));
+      }
+    };
+
+    // Global AddToCart Function
+    window.addToCartAjax = function(variantId, quantity, properties) {
+      quantity = quantity || 1;
+      var bodyObj = { id: variantId, quantity: quantity };
+      if (properties) bodyObj.properties = properties;
+
+      return fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyObj)
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(item) {
+        window.openCartDrawer();
+        fetch('/cart.js')
+          .then(function(r) { return r.json(); })
+          .then(function(cart) {
+            syncCartDrawerUI(cart);
+            document.dispatchEvent(new CustomEvent('theme:cart:change', { detail: { cart: cart }, bubbles: true }));
+            document.dispatchEvent(new CustomEvent('theme:cart:reload', { bubbles: true }));
+          });
+        return item;
+      })
+      .catch(function(err) {
+        console.error('Add to cart error:', err);
+        window.openCartDrawer();
+      });
+    };
+
+    // Delegated Quick Add Buttons on Product Cards
+    document.addEventListener('click', function(e) {
+      var quickBtn = e.target.closest('.quick-add-btn');
+      if (quickBtn) {
+        e.preventDefault();
+        var variantId = quickBtn.getAttribute('data-variant-id');
+        if (variantId) {
+          quickBtn.disabled = true;
+          var originalText = quickBtn.textContent;
+          quickBtn.textContent = 'Adding...';
+          window.addToCartAjax(variantId, 1).then(function() {
+            quickBtn.disabled = false;
+            quickBtn.textContent = originalText;
+          }).catch(function() {
+            quickBtn.disabled = false;
+            quickBtn.textContent = originalText;
+          });
+        }
+      }
+    });
+
+    // Event Listener for theme:cart:change
+    document.addEventListener('theme:cart:change', function(e) {
+      if (e.detail && e.detail.cart) {
+        syncCartDrawerUI(e.detail.cart);
+      }
+    });
+
+    // Run on initial page load to ensure state consistency
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('/cart.js')
+        .then(function(res) { return res.json(); })
+        .then(function(cart) {
+          syncCartDrawerUI(cart);
+        })
+        .catch(function() {});
+    });
+  })();
+</script>
