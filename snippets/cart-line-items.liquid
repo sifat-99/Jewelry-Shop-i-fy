@@ -1,0 +1,123 @@
+<!-- /snippets/cart-line-items.liquid -->
+<div class="cart__items">
+  {%- for item in cart.items -%}
+    <div class="cart__items__row" data-cart-item>
+      <div class="item--loadbar" data-item-loadbar style="display: none;">&nbsp;</div>
+      <div class="cart__items__grid" data-item>
+        <div class="cart__items__remove">
+          <a href="{{ item.url_to_remove }}"
+            data-remove-key="{{ item.key }}"
+            tabindex="0"
+            aria-label="Remove {{ item.title | escape }}">
+            <span class="cart__remove__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-trash" viewBox="0 0 24 24"><path d="m19.5 4-1.072 18H5.571L4.5 4M10 9v8m4-8v8M3 4h18M9 4V2h6v2"/></svg>
+            </span>
+            <span class="cart__remove badge">
+              Delete
+            </span>
+          </a>
+        </div>
+
+        <div class="cart__items__image">
+          <a href="{{ item.url }}">
+            <div class="relative block w-full h-full overflow-hidden aspect-[--wh-ratio]" style="--wh-ratio: 1.0; border-radius: var(--cart-image-radius, var(--card-radius, 0px));">
+              {%- if item.image -%}
+                <img src="{{ item.image | image_url: width: 90 }}" 
+                     srcset="{{ item.image | image_url: width: 180 }} 2x, {{ item.image | image_url: width: 90 }}"
+                     alt="{{ item.title | escape }}" 
+                     width="90" 
+                     height="90" 
+                     loading="lazy" 
+                     class="block overflow-hidden w-full h-full object-cover transition-opacity duration-300 ease-linear cart__items__img">
+              {%- else -%}
+                <div class="cart__items__img empty-content"></div>
+              {%- endif -%}
+            </div>
+          </a>
+        </div>
+
+        <div class="cart__items__title">
+          <p>
+            <a href="{{ item.url }}">
+              {{ item.product.title }}
+            </a>
+          </p>
+          <div class="cart__items__meta">
+            {%- unless item.product.has_only_default_variant -%}
+              <p class="body-size-3 text-subdued">{{ item.variant.title }}</p>
+            {%- endunless -%}
+            {%- for property in item.properties -%}
+              {%- if property.last != blank -%}
+                <p class="body-size-3 text-subdued">{{ property.first }}: {{ property.last }}</p>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+
+        <div class="cart__items__price">
+          <p class="line__price">
+            {%- if item.original_price > item.final_price -%}
+              <del style="color: #888888; margin-right: 6px;">{{ item.original_price | money }}</del>
+              {%- if item.quantity > 1 -%}
+                <span class="line__price-multi" style="font-size: 13px; font-weight: 500; color: #111111;">
+                  {{ item.final_price | money }} × {{ item.quantity }} = <strong style="font-weight: 700;">{{ item.final_line_price | money }}</strong>
+                </span>
+              {%- else -%}
+                <mark style="background: transparent; color: inherit;">{{ item.final_price | money }}</mark>
+              {%- endif -%}
+            {%- else -%}
+              {%- if item.quantity > 1 -%}
+                <span class="line__price-multi" style="font-size: 13px; font-weight: 500; color: #111111;">
+                  {{ item.final_price | money }} × {{ item.quantity }} = <strong style="font-weight: 700;">{{ item.final_line_price | money }}</strong>
+                </span>
+              {%- else -%}
+                {{ item.final_price | money }}
+              {%- endif -%}
+            {%- endif -%}
+          </p>
+        </div>
+
+        <div class="cart__items__quantity">
+          <div class="quantity__wrapper" data-quantity-selector>
+            <button class="quantity__button quantity__button--minus" data-decrease-quantity type="button" aria-label="Decrease quantity">
+              <svg width="10" height="2" viewBox="0 0 10 2" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M0.75 1H9.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <label for="updates_{{ item.key }}" class="visually-hidden">Quantity</label>
+            <input data-quantity-input
+              data-update-cart="{{ item.key }}"
+              class="quantity__input"
+              type="number"
+              min="0"
+              id="updates_{{ item.key }}"
+              name="updates[]"
+              value="{{ item.quantity }}"/>
+            <button class="quantity__button quantity__button--plus" data-increase-quantity type="button" aria-label="Increase quantity">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M5 0.75V9.25M0.75 5H9.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="cart__items__total">
+          {{ item.final_line_price | money }}
+        </div>
+
+        {%- if item.line_level_discount_allocations.size > 0 -%}
+          <div class="cart__items__savings">
+            {%- for discount_allocation in item.line_level_discount_allocations -%}
+              <span class="item__total__savings">
+                <span class="cart__icon--tags">
+                  <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-core-tags" viewBox="0 0 14 14"><g stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.625.79H7l6.125 6.124M5.325 2.54H1.75a.875.875 0 0 0-.875.874V6.99c0 .232.092.455.256.619l5.344 5.345a.875.875 0 0 0 1.438-.312l.837-2.227 2.22"/></g></svg>
+                </span>
+                {{ discount_allocation.discount_application.title }}: -{{ discount_allocation.amount | money }}
+              </span>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endfor -%}
+</div>
