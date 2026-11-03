@@ -1,0 +1,133 @@
+{%- comment -%}
+  Global loading states: image skeleton on product cards + animated loader on the product page gallery.
+  Settings: Theme settings > Loading & skeleton.
+{%- endcomment -%}
+{%- liquid
+  assign skel_on = true
+  if settings.enable_skeleton == false
+    assign skel_on = false
+  endif
+  assign loader_on = true
+  if settings.enable_product_loader == false
+    assign loader_on = false
+  endif
+  assign ld_a = settings.loader_color_a | default: '#8d6e63'
+  assign ld_b = settings.loader_color_b | default: '#d7b8a6'
+  assign ld_c = settings.loader_color_c | default: '#3b2a26'
+  assign ld_size = settings.loader_size | default: 64
+  assign skel_style = settings.skeleton_style | default: 'shimmer'
+-%}
+{%- if skel_on or loader_on -%}
+<style>
+  :root {
+    --lv-skel-base: color-mix(in srgb, var(--text, #111) 7%, var(--bg, #fff));
+    --lv-skel-shine: color-mix(in srgb, var(--text, #111) 13%, var(--bg, #fff));
+    --lv-loader-size: {{ ld_size }}px;
+    --lv-loader-a: {{ ld_a }};
+    --lv-loader-b: {{ ld_b }};
+    --lv-loader-c: {{ ld_c }};
+  }
+  @keyframes lv-shimmer { 0% { background-position: 130% 0; } 100% { background-position: -30% 0; } }
+  @keyframes lv-skel-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+  .lv-skel-fill {
+    {%- if skel_style == 'pulse' %}
+    background: var(--lv-skel-base);
+    animation: lv-skel-pulse 1.4s ease-in-out infinite;
+    {%- else %}
+    background: linear-gradient(100deg, var(--lv-skel-base) 30%, var(--lv-skel-shine) 50%, var(--lv-skel-base) 70%);
+    background-size: 250% 100%;
+    animation: lv-shimmer 1.6s ease-in-out infinite;
+    {%- endif %}
+  }
+
+  {%- if skel_on %}
+  /* Product card image skeleton */
+  .lv-card-media-wrap::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit;
+    transition: opacity .3s ease, visibility .3s ease;
+    {%- if skel_style == 'pulse' %}
+    background: var(--lv-skel-base); animation: lv-skel-pulse 1.4s ease-in-out infinite;
+    {%- else %}
+    background: linear-gradient(100deg, var(--lv-skel-base) 30%, var(--lv-skel-shine) 50%, var(--lv-skel-base) 70%);
+    background-size: 250% 100%; animation: lv-shimmer 1.6s ease-in-out infinite;
+    {%- endif %}
+  }
+  .lv-card-media-wrap.lv-ready::before { opacity: 0; visibility: hidden; animation: none; }
+  {%- endif %}
+
+  /* Hide alt text while images are still loading (browsers print it over the skeleton) */
+  .lv-card-media-wrap img, img.pg__img { color: transparent; font-size: 0; text-indent: -9999px; }
+
+  /* Animated loader */
+  .lv-loader { width: var(--lv-loader-size); height: var(--lv-loader-size); display: block; overflow: visible; }
+  .lv-loader__f--a1, .lv-loader__f--a2 { fill: var(--lv-loader-a); }
+  .lv-loader__f--b1, .lv-loader__f--b2 { fill: var(--lv-loader-b); }
+  .lv-loader__d { fill: #fff; }
+  .lv-loader__c { fill: var(--lv-loader-c); transform-box: fill-box; transform-origin: center; animation: lv-loader-core 1.8s cubic-bezier(.65, 0, .35, 1) infinite; }
+  .lv-loader__f { animation: lv-loader-facet 1.8s ease-in-out infinite; transform-box: fill-box; }
+  .lv-loader__f--a1 { animation-delay: 0s; transform-origin: 0 0; }
+  .lv-loader__f--b1 { animation-delay: .2s; transform-origin: 100% 0; }
+  .lv-loader__f--a2 { animation-delay: .4s; transform-origin: 100% 100%; }
+  .lv-loader__f--b2 { animation-delay: .6s; transform-origin: 0 100%; }
+  @keyframes lv-loader-core { 0% { transform: rotate(0) scale(1); } 40% { transform: rotate(90deg) scale(.7); } 70% { transform: rotate(90deg) scale(1.08); } 100% { transform: rotate(180deg) scale(1); } }
+  @keyframes lv-loader-facet { 0%, 100% { opacity: .35; transform: scale(.82); } 35% { opacity: 1; transform: scale(1); } }
+
+  {%- if loader_on %}
+  .lv-loader-overlay {
+    position: absolute; inset: 0; z-index: 6; display: flex; align-items: center; justify-content: center;
+    border-radius: var(--pv-gallery-radius, 0px); pointer-events: none;
+    transition: opacity .35s ease, visibility .35s ease;
+  }
+  .lv-loader-overlay.is-done { opacity: 0; visibility: hidden; }
+  {%- endif %}
+  @media (prefers-reduced-motion: reduce) {
+    .lv-card-media-wrap::before, .lv-skel-fill, .lv-loader__c, .lv-loader__f { animation: none !important; }
+  }
+</style>
+<noscript><style>.lv-card-media-wrap::before, .lv-loader-overlay { display: none !important; }</style></noscript>
+<script>
+  (function () {
+    var raf = null;
+    function cardReady(w) {
+      if (w.classList.contains('lv-ready')) return;
+      var img = w.querySelector('.card-media-slide.is-active') || w.querySelector('.card-media-slide');
+      if (!img || img.tagName !== 'IMG' || (img.complete && img.naturalWidth > 0)) w.classList.add('lv-ready');
+    }
+    function loaderDone(o) { if (o) o.classList.add('is-done'); }
+    function loaderCheck(o) {
+      var g = o.closest('[data-pg]') || o.parentNode;
+      var img = g && g.querySelector('img.pg__img');
+      if (!img || (img.complete && img.naturalWidth > 0)) loaderDone(o);
+    }
+    function scan() {
+      raf = null;
+      document.querySelectorAll('.lv-card-media-wrap:not(.lv-ready)').forEach(cardReady);
+      document.querySelectorAll('.lv-loader-overlay:not(.is-done)').forEach(loaderCheck);
+    }
+    function queue() { if (!raf) raf = requestAnimationFrame(scan); }
+    function onImg(e) {
+      var t = e.target;
+      if (!t || t.tagName !== 'IMG') return;
+      var w = t.closest && t.closest('.lv-card-media-wrap');
+      if (w) cardReady(w);
+      var o = t.closest && t.closest('[data-pg]');
+      if (o) loaderDone(o.querySelector('.lv-loader-overlay'));
+    }
+    document.addEventListener('load', onImg, true);
+    document.addEventListener('error', onImg, true);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', queue); else queue();
+    window.addEventListener('load', function () {
+      scan();
+      document.querySelectorAll('.lv-card-media-wrap').forEach(function (w) { w.classList.add('lv-ready'); });
+      document.querySelectorAll('.lv-loader-overlay').forEach(loaderDone);
+    });
+    if ('MutationObserver' in window) {
+      new MutationObserver(queue).observe(document.documentElement, { childList: true, subtree: true });
+    }
+    setTimeout(function () {
+      document.querySelectorAll('.lv-card-media-wrap').forEach(function (w) { w.classList.add('lv-ready'); });
+      document.querySelectorAll('.lv-loader-overlay').forEach(loaderDone);
+    }, 10000);
+  })();
+</script>
+{%- endif -%}
