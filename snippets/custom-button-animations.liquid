@@ -1,0 +1,769 @@
+<!-- /snippets/custom-button-animations.liquid -->
+<style>
+  /* ==========================================================================
+     UNIVERSAL BUTTON ANIMATIONS & DYNAMIC COLOR SYSTEM
+     100% Dynamic Colors via Online Store 2.0 Color Schemes & Theme Settings
+     Zero Hardcoded Colors
+     ========================================================================== */
+
+  :root {
+    --btn-radius: {{ settings.button_border_radius | default: 0 }}px;
+    --BUTTON-RADIUS: {{ settings.button_border_radius | default: 0 }}px;
+    /* Dynamic Theme Colors for Regular (Square/Rectangular) Buttons */
+    --btn-regular-bg: {{ settings.button_bg | default: settings.color_schemes[0].settings.button | default: '#000000' }};
+    --btn-regular-text: {{ settings.button_text | default: settings.color_schemes[0].settings.button_label | default: '#ffffff' }};
+    --btn-regular-border: {{ settings.button_border_color | default: 'var(--btn-regular-bg)' }};
+    --btn-regular-hover-bg: {{ settings.btn_hover_bg | default: settings.color_schemes[0].settings.text | default: '#2b2622' }};
+    --btn-regular-hover-text: {{ settings.btn_hover_text | default: settings.color_schemes[0].settings.background | default: '#ffffff' }};
+    --btn-regular-hover-border: {{ settings.btn_hover_border_color | default: 'var(--btn-regular-hover-bg)' }};
+    --btn-animation-duration: {% if settings.enable_hover_animations == false %}0ms{% else %}{{ settings.button_hover_speed | default: 450 }}ms{% endif %};
+    --btn-ease: cubic-bezier(0.65, 0, 0.35, 1);
+    --btn-base-bg: {% if settings.global_button_style == 'outline' or settings.global_button_style == 'minimal' %}transparent{% elsif settings.global_button_style == 'soft' %}color-mix(in srgb, var(--btn-regular-bg) 92%, var(--btn-regular-text) 8%){% else %}var(--btn-regular-bg){% endif %};
+    --btn-base-text: var(--btn-regular-text);
+    --btn-base-border: {% if settings.button_border_color != blank %}var(--btn-regular-border){% elsif settings.global_button_style == 'outline' %}var(--btn-regular-text){% elsif settings.global_button_style == 'soft' or settings.global_button_style == 'minimal' %}transparent{% else %}var(--btn-regular-border){% endif %};
+
+    --btn-soft-bg: var(--btn-regular-bg);
+    --btn-soft-text: var(--btn-regular-text);
+    --btn-soft-border: var(--btn-regular-border);
+    --btn-soft-hover-bg: var(--btn-regular-hover-bg);
+    --btn-soft-hover-text: var(--btn-regular-hover-text);
+    --btn-soft-hover-border: var(--btn-regular-hover-bg);
+
+    --btn-outline-bg: var(--btn-regular-bg);
+    --btn-outline-text: var(--btn-regular-text);
+    --btn-outline-border: var(--btn-regular-border);
+    --btn-outline-hover-bg: var(--btn-regular-hover-bg);
+    --btn-outline-hover-text: var(--btn-regular-hover-text);
+    --btn-outline-hover-border: var(--btn-regular-hover-bg);
+
+    /* Dynamic Theme Colors for Round Action Buttons */
+    --round-btn-bg: {{ settings.round_button_bg | default: settings.color_schemes[0].settings.background | default: '#ffffff' }};
+    --round-btn-text: {{ settings.round_button_text | default: settings.color_schemes[0].settings.text | default: '#000000' }};
+    --round-btn-border: rgba(0, 0, 0, 0.12);
+    --round-btn-hover-bg: {{ settings.btn_hover_bg | default: settings.color_schemes[0].settings.button | default: '#000000' }};
+    --round-btn-hover-text: {{ settings.btn_hover_text | default: settings.color_schemes[0].settings.button_label | default: '#ffffff' }};
+    --round-btn-hover-border: var(--round-btn-hover-bg);
+    --round-btn-shadow: rgba(0, 0, 0, 0.14);
+  }
+
+  /* ==========================================================================
+     1. REGULAR / SQUARE / RECTANGULAR BUTTONS: BASE SETUP & ISOLATION
+     Includes EVERY button across the entire theme!
+     ========================================================================== */
+
+  .btn,
+  .btn--primary,
+  .btn--hero,
+  .btn--full,
+  .btn--large,
+  .btn--neutral,
+  .hero__btn,
+  .btn--add-to-cart,
+  .product-add-to-cart-btn,
+  #AddToCartMainBtn,
+  .checkout__button,
+  .drawer__checkout,
+  .cart__checkout,
+  .btn-sliding-hover,
+  .filter-drawer__apply-btn,
+  .qv-add-btn,
+  .search-empty-btn {
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    isolation: isolate !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    background-color: var(--btn-base-bg) !important;
+    color: var(--btn-base-text) !important;
+    border: var(--btn-border-thickness, 1px) solid var(--btn-base-border) !important;
+    cursor: pointer !important;
+    /* Strict: Size and position NEVER change on hover or active */
+    transform: none !important;
+    transition: border-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), box-shadow var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+
+  .btn--soft,
+  .filter-drawer__clear-btn,
+  .collection-filter-toggle-btn {
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    isolation: isolate !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    background-color: var(--btn-base-bg) !important;
+    color: var(--btn-base-text) !important;
+    border: var(--btn-border-thickness, 1px) solid var(--btn-base-border) !important;
+    cursor: pointer !important;
+    transform: none !important;
+    transition: border-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), box-shadow var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+
+  .btn--outline,
+  .btn--white {
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    isolation: isolate !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    background-color: var(--btn-base-bg) !important;
+    color: var(--btn-base-text) !important;
+    border: var(--btn-border-thickness, 1px) solid var(--btn-base-border) !important;
+    cursor: pointer !important;
+    transform: none !important;
+    transition: border-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), box-shadow var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+
+  /* ==========================================================================
+     2. LEFT-TO-RIGHT ANIMATED SLIDING BACKGROUND FILL (350ms ease-in-out)
+     Kept strictly inside button boundary with border-radius: inherit
+     Layered at z-index: 1 so text at z-index: 3 is 100% visibly on top
+     ========================================================================== */
+
+  .btn::before,
+  .btn--primary::before,
+  .btn--hero::before,
+  .btn--full::before,
+  .btn--large::before,
+  .btn--neutral::before,
+  .hero__btn::before,
+  .btn--add-to-cart::before,
+  .product-add-to-cart-btn::before,
+  #AddToCartMainBtn::before,
+  .checkout__button::before,
+  .drawer__checkout::before,
+  .cart__checkout::before,
+  .btn-sliding-hover::before,
+  .filter-drawer__apply-btn::before,
+  .qv-add-btn::before,
+  .search-empty-btn::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: inherit !important;
+    background-color: var(--btn-regular-hover-bg) !important;
+    z-index: 1 !important;
+    opacity: 0 !important;
+    transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+    pointer-events: none !important;
+  }
+
+  .btn--soft::before,
+  .filter-drawer__clear-btn::before,
+  .collection-filter-toggle-btn::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: inherit !important;
+    background-color: var(--btn-soft-hover-bg) !important;
+    z-index: 1 !important;
+    opacity: 0 !important;
+    transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+    pointer-events: none !important;
+  }
+
+  .btn--outline::before,
+  .btn--white::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: inherit !important;
+    background-color: var(--btn-outline-hover-bg) !important;
+    z-index: 1 !important;
+    opacity: 0 !important;
+    transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+    pointer-events: none !important;
+  }
+
+  /* Slide in smoothly from Left-to-Right on Hover */
+  .btn:hover::before,
+  .btn--primary:hover::before,
+  .btn--hero:hover::before,
+  .btn--full:hover::before,
+  .btn--large:hover::before,
+  .btn--neutral:hover::before,
+  .hero__btn:hover::before,
+  .btn--add-to-cart:hover::before,
+  .product-add-to-cart-btn:hover::before,
+  #AddToCartMainBtn:hover::before,
+  .checkout__button:hover::before,
+  .drawer__checkout:hover::before,
+  .cart__checkout:hover::before,
+  .btn-sliding-hover:hover::before,
+  .filter-drawer__apply-btn:hover::before,
+  .qv-add-btn:hover::before,
+  .search-empty-btn:hover::before,
+  .btn--soft:hover::before,
+  .filter-drawer__clear-btn:hover::before,
+  .collection-filter-toggle-btn:hover::before,
+  .btn--outline:hover::before,
+  .btn--white:hover::before {
+    opacity: 1 !important;
+  }
+
+  /* Border and subtle shadow on hover (Size and Position strictly unchanged!) */
+  .btn:hover,
+  .btn--primary:hover,
+  .btn--hero:hover,
+  .btn--full:hover,
+  .btn--large:hover,
+  .btn--neutral:hover,
+  .hero__btn:hover,
+  .btn--add-to-cart:hover,
+  .product-add-to-cart-btn:hover,
+  #AddToCartMainBtn:hover,
+  .checkout__button:hover,
+  .drawer__checkout:hover,
+  .cart__checkout:hover,
+  .btn-sliding-hover:hover,
+  .filter-drawer__apply-btn:hover,
+  .qv-add-btn:hover,
+  .search-empty-btn:hover {
+    border-color: var(--btn-regular-hover-border) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    transform: none !important;
+  }
+
+  .btn--soft:hover,
+  .filter-drawer__clear-btn:hover,
+  .collection-filter-toggle-btn:hover {
+    border-color: var(--btn-soft-hover-border) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    transform: none !important;
+  }
+
+  .btn--outline:hover,
+  .btn--white:hover {
+    border-color: var(--btn-outline-hover-border) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    transform: none !important;
+  }
+
+  /* ==========================================================================
+     3. TEXT & CONTENT INSIDE BUTTONS: ALWAYS VISIBLE ON TOP OF FILL (z-index: 3)
+     Smooth 350ms color transition with 100% opacity
+     ========================================================================== */
+
+  .btn > *,
+  .btn span,
+  .btn--primary > *,
+  .btn--primary span,
+  .btn--hero > *,
+  .btn--hero span,
+  .btn--full > *,
+  .btn--full span,
+  .hero__btn > *,
+  .hero__btn span,
+  .btn--add-to-cart > *,
+  .btn--add-to-cart span,
+  .product-add-to-cart-btn > *,
+  .product-add-to-cart-btn span,
+  #AddToCartMainBtn > *,
+  #AddToCartMainBtn span,
+  #AddToCartText,
+  .checkout__button > *,
+  .checkout__button span,
+  .drawer__checkout > *,
+  .drawer__checkout span,
+  .cart__checkout > *,
+  .cart__checkout span,
+  .btn-sliding-hover > *,
+  .btn-sliding-hover span,
+  .filter-drawer__apply-btn > *,
+  .filter-drawer__apply-btn span,
+  .filter-drawer__clear-btn > *,
+  .filter-drawer__clear-btn span,
+  .qv-add-btn > *,
+  .qv-add-btn span,
+  .collection-filter-toggle-btn > *,
+  .collection-filter-toggle-btn span,
+  .search-empty-btn > *,
+  .search-empty-btn span,
+  .btn__text-content {
+    position: relative !important;
+    z-index: 3 !important;
+    pointer-events: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition: color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), fill var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), stroke var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+
+  /* ==========================================================================
+     4. ULTRA-HIGH SPECIFICITY HOVER TEXT COLOR RULES
+     Text smoothly changes to the dynamic hover color (from theme settings / schemes)
+     Never disappears, never black-on-black, never hidden under the fill
+     ========================================================================== */
+
+  .btn:hover,
+  .btn:hover *,
+  .btn:hover span,
+  .btn:hover .btn__text-content,
+  .btn--primary:hover,
+  .btn--primary:hover *,
+  .btn--primary:hover span,
+  .btn--primary:hover .btn__text-content,
+  .btn--hero:hover,
+  .btn--hero:hover *,
+  .btn--hero:hover span,
+  .btn--hero:hover .btn__text-content,
+  .btn--full:hover,
+  .btn--full:hover *,
+  .btn--full:hover span,
+  .btn--full:hover .btn__text-content,
+  .hero__btn:hover,
+  .hero__btn:hover *,
+  .hero__btn:hover span,
+  .hero__btn:hover .btn__text-content,
+  .btn--add-to-cart:hover,
+  .btn--add-to-cart:hover *,
+  .btn--add-to-cart:hover span,
+  .btn--add-to-cart:hover .btn__text-content,
+  .product-add-to-cart-btn:hover,
+  .product-add-to-cart-btn:hover *,
+  .product-add-to-cart-btn:hover span,
+  .product-add-to-cart-btn:hover .btn__text-content,
+  #AddToCartMainBtn:hover,
+  #AddToCartMainBtn:hover *,
+  #AddToCartMainBtn:hover span,
+  #AddToCartMainBtn:hover #AddToCartText,
+  #AddToCartMainBtn:hover .btn__text-content,
+  .checkout__button:hover,
+  .checkout__button:hover *,
+  .checkout__button:hover span,
+  .checkout__button:hover .btn__text-content,
+  .drawer__checkout:hover,
+  .drawer__checkout:hover *,
+  .drawer__checkout:hover span,
+  .cart__checkout:hover,
+  .cart__checkout:hover *,
+  .cart__checkout:hover span,
+  .btn-sliding-hover:hover,
+  .btn-sliding-hover:hover *,
+  .btn-sliding-hover:hover span,
+  .filter-drawer__apply-btn:hover,
+  .filter-drawer__apply-btn:hover *,
+  .filter-drawer__apply-btn:hover span,
+  .filter-drawer__apply-btn:hover .btn__text-content,
+  .qv-add-btn:hover,
+  .qv-add-btn:hover *,
+  .qv-add-btn:hover span,
+  .qv-add-btn:hover .btn__text-content,
+  .search-empty-btn:hover,
+  .search-empty-btn:hover *,
+  .search-empty-btn:hover span,
+  .search-empty-btn:hover .btn__text-content {
+    color: var(--btn-regular-hover-text, #ffffff) !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+    -webkit-text-fill-color: currentcolor !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .btn--soft:hover,
+  .btn--soft:hover *,
+  .btn--soft:hover span,
+  .btn--soft:hover .btn__text-content,
+  .filter-drawer__clear-btn:hover,
+  .filter-drawer__clear-btn:hover *,
+  .filter-drawer__clear-btn:hover span,
+  .filter-drawer__clear-btn:hover .btn__text-content,
+  .collection-filter-toggle-btn:hover,
+  .collection-filter-toggle-btn:hover *,
+  .collection-filter-toggle-btn:hover span,
+  .collection-filter-toggle-btn:hover .btn__text-content {
+    color: var(--btn-soft-hover-text, #ffffff) !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+    -webkit-text-fill-color: currentcolor !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .btn--outline:hover,
+  .btn--outline:hover *,
+  .btn--outline:hover span,
+  .btn--outline:hover .btn__text-content,
+  .btn--white:hover,
+  .btn--white:hover *,
+  .btn--white:hover span,
+  .btn--white:hover .btn__text-content {
+    color: var(--btn-outline-hover-text, #ffffff) !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+    -webkit-text-fill-color: currentcolor !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* ==========================================================================
+     5. REFINED LUXURY QUANTITY SELECTOR
+     ========================================================================== */
+  .quantity__wrapper:not(.product-quantity-selector),
+  [data-quantity-selector]:not(.product-quantity-selector),
+  .cart__items__quantity .quantity__wrapper {
+    position: relative !important;
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 96px !important;
+    min-width: 96px !important;
+    max-width: 96px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+    border: 1px solid rgba(0, 0, 0, 0.18) !important;
+    border-radius: 3px !important;
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 4px 0 0 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+  }
+
+  .quantity__wrapper:not(.product-quantity-selector):hover,
+  [data-quantity-selector]:not(.product-quantity-selector):hover,
+  .cart__items__quantity .quantity__wrapper:hover {
+    border-color: rgba(0, 0, 0, 0.45) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* Minus & Plus Buttons */
+  .quantity__button,
+  .quantity__button--minus,
+  .quantity__button--plus,
+  [data-decrease-quantity],
+  [data-increase-quantity] {
+    position: relative !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    right: auto !important;
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 100% !important;
+    min-height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    background: transparent !important;
+    color: #111111 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    touch-action: manipulation !important;
+    line-height: 1 !important;
+    z-index: 2 !important;
+    overflow: hidden !important;
+    transition: color 0.2s ease !important;
+  }
+
+  .quantity__button::before,
+  .quantity__button--minus::before,
+  .quantity__button--plus::before,
+  [data-decrease-quantity]::before,
+  [data-increase-quantity]::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.08) !important;
+    z-index: -1 !important;
+    opacity: 0 !important;
+    transition: opacity 0.25s ease !important;
+  }
+
+  .quantity__button:hover::before,
+  .quantity__button--minus:hover::before,
+  .quantity__button--plus:hover::before,
+  [data-decrease-quantity]:hover::before,
+  [data-increase-quantity]:hover::before {
+    opacity: 1 !important;
+  }
+
+  .quantity__button:active,
+  [data-decrease-quantity]:active,
+  [data-increase-quantity]:active {
+    transform: scale(0.9) !important;
+  }
+
+  .quantity__button svg,
+  [data-decrease-quantity] svg,
+  [data-increase-quantity] svg {
+    width: 10px !important;
+    height: 10px !important;
+    display: block !important;
+    stroke: currentColor !important;
+    pointer-events: none !important;
+  }
+
+  /* Quantity Number Input Display */
+  .quantity__input,
+  [data-quantity-input],
+  .cart__items__quantity .quantity__input {
+    flex: 1 1 auto !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    height: 100% !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: #111111 !important;
+    font-family: inherit !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    line-height: 32px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    -moz-appearance: textfield !important;
+    pointer-events: none !important;
+  }
+
+  .quantity__input::-webkit-outer-spin-button,
+  .quantity__input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+  }
+
+  /* Trash / Remove Icon Hover Animation */
+  .cart__items__remove a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #888888 !important;
+    transition: color 0.2s ease, transform 0.2s ease !important;
+    padding: 4px !important;
+  }
+  .cart__items__remove a:hover {
+    color: #e53935 !important;
+    transform: scale(1.15) !important;
+  }
+
+  {%- if settings.global_button_style == 'minimal' -%}
+    html :is(.btn, .btn--primary, .btn--hero, .btn--full, .btn--large, .btn--neutral, .hero__btn, .btn--add-to-cart, .product-add-to-cart-btn, #AddToCartMainBtn, .checkout__button, .drawer__checkout, .cart__checkout, .btn-sliding-hover, .filter-drawer__apply-btn, .qv-add-btn, .search-empty-btn, .btn--soft, .filter-drawer__clear-btn, .collection-filter-toggle-btn, .btn--outline, .btn--white)::before {
+      display: none !important;
+    }
+    html :is(.btn, .btn--primary, .btn--hero, .btn--full, .btn--large, .btn--neutral, .hero__btn, .btn--add-to-cart, .product-add-to-cart-btn, #AddToCartMainBtn, .checkout__button, .drawer__checkout, .cart__checkout, .btn-sliding-hover, .filter-drawer__apply-btn, .qv-add-btn, .search-empty-btn, .btn--soft, .filter-drawer__clear-btn, .collection-filter-toggle-btn, .btn--outline, .btn--white):hover,
+    html :is(.btn, .btn--primary, .btn--hero, .btn--full, .btn--large, .btn--neutral, .hero__btn, .btn--add-to-cart, .product-add-to-cart-btn, #AddToCartMainBtn, .checkout__button, .drawer__checkout, .cart__checkout, .btn-sliding-hover, .filter-drawer__apply-btn, .qv-add-btn, .search-empty-btn, .btn--soft, .filter-drawer__clear-btn, .collection-filter-toggle-btn, .btn--outline, .btn--white):hover > *,
+    html :is(.btn, .btn--primary, .btn--hero, .btn--full, .btn--large, .btn--neutral, .hero__btn, .btn--add-to-cart, .product-add-to-cart-btn, #AddToCartMainBtn, .checkout__button, .drawer__checkout, .cart__checkout, .btn-sliding-hover, .filter-drawer__apply-btn, .qv-add-btn, .search-empty-btn, .btn--soft, .filter-drawer__clear-btn, .collection-filter-toggle-btn, .btn--outline, .btn--white):hover span {
+      background-color: transparent !important;
+      color: var(--btn-regular-hover-bg, #2b2622) !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+      text-decoration: underline !important;
+      text-underline-offset: 4px;
+    }
+  {%- endif -%}
+
+  {%- if settings.enable_hover_animations == false -%}
+    html :is(.btn, .btn--primary, .btn--hero, .btn--full, .btn--large, .btn--neutral, .hero__btn, .btn--add-to-cart, .product-add-to-cart-btn, #AddToCartMainBtn, .checkout__button, .drawer__checkout, .cart__checkout, .btn-sliding-hover, .filter-drawer__apply-btn, .qv-add-btn, .search-empty-btn, .btn--soft, .filter-drawer__clear-btn, .collection-filter-toggle-btn, .btn--outline, .btn--white),
+    html :is(.btn, .btn--primary, .btn--hero, .btn--full, .btn--large, .btn--neutral, .hero__btn, .btn--add-to-cart, .product-add-to-cart-btn, #AddToCartMainBtn, .checkout__button, .drawer__checkout, .cart__checkout, .btn-sliding-hover, .filter-drawer__apply-btn, .qv-add-btn, .search-empty-btn, .btn--soft, .filter-drawer__clear-btn, .collection-filter-toggle-btn, .btn--outline, .btn--white) > *,
+    html .lv-header-dropdown .lv-dropdown-btn,
+    html .lv-header-dropdown .lv-dropdown-btn > * {
+      transition: none !important;
+    }
+    html :is(.btn, .btn--primary, .btn--hero, .btn--full, .btn--large, .btn--neutral, .hero__btn, .btn--add-to-cart, .product-add-to-cart-btn, #AddToCartMainBtn, .checkout__button, .drawer__checkout, .cart__checkout, .btn-sliding-hover, .filter-drawer__apply-btn, .qv-add-btn, .search-empty-btn, .btn--soft, .filter-drawer__clear-btn, .collection-filter-toggle-btn, .btn--outline, .btn--white)::before,
+    html .lv-header-dropdown .lv-dropdown-btn::before {
+      transition: none !important;
+    }
+    html :is(.btn, .btn--primary, .btn--hero, .btn--full, .btn--large, .btn--neutral, .hero__btn, .btn--add-to-cart, .product-add-to-cart-btn, #AddToCartMainBtn, .checkout__button, .drawer__checkout, .cart__checkout, .btn-sliding-hover, .filter-drawer__apply-btn, .qv-add-btn, .search-empty-btn, .btn--soft, .filter-drawer__clear-btn, .collection-filter-toggle-btn, .btn--outline, .btn--white):hover,
+    html .lv-header-dropdown .lv-dropdown-btn:hover {
+      box-shadow: none !important;
+    }
+  {%- endif -%}
+
+  html .lv-card-action-bar,
+  html .lv-card-direct-add-btn {
+    background: var(--btn-base-bg) !important;
+    background-color: var(--btn-base-bg) !important;
+    color: var(--btn-base-text) !important;
+    border-color: var(--btn-base-border) !important;
+    border-radius: var(--btn-radius, 0px) !important;
+  }
+
+  html .lv-card-direct-add-btn {
+    border-width: var(--btn-border-thickness, 1px) !important;
+  }
+
+  html .lv-card-direct-add-btn .lv-card-bar-label,
+  html .lv-card-direct-add-btn .lv-card-bar-label span,
+  html .lv-card-direct-add-btn .btn__text-content {
+    color: var(--btn-base-text) !important;
+    transition: color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+
+  html .lv-card-direct-add-btn:hover .lv-card-bar-label,
+  html .lv-card-direct-add-btn:hover .lv-card-bar-label span,
+  html .lv-card-direct-add-btn:hover .btn__text-content,
+  html .lv-card-direct-add-btn:hover span {
+    color: var(--btn-regular-hover-text, #ffffff) !important;
+  }
+
+  html .lv-card-direct-add-btn:hover {
+    border-color: var(--btn-regular-hover-border) !important;
+  }
+
+  {%- if settings.global_button_style == 'minimal' -%}
+    html .lv-card-direct-add-btn::before {
+      display: none !important;
+    }
+    html .lv-card-direct-add-btn:hover,
+    html .lv-card-direct-add-btn:hover .lv-card-bar-label,
+    html .lv-card-direct-add-btn:hover .lv-card-bar-label span,
+    html .lv-card-direct-add-btn:hover .btn__text-content,
+    html .lv-card-direct-add-btn:hover span {
+      background-color: transparent !important;
+      color: var(--btn-regular-hover-bg, #2b2622) !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+      text-decoration: underline !important;
+      text-underline-offset: 4px;
+    }
+  {%- endif -%}
+
+  {%- if settings.enable_hover_animations == false -%}
+    html .lv-card-action-bar,
+    html .lv-card-direct-add-btn,
+    html .lv-card-direct-add-btn > *,
+    html .lv-card-direct-add-btn .lv-card-bar-label,
+    html .lv-card-direct-add-btn .lv-card-bar-label span,
+    html .lv-card-direct-add-btn .btn__text-content,
+    html .lv-card-direct-add-btn::before {
+      transition: none !important;
+    }
+    html .lv-card-direct-add-btn:hover {
+      box-shadow: none !important;
+    }
+  {%- endif -%}
+
+  /* ==========================================================================
+     6. CONTROLS (quantity, option pills, selects, pagination, filter chips)
+     Same border colour / thickness / radius as the universal buttons, and a shared height scale,
+     so every small control matches the Add to cart / checkout buttons.
+     ========================================================================== */
+  :root {
+    --ctl-h: 44px;
+    --ctl-h-lg: 52px;
+  }
+  @media (max-width: 480px) {
+    :root { --ctl-h-lg: 48px; }
+  }
+  html :is(.quantity__wrapper:not(.product-quantity-selector), [data-quantity-selector], .product-quantity-selector, .pv-qty, .qv-qty-selector, .collection-sort-select, .lv-pagination__link, .lv-pagination__arrow, .pv-opt__pill, .pv-opt__select, .qv-pill-btn, .product-size-pill-btn, .product-color-swatch-btn, .active-filter-pill) {
+    border: var(--btn-border-thickness, 1px) solid var(--btn-regular-border) !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    box-sizing: border-box !important;
+  }
+  html :is(.quantity__wrapper:not(.product-quantity-selector), [data-quantity-selector], .product-quantity-selector, .pv-qty, .qv-qty-selector, .collection-sort-select, .lv-pagination__link, .lv-pagination__arrow, .pv-opt__pill, .pv-opt__select, .qv-pill-btn, .product-size-pill-btn, .product-color-swatch-btn, .active-filter-pill):hover {
+    border-color: var(--btn-regular-hover-border) !important;
+    box-shadow: none !important;
+  }
+  html .pv-opt__input:checked + .pv-opt__pill,
+  html .qv-pill-btn.is-selected,
+  html .product-size-pill-btn.is-active,
+  html .product-color-swatch-btn.is-active,
+  html .lv-pagination__current {
+    border: var(--btn-border-thickness, 1px) solid var(--btn-regular-hover-border) !important;
+    border-radius: var(--btn-radius, 0px) !important;
+  }
+  /* Quantity +/- buttons: hover uses the universal button hover colors (same as Add to cart) */
+  html :is(.pv-qty__btn, .quantity__button, .quantity__button--minus, .quantity__button--plus, .qv-qty-btn, .product-qty-btn, [data-decrease-quantity], [data-increase-quantity]) {
+    transition: background-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+  html :is(.pv-qty__btn, .quantity__button, .quantity__button--minus, .quantity__button--plus, .qv-qty-btn, .product-qty-btn, [data-decrease-quantity], [data-increase-quantity]):hover,
+  html :is(.pv-qty__btn, .quantity__button, .quantity__button--minus, .quantity__button--plus, .qv-qty-btn, .product-qty-btn, [data-decrease-quantity], [data-increase-quantity]):focus-visible,
+  html :is(.pv-qty__btn, .quantity__button, .quantity__button--minus, .quantity__button--plus, .qv-qty-btn, .product-qty-btn, [data-decrease-quantity], [data-increase-quantity]):active {
+    background-color: var(--btn-regular-hover-bg) !important;
+    color: var(--btn-regular-hover-text) !important;
+  }
+  html :is(.pv-qty__btn, .quantity__button, .quantity__button--minus, .quantity__button--plus, .qv-qty-btn, .product-qty-btn, [data-decrease-quantity], [data-increase-quantity]):hover svg,
+  html :is(.pv-qty__btn, .quantity__button, .quantity__button--minus, .quantity__button--plus, .qv-qty-btn, .product-qty-btn, [data-decrease-quantity], [data-increase-quantity]):hover svg *,
+  html :is(.pv-qty__btn, .quantity__button, .quantity__button--minus, .quantity__button--plus, .qv-qty-btn, .product-qty-btn, [data-decrease-quantity], [data-increase-quantity]):focus-visible svg,
+  html :is(.pv-qty__btn, .quantity__button, .quantity__button--minus, .quantity__button--plus, .qv-qty-btn, .product-qty-btn, [data-decrease-quantity], [data-increase-quantity]):focus-visible svg * {
+    stroke: var(--btn-regular-hover-text) !important;
+    color: var(--btn-regular-hover-text) !important;
+  }
+
+  /* Heights: small controls share --ctl-h, the quantity box + main action buttons share --ctl-h-lg */
+  html :is(.pv-opt__pill, .pv-opt__select) { min-height: var(--ctl-h) !important; }
+  html :is(.qv-pill-btn, .product-size-pill-btn, .lv-pagination__link, .lv-pagination__arrow, .lv-pagination__current, .lv-pagination__ellipsis) {
+    height: var(--ctl-h) !important;
+    min-height: var(--ctl-h) !important;
+  }
+  html .collection-sort-select { min-height: var(--ctl-h) !important; }
+  html :is(.pv-qty, .product-quantity-selector, .qv-qty-selector) {
+    height: var(--ctl-h-lg) !important;
+    min-height: var(--ctl-h-lg) !important;
+    max-height: var(--ctl-h-lg) !important;
+  }
+  html :is(.pv-atc .btn, .pv-sticky .btn, .product-add-to-cart-btn, .qv-add-btn) {
+    height: var(--ctl-h-lg) !important;
+    min-height: var(--ctl-h-lg) !important;
+    max-height: var(--ctl-h-lg) !important;
+  }
+
+  /* Option / pill buttons (variant, size, filters, pagination...): colours change smoothly at the global hover speed */
+  html body :is(.pv-opt__pill, .pv-opt__badge, .qv-pill-btn, .product-size-pill-btn, .product-color-swatch-btn, .lv-card-size-pill, .pv-qty__btn, .lv-pagination__link, .lv-pagination__arrow, .active-filter-pill, .collection-sort-select, .faq__cat, .pg-side__link) {
+    transition: background-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), border-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), box-shadow var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+</style>
+
+<script>
+  /* Auto-wrap button text nodes in a span so they are never covered by ::before pseudo-elements */
+  (function() {
+    function wrapButtonTextNodes() {
+      var sel = '.btn, .btn--primary, .btn--soft, .btn--outline, .btn--hero, .btn--full, .btn--add-to-cart, .product-add-to-cart-btn, .checkout__button, #AddToCartMainBtn, .filter-drawer__apply-btn, .filter-drawer__clear-btn, .qv-add-btn, .collection-filter-toggle-btn, .search-empty-btn';
+      var buttons = document.querySelectorAll(sel);
+      buttons.forEach(function(btn) {
+        Array.from(btn.childNodes).forEach(function(node) {
+          if (node.nodeType === 3 && node.textContent.trim().length > 0) {
+            var span = document.createElement('span');
+            span.className = 'btn__text-content';
+            node.parentNode.insertBefore(span, node);
+            span.appendChild(node);
+          }
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', wrapButtonTextNodes);
+    } else {
+      wrapButtonTextNodes();
+    }
+
+    if (window.MutationObserver) {
+      var observer = new MutationObserver(function() {
+        wrapButtonTextNodes();
+      });
+      observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+    }
+  })();
+</script>
