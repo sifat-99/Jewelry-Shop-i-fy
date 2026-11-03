@@ -1,0 +1,688 @@
+<!-- /sections/subfooter.liquid -->
+{%- liquid
+  assign current_year = 'now' | date: '%Y'
+  assign default_copyright = '© {year} {shop_name}. All rights reserved.'
+  assign copyright_raw = section.settings.copyright_text
+  if copyright_raw == blank
+    assign copyright_raw = default_copyright
+  endif
+  assign copyright_rendered = copyright_raw | replace: '{year}', current_year | replace: '{shop_name}', shop.name
+
+  if settings.use_brand_logo and shop.brand.logo != blank
+    assign fallback_logo = shop.brand.logo
+  elsif settings.logo != blank
+    assign fallback_logo = settings.logo
+  else
+    assign fallback_logo = shop.brand.logo
+  endif
+
+  assign subfooter_logo = section.settings.logo | default: fallback_logo
+  assign subfooter_logo_w = section.settings.logo_width | default: 90
+-%}
+
+<section class="subfooter color-{{ section.settings.color_scheme | default: 'scheme-2' }}{% if section.settings.show_border_top %} subfooter--border-top{% endif %}"
+  data-section-id="{{ section.id }}"
+  data-section-type="subfooter"
+  style="--PT: {{ section.settings.padding_top | default: 24 }}px; --PB: {{ section.settings.padding_bottom | default: 24 }}px;">
+  
+  <div class="subfooter__wrapper">
+    <div class="subfooter__inner subfooter__inner--align-{{ section.settings.layout_align | default: 'between' }}">
+      
+      <!-- Left Area: Logo & Copyright -->
+      <div class="subfooter__left">
+        {%- if section.settings.show_logo and subfooter_logo != blank -%}
+          <div class="subfooter__logo-wrap">
+            <a href="{{ section.settings.logo_link | default: routes.root_url }}" class="subfooter__logo-link" aria-label="{{ shop.name | escape }}">
+              <img
+                src="{{ subfooter_logo | image_url: width: subfooter_logo_w }}"
+                alt="{{ subfooter_logo.alt | default: shop.name | escape }}"
+                width="{{ subfooter_logo_w }}"
+                height="{{ subfooter_logo_w | divided_by: subfooter_logo.aspect_ratio | default: 2.2 | round }}"
+                loading="lazy"
+                class="subfooter__logo-img"
+                style="max-width: {{ subfooter_logo_w }}px;"
+              >
+            </a>
+          </div>
+        {%- endif -%}
+
+        <div class="subfooter__copyright-group">
+          <p class="subfooter__copyright">
+            {%- if section.settings.copyright_link != blank -%}
+              <a href="{{ section.settings.copyright_link }}">{{ copyright_rendered }}</a>
+            {%- else -%}
+              <span>{{ copyright_rendered }}</span>
+            {%- endif -%}
+
+            {%- if section.settings.show_powered_by -%}
+              <span class="subfooter__powered-by"> | {{ powered_by_link }}</span>
+            {%- endif -%}
+          </p>
+
+          {%- if section.settings.additional_text != blank -%}
+            <div class="subfooter__additional-text">
+              {{ section.settings.additional_text }}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <!-- Right Area: Payment Icons & Trust Badges -->
+      <div class="subfooter__right">
+        
+        <!-- Custom Trust Badges / Extra Logos (if enabled) -->
+        {%- if section.settings.show_trust_badges -%}
+          {%- assign tb_h = section.settings.trust_badges_height | default: 24 -%}
+          <div class="subfooter__trust-badges" style="--badge-h: {{ tb_h }}px;">
+            {%- if section.settings.trust_badge_1 != blank -%}
+              {%- assign tb1_ratio = section.settings.trust_badge_1.aspect_ratio | default: 3.0 -%}
+              {%- assign tb1_w = tb_h | times: tb1_ratio | round -%}
+              {%- if section.settings.trust_badge_1_link != blank -%}<a href="{{ section.settings.trust_badge_1_link }}" class="subfooter__trust-badge-link" target="_blank" rel="noopener">{%- endif -%}
+                <img src="{{ section.settings.trust_badge_1 | image_url: height: 60 }}" alt="{{ section.settings.trust_badge_1.alt | default: 'Trust Badge 1' | escape }}" width="{{ tb1_w }}" height="{{ tb_h }}" class="subfooter__trust-img" loading="lazy">
+              {%- if section.settings.trust_badge_1_link != blank -%}</a>{%- endif -%}
+            {%- endif -%}
+
+            {%- if section.settings.trust_badge_2 != blank -%}
+              {%- assign tb2_ratio = section.settings.trust_badge_2.aspect_ratio | default: 3.0 -%}
+              {%- assign tb2_w = tb_h | times: tb2_ratio | round -%}
+              {%- if section.settings.trust_badge_2_link != blank -%}<a href="{{ section.settings.trust_badge_2_link }}" class="subfooter__trust-badge-link" target="_blank" rel="noopener">{%- endif -%}
+                <img src="{{ section.settings.trust_badge_2 | image_url: height: 60 }}" alt="{{ section.settings.trust_badge_2.alt | default: 'Trust Badge 2' | escape }}" width="{{ tb2_w }}" height="{{ tb_h }}" class="subfooter__trust-img" loading="lazy">
+              {%- if section.settings.trust_badge_2_link != blank -%}</a>{%- endif -%}
+            {%- endif -%}
+
+            {%- if section.settings.trust_badge_3 != blank -%}
+              {%- assign tb3_ratio = section.settings.trust_badge_3.aspect_ratio | default: 3.0 -%}
+              {%- assign tb3_w = tb_h | times: tb3_ratio | round -%}
+              {%- if section.settings.trust_badge_3_link != blank -%}<a href="{{ section.settings.trust_badge_3_link }}" class="subfooter__trust-badge-link" target="_blank" rel="noopener">{%- endif -%}
+                <img src="{{ section.settings.trust_badge_3 | image_url: height: 60 }}" alt="{{ section.settings.trust_badge_3.alt | default: 'Trust Badge 3' | escape }}" width="{{ tb3_w }}" height="{{ tb_h }}" class="subfooter__trust-img" loading="lazy">
+              {%- if section.settings.trust_badge_3_link != blank -%}</a>{%- endif -%}
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        <!-- Payment Icons Section -->
+        {%- if section.settings.show_payment_icons -%}
+          <div class="subfooter__payment-wrapper">
+            
+            {%- if section.settings.payment_icons_mode == 'image' and section.settings.custom_payment_image != blank -%}
+              <!-- Mode: Single Custom Image Banner -->
+              {%- assign cpi_w = section.settings.custom_payment_image_width | default: 240 -%}
+              {%- assign cpi_ratio = section.settings.custom_payment_image.aspect_ratio | default: 4.0 -%}
+              {%- assign cpi_h = cpi_w | divided_by: cpi_ratio | round -%}
+              <img
+                src="{{ section.settings.custom_payment_image | image_url: width: cpi_w }}"
+                alt="{{ section.settings.custom_payment_image.alt | default: 'Supported Payment Methods' | escape }}"
+                width="{{ cpi_w }}"
+                height="{{ cpi_h }}"
+                loading="lazy"
+                class="subfooter__payment-banner-img"
+                style="max-width: {{ cpi_w }}px; height: auto;"
+              >
+            {%- elsif section.settings.payment_icons_mode == 'shopify' -%}
+              <!-- Mode: Automatic from Shopify Enabled Gateways -->
+              <ul class="subfooter__payment-list" role="list">
+                {%- for type in shop.enabled_payment_types -%}
+                  <li class="subfooter__payment-item">
+                    {{ type | payment_type_svg_tag: class: 'footer__icon footer__icon--payment' }}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- else -%}
+              <!-- Mode: Custom Checkbox Selection (Default) -->
+              <ul class="subfooter__payment-list" role="list">
+                
+                {%- if section.settings.payment_visa -%}
+                  <li class="subfooter__payment-item" title="Visa">
+                    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" fill="none" aria-label="Visa"><rect x=".5" y=".5" width="37" height="23" rx="2.5" stroke="#000" stroke-opacity=".07" fill="none"/><path d="M35 0H3C1.3 0 0 1.3 0 3V21C0 22.7 1.4 24 3 24H35C36.7 24 38 22.7 38 21V3C38 1.3 36.6 0 35 0Z" fill="#142FBD"/><path d="M35 1C36.1 1 37 1.9 37 3V21C37 22.1 36.1 23 35 23H3C1.9 23 1 22.1 1 21V3C1 1.9 1.9 1 3 1H35Z" fill="#1532CB"/><path d="M29.5944 10.2167H29.2778C28.8556 11.2722 28.5389 11.8 28.2222 13.3833H30.2278C29.9111 11.8 29.9111 11.0611 29.5944 10.2167V10.2167ZM32.6556 16.4444H30.8611C30.7556 16.4444 30.7556 16.4444 30.65 16.3389L30.4389 15.3889L30.3333 15.1778H27.8C27.6944 15.1778 27.5889 15.1778 27.5889 15.3889L27.2722 16.3389C27.2722 16.4444 27.1667 16.4444 27.1667 16.4444H24.95L25.1611 15.9167L28.2222 8.73889C28.2222 8.21111 28.5389 8 29.0667 8H30.65C30.7556 8 30.8611 8 30.8611 8.21111L32.3389 15.0722C32.4444 15.4944 32.55 15.8111 32.55 16.2333C32.6556 16.3389 32.6556 16.3389 32.6556 16.4444V16.4444ZM18.5111 16.1278L18.9333 14.2278C19.0389 14.2278 19.1444 14.3333 19.1444 14.3333C19.8833 14.65 20.6222 14.8611 21.3611 14.7556C21.5722 14.7556 21.8889 14.65 22.1 14.5444C22.6278 14.3333 22.6278 13.8056 22.2056 13.3833C21.9944 13.1722 21.6778 13.0667 21.3611 12.8556C20.9389 12.6444 20.5167 12.4333 20.2 12.1167C18.9333 11.0611 19.3556 9.58333 20.0944 8.84444C20.7278 8.42222 21.0444 8 21.8889 8C23.1556 8 24.5278 8 25.1611 8.21111H25.2667C25.1611 8.84444 25.0556 9.37222 24.8444 10.0056C24.3167 9.79444 23.7889 9.58333 23.2611 9.58333C22.9444 9.58333 22.6278 9.58333 22.3111 9.68889C22.1 9.68889 21.9944 9.79444 21.8889 9.9C21.6778 10.1111 21.6778 10.4278 21.8889 10.6389L22.4167 11.0611C22.8389 11.2722 23.2611 11.4833 23.5778 11.6944C24.1056 12.0111 24.6333 12.5389 24.7389 13.1722C24.95 14.1222 24.6333 14.9667 23.7889 15.6C23.2611 16.0222 23.05 16.2333 22.3111 16.2333C20.8333 16.2333 19.6722 16.3389 18.7222 16.0222C18.6167 16.2333 18.6167 16.2333 18.5111 16.1278V16.1278ZM14.8167 16.4444C14.9222 15.7056 14.9222 15.7056 15.0278 15.3889C15.5556 13.0667 16.0833 10.6389 16.5056 8.31667C16.6111 8.10556 16.6111 8 16.8222 8H18.7222C18.5111 9.26667 18.3 10.2167 17.9833 11.3778C17.6667 12.9611 17.35 14.5444 16.9278 16.1278C16.9278 16.3389 16.8222 16.3389 16.6111 16.3389L14.8167 16.4444ZM5 8.21111C5 8.10556 5.21111 8 5.31667 8H8.90556C9.43333 8 9.85556 8.31667 9.96111 8.84444L10.9111 13.4889C10.9111 13.5944 10.9111 13.5944 11.0167 13.7C11.0167 13.5944 11.1222 13.5944 11.1222 13.5944L13.3389 8.21111C13.2333 8.10556 13.3389 8 13.4444 8H15.6611C15.6611 8.10556 15.6611 8.10556 15.5556 8.21111L12.2833 15.9167C12.1778 16.1278 12.1778 16.2333 12.0722 16.3389C11.9667 16.4444 11.7556 16.3389 11.5444 16.3389H9.96111C9.85556 16.3389 9.75 16.3389 9.75 16.1278L8.06111 9.58333C7.85 9.37222 7.53333 9.05556 7.11111 8.95C6.47778 8.63333 5.31667 8.42222 5.10556 8.42222L5 8.21111Z" fill="white"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_mastercard -%}
+                  <li class="subfooter__payment-item" title="Mastercard">
+                    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" fill="none" aria-label="Mastercard"><rect x=".5" y=".5" width="37" height="23" rx="2.5" stroke="#000" stroke-opacity=".07" fill="none"/><path d="M35 0H3C1.3 0 0 1.3 0 3V21C0 22.7 1.4 24 3 24H35C36.7 24 38 22.7 38 21V3C38 1.3 36.6 0 35 0Z" fill="#1C1C1C"/><path d="M35 1C36.1 1 37 1.9 37 3V21C37 22.1 36.1 23 35 23H3C1.9 23 1 22.1 1 21V3C1 1.9 1.9 1 3 1H35Z" fill="#232323"/><path d="M14.6364 19.2727C18.8538 19.2727 22.2727 15.8538 22.2727 11.6364C22.2727 7.41892 18.8538 4 14.6364 4C10.4189 4 7 7.41892 7 11.6364C7 15.8538 10.4189 19.2727 14.6364 19.2727Z" fill="#EB001B"/><path d="M23.3637 19.2727C27.5811 19.2727 31 15.8538 31 11.6364C31 7.41892 27.5811 4 23.3637 4C19.1462 4 15.7273 7.41892 15.7273 11.6364C15.7273 15.8538 19.1462 19.2727 23.3637 19.2727Z" fill="#F79E1B"/><path d="M22.2727 11.6362C22.2727 9.01797 20.9637 6.72706 19 5.41797C17.0364 6.83615 15.7273 9.12706 15.7273 11.6362C15.7273 14.1452 17.0364 16.5452 19 17.8543C20.9637 16.5452 22.2727 14.2543 22.2727 11.6362Z" fill="#FF5F00"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_amex -%}
+                  <li class="subfooter__payment-item" title="American Express">
+                    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-label="American Express"><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#007BC1" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z"/><path fill="#FFF" d="M20.2 12l2.3-5.3h3.5v10.6h-2.2v-6.9L21.5 15h-2.5l-2.3-4.6v6.9h-2.2V6.7H18L20.2 12zm8.5-5.3h5.8v2.1h-3.6v2h3.4v2.1h-3.4v2.3h3.7v2.1h-5.9V6.7zm-18.4 0H7.5L4 17.3h2.3l.8-2h3.8l.8 2h2.4L10.3 6.7zm-2.4 6.6l1.2-3.3 1.2 3.3H7.9z"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_apple_pay -%}
+                  <li class="subfooter__payment-item" title="Apple Pay">
+                    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-label="Apple Pay"><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#000" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z"/><path fill="#FFF" d="M12.7 10.6c-.1 1-.9 1.7-1.7 1.8-.1 0-.3 0-.4-.1 0-.1 0-.2.1-.3.3-.9 1.2-1.4 2-1.4m.1.9c-.3.4-.7.6-1.1.6-.4 0-.8-.2-1.1-.2-.4 0-.8.2-1.2.2-.6 0-1.2-.4-1.5-1-.7-1.2-.2-3 .5-4 .4-.5.8-.8 1.4-.8.4 0 .7.2 1 .2.3 0 .6-.2 1.1-.2.5 0 1 .3 1.3.7-.8.5-1 1.6-.7 2.5.3.7.8 1.4 1.3 1.4-.1.3-.4.6-.7.6m-1.2-4.8c.3-.4.5-.9.4-1.4-.5 0-1 .4-1.3.8-.3.3-.5.8-.4 1.3.5 0 1-.3 1.3-.7m5 4.5h-1.6V6.6h2.7c1.3 0 2.2.8 2.2 2.2 0 1.4-.9 2.4-2.3 2.4h-1v2.5zm0-2.3h1.1c.7 0 1.1-.4 1.1-1.1 0-.7-.4-1.1-1.1-1.1h-1.1v2.2zm7.1 2.3v-.8c-.3.5-.8.9-1.5.9-.9 0-1.6-.6-1.6-1.5 0-1 .8-1.5 2.1-1.5v-.1c0-.4-.3-.7-.9-.7-.5 0-.9.2-1.1.4l-.4-.7c.4-.3 1-.5 1.7-.5 1.2 0 1.9.6 1.9 1.8v2.4h-.2zm-1.8-1.4c-.6 0-1 .3-1 .8 0 .5.3.8.9.8.5 0 1-.3 1.1-.7v-.9h-1zm4.9 3.2l.4-.9c.4.3.8.4 1.1.4.5 0 .8-.3.9-.7l.2-.5-2.2-5.4h1.3l1.5 4.1 1.4-4.1h1.3l-2.4 6c-.4 1-1 1.5-1.9 1.5-.6 0-1.1-.2-1.5-.4z"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_google_pay -%}
+                  <li class="subfooter__payment-item" title="Google Pay">
+                    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-label="Google Pay"><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#FFF" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z"/><path fill="#4285F4" d="M16.5 12.2c0-.3 0-.6-.1-.8H12v1.6h2.5c-.1.6-.4 1.1-.9 1.4v1.2h1.5c.8-.8 1.4-2 1.4-3.4z"/><path fill="#34A853" d="M12 16.8c1.3 0 2.4-.4 3.2-1.2l-1.5-1.2c-.4.3-1 .5-1.7.5-1.3 0-2.4-.9-2.8-2.1H7.7v1.2c.8 1.7 2.5 2.8 4.3 2.8z"/><path fill="#FBBC04" d="M9.2 12.8c-.1-.3-.2-.7-.2-1.1 0-.4.1-.7.2-1.1V9.4H7.7C7.4 10.1 7.2 10.9 7.2 11.7s.2 1.6.5 2.3l1.5-1.2z"/><path fill="#EA4335" d="M12 8.6c.7 0 1.4.2 1.9.7l1.4-1.4C14.4 7.1 13.3 6.6 12 6.6c-1.8 0-3.5 1.1-4.3 2.8l1.5 1.2c.4-1.2 1.5-2 2.8-2z"/><path fill="#5F6368" d="M21.5 10.5v4.5h-1v-6.3h2.6c.9 0 1.6.3 2.1.8.5.5.8 1.2.8 2s-.3 1.5-.8 2c-.5.5-1.2.8-2.1.8h-1.6zm0-3.6v2.7h1.6c.6 0 1.1-.2 1.4-.5.4-.4.5-.8.5-1.3s-.2-.9-.5-1.3c-.3-.4-.8-.5-1.4-.5h-1.6zm7.2 6.4c-.6 0-1.1-.2-1.5-.6-.4-.4-.6-.9-.6-1.6 0-.7.2-1.2.6-1.6.4-.4.9-.6 1.5-.6.6 0 1.1.2 1.5.6.4.4.6.9.6 1.6 0 .7-.2 1.2-.6 1.6-.4.4-.9.6-1.5.6zm0-.8c.4 0 .7-.1.9-.4.2-.3.4-.7.4-1.2s-.1-.9-.4-1.2c-.2-.3-.5-.4-.9-.4-.4 0-.7.1-.9.4-.2.3-.4.7-.4 1.2s.1.9.4 1.2c.2.3.5.4.9.4zm5.5.8c-.3 0-.6-.1-.8-.2-.2-.1-.4-.3-.5-.5l-.1.6h-.9v-8.1h1v2.5c.2-.2.4-.4.6-.5.2-.1.5-.2.8-.2.7 0 1.2.3 1.6.8.4.5.6 1.2.6 2s-.2 1.5-.6 2c-.4.5-.9.8-1.7.8zm0-.8c.4 0 .7-.1.9-.4.2-.3.4-.7.4-1.2s-.1-.9-.4-1.2c-.2-.3-.5-.4-.9-.4-.4 0-.7.1-.9.4-.2.3-.4.7-.4 1.2s.1.9.4 1.2c.2.3.5.4.9.4z"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_paypal -%}
+                  <li class="subfooter__payment-item" title="PayPal">
+                    <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" width="38" height="24" role="img" aria-label="PayPal"><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"/><path fill="#003087" d="M23.9 8.3c.2-1 0-1.7-.6-2.3-.6-.7-1.7-1-3.1-1h-4.1c-.3 0-.5.2-.6.5L14 15.6c0 .2.1.4.3.4H17l.4-3.4 1.8-2.2 4.7-2.1z"/><path fill="#3086C8" d="M23.9 8.3l-.2.2c-.5 2.8-2.2 3.8-4.6 3.8H18c-.3 0-.5.2-.6.5l-.6 3.9-.2 1c0 .2.1.4.3.4H19c.3 0 .5-.2.5-.4v-.1l.4-2.4v-.1c0-.2.3-.4.5-.4h.3c2.1 0 3.7-.8 4.1-3.2.2-1 .1-1.8-.4-2.4-.1-.5-.3-.7-.5-.8z"/><path fill="#012169" d="M23.3 8.1c-.1-.1-.2-.1-.3-.1-.1 0-.2 0-.3-.1-.3-.1-.7-.1-1.1-.1h-3c-.1 0-.2 0-.2.1-.2.1-.3.2-.3.4l-.7 4.4v.1c0-.3.3-.5.6-.5h1.3c2.5 0 4.1-1 4.6-3.8v-.2c-.1-.1-.3-.2-.5-.2h-.1z"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_shop_pay -%}
+                  <li class="subfooter__payment-item" title="Shop Pay">
+                    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-label="Shop Pay"><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#000"/><path d="M35.889 0C37.05 0 38 .982 38 2.182v19.636c0 1.2-.95 2.182-2.111 2.182H2.11C.95 24 0 23.018 0 21.818V2.182C0 .982.95 0 2.111 0H35.89z" fill="#5A31F4"/><path d="M9.35 11.368c-1.017-.223-1.47-.31-1.47-.705 0-.372.306-.558.92-.558.54 0 .934.238 1.225.704a.079.079 0 00.104.03l1.146-.584a.082.082 0 00.032-.114c-.475-.831-1.353-1.286-2.51-1.286-1.52 0-2.464.755-2.464 1.956 0 1.275 1.15 1.597 2.17 1.82 1.02.222 1.474.31 1.474.705 0 .396-.332.582-.993.582-.612 0-1.065-.282-1.34-.83a.08.08 0 00-.107-.035l-1.143.57a.083.083 0 00-.036.111c.454.92 1.384 1.437 2.627 1.437 1.583 0 2.539-.742 2.539-1.98s-1.155-1.598-2.173-1.82v-.003zM15.49 8.855c-.65 0-1.224.232-1.636.646a.04.04 0 01-.069-.03v-2.64a.08.08 0 00-.08-.081H12.27a.08.08 0 00-.08.082v8.194a.08.08 0 00.08.082h1.433a.08.08 0 00.081-.082v-3.594c0-.695.528-1.227 1.239-1.227.71 0 1.226.521 1.226 1.227v3.594a.08.08 0 00.081.082h1.433a.08.08 0 00.081-.082v-3.594c0-1.51-.981-2.577-2.355-2.577zM20.753 8.62c-.778 0-1.507.24-2.03.588a.082.082 0 00-.027.109l.632 1.088a.08.08 0 00.11.03 2.5 2.5 0 011.318-.366c1.25 0 2.17.891 2.17 2.068 0 1.003-.736 1.745-1.669 1.745-.76 0-1.288-.446-1.288-1.077 0-.361.152-.657.548-.866a.08.08 0 00.032-.113l-.596-1.018a.08.08 0 00-.098-.035c-.799.299-1.359 1.018-1.359 1.984 0 1.46 1.152 2.55 2.76 2.55 1.877 0 3.227-1.313 3.227-3.195 0-2.018-1.57-3.492-3.73-3.492zM28.675 8.843c-.724 0-1.373.27-1.845.746-.026.027-.069.007-.069-.029v-.572a.08.08 0 00-.08-.082h-1.397a.08.08 0 00-.08.082v8.182a.08.08 0 00.08.081h1.433a.08.08 0 00.081-.081v-2.683c0-.036.043-.054.069-.03a2.6 2.6 0 001.808.7c1.682 0 2.993-1.373 2.993-3.157s-1.313-3.157-2.993-3.157zm-.271 4.929c-.956 0-1.681-.768-1.681-1.783s.723-1.783 1.681-1.783c.958 0 1.68.755 1.68 1.783 0 1.027-.713 1.783-1.681 1.783h.001z" fill="#fff"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_maestro -%}
+                  <li class="subfooter__payment-item" title="Maestro">
+                    <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" width="38" height="24" role="img" aria-label="Maestro"><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"/><circle fill="#EB001B" cx="15" cy="12" r="7"/><circle fill="#00A2E5" cx="23" cy="12" r="7"/><path fill="#7375CF" d="M22 12c0-2.4-1.2-4.5-3-5.7-1.8 1.3-3 3.4-3 5.7s1.2 4.5 3 5.7c1.8-1.2 3-3.3 3-5.7z"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_ideal -%}
+                  <li class="subfooter__payment-item" title="iDEAL">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 24" width="38" height="24" role="img" aria-label="iDEAL"><path opacity="0.07" d="M35 0H3C1.3 0 0 1.3 0 3V21C0 22.7 1.4 24 3 24H35C36.7 24 38 22.7 38 21V3C38 1.3 36.6 0 35 0Z" fill="black"/><path d="M35 1C36.1 1 37 1.9 37 3V21C37 22.1 36.1 23 35 23H3C1.9 23 1 22.1 1 21V3C1 1.9 1.9 1 3 1H35Z" fill="#FFF48D"/><path d="M3.45001 7.43572V17.0022C3.45001 17.4602 3.82664 17.8347 4.28673 17.8347H10.0301C14.3722 17.8347 16.2539 15.4157 16.2539 12.2063C16.2539 8.99693 14.3715 6.60321 10.0294 6.60321H4.28603C3.82594 6.60321 3.44931 6.97773 3.44931 7.43572H3.45001Z" fill="white"/><path d="M7.29413 8.95133V16.0203H10.385C13.1918 16.0203 14.4087 14.4422 14.4087 12.2112C14.4087 9.98022 13.1911 8.41901 10.385 8.41901H7.82926C7.53259 8.41901 7.29413 8.66027 7.29413 8.95204V8.95133Z" fill="#CC0066"/><path fill-rule="evenodd" clip-rule="evenodd" d="M5.03507 17.073H10.0294C13.539 17.073 15.4754 15.3456 15.4754 12.2105C15.4754 10.4038 14.7685 7.36908 10.0294 7.36908H5.03507C4.59182 7.36908 4.23203 7.72677 4.23203 8.16862V16.2742C4.23203 16.7153 4.59182 17.0737 5.03507 17.0737V17.073ZM4.49924 8.16862C4.49924 7.87335 4.7377 7.63559 5.03437 7.63559H10.0287C11.9609 7.63559 15.2068 8.23104 15.2068 12.2105C15.2068 15.1744 13.3665 16.8065 10.0287 16.8065H5.03507C4.7384 16.8065 4.49994 16.5694 4.49994 16.2735V8.16862H4.49924Z" fill="#232323"/><path d="M10.7504 11.1333V11.4489H9.87441V11.815H10.6803V12.1053H9.87441V12.5219H10.7707V12.8376H9.51041V11.1305H10.7504V11.1347V11.1333Z" fill="white"/><path d="M13.2178 11.1325V12.5247H14.0278V12.8403H12.8538V11.1332H13.2178V11.1325Z" fill="white"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_bancontact -%}
+                  <li class="subfooter__payment-item" title="Bancontact">
+                    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-label="Bancontact"><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"/><path d="M11.394 13.946c3.803 0 5.705-2.14 7.606-4.28H6.38v4.28h5.014Z" fill="#005AB9"/><path d="M26.607 5.385c-3.804 0-5.705 2.14-7.607 4.28h12.62v-4.28h-5.013Z" fill="#FBA900"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_blik -%}
+                  <li class="subfooter__payment-item" title="Blik">
+                    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-label="Blik"><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#222" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z"/><path d="M30.343 17.155l-2.785-3.639 2.563-3.236h-2.185l-2.456 3.138V6.78h-1.848v10.375h1.848v-3.532l2.456 3.532h2.407zM18.613 6.78h-1.848v10.366h1.848V6.78zm3.433 3.508h-1.848v6.867h1.848v-6.867z" fill="#fff"/><circle cx="13.8" cy="8" r="1.6" fill="#E83E49"/><path d="M12 10.2c-.6 0-1.1.1-1.6.4V6.8H8.5v6.9a3.5 3.5 0 103.5-3.5zm0 5.2a1.6 1.6 0 110-3.3 1.6 1.6 0 010 3.3z" fill="#fff"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_mobilepay -%}
+                  <li class="subfooter__payment-item" title="MobilePay">
+                    <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" width="38" height="24" role="img" aria-label="MobilePay"><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"/><path d="M20.05 15.296s2.53-.771 4.282-.776c2.896-.007 4.857 1.15 4.857 1.15V10.06s-1.97-1.02-4.453-1.09c-2.481-.068-4.687 1.012-4.687 1.012v5.313z" fill="#5A78FF"/><path d="M17.308 9.19l2.082 4.957V9.396s1.646-.882 3.485-1.13c1.84-.249 4.181.08 4.181.08l-1.133-2.707s-2.461-.159-4.69.794c-2.228.952-3.925 2.756-3.925 2.756z" fill="#5A78FF"/><path d="M21.428 5.676l-.82-1.99a1.818 1.818 0 00-2.37-.996l-5.663 2.334a1.818 1.818 0 00-.98 2.376l5.46 13.247a1.818 1.818 0 002.37.995l5.662-2.334a1.817 1.817 0 00.98-2.376l-.677-1.642s-.462-.027-.676-.033c-.226-.006-.644-.001-.644-.001l.88 2.136a.606.606 0 01-.326.793l-5.663 2.333a.606.606 0 01-.79-.331L12.711 6.94a.606.606 0 01.327-.792L18.7 3.814a.606.606 0 01.79.332l.83 2.011s.383-.187.59-.27c.206-.082.518-.211.518-.211z" fill="#5A78FF"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_klarna -%}
+                  <li class="subfooter__payment-item" title="Klarna">
+                    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-label="Klarna"><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#FFB3C7" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z"/><path d="M8.5 7.5v9h2.2v-9H8.5zm8.8 9h2.3l-3.3-4.3 3.1-4.7H17l-2.4 3.8v-3.8h-2.2v9h2.2v-2.7l.7-1 2 2.7zm4.2 0h2.2v-1.7h-2.2v1.7z" fill="#0A0A0A"/></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_cod -%}
+                  <li class="subfooter__payment-item" title="Cash on Delivery">
+                    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-label="Cash on Delivery"><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#1A7F37" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z"/><text x="19" y="15" fill="#fff" font-family="'Quicksand',sans-serif" font-weight="700" font-size="9" text-anchor="middle" letter-spacing="1">COD</text></svg>
+                  </li>
+                {%- endif -%}
+
+                {%- if section.settings.payment_bkash -%}
+                  <li class="subfooter__payment-item" title="bKash">
+                    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-label="bKash"><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#E2136E" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z"/><path fill="#fff" d="M22 6.5l-5.3 4.8 5.7 3.3-2.1 2.9-8.8-5 11.2-8.2.7.3.6 1.9zm-4.7 8.7l-4.5-2.6 1.5-2.2 4.4 2.5-1.4 2.3z"/></svg>
+                  </li>
+                {%- endif -%}
+
+              </ul>
+            {%- endif -%}
+
+          </div>
+        {%- endif -%}
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .subfooter {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    padding-top: var(--PT, 24px);
+    padding-bottom: var(--PB, 24px);
+  }
+  .subfooter--border-top {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  /* Same horizontal alignment as the header and footer (.wrapper--full) */
+  .subfooter__wrapper {
+    max-width: none;
+    width: 100%;
+    margin: 0 auto;
+    padding-left: var(--outer);
+    padding-right: var(--outer);
+    box-sizing: border-box;
+  }
+  .subfooter__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .subfooter__inner--align-center {
+    justify-content: center !important;
+    text-align: center;
+    flex-direction: column;
+  }
+  .subfooter__inner--align-center .subfooter__left,
+  .subfooter__inner--align-center .subfooter__right {
+    justify-content: center !important;
+    text-align: center;
+  }
+  .subfooter__inner--align-reverse {
+    flex-direction: row-reverse !important;
+  }
+  .subfooter__left {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .subfooter__logo-wrap {
+    display: inline-flex;
+    align-items: center;
+  }
+  .subfooter__logo-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+  .subfooter__logo-img {
+    display: block;
+    height: auto;
+    object-fit: contain;
+  }
+  .subfooter__copyright-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .subfooter__copyright {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 0.03em;
+    opacity: 0.85;
+    font-family: inherit;
+  }
+  .subfooter__copyright a {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .subfooter__copyright a:hover {
+    text-decoration: underline;
+    opacity: 1;
+  }
+  .subfooter__powered-by {
+    font-size: 11px;
+    opacity: 0.7;
+  }
+  .subfooter__powered-by a {
+    color: inherit;
+  }
+  .subfooter__additional-text {
+    font-size: 11px;
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+  .subfooter__right {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .subfooter__trust-badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .subfooter__trust-img {
+    display: block;
+    height: var(--badge-h, 24px);
+    width: auto;
+    object-fit: contain;
+  }
+  .subfooter__payment-wrapper {
+    display: inline-flex;
+    align-items: center;
+  }
+  .subfooter__payment-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .subfooter__payment-item {
+    display: inline-flex;
+    align-items: center;
+    line-height: 0;
+    transition: transform 0.15s ease;
+  }
+  .subfooter__payment-item:hover {
+    transform: translateY(-1px);
+  }
+  .subfooter__payment-item svg {
+    width: 38px;
+    height: 24px;
+    border-radius: 3px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    display: block;
+  }
+  .subfooter__payment-banner-img {
+    display: block;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    .subfooter__inner {
+      flex-direction: column !important;
+      justify-content: center !important;
+      text-align: center !important;
+      gap: 16px;
+    }
+    .subfooter__left {
+      flex-direction: column;
+      justify-content: center !important;
+      text-align: center !important;
+      gap: 10px;
+      width: 100%;
+    }
+    .subfooter__right {
+      justify-content: center !important;
+      width: 100%;
+    }
+    .subfooter__payment-list {
+      justify-content: center !important;
+    }
+    .subfooter__trust-badges {
+      justify-content: center !important;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Subfooter",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "select",
+      "id": "layout_align",
+      "label": "Layout Alignment",
+      "options": [
+        { "value": "between", "label": "Space between (Left & Right)" },
+        { "value": "center", "label": "Centered" },
+        { "value": "reverse", "label": "Reversed (Right to Left)" }
+      ],
+      "default": "between"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border_top",
+      "label": "Show subtle top border",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top (px)",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom (px)",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Subfooter Brand Logo"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_logo",
+      "label": "Show logo in subfooter",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Custom subfooter logo",
+      "info": "Leave blank to use primary store logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width (px)",
+      "min": 40,
+      "max": 200,
+      "step": 5,
+      "default": 90
+    },
+    {
+      "type": "url",
+      "id": "logo_link",
+      "label": "Logo link"
+    },
+    {
+      "type": "header",
+      "content": "Copyright & Legal Text"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "default": "© {year} {shop_name}. All rights reserved.",
+      "info": "Use {year} for current dynamic year, and {shop_name} for store name"
+    },
+    {
+      "type": "url",
+      "id": "copyright_link",
+      "label": "Copyright link (Optional)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_powered_by",
+      "label": "Show 'Powered by Shopify'",
+      "default": false
+    },
+    {
+      "type": "richtext",
+      "id": "additional_text",
+      "label": "Additional legal text or links (Optional)"
+    },
+    {
+      "type": "header",
+      "content": "Payment Method Icons & Logos"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment methods",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "payment_icons_mode",
+      "label": "Payment icons source",
+      "options": [
+        { "value": "custom", "label": "Custom selection (Checkboxes below)" },
+        { "value": "shopify", "label": "Automatic (Shopify active gateways)" },
+        { "value": "image", "label": "Single custom image banner" }
+      ],
+      "default": "custom"
+    },
+    {
+      "type": "image_picker",
+      "id": "custom_payment_image",
+      "label": "Payment methods banner image (When image source selected)"
+    },
+    {
+      "type": "range",
+      "id": "custom_payment_image_width",
+      "label": "Payment banner width (px)",
+      "min": 100,
+      "max": 400,
+      "step": 10,
+      "default": 240
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_visa",
+      "label": "Visa",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_mastercard",
+      "label": "Mastercard",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_amex",
+      "label": "American Express (Amex)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_apple_pay",
+      "label": "Apple Pay",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_google_pay",
+      "label": "Google Pay",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_paypal",
+      "label": "PayPal",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_shop_pay",
+      "label": "Shop Pay",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_maestro",
+      "label": "Maestro",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_ideal",
+      "label": "iDEAL",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_bancontact",
+      "label": "Bancontact",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_blik",
+      "label": "Blik",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_mobilepay",
+      "label": "MobilePay",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_klarna",
+      "label": "Klarna",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_cod",
+      "label": "Cash on Delivery (COD)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_bkash",
+      "label": "bKash",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Trust Badges & Security Seals"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show trust badges",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "trust_badge_1",
+      "label": "Trust badge 1"
+    },
+    {
+      "type": "url",
+      "id": "trust_badge_1_link",
+      "label": "Trust badge 1 link (Optional)"
+    },
+    {
+      "type": "image_picker",
+      "id": "trust_badge_2",
+      "label": "Trust badge 2"
+    },
+    {
+      "type": "url",
+      "id": "trust_badge_2_link",
+      "label": "Trust badge 2 link (Optional)"
+    },
+    {
+      "type": "image_picker",
+      "id": "trust_badge_3",
+      "label": "Trust badge 3"
+    },
+    {
+      "type": "url",
+      "id": "trust_badge_3_link",
+      "label": "Trust badge 3 link (Optional)"
+    },
+    {
+      "type": "range",
+      "id": "trust_badges_height",
+      "label": "Trust badges height (px)",
+      "min": 16,
+      "max": 50,
+      "step": 2,
+      "default": 24
+    }
+  ]
+}
+{% endschema %}
