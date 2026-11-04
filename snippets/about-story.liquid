@@ -1,0 +1,106 @@
+{%- comment -%}
+  About us landing layout. Accepts: blocks ('stat' and 'value' types), cfg (section.settings), page_title, page_content
+{%- endcomment -%}
+{%- liquid
+  assign shop_link = cfg.about_button_link
+  if shop_link == blank
+    assign shop_link = routes.all_products_collection_url
+  endif
+  assign cta_link = cfg.about_cta_link
+  if cta_link == blank
+    assign cta_link = routes.root_url | append: 'pages/contact'
+  endif
+  assign has_stats = false
+  assign has_values = false
+  for block in blocks
+    if block.type == 'stat'
+      assign has_stats = true
+    elsif block.type == 'value'
+      assign has_values = true
+    endif
+  endfor
+-%}
+{% render 'landing-css' %}
+
+<section class="sl-hero">
+  <div class="sl-hero__copy">
+    <p class="sl-hero__eyebrow">{{ cfg.about_eyebrow | default: 'Our story' }}</p>
+    <h1 class="sl-hero__title">{{ cfg.about_heading | default: page_title }}</h1>
+    <p class="sl-hero__lead">{{ cfg.about_lead | default: 'Fine jewelry made to be worn every day: waterproof, hypoallergenic and designed to last. Simple pieces with a personal touch.' }}</p>
+    <div class="sl-hero__btns">
+      <a href="{{ shop_link }}" class="btn btn--primary btn-sliding-hover sl-btn"><span class="btn__text-content">{{ cfg.about_button_label | default: 'Shop the collection' }}</span></a>
+      <a href="{{ routes.root_url }}pages/contact" class="btn btn-sliding-hover sl-btn"><span class="btn__text-content">Contact us</span></a>
+    </div>
+  </div>
+  <div class="sl-hero__media">
+    {%- if cfg.about_image != blank -%}
+      <img src="{{ cfg.about_image | image_url: width: 1200 }}" srcset="{{ cfg.about_image | image_url: width: 600 }} 600w, {{ cfg.about_image | image_url: width: 900 }} 900w, {{ cfg.about_image | image_url: width: 1200 }} 1200w" sizes="(min-width: 901px) 46vw, 100vw" alt="{{ cfg.about_image.alt | default: page_title | escape }}" width="{{ cfg.about_image.width }}" height="{{ cfg.about_image.height }}" loading="eager">
+    {%- else -%}
+      <div class="sl-hero__ph" aria-hidden="true">
+        <svg viewBox="0 0 100 100" fill="none" stroke="#8d6e63" stroke-width="1.6" stroke-linejoin="round"><polygon points="50,8 92,50 50,92 8,50"/><polygon points="50,24 76,50 50,76 24,50"/><rect x="40" y="40" width="20" height="20" fill="#8d6e63" stroke="none"/></svg>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{%- if has_stats -%}
+  <section class="ab-stats">
+    {%- for block in blocks -%}
+      {%- if block.type == 'stat' -%}
+        <div class="ab-stat" {{ block.shopify_attributes }}>
+          <p class="ab-stat__num">{{ block.settings.number }}</p>
+          <p class="ab-stat__label">{{ block.settings.label }}</p>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </section>
+{%- endif -%}
+
+{%- if cfg.about_story != blank or page_content != blank -%}
+  <section class="ab-story{% if cfg.about_image_2 == blank %} ab-story--single{% endif %}">
+    {%- if cfg.about_image_2 != blank -%}
+      <div class="ab-story__media"><img src="{{ cfg.about_image_2 | image_url: width: 1000 }}" alt="{{ cfg.about_image_2.alt | default: page_title | escape }}" width="{{ cfg.about_image_2.width }}" height="{{ cfg.about_image_2.height }}" loading="lazy"></div>
+    {%- endif -%}
+    <div>
+      <p class="sl-sec__eyebrow">{{ cfg.about_story_eyebrow | default: 'Why Aurelle' }}</p>
+      <h2 class="ab-story__title">{{ cfg.about_story_title | default: 'Jewelry that moves with your life' }}</h2>
+      <div class="rte ab-story__body">{{ cfg.about_story }}{{ page_content }}</div>
+    </div>
+  </section>
+{%- endif -%}
+
+{%- if has_values -%}
+  <section class="sl-sec">
+    <div class="sl-sec__head">
+      <p class="sl-sec__eyebrow">What we believe</p>
+      <h2 class="sl-sec__title">{{ cfg.about_values_title | default: 'Our values' }}</h2>
+    </div>
+    <div class="sl-features">
+      {%- for block in blocks -%}
+        {%- if block.type == 'value' -%}
+          <div class="sl-feature" {{ block.shopify_attributes }}>
+            <span class="sl-feature__icon">
+              {%- case block.settings.icon -%}
+                {%- when 'drop' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.2 6 10.5A6 6 0 0 1 6 13.5C6 9.2 12 3 12 3Z"/></svg>
+                {%- when 'clock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                {%- when 'shield' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+                {%- when 'heart' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1Z"/></svg>
+                {%- else -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7L12 3Z"/></svg>
+              {%- endcase -%}
+            </span>
+            <h3 class="sl-feature__title">{{ block.settings.title }}</h3>
+            <p class="sl-feature__text">{{ block.settings.text }}</p>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </section>
+{%- endif -%}
+
+<section class="sl-cta">
+  <div>
+    <h2 class="sl-cta__title">{{ cfg.about_cta_title | default: 'Find your piece' }}</h2>
+    <p class="sl-cta__text">{{ cfg.about_cta_text | default: 'Explore our collection, or write to us if you need help choosing the perfect gift.' }}</p>
+  </div>
+  <a href="{{ cta_link }}" class="sl-cta__btn">{{ cfg.about_cta_label | default: 'Get in touch' }}</a>
+</section>
