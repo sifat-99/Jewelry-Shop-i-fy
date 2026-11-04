@@ -1,0 +1,711 @@
+<!-- /sections/main-page.liquid  (standard pages + a designed Contact layout) -->
+{%- liquid
+  assign is_contact = false
+  if page.handle contains 'contact' or template.suffix == 'contact'
+    assign is_contact = true
+  endif
+  assign c_email = section.settings.contact_email | default: shop.email
+  assign side_menu = section.settings.side_menu
+  assign has_side = false
+  if is_contact == false and side_menu != blank and side_menu.links.size > 0
+    assign has_side = true
+  endif
+  assign is_faq_page = false
+  if page.handle contains 'faq' or template.suffix == 'faq'
+    assign is_faq_page = true
+  endif
+  assign is_perm = false
+  if page.handle contains 'permanent' or template.suffix == 'permanent'
+    assign is_perm = true
+  endif
+  assign is_about = false
+  if page.handle contains 'about' or template.suffix == 'about'
+    assign is_about = true
+  endif
+  assign faq_blocks = false
+  if is_faq_page and section.blocks.size > 0
+    assign faq_blocks = true
+  endif
+  assign is_faq = false
+  if is_faq_page and faq_blocks == false and section.settings.faq_accordion
+    assign is_faq = true
+  endif
+-%}
+
+<style>
+  .pg-page { padding: var(--pp-t, 40px) 0 var(--pp-b, 70px); font-family: 'Quicksand', -apple-system, sans-serif; --pp-line: rgba(var(--color-foreground, 17, 17, 17), 0.12); --pp-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62); --pp-soft: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)); }
+  /* Same horizontal alignment as the header / footer (.wrapper--full) */
+  .pg-page__inner { width: 100%; max-width: none; margin: 0 auto; padding-left: var(--outer, 24px); padding-right: var(--outer, 24px); box-sizing: border-box; }
+  .pg-page .lv-crumbs { justify-content: center; }
+  .pg-page__head { text-align: center; margin: 0 auto 44px; max-width: 680px; }
+  .pg-page__eyebrow { margin: 0 0 10px; font-size: 11px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--pp-muted); }
+  .pg-page__title { margin: 0 0 12px; font-size: clamp(28px, 4vw, 42px); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; line-height: 1.15; }
+  .pg-page__lead { margin: 0; font-size: 15px; line-height: 1.7; color: var(--pp-muted); }
+  .pg-page__body { font-size: 15px; line-height: 1.85; }
+  .pg-page__body > :first-child { margin-top: 0; }
+  .pg-page__body h2 { margin: 2.2em 0 .7em; font-size: 20px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; line-height: 1.3; }
+  .pg-page__body h3 { margin: 1.8em 0 .5em; font-size: 15px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .pg-page__body h4 { margin: 1.5em 0 .4em; font-size: 14px; font-weight: 700; }
+  .pg-page__body p { margin: 0 0 1.1em; }
+  .pg-page__body a { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .pg-page__body a:hover { text-decoration-thickness: 2px; }
+  .pg-page__body ul, .pg-page__body ol { margin: 0 0 1.3em; padding-left: 1.3em; }
+  .pg-page__body li { margin: 0 0 .5em; }
+  .pg-page__body li::marker { color: var(--pp-muted); }
+  .pg-page__body blockquote { margin: 1.6em 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--text, #111); font-size: 17px; font-style: italic; color: var(--pp-muted); }
+  .pg-page__body hr { margin: 2.2em 0; border: 0; border-top: 1px solid var(--pp-line); }
+  .pg-page__body img, .pg-page__body iframe, .pg-page__body video { max-width: 100%; height: auto; border-radius: var(--ct-radius, 4px); }
+  .pg-page__body table { width: 100%; margin: 1.6em 0; border-collapse: collapse; font-size: 14px; }
+  .pg-page__body th { padding: 12px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; background: var(--pp-soft); border-bottom: 1px solid var(--text, #111); }
+  .pg-page__body td { padding: 12px 14px; border-bottom: 1px solid var(--pp-line); }
+  .pg-page__body details { margin: 0; border-bottom: 1px solid var(--pp-line); }
+  .pg-page__body details:first-of-type { border-top: 1px solid var(--pp-line); }
+  .pg-page__body summary { position: relative; padding: 18px 40px 18px 0; cursor: pointer; list-style: none; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .pg-page__body summary::-webkit-details-marker { display: none; }
+  .pg-page__body summary::after { content: ""; position: absolute; right: 6px; top: 50%; width: 8px; height: 8px; margin-top: -6px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); transition: transform .25s ease; }
+  .pg-page__body details[open] > summary::after { transform: rotate(-135deg); margin-top: -2px; }
+  .pg-page__body details > :not(summary) { animation: pg-fade .35s ease; }
+  .pg-page__body details > div, .pg-page__body details > p { padding-bottom: 6px; }
+  @keyframes pg-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+  /* Service pages: side menu + content */
+  .pg-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 56px; align-items: start; }
+  @media (max-width: 900px) { .pg-layout { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
+  .pg-side { position: sticky; top: 24px; padding: 22px 22px 14px; background: var(--pp-soft); border: 1px solid var(--pp-line); border-radius: var(--ct-radius, 4px); }
+  @media (max-width: 900px) { .pg-side { position: static; } }
+  .pg-side__title { margin: 0 0 12px; font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+  .pg-side__list { margin: 0; padding: 0; list-style: none; }
+  .pg-side__link { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 0; font-size: 14px; color: var(--pp-muted); text-decoration: none; border-top: 1px solid var(--pp-line); transition: color .2s ease, padding-left .25s ease; }
+  .pg-side__list li:first-child .pg-side__link { border-top: 0; }
+  .pg-side__link:hover { color: var(--text, #111); padding-left: 4px; }
+  .pg-side__link[aria-current="page"] { color: var(--text, #111); font-weight: 700; }
+  .pg-side__link[aria-current="page"]::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--text, #111); flex: none; }
+  .pg-article { min-width: 0; padding: 36px 40px; background: var(--bg, #fff); border: 1px solid var(--pp-line); border-radius: var(--ct-radius, 4px); }
+  @media (max-width: 640px) { .pg-article { padding: 24px 18px; } }
+
+  /* Contact layout */
+  .ct { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 36px; align-items: start; }
+  @media (max-width: 900px) { .ct { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
+  .ct__info { display: grid; gap: 14px; }
+  .ct-card { display: flex; gap: 16px; align-items: flex-start; padding: 20px; background: var(--pp-soft); border: 1px solid var(--pp-line); border-radius: var(--ct-radius, 4px); }
+  .ct-card__icon { flex: none; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--pp-line); border-radius: 50%; background: var(--bg, #fff); }
+  .ct-card__icon svg { width: 20px; height: 20px; }
+  .ct-card__label { margin: 0 0 4px; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--pp-muted); }
+  .ct-card__value { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.5; word-break: break-word; }
+  .ct-card__value a { color: inherit; text-decoration: none; }
+  .ct-card__value a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .ct-social { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+  .ct-social a { display: inline-flex; align-items: center; height: 34px; padding: 0 16px; font-size: 12px; font-weight: 600; letter-spacing: .06em; color: inherit; text-decoration: none; border: 1px solid var(--pp-line); border-radius: 99px; background: var(--bg, #fff); transition: background-color .25s ease, color .25s ease, border-color .25s ease; }
+  .ct-social a:hover { background: var(--text, #111); color: var(--bg, #fff); border-color: var(--text, #111); }
+
+  .ct-form { padding: 32px; background: var(--bg, #fff); border: 1px solid var(--pp-line); border-radius: var(--ct-radius, 4px); box-shadow: 0 18px 40px -28px rgba(0, 0, 0, .28); }
+  @media (max-width: 640px) { .ct-form { padding: 22px 18px; } }
+  .ct-form__title { margin: 0 0 6px; font-size: 16px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  .ct-form__sub { margin: 0 0 24px; font-size: 13px; color: var(--pp-muted); }
+  .ct-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 560px) { .ct-row { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+  .ct-field { margin: 0 0 16px; }
+  .ct-field label { display: block; margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  .ct-field label small { font-weight: 500; letter-spacing: .04em; text-transform: none; color: var(--pp-muted); }
+  .ct-field input, .ct-field textarea {
+    width: 100%; box-sizing: border-box; margin: 0 !important; padding: 0 14px; font: inherit; font-size: 15px; color: var(--text, #111);
+    background: var(--pp-soft); border: 1px solid var(--pp-line); border-radius: var(--input-radius, var(--btn-radius, 0px)); outline: none; box-shadow: none;
+    transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+  }
+  .ct-field input { height: 50px; }
+  .ct-field textarea { min-height: 150px; padding: 14px; resize: vertical; line-height: 1.6; }
+  .ct-field input:focus, .ct-field textarea:focus { background: var(--bg, #fff); border-color: var(--text, #111); box-shadow: 0 0 0 3px color-mix(in srgb, var(--text, #111) 8%, transparent); }
+  .ct-field.has-error input, .ct-field.has-error textarea { border-color: #b3261e; }
+  .ct-btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: var(--ctl-h-lg, 52px); }
+  .ct-alert { margin: 0 0 20px; padding: 14px 16px; font-size: 14px; line-height: 1.5; border-radius: var(--ct-radius, 4px); }
+  .ct-alert--ok { background: #eaf5ea; color: #1e5a22; border: 1px solid #b9dbb9; }
+  .ct-alert--err { background: #fbeceb; color: #8f1d17; border: 1px solid #f0bcb8; }
+  .ct-alert ul { margin: 6px 0 0; padding-left: 18px; }
+  .ct-privacy { margin: 14px 0 0; font-size: 12px; color: var(--pp-muted); text-align: center; }
+</style>
+
+<div class="pg-page color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
+  data-section-id="{{ section.id }}"
+  style="--pp-t: {{ section.settings.padding_top | default: 40 }}px; --pp-b: {{ section.settings.padding_bottom | default: 70 }}px; --ct-radius: {{ section.settings.box_radius | default: 4 }}px;">
+  <div class="pg-page__inner">
+
+    {% render 'breadcrumb', current: page.title %}
+
+    {%- if is_perm -%}
+      {% render 'service-landing', blocks: section.blocks, cfg: section.settings, page_title: page.title, page_content: page.content %}
+    {%- elsif is_about -%}
+      {% render 'about-story', blocks: section.blocks, cfg: section.settings, page_title: page.title, page_content: page.content %}
+    {%- else -%}
+    <div class="pg-page__head">
+      {%- if is_contact -%}<p class="pg-page__eyebrow">{{ section.settings.contact_eyebrow | default: 'We are here to help' }}</p>{%- elsif is_faq_page -%}<p class="pg-page__eyebrow">Help center</p>{%- endif -%}
+      <h1 class="pg-page__title">{{ page.title }}</h1>
+      {%- if is_contact and section.settings.contact_intro != blank -%}
+        <p class="pg-page__lead">{{ section.settings.contact_intro }}</p>
+      {%- elsif is_faq_page and section.settings.faq_intro != blank -%}
+        <p class="pg-page__lead">{{ section.settings.faq_intro }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if faq_blocks -%}
+      {% render 'faq-accordion', blocks: section.blocks, cfg: section.settings %}
+    {%- elsif has_side -%}
+      <div class="pg-layout">
+        <nav class="pg-side" aria-label="{{ side_menu.title | escape }}">
+          <p class="pg-side__title">{{ side_menu.title }}</p>
+          <ul class="pg-side__list">
+            {%- for link in side_menu.links -%}
+              <li><a class="pg-side__link" href="{{ link.url }}"{% if link.url == page.url %} aria-current="page"{% endif %}>{{ link.title }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+        <article class="pg-article">
+          <div class="rte pg-page__body"{% if is_faq %} data-pg-faq{% endif %}>{{ page.content }}</div>
+        </article>
+      </div>
+    {%- elsif page.content != blank -%}
+      <div class="rte pg-page__body{% unless is_contact %} pg-article{% endunless %}"{% if is_contact %} style="max-width: 760px; margin: 0 auto 44px;"{% endif %}{% if is_faq %} data-pg-faq{% endif %}>{{ page.content }}</div>
+    {%- endif -%}
+
+    {%- if is_contact -%}
+      <div class="ct">
+        <div class="ct__info">
+          {%- if c_email != blank -%}
+            <div class="ct-card">
+              <span class="ct-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+              <div><p class="ct-card__label">Email</p><p class="ct-card__value"><a href="mailto:{{ c_email }}">{{ c_email }}</a></p></div>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.contact_phone != blank -%}
+            <div class="ct-card">
+              <span class="ct-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg></span>
+              <div><p class="ct-card__label">Phone</p><p class="ct-card__value"><a href="tel:{{ section.settings.contact_phone | replace: ' ', '' }}">{{ section.settings.contact_phone }}</a></p></div>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.contact_address != blank -%}
+            <div class="ct-card">
+              <span class="ct-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+              <div><p class="ct-card__label">Studio</p><p class="ct-card__value">{{ section.settings.contact_address | newline_to_br }}</p></div>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.contact_hours != blank -%}
+            <div class="ct-card">
+              <span class="ct-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+              <div><p class="ct-card__label">Opening hours</p><p class="ct-card__value">{{ section.settings.contact_hours | newline_to_br }}</p></div>
+            </div>
+          {%- endif -%}
+          {%- if settings.social_instagram_link != blank or settings.social_tiktok_link != blank -%}
+            <div class="ct-card">
+              <span class="ct-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6" fill="currentColor"/></svg></span>
+              <div>
+                <p class="ct-card__label">Follow us</p>
+                <div class="ct-social">
+                  {%- if settings.social_instagram_link != blank -%}<a href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener">Instagram</a>{%- endif -%}
+                  {%- if settings.social_tiktok_link != blank -%}<a href="{{ settings.social_tiktok_link }}" target="_blank" rel="noopener">TikTok</a>{%- endif -%}
+                </div>
+              </div>
+            </div>
+          {%- endif -%}
+        </div>
+
+        <div class="ct-form">
+          <h2 class="ct-form__title">{{ section.settings.form_title | default: 'Send us a message' }}</h2>
+          <p class="ct-form__sub">{{ section.settings.form_sub | default: 'We usually reply within one working day.' }}</p>
+
+          {%- form 'contact', id: 'ContactForm' -%}
+            {%- if form.posted_successfully? -%}
+              <div class="ct-alert ct-alert--ok" role="status">{{ section.settings.success_text | default: 'Thank you! Your message has been sent. We will get back to you shortly.' }}</div>
+            {%- endif -%}
+            {%- if form.errors -%}
+              <div class="ct-alert ct-alert--err" role="alert">
+                Please check the following:
+                <ul>{%- for field in form.errors -%}<li>{{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}</li>{%- endfor -%}</ul>
+              </div>
+            {%- endif -%}
+
+            <div class="ct-row">
+              <div class="ct-field{% if form.errors contains 'name' %} has-error{% endif %}">
+                <label for="ContactForm-name">Name</label>
+                <input type="text" id="ContactForm-name" name="contact[name]" autocomplete="name" value="{{ form.name }}" required>
+              </div>
+              <div class="ct-field{% if form.errors contains 'email' %} has-error{% endif %}">
+                <label for="ContactForm-email">Email</label>
+                <input type="email" id="ContactForm-email" name="contact[email]" autocomplete="email" value="{{ form.email }}" required>
+              </div>
+            </div>
+            <div class="ct-field">
+              <label for="ContactForm-phone">Phone <small>(optional)</small></label>
+              <input type="tel" id="ContactForm-phone" name="contact[phone]" autocomplete="tel" value="{{ form.phone }}">
+            </div>
+            <div class="ct-field{% if form.errors contains 'body' %} has-error{% endif %}">
+              <label for="ContactForm-body">How can we help?</label>
+              <textarea id="ContactForm-body" name="contact[body]" required>{{ form.body }}</textarea>
+            </div>
+            <button type="submit" class="btn btn--primary btn-sliding-hover ct-btn"><span class="btn__text-content">{{ section.settings.button_label | default: 'Send message' }}</span></button>
+            <p class="ct-privacy">We only use your details to answer your message.</p>
+          {%- endform -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- endif -%}
+
+  </div>
+</div>
+
+{%- if is_faq -%}
+<script>
+  (function () {
+    var root = document.querySelector('[data-pg-faq]');
+    if (!root || root.querySelector('details')) return;
+    var level = root.querySelector('h3') ? 'H3' : (root.querySelector('h2') ? 'H2' : null);
+    if (!level) return;
+    var kids = Array.prototype.slice.call(root.children), current = null, out = document.createDocumentFragment(), intro = [];
+    kids.forEach(function (el) {
+      if (el.tagName === level) {
+        current = document.createElement('details');
+        var sum = document.createElement('summary');
+        sum.textContent = el.textContent;
+        current.appendChild(sum);
+        out.appendChild(current);
+      } else if (current) { current.appendChild(el); }
+      else { intro.push(el); }
+    });
+    root.innerHTML = '';
+    intro.forEach(function (el) { root.appendChild(el); });
+    root.appendChild(out);
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Page Content",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Service pages (shipping, returns...)"
+    },
+    {
+      "type": "link_list",
+      "id": "side_menu",
+      "label": "Side menu",
+      "info": "Shows a menu next to the page content (e.g. your Customer Service links). Leave empty for a plain centered page."
+    },
+    {
+      "type": "checkbox",
+      "id": "faq_accordion",
+      "label": "FAQ pages: turn headings into an accordion",
+      "default": true,
+      "info": "Applies to pages whose handle contains 'faq'. Each heading becomes a question, the text below it the answer."
+    },
+    {
+      "type": "header",
+      "content": "About page"
+    },
+    {
+      "type": "text",
+      "id": "about_eyebrow",
+      "label": "Small text above title",
+      "default": "Our story"
+    },
+    {
+      "type": "text",
+      "id": "about_heading",
+      "label": "Heading",
+      "info": "Leave empty to use the page title."
+    },
+    {
+      "type": "textarea",
+      "id": "about_lead",
+      "label": "Intro text",
+      "default": "Fine jewelry made to be worn every day: waterproof, hypoallergenic and designed to last. Simple pieces with a personal touch."
+    },
+    {
+      "type": "image_picker",
+      "id": "about_image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "about_button_label",
+      "label": "Main button",
+      "default": "Shop the collection"
+    },
+    {
+      "type": "url",
+      "id": "about_button_link",
+      "label": "Main button link",
+      "info": "Leave empty to link to all products."
+    },
+    {
+      "type": "text",
+      "id": "about_story_title",
+      "label": "Story: heading",
+      "default": "Jewelry that moves with your life"
+    },
+    {
+      "type": "richtext",
+      "id": "about_story",
+      "label": "Story text",
+      "default": "<p>We design jewelry for the moments in between: the commute, the beach, the birthday dinner. Every piece is finished by hand and checked before it reaches you.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "about_image_2",
+      "label": "Story image",
+      "info": "Optional. Shown next to the story text."
+    },
+    {
+      "type": "text",
+      "id": "about_cta_title",
+      "label": "Bottom banner title",
+      "default": "Find your piece"
+    },
+    {
+      "type": "textarea",
+      "id": "about_cta_text",
+      "label": "Bottom banner text",
+      "default": "Explore our collection, or write to us if you need help choosing the perfect gift."
+    },
+    {
+      "type": "text",
+      "id": "about_cta_label",
+      "label": "Bottom banner button",
+      "default": "Get in touch"
+    },
+    {
+      "type": "url",
+      "id": "about_cta_link",
+      "label": "Bottom banner link",
+      "info": "Leave empty to link to /pages/contact."
+    },
+    {
+      "type": "header",
+      "content": "Permanent jewelry page"
+    },
+    {
+      "type": "text",
+      "id": "perm_heading",
+      "label": "Heading",
+      "info": "Leave empty to use the page title."
+    },
+    {
+      "type": "textarea",
+      "id": "perm_lead",
+      "label": "Intro text",
+      "default": "A bracelet, anklet or necklace fitted to you and welded closed, with no clasp. Made to be worn every day, in the shower, at the beach, always."
+    },
+    {
+      "type": "image_picker",
+      "id": "perm_image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "perm_button_label",
+      "label": "Main button",
+      "default": "Book a session"
+    },
+    {
+      "type": "url",
+      "id": "perm_button_link",
+      "label": "Main button link",
+      "info": "Leave empty to link to /pages/contact."
+    },
+    {
+      "type": "text",
+      "id": "perm_cta_title",
+      "label": "Bottom banner title",
+      "default": "Ready for yours?"
+    },
+    {
+      "type": "textarea",
+      "id": "perm_cta_text",
+      "label": "Bottom banner text",
+      "default": "Tell us about your event, studio visit or group booking and we will find a date that works."
+    },
+    {
+      "type": "text",
+      "id": "perm_cta_label",
+      "label": "Bottom banner button",
+      "default": "Get in touch"
+    },
+    {
+      "type": "url",
+      "id": "perm_cta_link",
+      "label": "Bottom banner link",
+      "info": "Leave empty to use the main button link."
+    },
+    {
+      "type": "header",
+      "content": "FAQ page"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_intro",
+      "label": "Intro text",
+      "default": "Quick answers about orders, engraving, sizing and care."
+    },
+    {
+      "type": "text",
+      "id": "faq_cta_title",
+      "label": "Help box title",
+      "default": "Still have questions?"
+    },
+    {
+      "type": "text",
+      "id": "faq_cta_text",
+      "label": "Help box text",
+      "default": "Our team is happy to help with sizing, engraving and orders."
+    },
+    {
+      "type": "text",
+      "id": "faq_cta_label",
+      "label": "Help box button",
+      "default": "Contact us"
+    },
+    {
+      "type": "url",
+      "id": "faq_cta_link",
+      "label": "Help box link",
+      "info": "Leave empty to link to /pages/contact."
+    },
+    {
+      "type": "header",
+      "content": "Contact page"
+    },
+    {
+      "type": "textarea",
+      "id": "contact_intro",
+      "label": "Intro text",
+      "default": "Questions about an order, engraving or sizing? Send us a message and our team will help you."
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Email",
+      "default": "info@bssoln.com",
+      "info": "Shown on the contact page. Clear it to fall back to the store email."
+    },
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "Phone"
+    },
+    {
+      "type": "textarea",
+      "id": "contact_address",
+      "label": "Address"
+    },
+    {
+      "type": "textarea",
+      "id": "contact_hours",
+      "label": "Opening hours",
+      "default": "Mon - Fri: 09:00 - 17:00"
+    },
+    {
+      "type": "text",
+      "id": "form_title",
+      "label": "Form title",
+      "default": "Send us a message"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button text",
+      "default": "Send message"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "box_radius",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Card corner radius",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 70
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Number",
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number",
+          "default": "100%"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Waterproof"
+        }
+      ]
+    },
+    {
+      "type": "value",
+      "name": "Value",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "drop",
+              "label": "Water drop"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            }
+          ],
+          "default": "star"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Value"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "drop",
+              "label": "Water drop"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            }
+          ],
+          "default": "star"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Feature"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Step"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "faq",
+      "name": "Question",
+      "settings": [
+        {
+          "type": "text",
+          "id": "category",
+          "label": "Category",
+          "info": "Questions with the same category are grouped in the left menu."
+        },
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Your question"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Your answer.</p>"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

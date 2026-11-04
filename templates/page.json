@@ -1,0 +1,223 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "faq_1": {
+          "type": "faq",
+          "settings": {
+            "category": "Orders & shipping",
+            "question": "How long does delivery take?",
+            "answer": "<p>Orders are packed and dispatched within 24-48 hours. Delivery usually takes 2-5 working days within Europe.</p>"
+          }
+        },
+        "faq_2": {
+          "type": "faq",
+          "settings": {
+            "category": "Orders & shipping",
+            "question": "Is shipping free?",
+            "answer": "<p>Shipping is free on qualifying orders. The free shipping goal is shown in your cart.</p>"
+          }
+        },
+        "faq_3": {
+          "type": "faq",
+          "settings": {
+            "category": "Orders & shipping",
+            "question": "Can I change or cancel my order?",
+            "answer": "<p>Contact us as soon as possible. If your order has not been dispatched yet, we are happy to change or cancel it.</p>"
+          }
+        },
+        "faq_4": {
+          "type": "faq",
+          "settings": {
+            "category": "Engraving",
+            "question": "How does engraving work?",
+            "answer": "<p>Choose an engravable piece, select the number of characters and type your text on the product page. Your engraving appears on the order.</p>"
+          }
+        },
+        "faq_5": {
+          "type": "faq",
+          "settings": {
+            "category": "Engraving",
+            "question": "Can an engraved piece be returned?",
+            "answer": "<p>Personalised pieces are made for you and cannot be returned unless they arrive damaged or with an error on our side.</p>"
+          }
+        },
+        "faq_6": {
+          "type": "faq",
+          "settings": {
+            "category": "Sizing",
+            "question": "How do I find my ring size?",
+            "answer": "<p>Use our size guide: measure your finger at home and compare it with the chart.</p>"
+          }
+        },
+        "faq_7": {
+          "type": "faq",
+          "settings": {
+            "category": "Sizing",
+            "question": "What if my size does not fit?",
+            "answer": "<p>If an unengraved piece does not fit, you can exchange it within 14 days.</p>"
+          }
+        },
+        "faq_8": {
+          "type": "faq",
+          "settings": {
+            "category": "Care & materials",
+            "question": "Is the jewelry waterproof?",
+            "answer": "<p>Our stainless steel pieces are waterproof and made to be worn every day, in the shower and while swimming.</p>"
+          }
+        },
+        "faq_9": {
+          "type": "faq",
+          "settings": {
+            "category": "Care & materials",
+            "question": "Will it tarnish or cause skin irritation?",
+            "answer": "<p>Our pieces are hypoallergenic and do not tarnish. Clean them gently with warm water and a soft cloth.</p>"
+          }
+        },
+        "faq_10": {
+          "type": "faq",
+          "settings": {
+            "category": "Returns",
+            "question": "What is your return policy?",
+            "answer": "<p>You have 14 days after delivery to return unworn items in their original packaging. See our Returns Policy for details.</p>"
+          }
+        },
+        "feat_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "drop",
+            "title": "Waterproof",
+            "text": "Wear it in the shower, at the pool and at the beach. It is made to stay on."
+          }
+        },
+        "feat_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Welded, no clasp",
+            "text": "A tiny weld closes the chain around your wrist, ankle or neck. Nothing to fasten or lose."
+          }
+        },
+        "feat_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "heart",
+            "title": "Made around you",
+            "text": "Choose the chain, length and charms together with us, fitted to you on the spot."
+          }
+        },
+        "step_4": {
+          "type": "step",
+          "settings": {
+            "title": "Choose your chain",
+            "text": "Pick from gold and silver chains and add charms if you like."
+          }
+        },
+        "step_5": {
+          "type": "step",
+          "settings": {
+            "title": "Get it fitted",
+            "text": "We measure the chain around your wrist, ankle or neck for a comfortable fit."
+          }
+        },
+        "step_6": {
+          "type": "step",
+          "settings": {
+            "title": "Welded closed",
+            "text": "A quick, gentle weld seals the chain. It takes seconds and does not hurt."
+          }
+        },
+        "step_7": {
+          "type": "step",
+          "settings": {
+            "title": "Wear it every day",
+            "text": "No clasp, no taking it off. Care is simple and we are here for any adjustment."
+          }
+        },
+        "stat_1": {
+          "type": "stat",
+          "settings": {
+            "number": "100%",
+            "label": "Waterproof"
+          }
+        },
+        "stat_2": {
+          "type": "stat",
+          "settings": {
+            "number": "24-48h",
+            "label": "Dispatch time"
+          }
+        },
+        "stat_3": {
+          "type": "stat",
+          "settings": {
+            "number": "14 days",
+            "label": "Easy returns"
+          }
+        },
+        "stat_4": {
+          "type": "stat",
+          "settings": {
+            "number": "Hypoallergenic",
+            "label": "Skin friendly"
+          }
+        },
+        "value_1": {
+          "type": "value",
+          "settings": {
+            "icon": "star",
+            "title": "Made to last",
+            "text": "Durable materials and careful finishing, so your jewelry looks good for years."
+          }
+        },
+        "value_2": {
+          "type": "value",
+          "settings": {
+            "icon": "heart",
+            "title": "Personal by design",
+            "text": "Engraving and custom lengths turn a simple piece into something that is yours."
+          }
+        },
+        "value_3": {
+          "type": "value",
+          "settings": {
+            "icon": "shield",
+            "title": "Honest and simple",
+            "text": "Clear prices, easy returns and a team that answers your messages."
+          }
+        }
+      },
+      "block_order": [
+        "faq_1",
+        "faq_2",
+        "faq_3",
+        "faq_4",
+        "faq_5",
+        "faq_6",
+        "faq_7",
+        "faq_8",
+        "faq_9",
+        "faq_10",
+        "feat_1",
+        "feat_2",
+        "feat_3",
+        "step_4",
+        "step_5",
+        "step_6",
+        "step_7",
+        "stat_1",
+        "stat_2",
+        "stat_3",
+        "stat_4",
+        "value_1",
+        "value_2",
+        "value_3"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
