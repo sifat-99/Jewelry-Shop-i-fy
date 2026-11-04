@@ -1,0 +1,36 @@
+<!-- /templates/customers/addresses.liquid -->
+<div class="customer-account-page page-width">
+  <header class="account-header">
+    <div class="account-header__meta">
+      <span class="account-badge">ADDRESS BOOK</span>
+      <h1 class="account-title">{{ 'customer.addresses.title' | default: 'Saved Addresses' }}</h1>
+    </div>
+    <div class="account-header__actions">
+      <a href="{{ routes.account_url }}" class="btn btn-sliding-hover account-logout-btn">
+        &larr; Return to Account
+      </a>
+    </div>
+  </header>
+
+  <div class="account-grid">
+    <div class="account-orders">
+      {%- paginate customer.addresses by 5 -%}
+        <div class="addresses-list">
+          {%- for address in customer.addresses -%}
+            <div class="account-card" style="margin-bottom: 24px;">
+              {%- if address == customer.default_address -%}
+                <span class="account-badge" style="color: #111;">DEFAULT ADDRESS</span>
+              {%- endif -%}
+              {{ address | format_address }}
+            </div>
+          {%- endfor -%}
+        </div>
+        {%- if paginate.pages > 1 -%}
+          <div class="account-pagination">
+            {{ paginate | default_pagination }}
+          </div>
+        {%- endif -%}
+      {%- endpaginate -%}
+    </div>
+  </div>
+</div>

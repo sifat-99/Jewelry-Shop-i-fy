@@ -1,0 +1,73 @@
+<!-- /templates/customers/order.liquid -->
+<div class="customer-account-page page-width">
+  <header class="account-header">
+    <div class="account-header__meta">
+      <span class="account-badge">ORDER SUMMARY</span>
+      <h1 class="account-title">{{ order.name }}</h1>
+      <p class="account-welcome">Placed on {{ order.created_at | time_tag: format: 'date_at_time' }}</p>
+    </div>
+    <div class="account-header__actions">
+      <a href="{{ routes.account_url }}" class="btn btn-sliding-hover account-logout-btn">
+        &larr; Return to Account
+      </a>
+    </div>
+  </header>
+
+  <div class="account-grid">
+    <div class="account-orders">
+      <table class="account-orders-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for line_item in order.line_items -%}
+            <tr>
+              <td>
+                <strong>{{ line_item.title }}</strong>
+                {%- if line_item.line_level_discount_allocations != blank -%}
+                  <ul class="order-discounts">
+                    {%- for discount_allocation in line_item.line_level_discount_allocations -%}
+                      <li>{{ discount_allocation.discount_application.title }} (-{{ discount_allocation.amount | money }})</li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+              </td>
+              <td>{{ line_item.sku }}</td>
+              <td>{{ line_item.original_price | money }}</td>
+              <td>{{ line_item.quantity }}</td>
+              <td>{{ line_item.final_line_price | money }}</td>
+            </tr>
+          {%- endfor -%}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="4">Subtotal</th>
+            <td>{{ order.line_items_subtotal_price | money }}</td>
+          </tr>
+          <tr>
+            <th colspan="4">Total</th>
+            <td><strong>{{ order.total_net_amount | money_with_currency }}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="account-details">
+      <div class="account-card">
+        <h3 class="address-subhead">Billing Address</h3>
+        <p>Status: {{ order.financial_status_label }}</p>
+        {{ order.billing_address | format_address }}
+
+        <h3 class="address-subhead" style="margin-top: 20px;">Shipping Address</h3>
+        <p>Status: {{ order.fulfillment_status_label }}</p>
+        {{ order.shipping_address | format_address }}
+      </div>
+    </div>
+  </div>
+</div>

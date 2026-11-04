@@ -1,0 +1,242 @@
+<!-- /templates/customers/register.liquid -->
+<div class="customer-auth-wrapper">
+  <div class="customer-auth-container">
+    
+    <div class="customer-auth-card">
+      <div class="customer-auth-header">
+        <span class="customer-auth-badge">BECOME A MEMBER</span>
+        <h1 class="customer-auth-title">{{ 'customer.register.title' | default: 'Create Account' }}</h1>
+        <p class="customer-auth-subtitle">{{ 'customer.register.subtext' | default: 'Join the Jewelry Shop circle for personalized jewelry, order tracking, and private privileges.' }}</p>
+      </div>
+
+      {%- form 'create_customer', class: 'customer-auth-form', novalidate: 'novalidate' -%}
+        {%- if form.errors -%}
+          <div class="customer-auth-errors" role="alert">
+            {{ form.errors | default_errors }}
+          </div>
+        {%- endif -%}
+
+        <div class="form-field">
+          <label for="RegisterFirstName" class="form-label">{{ 'customer.register.first_name' | default: 'First Name' }}</label>
+          <input
+            type="text"
+            name="customer[first_name]"
+            id="RegisterFirstName"
+            {% if form.first_name %}value="{{ form.first_name }}"{% endif %}
+            autocomplete="given-name"
+            class="form-input"
+            placeholder="First name"
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="RegisterLastName" class="form-label">{{ 'customer.register.last_name' | default: 'Last Name' }}</label>
+          <input
+            type="text"
+            name="customer[last_name]"
+            id="RegisterLastName"
+            {% if form.last_name %}value="{{ form.last_name }}"{% endif %}
+            autocomplete="family-name"
+            class="form-input"
+            placeholder="Last name"
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="RegisterEmail" class="form-label">{{ 'customer.register.email' | default: 'Email Address' }}</label>
+          <input
+            type="email"
+            name="customer[email]"
+            id="RegisterEmail"
+            {% if form.email %}value="{{ form.email }}"{% endif %}
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="email"
+            class="form-input"
+            placeholder="yourname@example.com"
+            required
+            {% if form.errors contains 'email' %}
+              aria-invalid="true"
+            {% endif %}
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="RegisterPassword" class="form-label">{{ 'customer.register.password' | default: 'Password' }}</label>
+          <input
+            type="password"
+            name="customer[password]"
+            id="RegisterPassword"
+            aria-required="true"
+            class="form-input"
+            placeholder="••••••••"
+            required
+            {% if form.errors contains 'password' %}
+              aria-invalid="true"
+            {% endif %}
+          >
+        </div>
+
+        <button type="submit" class="btn btn-sliding-hover customer-auth-btn">
+          <span>{{ 'customer.register.submit' | default: 'CREATE ACCOUNT' }}</span>
+        </button>
+
+        <div class="customer-auth-footer">
+          <p class="customer-auth-footer-text">
+            Already have an account? 
+            <a href="{{ routes.account_login_url }}" class="customer-auth-link">Sign in here</a>
+          </p>
+          <p class="customer-auth-footer-text">
+            <a href="{{ routes.root_url }}" class="customer-auth-return">
+              &larr; Return to Store
+            </a>
+          </p>
+        </div>
+      {%- endform -%}
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .customer-auth-wrapper {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px 80px;
+    background: #ffffff;
+  }
+  .customer-auth-container {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+  .customer-auth-card {
+    background: #ffffff;
+    border: 1px solid #ebe8e2;
+    border-radius: var(--card-radius, 0px);
+    padding: 44px 36px 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  }
+  @media (max-width: 480px) {
+    .customer-auth-card {
+      padding: 32px 24px;
+      border: 1px solid #f0f0f0;
+    }
+  }
+  .customer-auth-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .customer-auth-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #b48a4c;
+    margin-bottom: 10px;
+  }
+  .customer-auth-title {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #111111;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+  }
+  .customer-auth-subtitle {
+    font-size: 13px;
+    color: #666666;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .customer-auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .customer-auth-errors {
+    background: #fdf2f2;
+    border: 1px solid #f8b4b4;
+    color: #9b1c1c;
+    padding: 12px 16px;
+    border-radius: var(--input-radius, 0px);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .customer-auth-errors ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .form-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #222222;
+  }
+  .form-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 13px;
+    color: #111111;
+    background: #faf9f6;
+    border: 1px solid #e0ded9;
+    border-radius: var(--input-radius, 0px);
+    box-sizing: border-box;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .form-input:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: #111111;
+  }
+  /* Colors, radius, border, case: global button settings (Theme settings > Buttons & Controls) */
+  .customer-auth-btn {
+    width: 100%;
+    height: 48px;
+    margin-top: 8px;
+  }
+  .customer-auth-footer {
+    margin-top: 16px;
+    text-align: center;
+    border-top: 1px solid #f0ede6;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .customer-auth-footer-text {
+    font-size: 12px;
+    color: #666666;
+    margin: 0;
+  }
+  .customer-auth-link {
+    color: #111111;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  .customer-auth-link:hover {
+    color: #b48a4c;
+  }
+  .customer-auth-return {
+    font-size: 11px;
+    color: #888888;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .customer-auth-return:hover {
+    color: #111111;
+  }
+</style>

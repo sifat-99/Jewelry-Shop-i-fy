@@ -1,0 +1,415 @@
+<!-- /sections/main-login.liquid  (Customer login + password recovery, editable in the theme editor) -->
+{%- liquid
+  assign layout = section.settings.layout | default: 'split'
+  assign has_image = false
+  if section.settings.image != blank and layout == 'split'
+    assign has_image = true
+  endif
+-%}
+
+<div class="lg lg--{{ layout }} color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
+  data-lg-root
+  data-section-id="{{ section.id }}"
+  style="--lg-pt: {{ section.settings.padding_top | default: 60 }}px; --lg-pb: {{ section.settings.padding_bottom | default: 80 }}px; --lg-overlay: {{ section.settings.overlay_opacity | default: 25 | divided_by: 100.0 }};">
+
+  <style>
+    .lg {
+      padding: var(--lg-pt, 60px) clamp(16px, 4vw, 48px) var(--lg-pb, 80px);
+      --lg-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62);
+      --lg-line: var(--btn-regular-border, var(--hairline, rgba(0, 0, 0, 0.18)));
+      --lg-soft: rgba(var(--color-foreground, 17, 17, 17), 0.035);
+    }
+    .lg__shell {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      border: 1px solid var(--hairline, rgba(0, 0, 0, 0.12));
+      border-radius: var(--card-radius, 0px);
+      overflow: hidden;
+      background: var(--bg, #fff);
+      min-height: 580px;
+    }
+    .lg--centered .lg__shell { max-width: 480px; grid-template-columns: minmax(0, 1fr); min-height: 0; }
+    @media (max-width: 860px) {
+      .lg__shell { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+    }
+
+    /* ----- Brand panel ----- */
+    .lg__side {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: clamp(28px, 4vw, 48px);
+      background: var(--lg-soft);
+      color: var(--text, #111);
+      overflow: hidden;
+    }
+    .lg--centered .lg__side { display: none; }
+    .lg__side-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+    .lg__side::before {
+      content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(to top, rgba(0, 0, 0, calc(var(--lg-overlay, 0.25) + 0.25)) 0%, rgba(0, 0, 0, var(--lg-overlay, 0.25)) 55%, rgba(0, 0, 0, 0) 100%);
+      opacity: 0;
+    }
+    .lg__side--image::before { opacity: 1; }
+    .lg__side-body { position: relative; z-index: 2; max-width: 420px; }
+    .lg__side--image .lg__side-body { color: #ffffff; }
+    .lg__side-title { margin: 0 0 12px; font-size: clamp(24px, 2.6vw, 34px); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.2; }
+    .lg__side--image .lg__side-title { color: #ffffff !important; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35); }
+    .lg__side-text { margin: 0 0 20px; font-size: 14px; line-height: 1.65; opacity: 0.9; }
+    .lg__benefits { list-style: none; margin: 0; padding: 0; font-size: 13.5px; line-height: 1.5; }
+    .lg__benefits li { display: flex; gap: 10px; }
+    .lg__benefits li + li { margin-top: 8px; }
+    .lg__benefits li::before { content: "\2713"; font-weight: 700; flex: 0 0 auto; }
+    @media (max-width: 860px) {
+      .lg__side { min-height: 0; padding: 24px 22px; justify-content: center; }
+      .lg__side--image { min-height: 200px; }
+      .lg__benefits { display: none; }
+    }
+
+    /* ----- Form panel ----- */
+    .lg__panel { display: flex; align-items: center; justify-content: center; padding: clamp(28px, 4vw, 56px) clamp(20px, 4vw, 56px); }
+    .lg__card { width: 100%; max-width: 400px; }
+    .lg__card[hidden] { display: none; }
+    .lg__head { margin-bottom: 26px; text-align: center; }
+    .lg__badge { display: inline-block; margin-bottom: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--lg-muted); }
+    .lg__title { margin: 0 0 10px; font-size: clamp(24px, 2.4vw, 30px); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.2; }
+    .lg__sub { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--lg-muted); }
+
+    .lg__form { display: flex; flex-direction: column; gap: 18px; }
+    .lg__field { display: flex; flex-direction: column; gap: 7px; }
+    .lg__label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .lg__label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+    .lg__link { font-size: 12px; color: var(--lg-muted); text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s ease; background: none; border: 0; padding: 0; cursor: pointer; }
+    .lg__link:hover { color: var(--text, #111); }
+
+    /* Inputs follow the same border / radius settings as the buttons and controls */
+    .lg__input-wrap { position: relative; }
+    .lg .lg__input {
+      width: 100%; height: var(--ctl-h-lg, 52px); margin: 0 !important; padding: 0 16px; box-sizing: border-box;
+      font-family: inherit; font-size: 14px; color: inherit; background: var(--bg, #fff);
+      border: var(--input-border-thickness, var(--btn-border-thickness, 1px)) solid var(--lg-line) !important;
+      border-radius: var(--input-radius, 0px) !important;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease; outline: none;
+    }
+    .lg .lg__input::placeholder { color: var(--lg-muted); opacity: 0.7; }
+    .lg .lg__input:hover { border-color: var(--btn-regular-hover-border, currentColor) !important; }
+    .lg .lg__input:focus { border-color: var(--btn-regular-hover-border, currentColor) !important; box-shadow: 0 0 0 1px var(--btn-regular-hover-border, currentColor); }
+    .lg .lg__input[aria-invalid="true"] { border-color: #b3261e !important; }
+    .lg__input-wrap .lg__input { padding-right: 52px; }
+    .lg__eye {
+      position: absolute; top: 0; right: 0; width: 50px; height: 100%; padding: 0; margin: 0;
+      display: flex; align-items: center; justify-content: center; background: transparent; border: 0; cursor: pointer; color: var(--lg-muted);
+    }
+    .lg__eye:hover { color: var(--text, #111); }
+    .lg__eye svg { width: 19px; height: 19px; display: block; }
+    .lg__eye .lg__eye-off { display: none; }
+    .lg__eye[aria-pressed="true"] .lg__eye-on { display: none; }
+    .lg__eye[aria-pressed="true"] .lg__eye-off { display: block; }
+
+    .lg__submit { width: 100%; height: var(--ctl-h-lg, 52px); margin-top: 4px; }
+    .lg__msg { padding: 12px 14px; font-size: 13px; line-height: 1.55; border: 1px solid; border-radius: var(--input-radius, 0px); }
+    .lg__msg ul { margin: 0; padding-left: 18px; }
+    .lg__msg--error { background: #fdf2f2; border-color: #f1b8b4; color: #8c1d18; }
+    .lg__msg--ok { background: #f0fdf4; border-color: #bbf0cc; color: #166534; text-align: center; }
+
+    .lg__foot { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--hairline, rgba(0, 0, 0, 0.12)); text-align: center; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--lg-muted); }
+    .lg__foot p { margin: 0; }
+    .lg__foot a { color: var(--text, #111); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+    .lg__foot .lg__back { font-weight: 500; font-size: 12px; letter-spacing: 0.04em; text-decoration: none; color: var(--lg-muted); }
+    .lg__foot .lg__back:hover { color: var(--text, #111); }
+  </style>
+
+  <div class="lg__shell">
+
+    {%- if layout == 'split' -%}
+      <aside class="lg__side{% if has_image %} lg__side--image{% endif %}">
+        {%- if has_image -%}
+          <img class="lg__side-img"
+            src="{{ section.settings.image | image_url: width: 1200 }}"
+            srcset="{{ section.settings.image | image_url: width: 600 }} 600w, {{ section.settings.image | image_url: width: 900 }} 900w, {{ section.settings.image | image_url: width: 1200 }} 1200w, {{ section.settings.image | image_url: width: 1600 }} 1600w"
+            sizes="(min-width: 861px) 50vw, 100vw"
+            alt="" width="{{ section.settings.image.width }}" height="{{ section.settings.image.height }}" loading="eager">
+        {%- endif -%}
+        <div class="lg__side-body">
+          {%- if section.settings.side_title != blank -%}<h2 class="lg__side-title">{{ section.settings.side_title }}</h2>{%- endif -%}
+          {%- if section.settings.side_text != blank -%}<p class="lg__side-text">{{ section.settings.side_text }}</p>{%- endif -%}
+          {%- if section.settings.benefit_1 != blank or section.settings.benefit_2 != blank or section.settings.benefit_3 != blank -%}
+            <ul class="lg__benefits">
+              {%- if section.settings.benefit_1 != blank -%}<li>{{ section.settings.benefit_1 }}</li>{%- endif -%}
+              {%- if section.settings.benefit_2 != blank -%}<li>{{ section.settings.benefit_2 }}</li>{%- endif -%}
+              {%- if section.settings.benefit_3 != blank -%}<li>{{ section.settings.benefit_3 }}</li>{%- endif -%}
+            </ul>
+          {%- endif -%}
+        </div>
+      </aside>
+    {%- endif -%}
+
+    <div class="lg__panel">
+
+      <!-- ===== Sign in ===== -->
+      <div class="lg__card" id="CustomerLoginForm" data-lg-login>
+        <div class="lg__head">
+          {%- if section.settings.badge != blank -%}<span class="lg__badge">{{ section.settings.badge }}</span>{%- endif -%}
+          <h1 class="lg__title">{{ section.settings.title | default: 'Sign in' }}</h1>
+          {%- if section.settings.subtitle != blank -%}<p class="lg__sub">{{ section.settings.subtitle }}</p>{%- endif -%}
+        </div>
+
+        {%- form 'customer_login', class: 'lg__form', novalidate: 'novalidate' -%}
+          {%- if form.errors -%}
+            <div class="lg__msg lg__msg--error" role="alert">{{ form.errors | default_errors }}</div>
+          {%- endif -%}
+
+          <div class="lg__field">
+            <label for="CustomerEmail" class="lg__label">Email address</label>
+            <input type="email" name="customer[email]" id="CustomerEmail" class="lg__input" autocomplete="email" autocorrect="off" autocapitalize="off" placeholder="yourname@example.com" required{% if form.errors contains 'form' %} aria-invalid="true"{% endif %}>
+          </div>
+
+          {%- if form.password_needed -%}
+            <div class="lg__field">
+              <div class="lg__label-row">
+                <label for="CustomerPassword" class="lg__label">Password</label>
+                <button type="button" class="lg__link" data-lg-show-recover>Forgot password?</button>
+              </div>
+              <div class="lg__input-wrap">
+                <input type="password" name="customer[password]" id="CustomerPassword" class="lg__input" autocomplete="current-password" placeholder="Your password" required{% if form.errors contains 'form' %} aria-invalid="true"{% endif %}>
+                <button type="button" class="lg__eye" data-lg-eye aria-label="Show password" aria-pressed="false">
+                  <svg class="lg__eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3.2"/></svg>
+                  <svg class="lg__eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5a10 10 0 0 1 1.4-.1c6.5 0 10.5 7.1 10.5 7.1a17 17 0 0 1-3.2 4M6.5 6.7A16.5 16.5 0 0 0 1.5 12S5.5 19.5 12 19.5a9.7 9.7 0 0 0 4.2-.9M9.9 9.9a3.2 3.2 0 0 0 4.2 4.2"/></svg>
+                </button>
+              </div>
+            </div>
+          {%- endif -%}
+
+          <button type="submit" class="btn btn--primary btn-sliding-hover lg__submit">
+            <span class="btn__text-content">{{ section.settings.button_label | default: 'Sign in' }}</span>
+          </button>
+        {%- endform -%}
+
+        <div class="lg__foot">
+          <p>New here? <a href="{{ routes.account_register_url }}">Create an account</a></p>
+          {%- if section.settings.show_return_link -%}
+            <p><a href="{{ routes.root_url }}" class="lg__back">&larr; Return to store</a></p>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <!-- ===== Recover password ===== -->
+      <div class="lg__card" id="RecoverPasswordForm" data-lg-recover hidden>
+        <div class="lg__head">
+          <span class="lg__badge">Reset access</span>
+          <h2 class="lg__title">Reset password</h2>
+          <p class="lg__sub">Enter your email and we will send you a link to choose a new password.</p>
+        </div>
+
+        {%- form 'recover_customer_password', class: 'lg__form' -%}
+          {%- assign recover_done = form.posted_successfully? -%}
+          {%- if form.errors -%}
+            <div class="lg__msg lg__msg--error" role="alert" data-lg-recover-state="error">{{ form.errors | default_errors }}</div>
+          {%- endif -%}
+          {%- if recover_done -%}
+            <div class="lg__msg lg__msg--ok" role="status" data-lg-recover-state="ok">We have sent you an email with a link to reset your password.</div>
+          {%- endif -%}
+
+          <div class="lg__field">
+            <label for="RecoverEmail" class="lg__label">Email address</label>
+            <input type="email" name="email" id="RecoverEmail" class="lg__input" autocomplete="email" autocorrect="off" autocapitalize="off" placeholder="yourname@example.com" required{% if form.errors %} aria-invalid="true"{% endif %}>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn-sliding-hover lg__submit">
+            <span class="btn__text-content">Send reset link</span>
+          </button>
+        {%- endform -%}
+
+        <div class="lg__foot">
+          <p>Remembered it? <a href="#login" data-lg-show-login>Back to sign in</a></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {% raw %}
+  <script>
+    (function () {
+      var root = document.currentScript.closest('[data-lg-root]');
+      if (!root || root.dataset.lgReady) return;
+      root.dataset.lgReady = '1';
+      var login = root.querySelector('[data-lg-login]');
+      var recover = root.querySelector('[data-lg-recover]');
+      if (!login || !recover) return;
+
+      function showRecover(focus) {
+        login.hidden = true; recover.hidden = false;
+        if (focus) { var i = recover.querySelector('input[type="email"]'); if (i) i.focus(); }
+      }
+      function showLogin(focus) {
+        recover.hidden = true; login.hidden = false;
+        if (focus) { var i = login.querySelector('input[type="email"]'); if (i) i.focus(); }
+      }
+      root.querySelectorAll('[data-lg-show-recover]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          showRecover(true);
+          try { window.history.replaceState(null, '', '#recover'); } catch (e) {}
+        });
+      });
+      root.querySelectorAll('[data-lg-show-login]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+          e.preventDefault(); showLogin(true);
+          try { window.history.replaceState(null, '', window.location.pathname); } catch (er) {}
+        });
+      });
+
+      // After sending the reset email Shopify reloads the page: keep the recovery card open to show the result
+      if (window.location.hash === '#recover' || recover.querySelector('[data-lg-recover-state]')) showRecover(false);
+
+      /* Show / hide password */
+      root.querySelectorAll('[data-lg-eye]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var input = btn.parentElement.querySelector('input');
+          if (!input) return;
+          var show = input.type === 'password';
+          input.type = show ? 'text' : 'password';
+          btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+          btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        });
+      });
+    })();
+  </script>
+  {% endraw %}
+</div>
+
+{% schema %}
+{
+  "name": "Login",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "split", "label": "Split - brand panel + form" },
+        { "value": "centered", "label": "Centered card" }
+      ],
+      "default": "split"
+    },
+    {
+      "type": "header",
+      "content": "Form"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Small label",
+      "default": "My account"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Sign in"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Access your orders, saved details and exclusive jewelry member privileges."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Sign in"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_return_link",
+      "label": "Show 'Return to store' link",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Brand panel (split layout)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Portrait works best, e.g. 1200 x 1500 px."
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 70,
+      "step": 5,
+      "unit": "%",
+      "label": "Image overlay",
+      "default": 25
+    },
+    {
+      "type": "text",
+      "id": "side_title",
+      "label": "Heading",
+      "default": "Welcome back"
+    },
+    {
+      "type": "textarea",
+      "id": "side_text",
+      "label": "Text",
+      "default": "Jewelry made to be worn every day and personal enough to keep forever."
+    },
+    {
+      "type": "text",
+      "id": "benefit_1",
+      "label": "Benefit 1",
+      "default": "Track your orders"
+    },
+    {
+      "type": "text",
+      "id": "benefit_2",
+      "label": "Benefit 2",
+      "default": "Faster checkout with saved details"
+    },
+    {
+      "type": "text",
+      "id": "benefit_3",
+      "label": "Benefit 3",
+      "default": "Easy 14 day returns"
+    },
+    {
+      "type": "header",
+      "content": "Section spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    }
+  ]
+}
+{% endschema %}

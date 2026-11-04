@@ -1,0 +1,243 @@
+<!-- /templates/customers/account.liquid -->
+<div class="customer-account-page page-width">
+  <header class="account-header">
+    <div class="account-header__meta">
+      <span class="account-badge">VIP PRIVILEGES</span>
+      <h1 class="account-title">{{ 'customer.account.title' | default: 'My Account' }}</h1>
+      <p class="account-welcome">Welcome back, {{ customer.first_name | default: customer.name }}!</p>
+    </div>
+    <div class="account-header__actions">
+      <a href="{{ routes.account_logout_url }}" class="btn btn-sliding-hover account-logout-btn">
+        {{ 'customer.log_out' | default: 'Log Out' }}
+      </a>
+    </div>
+  </header>
+
+  <div class="account-grid">
+    <!-- Order History -->
+    <div class="account-orders">
+      <h2 class="account-section-title">{{ 'customer.orders.title' | default: 'Order History' }}</h2>
+
+      {%- paginate customer.orders by 20 -%}
+        {%- if customer.orders.size > 0 -%}
+          <div class="account-table-wrapper">
+            <table class="account-orders-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Date</th>
+                  <th>Payment</th>
+                  <th>Fulfillment</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {%- for order in customer.orders -%}
+                  <tr>
+                    <td>
+                      <a href="{{ order.customer_url }}" class="order-link">
+                        {{ order.name }}
+                      </a>
+                    </td>
+                    <td>{{ order.created_at | time_tag: format: 'date' }}</td>
+                    <td>{{ order.financial_status_label }}</td>
+                    <td>{{ order.fulfillment_status_label }}</td>
+                    <td><strong>{{ order.total_net_amount | money_with_currency }}</strong></td>
+                  </tr>
+                {%- endfor -%}
+              </tbody>
+            </table>
+          </div>
+          {%- if paginate.pages > 1 -%}
+            <div class="account-pagination">
+              {{ paginate | default_pagination }}
+            </div>
+          {%- endif -%}
+        {%- else -%}
+          <div class="account-empty-state">
+            <p>{{ 'customer.orders.none' | default: "You haven't placed any orders yet." }}</p>
+            <a href="{{ routes.all_products_collection_url }}" class="btn btn-sliding-hover account-btn">
+              START SHOPPING
+            </a>
+          </div>
+        {%- endif -%}
+      {%- endpaginate -%}
+    </div>
+
+    <!-- Account Details / Addresses -->
+    <div class="account-details">
+      <h2 class="account-section-title">{{ 'customer.account.details' | default: 'Account Details' }}</h2>
+      <div class="account-card">
+        <p class="account-name"><strong>{{ customer.name }}</strong></p>
+        <p class="account-email">{{ customer.email }}</p>
+
+        {%- if customer.default_address -%}
+          <div class="account-address-default">
+            <h3 class="address-subhead">Default Shipping Address</h3>
+            {{ customer.default_address | format_address }}
+          </div>
+        {%- endif -%}
+
+        <div class="account-card-action">
+          <a href="{{ routes.account_addresses_url }}" class="account-link">
+            View & Manage Addresses ({{ customer.addresses_count }}) &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .customer-account-page {
+    max-width: var(--page-width, 1400px);
+    margin: 0 auto;
+    padding: 50px 20px 80px;
+  }
+  .account-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e8e5df;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .account-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #b48a4c;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .account-title {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+  .account-welcome {
+    font-size: 14px;
+    color: #666666;
+    margin: 0;
+  }
+  .account-logout-btn {
+    padding: 10px 20px;
+  }
+  .account-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 48px;
+  }
+  @media (max-width: 900px) {
+    .account-grid {
+      grid-template-columns: 1fr;
+      gap: 36px;
+    }
+  }
+  .account-section-title {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0ede6;
+  }
+  .account-table-wrapper {
+    overflow-x: auto;
+  }
+  .account-orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+  }
+  .account-orders-table th {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 12px 14px;
+    background: #faf9f6;
+    border-bottom: 1px solid #ebe8e2;
+  }
+  .account-orders-table td {
+    padding: 16px 14px;
+    border-bottom: 1px solid #f0ede6;
+  }
+  .order-link {
+    color: #111111;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  .order-link:hover {
+    color: #b48a4c;
+  }
+  .account-empty-state {
+    padding: 40px 24px;
+    background: #faf9f6;
+    border: 1px solid #ebe8e2;
+    border-radius: var(--card-radius, 0px);
+    text-align: center;
+  }
+  .account-empty-state p {
+    color: #777777;
+    margin: 0 0 20px;
+  }
+  .account-btn {
+    display: inline-block;
+    padding: 12px 28px;
+  }
+  .account-card {
+    background: #faf9f6;
+    border: 1px solid #ebe8e2;
+    border-radius: var(--card-radius, 0px);
+    padding: 24px;
+  }
+  .account-name {
+    margin: 0 0 4px;
+    font-size: 15px;
+  }
+  .account-email {
+    margin: 0 0 20px;
+    font-size: 13px;
+    color: #666666;
+  }
+  .account-address-default {
+    border-top: 1px solid #e8e5df;
+    padding-top: 16px;
+    margin-top: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #555555;
+  }
+  .address-subhead {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+    color: #111111;
+  }
+  .account-card-action {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e8e5df;
+  }
+  .account-link {
+    font-size: 12px;
+    font-weight: 600;
+    color: #111111;
+    text-decoration: underline;
+  }
+  .account-link:hover {
+    color: #b48a4c;
+  }
+</style>

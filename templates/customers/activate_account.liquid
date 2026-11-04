@@ -1,0 +1,52 @@
+<!-- /templates/customers/activate_account.liquid -->
+<div class="customer-auth-wrapper">
+  <div class="customer-auth-container">
+    <div class="customer-auth-card">
+      <div class="customer-auth-header">
+        <span class="customer-auth-badge">WELCOME</span>
+        <h1 class="customer-auth-title">{{ 'customer.activate_account.title' | default: 'Activate Account' }}</h1>
+        <p class="customer-auth-subtitle">{{ 'customer.activate_account.subtext' | default: 'Create your password to activate your account.' }}</p>
+      </div>
+
+      {%- form 'activate_customer_password', class: 'customer-auth-form' -%}
+        {%- if form.errors -%}
+          <div class="customer-auth-errors" role="alert">
+            {{ form.errors | default_errors }}
+          </div>
+        {%- endif -%}
+
+        <div class="form-field">
+          <label for="password" class="form-label">{{ 'customer.activate_account.password' | default: 'Password' }}</label>
+          <input
+            type="password"
+            name="customer[password]"
+            id="password"
+            autocomplete="new-password"
+            class="form-input"
+            required
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="password_confirmation" class="form-label">{{ 'customer.activate_account.password_confirm' | default: 'Confirm Password' }}</label>
+          <input
+            type="password"
+            name="customer[password_confirmation]"
+            id="password_confirmation"
+            autocomplete="new-password"
+            class="form-input"
+            required
+          >
+        </div>
+
+        <button type="submit" class="btn btn-sliding-hover customer-auth-btn">
+          <span>{{ 'customer.activate_account.submit' | default: 'ACTIVATE ACCOUNT' }}</span>
+        </button>
+
+        <button type="submit" name="decline" class="btn btn-sliding-hover customer-auth-btn" style="margin-top: 10px;">
+          <span>{{ 'customer.activate_account.cancel' | default: 'DECLINE INVITATION' }}</span>
+        </button>
+      {%- endform -%}
+    </div>
+  </div>
+</div>
