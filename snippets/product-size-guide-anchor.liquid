@@ -1,0 +1,20 @@
+{%- comment -%}
+  Outputs the size guide tab anchor (#ring, #bracelet, #necklace) matching a product, or nothing (earrings, piercings, others).
+  Accepts: product
+{%- endcomment -%}
+{%- liquid
+  assign sg_text = product.type | append: ' ' | append: product.title | append: ' ' | append: product.options | join: ' ' | downcase
+  assign sg_has_hand = false
+  if sg_text contains 'hand'
+    assign sg_has_hand = true
+  endif
+  if sg_text contains 'earring' or sg_text contains 'oorbel' or sg_text contains 'piercing' or sg_text contains 'keychain' or sg_text contains 'supply'
+    echo ''
+  elsif sg_text contains 'ring' and sg_has_hand == false
+    echo '#ring'
+  elsif sg_text contains 'armband' or sg_text contains 'bracelet' or sg_text contains 'bangle' or sg_text contains 'hand chain' or sg_text contains 'handchain' or sg_text contains 'cuff'
+    echo '#bracelet'
+  elsif sg_text contains 'ketting' or sg_text contains 'necklace' or sg_text contains 'chain' or sg_text contains 'pendant' or sg_text contains 'choker'
+    echo '#necklace'
+  endif
+-%}

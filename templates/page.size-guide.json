@@ -1,0 +1,73 @@
+{
+  "sections": {
+    "main": {
+      "type": "size-guide",
+      "blocks": {
+        "guide_rings": {
+          "type": "guide",
+          "settings": {
+            "title": "Rings",
+            "key": "ring",
+            "intro": "Measure your finger at home in two minutes and pick the matching size.",
+            "table_title": "Ring size chart",
+            "table_head": "Size | Inner diameter (mm) | Circumference (mm) | US (approx.)",
+            "table_rows": "14 | 14.0 | 44.0 | 3\n15 | 15.0 | 47.1 | 4\n16 | 16.0 | 50.3 | 5.5\n17 | 17.0 | 53.4 | 6.5\n18 | 18.0 | 56.5 | 8\n19 | 19.0 | 59.7 | 9\n20 | 20.0 | 62.8 | 10.5\n21 | 21.0 | 66.0 | 12\n22 | 22.0 | 69.1 | 13",
+            "calculator": "ring",
+            "steps_title": "How to measure",
+            "steps": "Wrap a thin strip of paper or string around the base of your finger.\nMark the point where the ends meet.\nLay it flat and measure the length in millimetres. This is your finger circumference.\nUse the calculator or the chart to find your size.",
+            "tips": "Measure at the end of the day, when your fingers are at their widest.\nBetween two sizes? Choose the larger one.\nWide rings fit a little tighter than thin ones.\nOr measure a ring you already own: its inner diameter in mm is your size."
+          }
+        },
+        "guide_bracelets": {
+          "type": "guide",
+          "settings": {
+            "title": "Bracelets",
+            "key": "bracelet",
+            "intro": "A bracelet should move gently on your wrist without slipping over your hand.",
+            "table_title": "Bracelet length chart",
+            "table_head": "Fit | Bracelet length (cm) | Wrist circumference (cm)",
+            "table_rows": "Snug | 16 | 13 - 14\nComfortable | 18 | 15 - 16\nRelaxed | 20 | 17 - 18\nLoose | 22 | 19 - 20",
+            "calculator": "none",
+            "steps_title": "How to measure",
+            "steps": "Wrap a strip of paper or string around your wrist, just above the wrist bone.\nMark where the ends meet and measure the length in centimetres.\nAdd 1.5 - 2 cm for a comfortable fit.\nCompare the result with the chart.",
+            "tips": "Many of our chain bracelets are adjustable, so you can fine-tune the length.\nFor a bangle, measure the widest part of your hand with the thumb tucked in."
+          }
+        },
+        "guide_necklaces": {
+          "type": "guide",
+          "settings": {
+            "title": "Necklaces",
+            "key": "necklace",
+            "intro": "The length decides where your necklace rests, so pick the style that suits your neckline.",
+            "table_title": "Necklace length chart",
+            "table_head": "Style | Length (cm) | Sits at",
+            "table_rows": "Choker | 35 - 40 | Base of the neck\nPrincess | 40 - 46 | Collarbone\nMatinee | 50 - 60 | Just above the bust\nOpera | 70 - 80 | Below the bust",
+            "calculator": "none",
+            "steps_title": "How to choose",
+            "steps": "Measure a necklace you already wear and love, from clasp to clasp.\nOr lay a piece of string around your neck at the length you want and measure it.\nChoose the nearest length in the chart.",
+            "tips": "Our initial necklaces are 40 - 46 cm and adjustable.\nLayering? Pick lengths about 5 cm apart."
+          }
+        }
+      },
+      "block_order": [
+        "guide_rings",
+        "guide_bracelets",
+        "guide_necklaces"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "",
+        "intro": "Find the perfect fit. Pick your jewelry type, measure at home and use the chart below.",
+        "cta_title": "Still not sure?",
+        "cta_text": "Send us a message and we will help you find your size.",
+        "cta_label": "Contact us",
+        "cta_link": "",
+        "padding_top": 40,
+        "padding_bottom": 65
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

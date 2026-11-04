@@ -1,0 +1,29 @@
+{%- comment -%}
+  Stand-alone "Size guide" link for jewelry that has no size / length option
+  (the option label already shows the link when a size-like option exists).
+  Shown for rings, bracelets and necklaces only; opens the matching tab of the size guide page.
+  Accepts: product, page (size guide page), label
+{%- endcomment -%}
+{%- if page != blank -%}
+  {%- liquid
+    assign opt_text = product.options | join: ' ' | downcase
+    assign has_size_option = false
+    unless product.has_only_default_variant
+      if opt_text contains 'size' or opt_text contains 'grootte' or opt_text contains 'maat' or opt_text contains 'lengte' or opt_text contains 'length'
+        assign has_size_option = true
+      endif
+    endunless
+    capture anchor
+      render 'product-size-guide-anchor', product: product
+    endcapture
+    assign anchor = anchor | strip
+  -%}
+  {%- if has_size_option == false and anchor != blank -%}
+    <p class="pv-sg-link">
+      <a href="{{ page.url }}{{ anchor }}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17 17 3l4 4L7 21z"/><path d="m7 13 2 2M10 10l2 2M13 7l2 2"/></svg>
+        {{ label | default: 'Size guide' }}
+      </a>
+    </p>
+  {%- endif -%}
+{%- endif -%}
