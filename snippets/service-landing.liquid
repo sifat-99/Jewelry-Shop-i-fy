@@ -1,0 +1,95 @@
+{%- comment -%}
+  Landing layout for the "Permanent jewelry on-site" service page.
+  Accepts: blocks (section.blocks: 'feature' and 'step' types), cfg (section.settings), page_title
+{%- endcomment -%}
+{%- liquid
+  assign book_link = cfg.perm_button_link
+  if book_link == blank
+    assign book_link = routes.root_url | append: 'pages/contact'
+  endif
+  assign cta_link = cfg.perm_cta_link
+  if cta_link == blank
+    assign cta_link = book_link
+  endif
+-%}
+{% render 'landing-css' %}
+
+<section class="sl-hero">
+  <div class="sl-hero__copy">
+    <p class="sl-hero__eyebrow">{{ cfg.perm_eyebrow | default: 'Permanent jewelry' }}</p>
+    <h1 class="sl-hero__title">{{ cfg.perm_heading | default: page_title }}</h1>
+    <p class="sl-hero__lead">{{ cfg.perm_lead | default: 'A bracelet, anklet or necklace fitted to you and welded closed, with no clasp. Made to be worn every day, in the shower, at the beach, always.' }}</p>
+    <div class="sl-hero__btns">
+      <a href="{{ book_link }}" class="btn btn--primary btn-sliding-hover sl-btn"><span class="btn__text-content">{{ cfg.perm_button_label | default: 'Book a session' }}</span></a>
+      <a href="#how-it-works" class="btn btn-sliding-hover sl-btn"><span class="btn__text-content">How it works</span></a>
+    </div>
+  </div>
+  <div class="sl-hero__media">
+    {%- if cfg.perm_image != blank -%}
+      <img src="{{ cfg.perm_image | image_url: width: 1200 }}" srcset="{{ cfg.perm_image | image_url: width: 600 }} 600w, {{ cfg.perm_image | image_url: width: 900 }} 900w, {{ cfg.perm_image | image_url: width: 1200 }} 1200w" sizes="(min-width: 901px) 46vw, 100vw" alt="{{ cfg.perm_image.alt | default: page_title | escape }}" width="{{ cfg.perm_image.width }}" height="{{ cfg.perm_image.height }}" loading="eager">
+    {%- else -%}
+      <div class="sl-hero__ph" aria-hidden="true">
+        <svg viewBox="0 0 100 100" fill="none" stroke="#8d6e63" stroke-width="1.6" stroke-linejoin="round"><polygon points="50,8 92,50 50,92 8,50"/><polygon points="50,24 76,50 50,76 24,50"/><rect x="40" y="40" width="20" height="20" fill="#8d6e63" stroke="none"/></svg>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{%- assign has_features = false -%}
+{%- for block in blocks -%}{%- if block.type == 'feature' -%}{%- assign has_features = true -%}{%- endif -%}{%- endfor -%}
+{%- if has_features -%}
+  <section class="sl-sec">
+    <div class="sl-features">
+      {%- for block in blocks -%}
+        {%- if block.type == 'feature' -%}
+          <div class="sl-feature" {{ block.shopify_attributes }}>
+            <span class="sl-feature__icon">
+              {%- case block.settings.icon -%}
+                {%- when 'drop' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.2 6 10.5A6 6 0 0 1 6 13.5C6 9.2 12 3 12 3Z"/></svg>
+                {%- when 'clock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                {%- when 'shield' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+                {%- when 'heart' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1Z"/></svg>
+                {%- else -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7L12 3Z"/></svg>
+              {%- endcase -%}
+            </span>
+            <h3 class="sl-feature__title">{{ block.settings.title }}</h3>
+            <p class="sl-feature__text">{{ block.settings.text }}</p>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </section>
+{%- endif -%}
+
+{%- assign has_steps = false -%}
+{%- for block in blocks -%}{%- if block.type == 'step' -%}{%- assign has_steps = true -%}{%- endif -%}{%- endfor -%}
+{%- if has_steps -%}
+  <section class="sl-sec" id="how-it-works">
+    <div class="sl-sec__head">
+      <p class="sl-sec__eyebrow">{{ cfg.perm_steps_eyebrow | default: 'The experience' }}</p>
+      <h2 class="sl-sec__title">{{ cfg.perm_steps_title | default: 'How it works' }}</h2>
+    </div>
+    <div class="sl-steps">
+      {%- for block in blocks -%}
+        {%- if block.type == 'step' -%}
+          <div class="sl-step" {{ block.shopify_attributes }}>
+            <h3 class="sl-step__title">{{ block.settings.title }}</h3>
+            <p class="sl-step__text">{{ block.settings.text }}</p>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </section>
+{%- endif -%}
+
+{%- if page_content != blank -%}
+  <section class="sl-content"><div class="rte pg-page__body">{{ page_content }}</div></section>
+{%- endif -%}
+
+<section class="sl-cta">
+  <div>
+    <h2 class="sl-cta__title">{{ cfg.perm_cta_title | default: 'Ready for yours?' }}</h2>
+    <p class="sl-cta__text">{{ cfg.perm_cta_text | default: 'Tell us about your event, studio visit or group booking and we will find a date that works.' }}</p>
+  </div>
+  <a href="{{ cta_link }}" class="sl-cta__btn">{{ cfg.perm_cta_label | default: 'Get in touch' }}</a>
+</section>
