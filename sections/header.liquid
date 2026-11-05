@@ -1165,7 +1165,7 @@ data-header-cart-full="false"
       "name": {{ shop.name | json }},
       "potentialAction": {
         "@type": "SearchAction",
-        "target": {{ shop.url | append: '/search?q={search_term_string}' | json }},
+        "target": "{{ shop.url }}/search?q={% raw %}{search_term_string}{% endraw %}",
         "query-input": "required name=search_term_string"
       },
       "url": {{ shop.url | json }}
