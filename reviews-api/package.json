@@ -1,0 +1,7 @@
+{
+  "name": "le-velair-reviews-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tiny serverless endpoint that saves customer reviews as DRAFT Shopify metaobjects (type: review).",
+  "engines": { "node": ">=18" }
+}
