@@ -1,0 +1,1729 @@
+<!-- /sections/main-collection.liquid -->
+{%- liquid
+  assign current_sort = collection.sort_by | default: collection.default_sort_by
+  assign products_per_page = section.settings.products_per_page | default: 24
+
+  assign total_active_filters = 0
+  for filter in collection.filters
+    assign total_active_filters = total_active_filters | plus: filter.active_values.size
+    if filter.type == 'price_range'
+      if filter.min_value.value != nil or filter.max_value.value != nil
+        assign total_active_filters = total_active_filters | plus: 1
+      endif
+    endif
+  endfor
+-%}
+
+<div class="color-{{ section.settings.color_scheme | default: 'scheme-1' }} collection-page-wrapper"
+  data-section-id="{{ section.id }}"
+  data-section-type="collection"
+  style="--PT: {{ section.settings.padding_top | default: 20 }}px; --PB: {{ section.settings.padding_bottom | default: 60 }}px; --card-radius: {{ section.settings.card_border_radius | default: settings.card_border_radius | default: 4 }}px;">
+
+  {{ 'product-grid.css' | asset_url | stylesheet_tag }}
+  <style>
+    /* === Collection Toolbar Styling === */
+    .collection-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      margin-bottom: 24px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      gap: 16px;
+      flex-wrap: nowrap;
+    }
+    .collection-toolbar__left {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .collection-toolbar__right {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .collection-filter-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--btn-soft-bg);
+      border: 1px solid var(--btn-soft-border);
+      border-radius: var(--btn-radius, 0px);
+      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--btn-soft-text);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .collection-filter-toggle-btn:hover {
+      border-color: var(--btn-soft-hover-border);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+    .collection-filter-toggle-btn .badge-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 9px;
+      background: #000000;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .collection-count-text {
+      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-size: 12px;
+      color: #666666;
+      white-space: nowrap;
+    }
+
+    /* === Sort By: Zero-Wrap Architecture === */
+    .collection-sort-container {
+      display: inline-flex !important;
+      align-items: center !important;
+      flex-wrap: nowrap !important;
+      gap: 8px !important;
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+    }
+    .collection-sort-label {
+      white-space: nowrap !important;
+      display: inline-block !important;
+      flex-shrink: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      font-family: 'Quicksand', -apple-system, sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.12em !important;
+      color: #333333 !important;
+    }
+    .collection-sort-select-wrapper {
+      position: relative !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+    }
+    .collection-sort-select {
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      background: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.16) !important;
+      border-radius: var(--input-radius, var(--btn-radius, 0px)) !important;
+      padding: 8px 30px 8px 14px !important;
+      font-family: 'Quicksand', -apple-system, sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.1em !important;
+      color: #111111 !important;
+      cursor: pointer !important;
+      white-space: nowrap !important;
+      min-width: 140px !important;
+      line-height: normal !important;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    }
+    .collection-sort-select:hover {
+      border-color: #000000 !important;
+    }
+    .collection-sort-select-wrapper svg {
+      position: absolute !important;
+      right: 12px !important;
+      pointer-events: none !important;
+      width: 10px !important;
+      height: 10px !important;
+      color: #444444 !important;
+    }
+
+    /* Toolbar controls: same height, text vertically centred */
+    html body .collection-filter-toggle-btn,
+    html body .collection-sort-select {
+      box-sizing: border-box !important;
+      height: 40px !important;
+      min-height: 40px !important;
+    }
+    html body .collection-filter-toggle-btn { padding-top: 0 !important; padding-bottom: 0 !important; }
+    html body .collection-sort-select {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      margin: 0 !important;
+      vertical-align: middle !important;
+    }
+    html body .collection-sort-select-wrapper { height: 40px !important; align-items: center !important; }
+    html body .collection-sort-select-wrapper svg { top: 50% !important; transform: translateY(-50%) !important; margin: 0 !important; }
+    html body .collection-sort-container { align-items: center !important; }
+    html body .collection-sort-label { line-height: 1 !important; }
+
+    /* Custom sort dropdown (built by JS from the native select; native select stays as fallback) */
+    html body .collection-toolbar { position: relative; z-index: 40; }
+    .csd { position: relative; display: inline-block; }
+    .csd.is-ready .collection-sort-select { position: absolute !important; opacity: 0 !important; pointer-events: none !important; width: 100% !important; left: 0; top: 0; }
+    html body .csd.is-ready .collection-sort-select-wrapper { position: absolute !important; width: 0 !important; height: 0 !important; overflow: hidden !important; }
+    .csd.is-ready .collection-sort-select-wrapper > svg { display: none !important; }
+    .csd__btn {
+      display: inline-flex; align-items: center; justify-content: space-between; gap: 14px;
+      box-sizing: border-box; height: 40px; min-width: 190px; padding: 0 14px;
+      background: #fff; border: 1px solid rgba(0,0,0,.16); border-radius: var(--input-radius, var(--btn-radius, 0px));
+      font-family: 'Quicksand', -apple-system, sans-serif; font-size: 11px; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase; color: #111; cursor: pointer; white-space: nowrap;
+      transition: border-color .2s ease;
+    }
+    .csd__btn:hover, .csd.is-open .csd__btn { border-color: #000; }
+    .csd__btn svg { width: 10px; height: 10px; flex: none; transition: transform .2s ease; }
+    .csd.is-open .csd__btn svg { transform: rotate(180deg); }
+    .csd__menu {
+      position: absolute; top: calc(100% + 6px); right: 0; z-index: 60; min-width: 100%; width: max-content; max-width: 280px;
+      margin: 0; padding: 6px 0; list-style: none; background: #fff; border: 1px solid rgba(0,0,0,.12);
+      border-radius: var(--input-radius, var(--btn-radius, 0px)); box-shadow: 0 12px 28px rgba(0,0,0,.12);
+      opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity .15s ease, transform .15s ease, visibility .15s;
+    }
+    .csd.is-open .csd__menu { opacity: 1; visibility: visible; transform: none; }
+    .csd__opt {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0; padding: 10px 16px;
+      font-family: 'Quicksand', -apple-system, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .1em;
+      text-transform: uppercase; color: #333; cursor: pointer; white-space: nowrap;
+    }
+    .csd__opt:hover, .csd__opt.is-active { background: rgba(0,0,0,.05); color: #000; }
+    .csd__opt[aria-selected="true"]::after { content: ""; width: 5px; height: 9px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg) translateY(-2px); flex: none; }
+    /* Mobile toolbar: [Filters] ........ [Sort] on one row, item count underneath */
+    @media (max-width: 640px) {
+      html body .collection-toolbar {
+        display: grid !important;
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-areas: "f s" "c c";
+        align-items: center;
+        gap: 10px 12px;
+        padding: 12px 0;
+        margin-bottom: 18px;
+      }
+      html body .collection-toolbar__left { display: contents !important; }
+      html body .collection-filter-toggle-btn { grid-area: f; }
+      html body .collection-count-text { grid-area: c; font-size: 12px; }
+      html body .collection-toolbar__right { grid-area: s; justify-self: end; min-width: 0; }
+      html body .collection-sort-label { display: none !important; }
+      html body .collection-sort-container { gap: 0 !important; }
+      .csd__btn { min-width: 0; width: 100%; max-width: 100%; gap: 10px; }
+      .csd__menu { max-width: calc(100vw - 32px); }
+      html body .collection-sort-select { min-width: 0 !important; }
+    }
+
+    /* === Active Filters Badges Bar === */
+    .active-filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: -12px;
+      margin-bottom: 24px;
+    }
+    .active-filter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: #f7f5f0;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #111111;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .active-filter-pill:hover {
+      background: #eeebe3;
+    }
+    .active-filter-pill svg {
+      width: 8px;
+      height: 8px;
+      stroke: currentColor;
+    }
+    .active-filters-clear-all {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666666;
+      text-decoration: underline;
+      margin-left: 6px;
+    }
+    .active-filters-clear-all:hover {
+      color: #000000;
+    }
+
+    /* === Slide-out Filter Drawer === */
+    .filter-drawer-underlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 100000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .filter-drawer-underlay.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .filter-drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 380px;
+      max-width: 88vw;
+      background: #ffffff;
+      z-index: 100001;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 25px rgba(0, 0, 0, 0.15);
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .filter-drawer.is-open {
+      transform: translateX(0);
+    }
+    /* Phones: filter panel takes the full screen */
+    @media (max-width: 450px) {
+      .filter-drawer {
+        width: 100vw;
+        max-width: 100vw;
+        box-shadow: none;
+      }
+      @supports (height: 100dvh) {
+        .filter-drawer { height: 100dvh; bottom: auto; }
+      }
+    }
+    .filter-drawer__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    .filter-drawer__title {
+      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-drawer__close {
+      background: transparent;
+      border: none;
+      padding: 6px;
+      cursor: pointer;
+      color: #333333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+    .filter-drawer__close:hover {
+      transform: rotate(90deg);
+      color: #000000;
+    }
+    .filter-drawer__body {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 14px 24px 28px 24px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 0, 0, 0.22) transparent;
+    }
+    .filter-drawer__body::-webkit-scrollbar {
+      width: 5px;
+    }
+    .filter-drawer__body::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+    .filter-drawer__group {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      padding: 16px 0;
+    }
+    .filter-drawer__group-header {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #111111;
+      cursor: pointer;
+      text-align: left;
+    }
+    .filter-drawer__group-header .filter-drawer__accordion-icon {
+      width: 12px;
+      height: 12px;
+      transition: transform 0.25s ease;
+      color: #111111;
+    }
+    .filter-drawer__group-content {
+      margin-top: 14px;
+    }
+    .filter-drawer__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .filter-drawer__item {
+      padding: 4px 0;
+    }
+    .filter-drawer__item label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      cursor: pointer;
+      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #333333;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: color 0.15s ease;
+    }
+    .filter-drawer__item label:hover {
+      color: #000000;
+    }
+    .filter-drawer__item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid rgba(0, 0, 0, 0.22);
+      border-radius: 2px;
+      accent-color: #000000;
+      cursor: pointer;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .filter-drawer__show-more-btn {
+      background: none;
+      border: none;
+      padding: 10px 0 2px 0;
+      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #111111;
+      cursor: pointer;
+      display: inline-block;
+      text-align: left;
+      transition: opacity 0.2s ease;
+    }
+    .filter-drawer__show-more-btn:hover {
+      opacity: 0.65;
+    }
+
+    /* Dual-Range Price Slider (Image 1:1 match) */
+    .filter-price-slider-wrap {
+      padding: 6px 2px 8px 2px;
+    }
+    .price-slider-track-container {
+      position: relative;
+      width: 100%;
+      height: 24px;
+      display: flex;
+      align-items: center;
+    }
+    .price-slider-bar {
+      position: absolute;
+      width: 100%;
+      height: 3px;
+      background: #e2e2e2;
+      border-radius: 2px;
+    }
+    .price-slider-fill {
+      position: absolute;
+      height: 3px;
+      background: #000000;
+      border-radius: 2px;
+      left: 0%;
+      right: 0%;
+    }
+    .price-slider-range {
+      position: absolute;
+      width: 100%;
+      height: 24px;
+      background: none;
+      pointer-events: none;
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+      z-index: 3;
+    }
+    .price-slider-range::-webkit-slider-thumb {
+      pointer-events: auto;
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #000000;
+      border: 2px solid #000000;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+      transition: transform 0.1s ease;
+    }
+    .price-slider-range::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    .price-slider-range::-moz-range-thumb {
+      pointer-events: auto;
+      width: 18px;
+      height: 18px;
+      background: #000000;
+      border: 2px solid #000000;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    }
+    .filter-price-inputs-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 14px;
+    }
+    .price-input-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+      padding-bottom: 4px;
+    }
+    .price-input-box .currency-symbol {
+      font-size: 14px;
+      font-weight: 500;
+      color: #111111;
+      margin-right: 6px;
+    }
+    .price-input-box input {
+      width: 100%;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #555555;
+      text-align: right;
+      padding: 0;
+      -moz-appearance: textfield;
+    }
+    .price-input-box input::-webkit-outer-spin-button,
+    .price-input-box input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .price-separator {
+      color: #777777;
+      font-size: 16px;
+    }
+
+    .filter-drawer__footer {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      background: #ffffff;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .filter-drawer__apply-btn {
+      flex: 1;
+      height: 48px;
+      background: var(--btn-regular-bg, #000000);
+      color: var(--btn-regular-text, #ffffff);
+      border: 1px solid var(--btn-regular-border, #000000);
+      border-radius: var(--btn-radius, 0px);
+      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      transform: none !important;
+      transition: border-color var(--btn-animation-duration, 350ms) ease-in-out, box-shadow var(--btn-animation-duration, 350ms) ease-in-out !important;
+    }
+    .filter-drawer__clear-btn {
+      height: 48px;
+      padding: 0 20px;
+      background: var(--btn-soft-bg, rgba(0,0,0,0.05));
+      color: var(--btn-soft-text, #000000);
+      border: 1px solid var(--btn-soft-border, rgba(0,0,0,0.12));
+      border-radius: var(--btn-radius, 0px);
+      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      transform: none !important;
+      transition: border-color 350ms ease-in-out, box-shadow 350ms ease-in-out !important;
+    }
+
+    /* === Responsive Behavior for Mobile Toolbar === */
+    @media (max-width: 640px) {
+      .collection-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .collection-toolbar__row-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+      .collection-toolbar__row-bottom {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        width: 100%;
+      }
+      .collection-sort-select {
+        min-width: 120px !important;
+        padding-right: 26px !important;
+      }
+    }
+
+    /* Product grid columns: see assets/product-grid.css (settings: Product grid columns) */
+    @media (max-width: 640px) {
+      .collection-page-wrapper .wrapper {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+    }
+
+    /* === Collection header designs === */
+    .collection-hero {
+      width: 100%;
+      color: var(--hero-fg, inherit);
+    }
+    .collection-hero--band { background: rgb(var(--color-background)); }
+    .collection-hero--band .collection-hero__desc { color: var(--hero-fg, rgb(var(--color-foreground))); }
+    .collection-hero .collection-hero__title {
+      margin: 0 0 12px;
+      line-height: 1.08;
+      letter-spacing: 0;
+      color: var(--hero-fg, var(--text, #111)) !important;
+    }
+    .collection-hero--size-small .collection-hero__title { font-size: clamp(22px, 2.4vw, 30px); }
+    .collection-hero--size-medium .collection-hero__title { font-size: clamp(26px, 3.2vw, 40px); }
+    .collection-hero--size-large .collection-hero__title { font-size: clamp(34px, 5vw, 64px); }
+    .collection-hero--size-xlarge .collection-hero__title { font-size: clamp(42px, 7vw, 96px); letter-spacing: -0.01em; }
+    .collection-hero .collection-hero__desc {
+      max-width: 760px;
+      font-size: 14.5px;
+      line-height: 1.65;
+      font-weight: 500;
+      color: var(--hero-fg, #2b2622);
+    }
+    .collection-hero .collection-hero__desc * { color: inherit; }
+    .collection-hero--centered .collection-hero__text { text-align: center; }
+    .collection-hero--centered .collection-hero__desc { margin-left: auto; margin-right: auto; }
+    .collection-hero--editorial .collection-hero__inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 32px;
+      align-items: center;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .collection-hero--editorial .collection-hero__inner.no-media { grid-template-columns: minmax(0, 1fr); }
+    .collection-hero--editorial .collection-hero__media { text-align: right; }
+    .collection-hero--editorial .collection-hero__media img {
+      display: inline-block;
+      max-width: 100%;
+      max-height: 360px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    @media (max-width: 768px) {
+      .collection-hero--editorial .collection-hero__inner { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      .collection-hero--editorial .collection-hero__media { text-align: center; }
+      .collection-hero--editorial .collection-hero__media img { max-height: 220px; }
+    }
+    .collection-hero--band { padding: 0 0 clamp(26px, 4vw, 56px); } /* top space comes from the "Padding top" setting */
+    .collection-hero--band .collection-hero__text { padding: 0; }
+    .collection-hero__pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 16px;
+      padding-top: 24px;
+      padding-bottom: 4px;
+    }
+    .collection-hero__pill {
+      display: inline-block;
+      padding: 14px 24px;
+      background: #ffffff;
+      border: 1px solid #e6e1d8;
+      border-radius: 2px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #2b2622;
+      line-height: 1.2;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .collection-hero__pill:hover,
+    .collection-hero__pill[aria-current] {
+      border-color: #111111;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+    }
+    @media (max-width: 640px) {
+      .collection-hero__pill { padding: 10px 16px; font-size: 13px; }
+    }
+  </style>
+
+  <!-- Collection Hero Header -->
+  {%- liquid
+    assign header_style = section.settings.header_style | default: 'minimal'
+    assign title_size = section.settings.title_size | default: 'medium'
+    assign hero_desc = ''
+    if section.settings.show_description
+      if collection.description != blank
+        assign hero_desc = collection.description
+      elsif section.settings.custom_description != blank
+        assign hero_desc = section.settings.custom_description
+      endif
+    endif
+    assign hero_media = nil
+    if header_style == 'editorial' and collection.image != blank
+      assign hero_media = collection.image
+    endif
+    assign hero_links = section.settings.collection_links_menu.links
+  -%}
+  <section class="collection-hero collection-hero--{{ header_style }} collection-hero--size-{{ title_size }} palette--light{% if header_style == 'band' %} color-{{ section.settings.header_color_scheme | default: 'scheme-3' }}{% else %} bg--neutral{% endif %}"
+    data-section-type="hero"
+    style="{% if section.settings.header_text_color != blank %}--hero-fg: {{ section.settings.header_text_color }};{% endif %}">
+    <div style="--PT: {{ section.settings.padding_top | default: 20 }}px; --PB: 10px;">
+      <div class="collection__text-content wrapper--full section-padding">
+        <div class="collection-hero__inner{% unless hero_media %} no-media{% endunless %}">
+          <div class="collection-hero__text">
+            {% render 'breadcrumb', current: collection.title %}
+            <h1 class="collection-hero__title">{{ collection.title | default: 'Collection' }}</h1>
+            {%- if hero_desc != blank -%}
+              <div class="rte collection-hero__desc">{{ hero_desc }}</div>
+            {%- endif -%}
+          </div>
+          {%- if hero_media -%}
+            <div class="collection-hero__media">
+              <img src="{{ hero_media | image_url: width: 900 }}"
+                srcset="{{ hero_media | image_url: width: 500 }} 500w, {{ hero_media | image_url: width: 900 }} 900w, {{ hero_media | image_url: width: 1400 }} 1400w"
+                sizes="(max-width: 768px) 80vw, 40vw"
+                alt="{{ hero_media.alt | default: collection.title | escape }}"
+                width="{{ hero_media.width }}" height="{{ hero_media.height }}" loading="eager">
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </section>
+  {%- if hero_links.size > 0 -%}
+    <nav class="collection-hero__pills-wrap wrapper--full section-padding" aria-label="Sub collections">
+      <div class="collection-hero__pills">
+        {%- for link in hero_links -%}
+          <a href="{{ link.url }}" class="collection-hero__pill"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a>
+        {%- endfor -%}
+      </div>
+    </nav>
+  {%- endif -%}
+
+  <!-- Collection Toolbar & Product Grid Container -->
+  <div class="collection collection--compact-mobile">
+    <div class="wrapper--full section-padding">
+
+      <!-- Responsive Toolbar -->
+      <div class="collection-toolbar">
+        
+        <!-- Left: Filters Trigger & Count -->
+        <div class="collection-toolbar__left">
+          {%- if section.settings.enable_filtering -%}
+            <button type="button" class="collection-filter-toggle-btn" id="CollectionFiltersToggle" aria-haspopup="dialog" aria-expanded="false">
+              <span>Filters</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M21 7H3M18 12H6M15 17H9"/></svg>
+              {%- if total_active_filters > 0 -%}
+                <span class="badge-count">{{ total_active_filters }}</span>
+              {%- endif -%}
+            </button>
+          {%- endif -%}
+
+          {%- if section.settings.show_products_count -%}
+            <div class="collection-count-text">
+              Showing <strong>{{ collection.products_count }}</strong> items
+            </div>
+          {%- endif -%}
+        </div>
+
+        <!-- Right: Sort By (Guaranteed Zero-Wrap) -->
+        {%- if section.settings.enable_sorting -%}
+          <div class="collection-toolbar__right">
+            <div class="collection-sort-container">
+              <label for="CollectionSortBy" class="collection-sort-label">Sort by:</label>
+              <div class="collection-sort-select-wrapper">
+                <select id="CollectionSortBy" class="collection-sort-select">
+                  <option value="best-selling"{% if current_sort == 'best-selling' %} selected{% endif %}>Best selling</option>
+                  <option value="manual"{% if current_sort == 'manual' %} selected{% endif %}>Featured</option>
+                  <option value="price-ascending"{% if current_sort == 'price-ascending' %} selected{% endif %}>Price: Low to High</option>
+                  <option value="price-descending"{% if current_sort == 'price-descending' %} selected{% endif %}>Price: High to Low</option>
+                  <option value="title-ascending"{% if current_sort == 'title-ascending' %} selected{% endif %}>Alphabetically, A-Z</option>
+                  <option value="title-descending"{% if current_sort == 'title-descending' %} selected{% endif %}>Alphabetically, Z-A</option>
+                  <option value="created-descending"{% if current_sort == 'created-descending' %} selected{% endif %}>Date: New to Old</option>
+                </select>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+
+      </div>
+
+      <!-- Active Filters Badges Bar -->
+      {%- if total_active_filters > 0 -%}
+        <div class="active-filters-bar">
+          <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em; color: #777;">Active:</span>
+          {%- for filter in collection.filters -%}
+            {%- for value in filter.active_values -%}
+              <a href="{{ value.url_to_remove }}" class="active-filter-pill">
+                <span>{{ filter.label }}: {{ value.label }}</span>
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </a>
+            {%- endfor -%}
+            {%- if filter.type == 'price_range' -%}
+              {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                <a href="{{ filter.url_to_remove }}" class="active-filter-pill">
+                  <span>Price: {{ filter.min_value.value | default: 0 | money }} - {{ filter.max_value.value | default: filter.range_max | money }}</span>
+                  <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </a>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+          <a href="{{ collection.url }}?sort_by={{ current_sort }}" class="active-filters-clear-all">Clear all</a>
+        </div>
+      {%- endif -%}
+
+      <!-- Products Grid -->
+      {%- paginate collection.products by products_per_page -%}
+        {%- if collection.products.size > 0 -%}
+          <div class="collection-products-grid lv-product-grid" style="{% render 'product-grid-vars', settings: section.settings %}">
+            {%- for product in collection.products -%}
+              {% render 'product-grid-item', product: product, fallback_index: forloop.index, card_border_radius: section.settings.card_border_radius %}
+            {%- endfor -%}
+          </div>
+
+          {%- if paginate.pages > 1 -%}
+            {% render 'pagination', paginate: paginate %}
+          {%- endif -%}
+        {%- elsif collection.all_products_count == 0 -%}
+          {%- comment -%} Store has no products yet: show EUR demo pieces so the theme still looks complete {%- endcomment -%}
+          <div class="collection-products-grid lv-product-grid" style="{% render 'product-grid-vars', settings: section.settings %}">
+            {%- for i in (1..12) -%}
+              {% render 'product-grid-item', fallback_index: i, card_border_radius: section.settings.card_border_radius %}
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+          <div style="text-align: center; padding: 90px 20px;">
+            <p style="font-family: 'Quicksand', sans-serif; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #111; margin-bottom: 12px;">
+              No products found
+            </p>
+            <p style="font-family: 'Quicksand', sans-serif; font-size: 13px; color: #777; margin-bottom: 28px;">
+              Try adjusting or clearing your filters to see available pieces.
+            </p>
+            <a href="{{ collection.url }}" class="btn btn--primary" style="display: inline-flex; padding: 12px 32px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em;">
+              <span>Clear All Filters</span>
+            </a>
+          </div>
+        {%- endif -%}
+      {%- endpaginate -%}
+
+    </div>
+  </div>
+
+  <!-- Slide-out Filter Drawer & Backdrop -->
+  {%- if section.settings.enable_filtering -%}
+    <div class="filter-drawer-underlay" id="CollectionFilterUnderlay" aria-hidden="true"></div>
+
+    <aside class="filter-drawer" id="CollectionFilterDrawer" role="dialog" aria-modal="true" aria-label="Filters">
+      
+      <!-- Drawer Header -->
+      <div class="filter-drawer__header">
+        <h2 class="filter-drawer__title">
+          <span>Filters</span>
+          {%- if total_active_filters > 0 -%}
+            <span class="badge-count" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:#000; color:#fff; font-size:10px;">{{ total_active_filters }}</span>
+          {%- endif -%}
+        </h2>
+        <button type="button" class="filter-drawer__close" id="CollectionFilterClose" aria-label="Close filters">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Drawer Scrollable Form -->
+      <div class="filter-drawer__body">
+        <form id="CollectionFilterForm" method="get" action="{{ collection.url }}">
+          <input type="hidden" name="sort_by" value="{{ current_sort }}">
+
+          {%- assign price_filter = nil -%}
+          {%- for filter in collection.filters -%}
+            {%- if filter.type == 'price_range' -%}
+              {%- assign price_filter = filter -%}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+
+          {%- liquid
+            assign min_slider_val = 0
+            assign max_slider_val = 65
+            assign price_min_name = 'filter.v.price.gte'
+            assign price_max_name = 'filter.v.price.lte'
+            if price_filter
+              assign price_min_name = price_filter.min_value.param_name
+              assign price_max_name = price_filter.max_value.param_name
+              assign range_max_val = price_filter.range_max | divided_by: 100.0 | ceil
+              if range_max_val > 0
+                assign max_slider_val = range_max_val
+              endif
+            endif
+            if collection.products.size > 0
+              assign page_prices = collection.products | map: 'price' | sort
+              assign page_min_val = page_prices.first | divided_by: 100.0 | floor
+              if page_min_val < max_slider_val
+                assign min_slider_val = page_min_val
+              endif
+            endif
+            assign current_min_val = min_slider_val
+            assign current_max_val = max_slider_val
+            if price_filter.min_value.value != blank
+              assign current_min_val = price_filter.min_value.value | divided_by: 100.0 | floor
+            endif
+            if price_filter.max_value.value != blank
+              assign current_max_val = price_filter.max_value.value | divided_by: 100.0 | ceil
+            endif
+            if current_min_val < min_slider_val
+              assign min_slider_val = current_min_val
+            endif
+            if current_max_val > max_slider_val
+              assign max_slider_val = current_max_val
+            endif
+          -%}
+
+          <!-- 1. PRICE Group (Dual-Range Slider 1:1 Reference Match) -->
+          <div class="filter-drawer__group is-open">
+            <button type="button" class="filter-drawer__group-header filter-drawer__accordion-trigger" aria-expanded="true">
+              <span>Price</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-drawer__accordion-icon"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="filter-drawer__group-content">
+              <div class="filter-price-slider-wrap">
+                <div class="price-slider-track-container">
+                  <div class="price-slider-bar"></div>
+                  <div class="price-slider-fill" id="PriceSliderFill"></div>
+                  <input type="range" class="price-slider-range" id="PriceRangeMin" min="{{ min_slider_val }}" max="{{ max_slider_val }}" value="{{ current_min_val }}" step="1" aria-label="Minimum price">
+                  <input type="range" class="price-slider-range" id="PriceRangeMax" min="{{ min_slider_val }}" max="{{ max_slider_val }}" value="{{ current_max_val }}" step="1" aria-label="Maximum price">
+                </div>
+                <div class="filter-price-inputs-row">
+                  <div class="price-input-box">
+                    <span class="currency-symbol">{{ cart.currency.symbol | default: '€' }}</span>
+                    <input type="number" id="FilterPriceGte" name="{{ price_min_name }}" min="{{ min_slider_val }}" max="{{ max_slider_val }}" value="{{ current_min_val }}" placeholder="{{ min_slider_val }}" aria-label="Min price">
+                  </div>
+                  <span class="price-separator">–</span>
+                  <div class="price-input-box">
+                    <span class="currency-symbol">{{ cart.currency.symbol | default: '€' }}</span>
+                    <input type="number" id="FilterPriceLte" name="{{ price_max_name }}" min="0" max="{{ max_slider_val }}" value="{{ current_max_val }}" placeholder="{{ max_slider_val }}" aria-label="Max price">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. STYLE Group (10 Items with Show More) -->
+          <div class="filter-drawer__group is-open">
+            <button type="button" class="filter-drawer__group-header filter-drawer__accordion-trigger" aria-expanded="true">
+              <span>Style</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-drawer__accordion-icon"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="filter-drawer__group-content">
+              <ul class="filter-drawer__list" id="FilterStyleList">
+                <li class="filter-drawer__item">
+                  <label for="FilterStyle-1">
+                    <span class="filter-label-text">Basis Armbanden</span>
+                    <input type="checkbox" id="FilterStyle-1" name="filter.p.tag" value="Basis Armbanden" data-filter-type="style">
+                  </label>
+                </li>
+                <li class="filter-drawer__item">
+                  <label for="FilterStyle-2">
+                    <span class="filter-label-text">Bedel Armbanden</span>
+                    <input type="checkbox" id="FilterStyle-2" name="filter.p.tag" value="Bedel Armbanden" data-filter-type="style">
+                  </label>
+                </li>
+                <li class="filter-drawer__item">
+                  <label for="FilterStyle-3">
+                    <span class="filter-label-text">Bloemetjes Armbanden</span>
+                    <input type="checkbox" id="FilterStyle-3" name="filter.p.tag" value="Bloemetjes Armbanden" data-filter-type="style">
+                  </label>
+                </li>
+                <li class="filter-drawer__item">
+                  <label for="FilterStyle-4">
+                    <span class="filter-label-text">Dubbele Armbanden</span>
+                    <input type="checkbox" id="FilterStyle-4" name="filter.p.tag" value="Dubbele Armbanden" data-filter-type="style">
+                  </label>
+                </li>
+                <li class="filter-drawer__item">
+                  <label for="FilterStyle-5">
+                    <span class="filter-label-text">Grove Ringen</span>
+                    <input type="checkbox" id="FilterStyle-5" name="filter.p.tag" value="Grove Ringen" data-filter-type="style">
+                  </label>
+                </li>
+                <li class="filter-drawer__item">
+                  <label for="FilterStyle-6">
+                    <span class="filter-label-text">Hangende Oorbellen</span>
+                    <input type="checkbox" id="FilterStyle-6" name="filter.p.tag" value="Hangende Oorbellen" data-filter-type="style">
+                  </label>
+                </li>
+                <li class="filter-drawer__item">
+                  <label for="FilterStyle-7">
+                    <span class="filter-label-text">Hanger Kettingen</span>
+                    <input type="checkbox" id="FilterStyle-7" name="filter.p.tag" value="Hanger Kettingen" data-filter-type="style">
+                  </label>
+                </li>
+                <li class="filter-drawer__item is-extra-item" style="display: none;">
+                  <label for="FilterStyle-8">
+                    <span class="filter-label-text">Schakelarmbanden</span>
+                    <input type="checkbox" id="FilterStyle-8" name="filter.p.tag" value="Schakelarmbanden" data-filter-type="style">
+                  </label>
+                </li>
+                <li class="filter-drawer__item is-extra-item" style="display: none;">
+                  <label for="FilterStyle-9">
+                    <span class="filter-label-text">Statement Ringen</span>
+                    <input type="checkbox" id="FilterStyle-9" name="filter.p.tag" value="Statement Ringen" data-filter-type="style">
+                  </label>
+                </li>
+                <li class="filter-drawer__item is-extra-item" style="display: none;">
+                  <label for="FilterStyle-10">
+                    <span class="filter-label-text">Subtiele Armbanden</span>
+                    <input type="checkbox" id="FilterStyle-10" name="filter.p.tag" value="Subtiele Armbanden" data-filter-type="style">
+                  </label>
+                </li>
+              </ul>
+              <button type="button" class="filter-drawer__show-more-btn" id="StyleShowMoreBtn">Show More</button>
+            </div>
+          </div>
+
+          <!-- 3. MATERIALS Group -->
+          <div class="filter-drawer__group is-open">
+            <button type="button" class="filter-drawer__group-header filter-drawer__accordion-trigger" aria-expanded="true">
+              <span>Materials</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-drawer__accordion-icon"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="filter-drawer__group-content">
+              <ul class="filter-drawer__list">
+                <li class="filter-drawer__item">
+                  <label for="FilterMaterial-1">
+                    <span class="filter-label-text">Stainless Steel</span>
+                    <input type="checkbox" id="FilterMaterial-1" name="filter.p.tag" value="Stainless Steel" data-filter-type="material">
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 4. TO COLOUR Group -->
+          <div class="filter-drawer__group is-open">
+            <button type="button" class="filter-drawer__group-header filter-drawer__accordion-trigger" aria-expanded="true">
+              <span>To Colour</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-drawer__accordion-icon"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="filter-drawer__group-content">
+              <ul class="filter-drawer__list">
+                <li class="filter-drawer__item">
+                  <label for="FilterColor-1">
+                    <span class="filter-label-text">Goud</span>
+                    <input type="checkbox" id="FilterColor-1" name="filter.v.option.color" value="Goud" data-filter-type="color">
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 5. RING SIZE Group (16, 17, 18) -->
+          <div class="filter-drawer__group is-open">
+            <button type="button" class="filter-drawer__group-header filter-drawer__accordion-trigger" aria-expanded="true">
+              <span>Ring Size</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-drawer__accordion-icon"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="filter-drawer__group-content">
+              <ul class="filter-drawer__list">
+                <li class="filter-drawer__item">
+                  <label for="FilterSize-1">
+                    <span class="filter-label-text">16</span>
+                    <input type="checkbox" id="FilterSize-1" name="filter.v.option.size" value="16" data-filter-type="size">
+                  </label>
+                </li>
+                <li class="filter-drawer__item">
+                  <label for="FilterSize-2">
+                    <span class="filter-label-text">17</span>
+                    <input type="checkbox" id="FilterSize-2" name="filter.v.option.size" value="17" data-filter-type="size">
+                  </label>
+                </li>
+                <li class="filter-drawer__item">
+                  <label for="FilterSize-3">
+                    <span class="filter-label-text">18</span>
+                    <input type="checkbox" id="FilterSize-3" name="filter.v.option.size" value="18" data-filter-type="size">
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Drawer Footer Action Buttons -->
+      <div class="filter-drawer__footer">
+        <button type="submit" form="CollectionFilterForm" class="filter-drawer__apply-btn btn btn--primary">
+          <span>Apply Filters</span>
+        </button>
+        <a href="{{ collection.url }}?sort_by={{ current_sort }}" class="filter-drawer__clear-btn btn--soft" id="FilterResetBtn">
+          <span>Clear</span>
+        </a>
+      </div>
+
+    </aside>
+  {%- endif -%}
+
+</div>
+
+<script>
+  (function() {
+    function initFiltersAndSort() {
+      var filterToggleBtn = document.getElementById('CollectionFiltersToggle');
+      var filterDrawer = document.getElementById('CollectionFilterDrawer');
+      var filterUnderlay = document.getElementById('CollectionFilterUnderlay');
+      var filterCloseBtn = document.getElementById('CollectionFilterClose');
+      var filterForm = document.getElementById('CollectionFilterForm');
+
+      function openDrawer() {
+        if (filterDrawer && filterUnderlay) {
+          filterDrawer.classList.add('is-open');
+          filterUnderlay.classList.add('is-open');
+          document.body.style.overflow = 'hidden';
+          if (filterToggleBtn) filterToggleBtn.setAttribute('aria-expanded', 'true');
+        }
+      }
+
+      function closeDrawer() {
+        if (filterDrawer && filterUnderlay) {
+          filterDrawer.classList.remove('is-open');
+          filterUnderlay.classList.remove('is-open');
+          document.body.style.overflow = '';
+          if (filterToggleBtn) filterToggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      }
+
+      if (filterToggleBtn) {
+        filterToggleBtn.onclick = function(e) {
+          e.preventDefault();
+          openDrawer();
+        };
+      }
+
+      if (filterCloseBtn) {
+        filterCloseBtn.onclick = function(e) {
+          e.preventDefault();
+          closeDrawer();
+        };
+      }
+
+      if (filterUnderlay) {
+        filterUnderlay.onclick = function(e) {
+          e.preventDefault();
+          closeDrawer();
+        };
+      }
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && filterDrawer && filterDrawer.classList.contains('is-open')) {
+          closeDrawer();
+        }
+      });
+
+      // 1. Filter Drawer Accordion Toggles
+      var triggers = document.querySelectorAll('.filter-drawer__accordion-trigger');
+      triggers.forEach(function(trigger) {
+        trigger.onclick = function() {
+          var content = this.nextElementSibling;
+          var icon = this.querySelector('.filter-drawer__accordion-icon');
+          if (content) {
+            var isHidden = content.style.display === 'none';
+            content.style.display = isHidden ? 'block' : 'none';
+            if (icon) {
+              icon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+            this.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+          }
+        };
+      });
+
+      // 2. Style "Show More" / "Show Less" Toggle
+      var showMoreBtn = document.getElementById('StyleShowMoreBtn');
+      if (showMoreBtn) {
+        showMoreBtn.onclick = function() {
+          var extraItems = document.querySelectorAll('.filter-drawer__list .is-extra-item');
+          var isExpanded = showMoreBtn.getAttribute('data-expanded') === 'true';
+          extraItems.forEach(function(item) {
+            item.style.display = isExpanded ? 'none' : 'block';
+          });
+          showMoreBtn.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
+          showMoreBtn.textContent = isExpanded ? 'Show More' : 'Show Less';
+        };
+      }
+
+      // 3. Dual-Handle Price Slider
+      var rangeMin = document.getElementById('PriceRangeMin');
+      var rangeMax = document.getElementById('PriceRangeMax');
+      var inputMin = document.getElementById('FilterPriceGte');
+      var inputMax = document.getElementById('FilterPriceLte');
+      var trackFill = document.getElementById('PriceSliderFill');
+
+      if (rangeMin && rangeMax && trackFill) {
+        var sliderMax = parseFloat(rangeMin.getAttribute('max')) || 65;
+        var sliderMin = parseFloat(rangeMin.getAttribute('min')) || 0;
+        var sliderSpan = (sliderMax - sliderMin) || 1;
+
+        function updatePriceSlider() {
+          var minVal = parseFloat(rangeMin.value);
+          var maxVal = parseFloat(rangeMax.value);
+
+          if (minVal > maxVal) {
+            var tmp = minVal;
+            minVal = maxVal;
+            maxVal = tmp;
+          }
+
+          var leftPercent = ((minVal - sliderMin) / sliderSpan) * 100;
+          var rightPercent = 100 - ((maxVal - sliderMin) / sliderSpan) * 100;
+
+          trackFill.style.left = leftPercent + '%';
+          trackFill.style.right = rightPercent + '%';
+
+          if (inputMin) inputMin.value = Math.round(minVal);
+          if (inputMax) inputMax.value = Math.round(maxVal);
+        }
+
+        rangeMin.addEventListener('input', updatePriceSlider);
+        rangeMax.addEventListener('input', updatePriceSlider);
+
+        if (inputMin) {
+          inputMin.addEventListener('change', function() {
+            var val = Math.min(Math.max(parseFloat(this.value) || sliderMin, sliderMin), sliderMax);
+            rangeMin.value = val;
+            updatePriceSlider();
+          });
+        }
+
+        if (inputMax) {
+          inputMax.addEventListener('change', function() {
+            var val = Math.min(Math.max(parseFloat(this.value) || sliderMax, sliderMin), sliderMax);
+            rangeMax.value = val;
+            updatePriceSlider();
+          });
+        }
+
+        updatePriceSlider();
+
+        // Untouched price range = no price filter: keep the URL clean
+        if (filterForm) {
+          filterForm.addEventListener('submit', function () {
+            if (inputMin && inputMax && parseFloat(inputMin.value) <= sliderMin && parseFloat(inputMax.value) >= sliderMax) {
+              inputMin.disabled = true;
+              inputMax.disabled = true;
+            }
+          });
+        }
+      }
+
+      // 4. URL State Synchronization & Active Badges
+      var urlParams = new URLSearchParams(window.location.search);
+      var activeFilterCount = 0;
+
+      // Price filter from URL
+      var pMin = urlParams.get('filter.v.price.gte');
+      var pMax = urlParams.get('filter.v.price.lte');
+      if (pMin && rangeMin && inputMin) {
+        rangeMin.value = pMin;
+        inputMin.value = pMin;
+        activeFilterCount++;
+      }
+      if (pMax && rangeMax && inputMax) {
+        rangeMax.value = pMax;
+        inputMax.value = pMax;
+        activeFilterCount++;
+      }
+      if (trackFill && (pMin || pMax)) {
+        updatePriceSlider();
+      }
+
+      // Checkboxes from URL
+      var allCheckboxes = document.querySelectorAll('.filter-drawer__item input[type="checkbox"]');
+      allCheckboxes.forEach(function(cb) {
+        var name = cb.getAttribute('name');
+        var val = cb.getAttribute('value');
+        if (urlParams.getAll(name).includes(val)) {
+          cb.checked = true;
+          activeFilterCount++;
+          // If in extra items, expand Show More automatically
+          var extraParent = cb.closest('.is-extra-item');
+          if (extraParent && showMoreBtn) {
+            extraParent.style.display = 'block';
+            showMoreBtn.setAttribute('data-expanded', 'true');
+            showMoreBtn.textContent = 'Show Less';
+          }
+        }
+      });
+
+      // Update badge counts
+      if (activeFilterCount > 0) {
+        var toggleBadge = document.querySelector('.collection-filter-toggle-btn .badge-count');
+        var drawerBadge = document.querySelector('.filter-drawer__title .badge-count');
+        if (toggleBadge) {
+          toggleBadge.textContent = activeFilterCount;
+          toggleBadge.style.display = 'inline-flex';
+        }
+        if (drawerBadge) {
+          drawerBadge.textContent = activeFilterCount;
+          drawerBadge.style.display = 'inline-flex';
+        }
+      }
+
+      // 5. Client-Side Instant Product Filtering Matching (Zero False Empty Grids!)
+      function applyClientSideFiltering() {
+        var checkedStyles = [];
+        var checkedMaterials = [];
+        var checkedColors = [];
+        var checkedSizes = [];
+
+        document.querySelectorAll('input[data-filter-type="style"]:checked').forEach(function(c) {
+          checkedStyles.push(c.value.toLowerCase().trim());
+        });
+        document.querySelectorAll('input[data-filter-type="material"]:checked').forEach(function(c) {
+          checkedMaterials.push(c.value.toLowerCase().trim());
+        });
+        document.querySelectorAll('input[data-filter-type="color"]:checked').forEach(function(c) {
+          checkedColors.push(c.value.toLowerCase().trim());
+        });
+        document.querySelectorAll('input[data-filter-type="size"]:checked').forEach(function(c) {
+          checkedSizes.push(c.value.toLowerCase().trim());
+        });
+
+        var minPrice = inputMin ? (parseFloat(inputMin.value) || 0) : 0;
+        var maxPrice = inputMax ? (parseFloat(inputMax.value) || 999999) : 999999;
+
+        var hasAnyActiveFilter = checkedStyles.length > 0 || checkedMaterials.length > 0 || checkedColors.length > 0 || checkedSizes.length > 0 || (pMin || pMax);
+
+        if (!hasAnyActiveFilter) return;
+
+        var cards = document.querySelectorAll('.collection-products-grid product-grid-item');
+        var visibleCount = 0;
+
+        cards.forEach(function(card) {
+          var price = parseFloat(card.getAttribute('data-price') || '0');
+          var title = (card.getAttribute('data-title') || '').toLowerCase();
+          var tags = (card.getAttribute('data-tags') || '').toLowerCase();
+          var type = (card.getAttribute('data-type') || '').toLowerCase();
+          var options = (card.getAttribute('data-options') || '').toLowerCase();
+          var variants = (card.getAttribute('data-variants') || '').toLowerCase();
+
+          var allText = title + ' ' + tags + ' ' + type + ' ' + options + ' ' + variants;
+
+          // Price match
+          var priceMatch = price >= minPrice && price <= maxPrice;
+
+          // Style match
+          var styleMatch = checkedStyles.length === 0;
+          if (!styleMatch) {
+            styleMatch = checkedStyles.some(function(s) {
+              return allText.indexOf(s) > -1 || tags.indexOf(s) > -1;
+            });
+          }
+
+          // Material match
+          var materialMatch = checkedMaterials.length === 0;
+          if (!materialMatch) {
+            materialMatch = checkedMaterials.some(function(m) {
+              return allText.indexOf(m) > -1 || allText.indexOf('stainless') > -1 || allText.indexOf('steel') > -1;
+            });
+          }
+
+          // Color match
+          var colorMatch = checkedColors.length === 0;
+          if (!colorMatch) {
+            colorMatch = checkedColors.some(function(col) {
+              return allText.indexOf(col) > -1 || allText.indexOf('gold') > -1;
+            });
+          }
+
+          // Size match
+          var sizeMatch = checkedSizes.length === 0;
+          if (!sizeMatch) {
+            sizeMatch = checkedSizes.some(function(sz) {
+              return options.indexOf(sz) > -1 || variants.indexOf(sz) > -1 || allText.indexOf(sz) > -1;
+            });
+          }
+
+          if (priceMatch && styleMatch && materialMatch && colorMatch && sizeMatch) {
+            card.style.display = '';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      applyClientSideFiltering();
+
+      // Clear button: reset the filter form only (no page reload)
+      var clearBtn = document.getElementById('FilterResetBtn');
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (filterForm) {
+            filterForm.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(function(i) { i.checked = false; });
+          }
+          if (rangeMin && rangeMax) {
+            rangeMin.value = rangeMin.getAttribute('min') || 0;
+            rangeMax.value = rangeMax.getAttribute('max') || rangeMax.value;
+            rangeMin.dispatchEvent(new Event('input', { bubbles: true }));
+            rangeMax.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        });
+      }
+
+      // 6. Sort by Dropdown
+      var sortSelect = document.getElementById('CollectionSortBy');
+      if (sortSelect) {
+        var goSort = function(value) {
+          var url = new URL(window.location.href);
+          url.searchParams.set('sort_by', value);
+          window.location.href = url.href;
+        };
+        sortSelect.onchange = function() { goSort(this.value); };
+
+        // Custom dropdown on top of the native select
+        var wrap = sortSelect.parentNode;
+        if (wrap && !wrap.parentNode.classList.contains('csd')) {
+          var box = document.createElement('div');
+          box.className = 'csd';
+          wrap.parentNode.insertBefore(box, wrap);
+          box.appendChild(wrap);
+
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'csd__btn';
+          btn.setAttribute('aria-haspopup', 'listbox');
+          btn.setAttribute('aria-expanded', 'false');
+          var label = document.createElement('span');
+          btn.appendChild(label);
+          btn.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
+
+          var menu = document.createElement('ul');
+          menu.className = 'csd__menu';
+          menu.setAttribute('role', 'listbox');
+          menu.setAttribute('aria-labelledby', 'CollectionSortBy');
+
+          var opts = [];
+          Array.prototype.forEach.call(sortSelect.options, function(o) {
+            var li = document.createElement('li');
+            li.className = 'csd__opt';
+            li.setAttribute('role', 'option');
+            li.setAttribute('data-value', o.value);
+            li.setAttribute('aria-selected', o.selected ? 'true' : 'false');
+            li.textContent = o.text;
+            if (o.selected) label.textContent = o.text;
+            menu.appendChild(li);
+            opts.push(li);
+          });
+
+          box.appendChild(btn);
+          box.appendChild(menu);
+          sortSelect.setAttribute('tabindex', '-1');
+          sortSelect.setAttribute('aria-hidden', 'true');
+          box.classList.add('is-ready');
+
+          var setOpen = function(open) {
+            box.classList.toggle('is-open', open);
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          };
+          var move = function(dir) {
+            var cur = opts.findIndex(function(o) { return o.classList.contains('is-active'); });
+            if (cur < 0) cur = opts.findIndex(function(o) { return o.getAttribute('aria-selected') === 'true'; });
+            var next = Math.max(0, Math.min(opts.length - 1, cur + dir));
+            opts.forEach(function(o) { o.classList.remove('is-active'); });
+            opts[next].classList.add('is-active');
+          };
+
+          btn.addEventListener('click', function(e) { e.stopPropagation(); setOpen(!box.classList.contains('is-open')); });
+          menu.addEventListener('click', function(e) {
+            var li = e.target.closest('.csd__opt');
+            if (!li) return;
+            setOpen(false);
+            if (li.getAttribute('data-value') !== sortSelect.value) goSort(li.getAttribute('data-value'));
+          });
+          document.addEventListener('click', function(e) { if (!box.contains(e.target)) setOpen(false); });
+          box.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') { setOpen(false); btn.focus(); }
+            else if (e.key === 'ArrowDown') { e.preventDefault(); setOpen(true); move(1); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); setOpen(true); move(-1); }
+            else if (e.key === 'Enter' && box.classList.contains('is-open')) {
+              var act = menu.querySelector('.csd__opt.is-active');
+              if (act) { e.preventDefault(); act.click(); }
+            }
+          });
+        }
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFiltersAndSort);
+    } else {
+      initFiltersAndSort();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collection Grid",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection header"
+    },
+    {
+      "type": "select",
+      "id": "header_style",
+      "label": "Header design",
+      "options": [
+        { "value": "minimal", "label": "Minimal - title + description (left)" },
+        { "value": "centered", "label": "Centered - title + description" },
+        { "value": "editorial", "label": "Editorial - text left, collection image right" },
+        { "value": "band", "label": "Color band - large title on colored background" }
+      ],
+      "default": "minimal",
+      "info": "Editorial uses the collection's own image (Admin > Collections)."
+    },
+    {
+      "type": "select",
+      "id": "title_size",
+      "label": "Title size",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" },
+        { "value": "xlarge", "label": "Extra large" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "color_scheme",
+      "id": "header_color_scheme",
+      "label": "Band color scheme",
+      "default": "scheme-3",
+      "info": "Background and text colors of the band come from this scheme (Edit scheme to change them).",
+      "visible_if": "{{ section.settings.header_style == 'band' }}"
+    },
+    {
+      "type": "color",
+      "id": "header_text_color",
+      "label": "Header text color",
+      "info": "Leave empty to follow the color scheme."
+    },
+    {
+      "type": "link_list",
+      "id": "collection_links_menu",
+      "label": "Sub-collection buttons",
+      "info": "Pick a menu to show its links as buttons under the header (e.g. Silver, Gold, Watches)."
+    },
+    {
+      "type": "header",
+      "content": "Page"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "Enable filtering",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "Enable sorting",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_products_count",
+      "label": "Show products count",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show collection description",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "custom_description",
+      "label": "Custom description (fallback)",
+      "info": "Optional text if a collection doesn't have its own description in Shopify Admin. Leave empty to show no description."
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 12,
+      "max": 48,
+      "step": 4,
+      "label": "Products per page",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Product grid columns"
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_desktop",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns: above 1024px",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_1024",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns: 1024px and below",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_960",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns: 960px and below",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_768",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columns: 768px and below",
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "grid_columns_650",
+      "label": "Columns: 650px and below",
+      "options": [
+        { "value": "1", "label": "1 product per row" },
+        { "value": "2", "label": "2 products per row" },
+        { "value": "3", "label": "3 products per row" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "grid_columns_mobile",
+      "label": "Columns: 450px and below",
+      "options": [
+        { "value": "1", "label": "1 product per row" },
+        { "value": "2", "label": "2 products per row" },
+        { "value": "3", "label": "3 products per row" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Card border radius",
+      "default": 4,
+      "info": "Controls corner roundness of product card images in this collection"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 60
+    }
+  ]
+}
+{% endschema %}

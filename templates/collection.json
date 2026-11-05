@@ -1,0 +1,90 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-collection",
+      "settings": {
+        "header_style": "band",
+        "title_size": "medium",
+        "header_color_scheme": "scheme-2",
+        "header_text_color": "",
+        "collection_links_menu": "",
+        "color_scheme": "",
+        "enable_filtering": true,
+        "enable_sorting": true,
+        "show_products_count": true,
+        "show_description": true,
+        "custom_description": "",
+        "products_per_page": 24,
+        "grid_columns_desktop": 4,
+        "grid_columns_1024": 3,
+        "grid_columns_960": 3,
+        "grid_columns_768": 2,
+        "grid_columns_mobile": "1",
+        "card_border_radius": 0,
+        "padding_top": 20,
+        "padding_bottom": 60
+      }
+    },
+    "section_icons_HaftxK": {
+      "type": "section-icons",
+      "blocks": {
+        "trust_item_FGM6i8": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "shipping",
+            "title": "Free Shipping from ৳4000",
+            "text": "Fast dispatch within 24-48 hours"
+          }
+        },
+        "trust_item_xdHAb7": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "waterproof",
+            "title": "100% Waterproof",
+            "text": "Stainless steel, never discolors or tarnishes"
+          }
+        },
+        "trust_item_PNwh8P": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "engraving",
+            "title": "Personal Touch",
+            "text": "Custom engraving crafted with precision"
+          }
+        },
+        "trust_item_bbCUzr": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "returns",
+            "title": "14 Days Returns",
+            "text": "Hassle-free return policy"
+          }
+        }
+      },
+      "block_order": [
+        "trust_item_FGM6i8",
+        "trust_item_xdHAb7",
+        "trust_item_PNwh8P",
+        "trust_item_bbCUzr"
+      ],
+      "settings": {
+        "color_scheme": "",
+        "padding_top": 35,
+        "padding_bottom": 35
+      }
+    }
+  },
+  "order": [
+    "main",
+    "section_icons_HaftxK"
+  ]
+}
