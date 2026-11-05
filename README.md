@@ -1,7 +1,8 @@
 # Jewelry-Shop-i-fy
 
-> **Lè Velair — Bespoke Luxury Jewelry Shopify Theme & Reviews Microservice**  
-> Tailored for high-end jewelry brands featuring custom engravings, retina product galleries, split-screen collection showcases, and a serverless Shopify Metaobjects reviews integration.
+> **Aurelle — Bespoke Luxury Jewelry Shopify Theme & Reviews Microservice**  
+> Developed by **Bangladesh Software Solutions** for **Aurelle Fine Jewelry**.  
+> Featuring custom engravings, retina product galleries, split-screen collection showcases, and a serverless Shopify Metaobjects reviews integration.
 
 ---
 
@@ -87,4 +88,4 @@ Configure the following environment variables in Vercel:
 ---
 
 ## 🛡️ License
-Private & Proprietary © Lè Velair. All rights reserved.
+Private & Proprietary © Bangladesh Software Solutions. All rights reserved.

@@ -1152,7 +1152,7 @@ data-header-cart-full="false"
     "",
     ""
   ],
-  "url": "https:\/\/le-velair.nl"
+  "url": {{ shop.url | json }}
 }
 </script>
 
@@ -1162,13 +1162,13 @@ data-header-cart-full="false"
     {
       "@context": "http://schema.org",
       "@type": "WebSite",
-      "name": "Jewelry Shop",
+      "name": {{ shop.name | json }},
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "https:\/\/le-velair.nl\/search?q={search_term_string}",
+        "target": {{ shop.url | append: '/search?q={search_term_string}' | json }},
         "query-input": "required name=search_term_string"
       },
-      "url": "https:\/\/le-velair.nl"
+      "url": {{ shop.url | json }}
     }
   </script>
 

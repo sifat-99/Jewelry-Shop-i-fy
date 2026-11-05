@@ -1,7 +1,7 @@
 {
-  "name": "le-velair-reviews-api",
+  "name": "bss-reviews-api",
   "version": "1.0.0",
   "private": true,
-  "description": "Tiny serverless endpoint that saves customer reviews as DRAFT Shopify metaobjects (type: review).",
+  "description": "Bangladesh Software Solutions Serverless API for Shopify Metaobjects review ingestion.",
   "engines": { "node": ">=18" }
 }

@@ -86,7 +86,7 @@
 
   {%- if section.settings.title != blank -%}
     <h2>
-      <a href="{{ section.settings.link | default: 'https://www.instagram.com/le.velair' }}" target="_blank" rel="noopener">
+      <a href="{{ section.settings.link | default: 'https://www.instagram.com/bssoln' }}" target="_blank" rel="noopener">
         {{ section.settings.title }}
       </a>
     </h2>
@@ -96,7 +96,7 @@
     {%- if section.blocks.size > 0 -%}
       {%- for block in section.blocks -%}
         {%- assign fallback_img = 'product_' | append: forloop.index | append: '_1.jpg' | asset_url -%}
-        <a href="{{ block.settings.link | default: section.settings.link | default: 'https://www.instagram.com/le.velair' }}"
+        <a href="{{ block.settings.link | default: section.settings.link | default: 'https://www.instagram.com/bssoln' }}"
           target="_blank" rel="noopener" class="insta-item" {{ block.shopify_attributes }}>
           {%- if block.settings.image != blank -%}
             <img src="{{ block.settings.image | image_url: width: 600 }}"
@@ -117,7 +117,7 @@
     {%- else -%}
       {%- for i in (1..6) -%}
         {%- assign img_name = 'product_' | append: i | append: '_1.jpg' -%}
-        <a href="{{ section.settings.link | default: 'https://www.instagram.com/le.velair' }}" target="_blank" rel="noopener" class="insta-item">
+        <a href="{{ section.settings.link | default: 'https://www.instagram.com/bssoln' }}" target="_blank" rel="noopener" class="insta-item">
           <img src="{{ img_name | asset_url }}" alt="Instagram Lifestyle" width="300" height="300" loading="lazy">
           <div class="insta-item-overlay">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">

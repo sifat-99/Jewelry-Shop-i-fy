@@ -822,7 +822,7 @@
       productId = String(productId);
       var wishlist = [];
       try {
-        wishlist = JSON.parse(localStorage.getItem('le_velair_wishlist') || '[]');
+        wishlist = JSON.parse(localStorage.getItem('bss_wishlist') || '[]');
       } catch(e) {
         wishlist = [];
       }
@@ -838,7 +838,7 @@
       }
 
       try {
-        localStorage.setItem('le_velair_wishlist', JSON.stringify(wishlist));
+        localStorage.setItem('bss_wishlist', JSON.stringify(wishlist));
       } catch(e) {}
 
       // Update buttons on page
@@ -858,7 +858,7 @@
     function syncWishlistIcons() {
       var wishlist = [];
       try {
-        wishlist = JSON.parse(localStorage.getItem('le_velair_wishlist') || '[]');
+        wishlist = JSON.parse(localStorage.getItem('bss_wishlist') || '[]');
       } catch(e) {
         wishlist = [];
       }
