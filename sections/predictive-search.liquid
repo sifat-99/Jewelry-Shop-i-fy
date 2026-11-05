@@ -1,0 +1,131 @@
+<!-- /sections/predictive-search.liquid -->
+{%- if predictive_search.performed -%}
+  {%- liquid
+    assign total_results = 0
+    if predictive_search.resources.products.size > 0
+      assign total_results = total_results | plus: predictive_search.resources.products.size
+    endif
+    if predictive_search.resources.collections.size > 0
+      assign total_results = total_results | plus: predictive_search.resources.collections.size
+    endif
+    if predictive_search.resources.pages.size > 0
+      assign total_results = total_results | plus: predictive_search.resources.pages.size
+    endif
+    if predictive_search.resources.articles.size > 0
+      assign total_results = total_results | plus: predictive_search.resources.articles.size
+    endif
+  -%}
+  <div class="wrapper">
+    <span class="predictive-search-status visually-hidden" data-predictive-search-live-region-count-value role="status">
+      {%- if total_results > 0 -%}
+        {{ total_results }} results: {{ predictive_search.resources.products.size }} products
+      {%- else -%}
+        No results found for “{{ predictive_search.terms }}”. Check the spelling or use a different word or phrase.
+      {%- endif -%}
+    </span>
+    <div class="search__results__wrapper" id="predictive-search-results" role="listbox" aria-label="Search for “{{ predictive_search.terms }}”">
+      {%- if total_results > 0 -%}
+        <div class="search__results__outer">
+          <div class="search__results__other">
+            {%- if predictive_search.resources.products.size > 0 -%}
+              <div class="search__results__products">
+                <div class="search__results__products__title">
+                  <div id="search_product_results_heading" class="search__results__heading">
+                    <p class="search__results__title">Products</p>
+                    <span class="badge">{{ predictive_search.resources.products.size }}</span>
+                  </div>
+                </div>
+
+                <ul aria-label="Products" class="search__results__products__list">
+                  {%- for product in predictive_search.resources.products -%}
+                    <div class="product__inline animates" style="animation-delay: {{ forloop.index | times: 90 | plus: 10 }}ms;" role="option" aria-selected="false">
+                      <a href="{{ product.url }}" class="product__inline__link">
+                        <div role="presentation" class="product__inline__image">
+                          {%- if product.featured_media -%}
+                            <img src="{{ product.featured_media | image_url: width: 352 }}" 
+                                 srcset="{{ product.featured_media | image_url: width: 352 }} 352w, {{ product.featured_media | image_url: width: 832 }} 832w" 
+                                 width="{{ product.featured_media.width | default: 849 }}" 
+                                 height="{{ product.featured_media.height | default: 849 }}" 
+                                 alt="{{ product.featured_media.alt | default: product.title | escape }}" 
+                                 class="img-aspect-ratio" 
+                                 loading="lazy">
+                          {%- endif -%}
+                        </div>
+                        <div>
+                          <p class="product__inline__title">
+                            {{ product.title | escape }}
+                          </p>
+                          <p class="product__inline__price">
+                            <span class="price">
+                              {{ product.price | money }}
+                            </span>
+                            {%- if product.compare_at_price > product.price -%}
+                              <span class="compare-at">
+                                {{ product.compare_at_price | money }}
+                              </span>
+                            {%- endif -%}
+                          </p>
+                        </div>
+                      </a>
+                    </div>
+                  {%- endfor -%}
+                </ul>
+              </div>
+            {%- endif -%}
+
+            {%- if predictive_search.resources.collections.size > 0 -%}
+              <div class="search__results__other__list">
+                <div id="search_collection_results_heading" class="search__results__heading">
+                  <p class="search__results__title">Collections</p>
+                  <span class="badge">{{ predictive_search.resources.collections.size }}</span>
+                </div>
+
+                <ul aria-label="Collections" role="group" class="search__results__collections__list">
+                  {%- for collection in predictive_search.resources.collections -%}
+                    <div class="other__inline animates" style="animation-delay: {{ forloop.index | times: 90 | plus: 820 }}ms;" id="predictive-search-option-collection-{{ forloop.index }}" role="option" aria-selected="false">
+                      <p class="other__inline__title">
+                        <a href="{{ collection.url }}">{{ collection.title | escape }}</a>
+                      </p>
+                    </div>
+                  {%- endfor -%}
+                </ul>
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- else -%}
+        <div class="search__results__empty">
+          <div aria-live="polite">
+            <p>
+              No results for
+              <em>{{ predictive_search.terms }}</em>
+            </p>
+          </div>
+        </div>
+      {%- endif -%}
+
+      <div class="search__results__actions">
+        <button
+          class="btn btn--outline search__results__btn"
+          tabindex="-1"
+          role="option"
+          aria-selected="false"
+          type="button"
+          onclick="this.closest('form').submit();"
+        >
+          <span data-predictive-search-search-for-text>Search for “{{ predictive_search.terms }}”</span>
+          <span class="ml-r2 accent-size-5 [&>svg]:inline-block">
+            <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Predictive Search",
+  "settings": []
+}
+{% endschema %}

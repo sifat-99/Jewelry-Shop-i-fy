@@ -1,0 +1,127 @@
+<!-- /snippets/search-predictive.liquid -->
+{%- liquid
+  assign search_style = style | default: 'search-popdown'
+  if search_style == 'search-drawer'
+    assign search_id = 'search-drawer'
+  else
+    assign search_id = 'search-popdown'
+  endif
+-%}
+
+<div data-search-popdown-wrap>
+  <div id="{{ search_id }}" class="{{ search_style }} search__predictive" data-popdown-outer>
+    <predictive-search>
+      <form
+        action="{{ routes.search_url }}"
+        method="get"
+        role="search">
+
+        <div class="item--loadbar" data-loading-indicator style="display: none;"></div>
+        <div class="search__predictive__outer">
+          <div class="wrapper">
+            <div class="search__predictive__main">
+              <div class="search__predictive__actions">
+                <button class="search__predictive__button" type="submit" aria-label="Search">
+                  <span class="visually-hidden">Search</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-search" viewBox="0 0 24 24"><path stroke-linecap="square" d="M10.1 17.7a7.6 7.6 0 1 0 0-15.2 7.6 7.6 0 0 0 0 15.2Zm11.4 3.8-5.7-5.7"/></svg>
+                </button>
+
+                <input type="search"
+                  data-predictive-search-input="{{ search_id }}-results"
+                  name="q"
+                  value=""
+                  placeholder="Search our luxury collection..."
+                  aria-label="Search our store"
+                  aria-controls="predictive-search-results"
+                >
+
+                <div class="search__predictive__clear">
+                  <button type="reset" class="search__predictive__close__inner search-reset is-hidden" aria-label="Reset">
+                    <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    Clear
+                  </button>
+                </div>
+              </div>
+
+              <div class="search__predictive__close">
+                <button type="button" class="search__predictive__close__inner" data-close-popdown aria-label="Close">
+                  <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="header__search__results" tabindex="-1" data-predictive-search-results></div>
+
+        <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true" data-predictive-search-status></span>
+      </form>
+    </predictive-search>
+  </div>
+
+  {%- if search_style == 'search-popdown' -%}
+    <span class="drawer__underlay" data-search-underlay>
+      <span class="drawer__underlay__fill"></span>
+      <span class="drawer__underlay__blur"></span>
+    </span>
+  {%- endif -%}
+
+  {% raw %}<script data-predictive-search-aria-template type="text/x-template">
+    <div aria-live="polite">
+      <p>
+        {{@if(it.count)}}
+          <span class="badge">{{ it.count }}</span>
+        {{/if}}
+        {{ it.title }} <em>{{ it.query }}</em>
+      </p>
+    </div>
+  </script>{% endraw %}
+
+  {% raw %}<script data-predictive-search-title-template type="text/x-template">
+    <div class="search__results__heading">
+      <p>
+        <span class="search__results__title">{{ it.title }}</span>
+        <span class="badge">{{ it.count }}</span>
+      </p>
+    </div>
+  </script>{% endraw %}
+
+  {% raw %}<script data-search-other-template type="text/x-template">
+    {{@each(it) => object, index}}
+      <div class="other__inline animates" style="animation-delay: {{ index | animationDelay }}ms;">
+        <p class="other__inline__title">
+          <a href="{{ object.url }}">{{ object.title | safe }}</a>
+        </p>
+      </div>
+    {{/each}}
+  </script>{% endraw %}
+
+  {% raw %}<script data-search-product-template type="text/x-template">
+    {{@each(it) => object, index}}
+      <a href="{{ object.url }}" class="product__inline animates" style="animation-delay: {{ index | animationDelay }}ms;">
+        <div class="product__inline__image {{ @if (object.featured_image.width === null) }} product__inline__image--no-image {{ /if}}">
+          {{ @if (object.featured_image.width !== null) }}
+            <img class="img-aspect-ratio" width="{{object.featured_image.width}}" height="{{ object.featured_image.height }}" alt="{{ object.featured_image.alt }}" src="{{ object.thumb }}">
+          {{ /if}}
+        </div>
+        <div>
+          <p class="product__inline__title">
+            {{ object.title | safe }}
+          </p>
+          <p class="product__inline__price">
+            <span class="price {{ object.classes }}">
+              {{ object.price | safe }}
+            </span>
+            {{@if(object.sold_out)}}
+              <br /><em>{{ object.sold_out_translation }}</em>
+            {{/if}}
+            {{@if(object.on_sale)}}
+              <span class="compare-at">
+                {{ object.compare_at_price | safe }}
+              </span>
+            {{/if}}
+          </p>
+        </div>
+      </a>
+    {{/each}}
+  </script>{% endraw %}
+</div>
