@@ -255,19 +255,22 @@
     color: var(--pp-muted, rgba(var(--color-foreground, 0, 0, 0), 0.62)) !important;
   }
 
-  /* Harmonized Luxury CTA Section (Ultra-High Specificity Overrides) */
+  /* Harmonized Luxury CTA Section (Full-Width Bleed with Theme Soft Tint) */
   .sl-cta,
   html body .pg-page .sl-cta,
   html body .sl-cta {
     display: block !important;
     text-align: center !important;
-    padding: 72px 24px !important;
-    margin: 0 auto 76px !important;
-    max-width: 860px !important;
-    background: transparent !important;
-    border: none !important;
+    padding: 68px var(--outer, 24px) !important;
+    margin: 0 calc(-1 * var(--outer, 24px)) 80px !important;
+    width: calc(100% + (2 * var(--outer, 24px))) !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    background: var(--pp-soft, color-mix(in srgb, var(--text, #000) 4%, var(--bg, #fff))) !important;
     border-top: 1px solid var(--pp-line, rgba(var(--color-foreground, 0, 0, 0), 0.12)) !important;
     border-bottom: 1px solid var(--pp-line, rgba(var(--color-foreground, 0, 0, 0), 0.12)) !important;
+    border-left: none !important;
+    border-right: none !important;
     border-radius: 0px !important;
     color: #000000 !important;
     box-shadow: none !important;
@@ -276,8 +279,9 @@
     .sl-cta,
     html body .pg-page .sl-cta,
     html body .sl-cta {
-      padding: 48px 16px !important;
-      margin-bottom: 52px !important;
+      padding: 48px var(--outer, 16px) !important;
+      margin: 0 calc(-1 * var(--outer, 16px)) 56px !important;
+      width: calc(100% + (2 * var(--outer, 16px))) !important;
     }
   }
   .sl-cta__inner,
@@ -616,10 +620,10 @@
     <p class="sl-cta__text" style="color: #444444 !important; opacity: 1 !important;">{{ cfg.about_cta_text | default: 'Explore our curated collection of waterproof rings, necklaces, and engravable keepsakes, or consult our concierge team for personalized guidance.' }}</p>
     <div class="sl-cta__actions">
       <a href="{{ shop_link }}" class="btn btn--primary btn-sliding-hover sl-cta__btn-primary">
-        <span class="btn__text-content">{{ cfg.about_cta_label | default: 'Explore Collection' }}</span>
+        <span class="btn__text-content">Explore Collection</span>
       </a>
       <a href="{{ cta_link }}" class="btn btn-sliding-hover sl-cta__btn-secondary">
-        <span class="btn__text-content">Contact Concierge</span>
+        <span class="btn__text-content">{{ cfg.about_cta_label | default: 'Contact Concierge' }}</span>
       </a>
     </div>
   </div>
