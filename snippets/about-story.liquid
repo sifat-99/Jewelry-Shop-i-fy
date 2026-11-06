@@ -117,26 +117,39 @@
   }
   .about-slide__btn {
     flex: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--btn-regular-text, #ffffff) !important;
-    background: var(--btn-regular-hover-bg, #000000);
-    border: var(--btn-border-thickness, 1px) solid var(--btn-regular-hover-bg, #000000);
-    border-radius: var(--btn-radius, 0px) !important;
-    padding: 9px 18px;
-    text-decoration: none;
-    transition: background-color var(--btn-animation-duration, 350ms) var(--btn-ease, ease), color var(--btn-animation-duration, 350ms) var(--btn-ease, ease), border-color var(--btn-animation-duration, 350ms) var(--btn-ease, ease);
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.16em !important;
+    text-transform: uppercase !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    color: #ffffff !important;
+    background: #000000 !important;
+    border: 1px solid #000000 !important;
+    border-radius: 0px !important;
+    padding: 10px 18px !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease !important;
+  }
+  .about-slide__btn span,
+  .about-slide__btn .about-slide__btn-text {
+    color: #ffffff !important;
+    display: inline-block !important;
+    line-height: 1 !important;
   }
   .about-slide__btn:hover {
-    background: var(--bg, #ffffff);
-    color: var(--text, #000000) !important;
-    border-color: var(--text, #000000);
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+  }
+  .about-slide__btn:hover span,
+  .about-slide__btn:hover .about-slide__btn-text {
+    color: #000000 !important;
   }
   .about-slide-nav {
     position: absolute;
@@ -315,10 +328,10 @@
             <div class="about-slide__overlay"></div>
             <div class="about-slide__card">
               <div>
-                <span class="about-slide__badge">✦ Atelier Spotlight</span>
+                <span class="about-slide__badge">Atelier Spotlight</span>
                 <a href="{{ prod.url }}" class="about-slide__title">{{ prod.title }}</a>
               </div>
-              <a href="{{ prod.url }}" class="about-slide__btn">View Piece</a>
+              <a href="{{ prod.url }}" class="about-slide__btn"><span class="about-slide__btn-text">View Piece</span></a>
             </div>
           </div>
           {%- assign found_slides = found_slides | plus: 1 -%}
@@ -328,7 +341,11 @@
 
       {%- if found_slides == 0 -%}
         <div class="about-slide is-active">
-          <img src="{{ '1-13.webp' | asset_url }}" alt="Aurelle Atelier">
+          {%- if cfg.about_image != blank -%}
+            <img src="{{ cfg.about_image | image_url: width: 1200 }}" alt="{{ cfg.about_heading | default: 'Aurelle Atelier' | escape }}">
+          {%- else -%}
+            <img src="{{ 'split_banner_2.jpg' | asset_url }}" alt="Aurelle Atelier">
+          {%- endif -%}
         </div>
       {%- endif -%}
 
@@ -377,14 +394,29 @@
 <!-- THE AURELLE STORY & METALLURGY -->
 <section class="ab-story">
   <div class="ab-story__media">
-    <img src="{{ 'Luna_Paperclip_Bar_Chain_Supply_03-Macro.webp' | asset_url }}"
-         alt="Aurelle Jewelry Craftsmanship"
-         width="1000" height="1000" loading="lazy"
-         onerror="this.src='{{ '1-13.webp' | asset_url }}'">
+    {%- if cfg.about_image_2 != blank -%}
+      <img src="{{ cfg.about_image_2 | image_url: width: 1200 }}"
+           alt="{{ cfg.about_image_2.alt | default: cfg.about_story_title | default: 'Aurelle Jewelry Craftsmanship' | escape }}"
+           width="{{ cfg.about_image_2.width }}"
+           height="{{ cfg.about_image_2.height }}"
+           loading="lazy">
+    {%- elsif cfg.about_image != blank -%}
+      <img src="{{ cfg.about_image | image_url: width: 1200 }}"
+           alt="{{ cfg.about_image.alt | default: 'Aurelle Fine Jewelry' | escape }}"
+           width="{{ cfg.about_image.width }}"
+           height="{{ cfg.about_image.height }}"
+           loading="lazy">
+    {%- else -%}
+      <img src="{{ 'split_banner_1.jpg' | asset_url }}"
+           alt="Aurelle Fine Jewelry Atelier Craftsmanship"
+           width="1200"
+           height="1200"
+           loading="lazy">
+    {%- endif -%}
   </div>
   <div>
     <p class="sl-sec__eyebrow">{{ cfg.about_story_eyebrow | default: 'Behind the Craft' }}</p>
-    <h2 class="ab-story__title">{{ cfg.about_story_title | default: 'Waterproof Innovation Meets Laser Artistry' }}</h2>
+    <h2 class="ab-story__title">{{ cfg.about_story_title | default: 'Jewelry that moves with your life' }}</h2>
     <div class="rte ab-story__body">
       {%- if cfg.about_story != blank -%}
         {{ cfg.about_story }}
@@ -409,7 +441,7 @@
   <p class="about-quote-text">
     "We don't create jewelry to be locked away in velvet boxes. We forge pieces you put on once, and never have to take off."
   </p>
-  <p class="about-quote-author">✦ The Aurelle Design Philosophy ✦</p>
+  <p class="about-quote-author">The Aurelle Design Philosophy</p>
 </div>
 
 <!-- VALUES SECTION -->
