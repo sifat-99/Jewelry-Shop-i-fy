@@ -22,6 +22,12 @@
   #shopify-section-{{ section.id }} .lv-shuffled-hidden {
     display: none !important;
   }
+  {%- if display_limit <= 2 -%}
+  #shopify-section-{{ section.id }} .lv-product-grid {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  {%- endif -%}
   {%- if section.settings.rows_by_screen -%}
     {%- liquid
       assign sel = '#shopify-section-' | append: section.id | append: ' .lv-product-grid > product-grid-item:nth-of-type(n+'
@@ -159,9 +165,9 @@
     {
       "type": "range",
       "id": "limit",
-      "min": 4,
+      "min": 1,
       "max": 24,
-      "step": 4,
+      "step": 1,
       "label": "Products to show",
       "default": 8
     },

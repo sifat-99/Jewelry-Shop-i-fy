@@ -215,9 +215,28 @@
         "value_3"
       ],
       "settings": {}
+    },
+    "featured_products": {
+      "type": "section-collection",
+      "settings": {
+        "title": "Curated Daily Picks",
+        "subtitle": "Discover our signature waterproof & bespoke engraved creations",
+        "collection": "all",
+        "limit": 2,
+        "shuffle_products": true,
+        "grid_columns_desktop": 2,
+        "grid_columns_1024": 2,
+        "grid_columns_960": 2,
+        "grid_columns_768": 2,
+        "grid_columns_650": "2",
+        "grid_columns_mobile": "1",
+        "padding_top": 35,
+        "padding_bottom": 50
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "featured_products"
   ]
 }

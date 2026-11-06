@@ -2,10 +2,41 @@
   "sections": {
     "main": {
       "type": "main-page",
-      "settings": {}
+      "settings": {
+        "color_scheme": "scheme-1",
+        "contact_eyebrow": "Aurelle Concierge & Support",
+        "contact_intro": "Have an inquiry regarding custom laser engravings, an existing order, permanent jewelry appointments, or ring sizing? We are here to ensure your experience is seamless.",
+        "contact_email": "store.bssoln@gmail.com",
+        "contact_hours": "Monday – Friday: 9:00 AM – 6:00 PM\nSaturday: 10:00 AM – 4:00 PM",
+        "contact_address": "Aurelle Fine Jewelry Atelier\nBangladesh Software Solutions",
+        "form_title": "Send Us a Message",
+        "form_sub": "Our jewelry specialists typically reply within 2 to 4 business hours.",
+        "button_label": "Submit Message",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "featured_products": {
+      "type": "section-collection",
+      "settings": {
+        "title": "While You Are Here",
+        "subtitle": "Explore our signature waterproof & bespoke engraved creations",
+        "collection": "all",
+        "limit": 2,
+        "shuffle_products": true,
+        "grid_columns_desktop": 2,
+        "grid_columns_1024": 2,
+        "grid_columns_960": 2,
+        "grid_columns_768": 2,
+        "grid_columns_650": "2",
+        "grid_columns_mobile": "1",
+        "padding_top": 35,
+        "padding_bottom": 50
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "featured_products"
   ]
 }

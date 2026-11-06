@@ -8,44 +8,44 @@
           "settings": {
             "title": "Rings",
             "key": "ring",
-            "intro": "Measure your finger at home in two minutes and pick the matching size.",
-            "table_title": "Ring size chart",
-            "table_head": "Size | Inner diameter (mm) | Circumference (mm) | US (approx.)",
-            "table_rows": "14 | 14.0 | 44.0 | 3\n15 | 15.0 | 47.1 | 4\n16 | 16.0 | 50.3 | 5.5\n17 | 17.0 | 53.4 | 6.5\n18 | 18.0 | 56.5 | 8\n19 | 19.0 | 59.7 | 9\n20 | 20.0 | 62.8 | 10.5\n21 | 21.0 | 66.0 | 12\n22 | 22.0 | 69.1 | 13",
+            "intro": "Find your perfect ring fit in minutes. Measure your finger circumference at home or measure the inside diameter of your favorite existing ring.",
+            "table_title": "Comprehensive Ring Sizing Chart",
+            "table_head": "US / CA | EU / ISO | UK / AU | Inner Diameter (mm) | Circumference (mm)",
+            "table_rows": "4 | 47 | H | 14.9 | 46.8\n5 | 49 | J½ | 15.7 | 49.3\n6 | 52 | L½ | 16.5 | 51.9\n7 | 54 | N½ | 17.3 | 54.4\n8 | 57 | P½ | 18.1 | 57.0\n9 | 59 | R½ | 18.9 | 59.5\n10 | 62 | T½ | 19.8 | 62.1\n11 | 65 | V½ | 20.6 | 64.6\n12 | 67 | X½ | 21.4 | 67.2",
             "calculator": "ring",
-            "steps_title": "How to measure",
-            "steps": "Wrap a thin strip of paper or string around the base of your finger.\nMark the point where the ends meet.\nLay it flat and measure the length in millimetres. This is your finger circumference.\nUse the calculator or the chart to find your size.",
-            "tips": "Measure at the end of the day, when your fingers are at their widest.\nBetween two sizes? Choose the larger one.\nWide rings fit a little tighter than thin ones.\nOr measure a ring you already own: its inner diameter in mm is your size."
+            "steps_title": "How to Measure Your Ring Size",
+            "steps": "1. Wrap a thin strip of paper or non-stretchy string comfortably around the base of your intended finger.\n2. Mark the exact point where the paper overlaps with a fine pen.\n3. Lay the paper flat and measure the distance in millimeters with a ruler (this is your circumference).\n4. Match your millimeter measurement with our chart above or enter it into the interactive calculator.",
+            "tips": "✦ Measure at room temperature at the end of the day when your hands are at their natural, full size.\n✦ Account for your knuckle: make sure the size you choose can slide smoothly over the knuckle.\n✦ Between two sizes? We always recommend choosing the larger size for maximum comfort.\n✦ Wide band rings fit snugger than dainty bands; consider sizing up half a size for wide statement rings."
           }
         },
         "guide_bracelets": {
           "type": "guide",
           "settings": {
-            "title": "Bracelets",
+            "title": "Bracelets & Bangles",
             "key": "bracelet",
-            "intro": "A bracelet should move gently on your wrist without slipping over your hand.",
-            "table_title": "Bracelet length chart",
-            "table_head": "Fit | Bracelet length (cm) | Wrist circumference (cm)",
-            "table_rows": "Snug | 16 | 13 - 14\nComfortable | 18 | 15 - 16\nRelaxed | 20 | 17 - 18\nLoose | 22 | 19 - 20",
+            "intro": "A fine bracelet should drape effortlessly around your wrist with enough room to move gently without slipping over your hand.",
+            "table_title": "Bracelet & Wrist Fit Guide",
+            "table_head": "Fit Style | Wrist Circumference (cm) | Recommended Bracelet Length (cm)",
+            "table_rows": "Snug Fit (Close to skin) | 14.0 - 15.0 cm | 16.0 cm\nClassic Fit (Comfort drape) | 15.5 - 16.5 cm | 17.5 - 18.0 cm\nRelaxed Fit (Loose drape) | 17.0 - 18.0 cm | 19.5 - 20.0 cm\nExtra Room (Cuffs & Bangles) | 18.5 - 20.0 cm | 21.0 - 22.0 cm",
             "calculator": "none",
-            "steps_title": "How to measure",
-            "steps": "Wrap a strip of paper or string around your wrist, just above the wrist bone.\nMark where the ends meet and measure the length in centimetres.\nAdd 1.5 - 2 cm for a comfortable fit.\nCompare the result with the chart.",
-            "tips": "Many of our chain bracelets are adjustable, so you can fine-tune the length.\nFor a bangle, measure the widest part of your hand with the thumb tucked in."
+            "steps_title": "How to Measure Your Wrist",
+            "steps": "1. Wrap a flexible measuring tape or strip of paper snugly around your wrist just above the wrist bone.\n2. Note your exact wrist circumference in centimeters.\n3. Add 1.5 cm to 2 cm to your measurement depending on your preferred fit (snug vs relaxed drape).\n4. Compare with our size options on the product page.",
+            "tips": "✦ Most Aurelle chain bracelets include an adjustable 3cm extension chain to ensure a tailored fit.\n✦ For solid cuffs and bangles, measure across the widest part of your hand with your thumb tucked toward your pinky."
           }
         },
         "guide_necklaces": {
           "type": "guide",
           "settings": {
-            "title": "Necklaces",
+            "title": "Necklace Layering",
             "key": "necklace",
-            "intro": "The length decides where your necklace rests, so pick the style that suits your neckline.",
-            "table_title": "Necklace length chart",
-            "table_head": "Style | Length (cm) | Sits at",
-            "table_rows": "Choker | 35 - 40 | Base of the neck\nPrincess | 40 - 46 | Collarbone\nMatinee | 50 - 60 | Just above the bust\nOpera | 70 - 80 | Below the bust",
+            "intro": "Necklace length defines where your pendant or chain rests against your collarbone and neckline. Use our placement guide to curate your personalized layered look.",
+            "table_title": "Necklace Length & Silhouette Guide",
+            "table_head": "Style | Length (cm / inches) | Optimal Rest Position | Best Necklines",
+            "table_rows": "Choker | 36 - 40 cm (14 - 16\") | Base of the throat / Collarbone | V-Necks, Off-Shoulder, Open Collars\nPrincess | 45 cm (18\") | Just below the collarbone | Universal fit, Crew necks, Pendants\nMatinee | 50 - 55 cm (20 - 22\") | Between collarbone and bust | Plunging necklines, Turtlenecks, Layering\nOpera | 60 - 65 cm (24 - 26\") | At or below the bustline | High necklines, Evening wear, Statement pendants",
             "calculator": "none",
-            "steps_title": "How to choose",
-            "steps": "Measure a necklace you already wear and love, from clasp to clasp.\nOr lay a piece of string around your neck at the length you want and measure it.\nChoose the nearest length in the chart.",
-            "tips": "Our initial necklaces are 40 - 46 cm and adjustable.\nLayering? Pick lengths about 5 cm apart."
+            "steps_title": "How to Select Your Ideal Chain Length",
+            "steps": "1. Take a piece of string or an existing necklace you love, loop it around your neck, and adjust it to your preferred drop level.\n2. Hold where the ends meet and measure the length flat against a ruler in centimeters.\n3. If you plan to layer two or three necklaces, choose lengths that are 5 cm (2 inches) apart to allow each piece its own spotlight.",
+            "tips": "✦ Most Aurelle necklaces feature our signature 5cm extension chain (e.g. 40cm + 5cm), giving you two distinct length styling options in one piece.\n✦ For personalized engraved bar pendants, the 45cm Princess length rests at the ideal flattering focal point."
           }
         }
       },
@@ -56,18 +56,37 @@
       ],
       "settings": {
         "color_scheme": "scheme-1",
-        "heading": "",
-        "intro": "Find the perfect fit. Pick your jewelry type, measure at home and use the chart below.",
-        "cta_title": "Still not sure?",
-        "cta_text": "Send us a message and we will help you find your size.",
-        "cta_label": "Contact us",
-        "cta_link": "",
+        "heading": "Jewelry Sizing & Fit Guide",
+        "intro": "Ensure every ring, bracelet, and necklace feels like it was custom-made for you. Select a category below to explore our detailed size tables, measurement methods, and pro fit tips.",
+        "cta_title": "Still uncertain about your size?",
+        "cta_text": "Our personal jewelry concierge is delighted to provide tailored sizing assistance before you order.",
+        "cta_label": "Contact Concierge",
+        "cta_link": "/pages/contact",
         "padding_top": 40,
-        "padding_bottom": 65
+        "padding_bottom": 40
+      }
+    },
+    "featured_products": {
+      "type": "section-collection",
+      "settings": {
+        "title": "Bestselling Favorites",
+        "subtitle": "Discover our most loved waterproof rings, chains & pendants",
+        "collection": "all",
+        "limit": 2,
+        "shuffle_products": true,
+        "grid_columns_desktop": 2,
+        "grid_columns_1024": 2,
+        "grid_columns_960": 2,
+        "grid_columns_768": 2,
+        "grid_columns_650": "2",
+        "grid_columns_mobile": "1",
+        "padding_top": 35,
+        "padding_bottom": 50
       }
     }
   },
   "order": [
-    "main"
+    "main",
+    "featured_products"
   ]
 }

@@ -1,271 +1,109 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
       "type": "main-page",
       "blocks": {
-        "faq_1": {
-          "type": "faq",
-          "settings": {
-            "category": "Orders & shipping",
-            "question": "How long does delivery take?",
-            "answer": "<p>Orders are packed and dispatched within 24-48 hours. Delivery usually takes 2-5 working days within Europe.</p>"
-          }
-        },
-        "faq_2": {
-          "type": "faq",
-          "settings": {
-            "category": "Orders & shipping",
-            "question": "Is shipping free?",
-            "answer": "<p>Shipping is free on qualifying orders. The free shipping goal is shown in your cart.</p>"
-          }
-        },
-        "faq_3": {
-          "type": "faq",
-          "settings": {
-            "category": "Orders & shipping",
-            "question": "Can I change or cancel my order?",
-            "answer": "<p>Contact us as soon as possible. If your order has not been dispatched yet, we are happy to change or cancel it.</p>"
-          }
-        },
-        "faq_4": {
-          "type": "faq",
-          "settings": {
-            "category": "Engraving",
-            "question": "How does engraving work?",
-            "answer": "<p>Choose an engravable piece, select the number of characters and type your text on the product page. Your engraving appears on the order.</p>"
-          }
-        },
-        "faq_5": {
-          "type": "faq",
-          "settings": {
-            "category": "Engraving",
-            "question": "Can an engraved piece be returned?",
-            "answer": "<p>Personalised pieces are made for you and cannot be returned unless they arrive damaged or with an error on our side.</p>"
-          }
-        },
-        "faq_6": {
-          "type": "faq",
-          "settings": {
-            "category": "Sizing",
-            "question": "How do I find my ring size?",
-            "answer": "<p>Use our size guide: measure your finger at home and compare it with the chart.</p>"
-          }
-        },
-        "faq_7": {
-          "type": "faq",
-          "settings": {
-            "category": "Sizing",
-            "question": "What if my size does not fit?",
-            "answer": "<p>If an unengraved piece does not fit, you can exchange it within 14 days.</p>"
-          }
-        },
-        "faq_8": {
-          "type": "faq",
-          "settings": {
-            "category": "Care & materials",
-            "question": "Is the jewelry waterproof?",
-            "answer": "<p>Our stainless steel pieces are waterproof and made to be worn every day, in the shower and while swimming.</p>"
-          }
-        },
-        "faq_9": {
-          "type": "faq",
-          "settings": {
-            "category": "Care & materials",
-            "question": "Will it tarnish or cause skin irritation?",
-            "answer": "<p>Our pieces are hypoallergenic and do not tarnish. Clean them gently with warm water and a soft cloth.</p>"
-          }
-        },
-        "faq_10": {
-          "type": "faq",
-          "settings": {
-            "category": "Returns",
-            "question": "What is your return policy?",
-            "answer": "<p>You have 14 days after delivery to return unworn items in their original packaging. See our Returns Policy for details.</p>"
-          }
-        },
-        "feat_1": {
-          "type": "feature",
-          "settings": {
-            "icon": "drop",
-            "title": "Waterproof",
-            "text": "Wear it in the shower, at the pool and at the beach. It is made to stay on."
-          }
-        },
-        "feat_2": {
-          "type": "feature",
-          "settings": {
-            "icon": "shield",
-            "title": "Welded, no clasp",
-            "text": "A tiny weld closes the chain around your wrist, ankle or neck. Nothing to fasten or lose."
-          }
-        },
-        "feat_3": {
-          "type": "feature",
-          "settings": {
-            "icon": "heart",
-            "title": "Made around you",
-            "text": "Choose the chain, length and charms together with us, fitted to you on the spot."
-          }
-        },
-        "step_4": {
-          "type": "step",
-          "settings": {
-            "title": "Choose your chain",
-            "text": "Pick from gold and silver chains and add charms if you like."
-          }
-        },
-        "step_5": {
-          "type": "step",
-          "settings": {
-            "title": "Get it fitted",
-            "text": "We measure the chain around your wrist, ankle or neck for a comfortable fit."
-          }
-        },
-        "step_6": {
-          "type": "step",
-          "settings": {
-            "title": "Welded closed",
-            "text": "A quick, gentle weld seals the chain. It takes seconds and does not hurt."
-          }
-        },
-        "step_7": {
-          "type": "step",
-          "settings": {
-            "title": "Wear it every day",
-            "text": "No clasp, no taking it off. Care is simple and we are here for any adjustment."
-          }
-        },
-        "stat_1": {
+        "stat_waterproof": {
           "type": "stat",
           "settings": {
             "number": "100%",
-            "label": "Waterproof"
+            "label": "Waterproof & Sweat-Proof"
           }
         },
-        "stat_2": {
+        "stat_gold": {
           "type": "stat",
           "settings": {
-            "number": "24-48h",
-            "label": "Dispatch time"
+            "number": "18K Gold",
+            "label": "Vacuum PVD Plating"
           }
         },
-        "stat_3": {
+        "stat_warranty": {
           "type": "stat",
           "settings": {
-            "number": "14 days",
-            "label": "Easy returns"
+            "number": "Lifetime",
+            "label": "Color & Tarnish Warranty"
           }
         },
-        "stat_4": {
+        "stat_skin": {
           "type": "stat",
           "settings": {
-            "number": "Hypoallergenic",
-            "label": "Skin friendly"
+            "number": "0% Nickel",
+            "label": "Hypoallergenic & Sensitive Safe"
           }
         },
-        "value_1": {
-          "type": "value",
-          "settings": {
-            "icon": "star",
-            "title": "Made to last",
-            "text": "Durable materials and careful finishing, so your jewelry looks good for years."
-          }
-        },
-        "value_2": {
-          "type": "value",
-          "settings": {
-            "icon": "heart",
-            "title": "Personal by design",
-            "text": "Engraving and custom lengths turn a simple piece into something that is yours."
-          }
-        },
-        "value_3": {
+        "value_durable": {
           "type": "value",
           "settings": {
             "icon": "shield",
-            "title": "Honest and simple",
-            "text": "Clear prices, easy returns and a team that answers your messages."
+            "title": "Engineered to Last",
+            "text": "Forged from surgical-grade 316L stainless steel that will never oxidize, rust, or turn your skin green—even with daily wear in water."
+          }
+        },
+        "value_bespoke": {
+          "type": "value",
+          "settings": {
+            "icon": "heart",
+            "title": "Bespoke Laser Artistry",
+            "text": "Every custom initial, anniversary date, and meaningful coordinate is permanently etched in-house using micro-laser precision."
+          }
+        },
+        "value_luxury": {
+          "type": "value",
+          "settings": {
+            "icon": "star",
+            "title": "Direct Luxury, Honest Pricing",
+            "text": "We eliminate traditional luxury markups, delivering heirloom-quality pieces directly from our atelier into your hands."
           }
         }
       },
       "block_order": [
-        "faq_1",
-        "faq_2",
-        "faq_3",
-        "faq_4",
-        "faq_5",
-        "faq_6",
-        "faq_7",
-        "faq_8",
-        "faq_9",
-        "faq_10",
-        "feat_1",
-        "feat_2",
-        "feat_3",
-        "step_4",
-        "step_5",
-        "step_6",
-        "step_7",
-        "stat_1",
-        "stat_2",
-        "stat_3",
-        "stat_4",
-        "value_1",
-        "value_2",
-        "value_3"
+        "stat_waterproof",
+        "stat_gold",
+        "stat_warranty",
+        "stat_skin",
+        "value_durable",
+        "value_bespoke",
+        "value_luxury"
       ],
       "settings": {
-        "color_scheme": "",
-        "side_menu": "",
-        "faq_accordion": true,
-        "about_eyebrow": "Our story",
-        "about_heading": "",
-        "about_lead": "Fine jewelry made to be worn every day: waterproof, hypoallergenic and designed to last. Simple pieces with a personal touch.",
+        "color_scheme": "scheme-1",
+        "about_eyebrow": "Our Heritage & Philosophy",
+        "about_heading": "Crafted for Everyday Elegance",
+        "about_lead": "Aurelle was founded with a singular conviction: fine jewelry shouldn't be reserved for velvet boxes and special occasions. We forge waterproof, tarnish-free, and hypoallergenic heirlooms designed to accompany you through every shower, swim, milestone, and quiet morning.",
         "about_image": "shopify://shop_images/1-13.webp",
-        "about_button_label": "Shop the collection",
-        "about_button_link": "",
-        "about_story_title": "Jewelry that moves with your life",
-        "about_story": "<p>We design jewelry for the moments in between: the commute, the beach, the birthday dinner. Every piece is finished by hand and checked before it reaches you.</p>",
-        "about_cta_title": "Find your piece",
-        "about_cta_text": "Explore our collection, or write to us if you need help choosing the perfect gift.",
-        "about_cta_label": "Get in touch",
-        "about_cta_link": "",
-        "perm_heading": "",
-        "perm_lead": "A bracelet, anklet or necklace fitted to you and welded closed, with no clasp. Made to be worn every day, in the shower, at the beach, always.",
-        "perm_button_label": "Book a session",
-        "perm_button_link": "",
-        "perm_cta_title": "Ready for yours?",
-        "perm_cta_text": "Tell us about your event, studio visit or group booking and we will find a date that works.",
-        "perm_cta_label": "Get in touch",
-        "perm_cta_link": "",
-        "faq_intro": "Quick answers about orders, engraving, sizing and care.",
-        "faq_cta_title": "Still have questions?",
-        "faq_cta_text": "Our team is happy to help with sizing, engraving and orders.",
-        "faq_cta_label": "Contact us",
-        "faq_cta_link": "",
-        "contact_intro": "Questions about an order, engraving or sizing? Send us a message and our team will help you.",
-        "contact_email": "info@bssoln.com",
-        "contact_phone": "",
-        "contact_address": "",
-        "contact_hours": "Mon - Fri: 09:00 - 17:00",
-        "form_title": "Send us a message",
-        "button_label": "Send message",
-        "box_radius": 4,
+        "about_button_label": "Shop The Collection",
+        "about_button_link": "/collections/all",
+        "about_story_title": "Waterproof Innovation Meets Laser Artistry",
+        "about_story": "<p>Every piece in the Aurelle collection begins with surgical-grade 316L stainless steel—the exact metal celebrated in luxury Swiss horology for its supreme strength and imperviousness to corrosion.</p><p>Through Physical Vapor Deposition (PVD), real 18-karat gold is vaporized and bonded at a molecular scale within high-vacuum chambers. The resulting finish is up to 10 times more resilient than traditional electroplating, allowing your jewelry to withstand ocean saltwater, chlorinated pools, daily perfumes, and sweat without ever tarnishing or fading.</p><p>In our private atelier, our master artisans finish, polish, and laser-engrave every piece individually. From meaningful coordinates and Roman numerals to loved ones' initials, we turn metal into memory.</p>",
+        "about_cta_title": "Discover Your Signature Piece",
+        "about_cta_text": "Explore our curated collection of waterproof rings, necklaces, and engravable keepsakes, or consult our concierge team for custom bespoke inquiries.",
+        "about_cta_label": "Explore Collection",
+        "about_cta_link": "/collections/all",
         "padding_top": 40,
-        "padding_bottom": 70
+        "padding_bottom": 40
+      }
+    },
+    "featured_products": {
+      "type": "section-collection",
+      "settings": {
+        "title": "Signature Aurelle Pieces",
+        "subtitle": "Handcrafted waterproof jewelry made for effortless daily wear",
+        "collection": "all",
+        "limit": 2,
+        "shuffle_products": true,
+        "grid_columns_desktop": 2,
+        "grid_columns_1024": 2,
+        "grid_columns_960": 2,
+        "grid_columns_768": 2,
+        "grid_columns_650": "2",
+        "grid_columns_mobile": "1",
+        "padding_top": 35,
+        "padding_bottom": 50
       }
     }
   },
   "order": [
-    "main"
+    "main",
+    "featured_products"
   ]
 }

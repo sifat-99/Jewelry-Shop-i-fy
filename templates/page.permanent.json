@@ -1,271 +1,126 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
       "type": "main-page",
       "blocks": {
-        "faq_1": {
-          "type": "faq",
-          "settings": {
-            "category": "Orders & shipping",
-            "question": "How long does delivery take?",
-            "answer": "<p>Orders are packed and dispatched within 24-48 hours. Delivery usually takes 2-5 working days within Europe.</p>"
-          }
-        },
-        "faq_2": {
-          "type": "faq",
-          "settings": {
-            "category": "Orders & shipping",
-            "question": "Is shipping free?",
-            "answer": "<p>Shipping is free on qualifying orders. The free shipping goal is shown in your cart.</p>"
-          }
-        },
-        "faq_3": {
-          "type": "faq",
-          "settings": {
-            "category": "Orders & shipping",
-            "question": "Can I change or cancel my order?",
-            "answer": "<p>Contact us as soon as possible. If your order has not been dispatched yet, we are happy to change or cancel it.</p>"
-          }
-        },
-        "faq_4": {
-          "type": "faq",
-          "settings": {
-            "category": "Engraving",
-            "question": "How does engraving work?",
-            "answer": "<p>Choose an engravable piece, select the number of characters and type your text on the product page. Your engraving appears on the order.</p>"
-          }
-        },
-        "faq_5": {
-          "type": "faq",
-          "settings": {
-            "category": "Engraving",
-            "question": "Can an engraved piece be returned?",
-            "answer": "<p>Personalised pieces are made for you and cannot be returned unless they arrive damaged or with an error on our side.</p>"
-          }
-        },
-        "faq_6": {
-          "type": "faq",
-          "settings": {
-            "category": "Sizing",
-            "question": "How do I find my ring size?",
-            "answer": "<p>Use our size guide: measure your finger at home and compare it with the chart.</p>"
-          }
-        },
-        "faq_7": {
-          "type": "faq",
-          "settings": {
-            "category": "Sizing",
-            "question": "What if my size does not fit?",
-            "answer": "<p>If an unengraved piece does not fit, you can exchange it within 14 days.</p>"
-          }
-        },
-        "faq_8": {
-          "type": "faq",
-          "settings": {
-            "category": "Care & materials",
-            "question": "Is the jewelry waterproof?",
-            "answer": "<p>Our stainless steel pieces are waterproof and made to be worn every day, in the shower and while swimming.</p>"
-          }
-        },
-        "faq_9": {
-          "type": "faq",
-          "settings": {
-            "category": "Care & materials",
-            "question": "Will it tarnish or cause skin irritation?",
-            "answer": "<p>Our pieces are hypoallergenic and do not tarnish. Clean them gently with warm water and a soft cloth.</p>"
-          }
-        },
-        "faq_10": {
-          "type": "faq",
-          "settings": {
-            "category": "Returns",
-            "question": "What is your return policy?",
-            "answer": "<p>You have 14 days after delivery to return unworn items in their original packaging. See our Returns Policy for details.</p>"
-          }
-        },
-        "feat_1": {
+        "feat_waterproof": {
           "type": "feature",
           "settings": {
             "icon": "drop",
-            "title": "Waterproof",
-            "text": "Wear it in the shower, at the pool and at the beach. It is made to stay on."
+            "title": "100% Waterproof & Tarnish-Proof",
+            "text": "Crafted from solid 14K gold-filled and surgical-grade 316L stainless steel. Wear it in the shower, ocean, sauna, and workouts without taking it off."
           }
         },
-        "feat_2": {
+        "feat_claspless": {
           "type": "feature",
           "settings": {
             "icon": "shield",
-            "title": "Welded, no clasp",
-            "text": "A tiny weld closes the chain around your wrist, ankle or neck. Nothing to fasten or lose."
+            "title": "Claspless Micro-Weld",
+            "text": "A delicate flash welds the jump ring closed around your wrist, ankle, or neck. No clasp to fasten, turn around, or accidentally lose."
           }
         },
-        "feat_3": {
+        "feat_bespoke": {
           "type": "feature",
           "settings": {
             "icon": "heart",
-            "title": "Made around you",
-            "text": "Choose the chain, length and charms together with us, fitted to you on the spot."
+            "title": "Bespoke Custom Fitting",
+            "text": "Measured to your exact millimeter for an effortless, tailored drape. Personalize with genuine birthstones, initial tags, and diamond-cut charms."
+          }
+        },
+        "feat_painless": {
+          "type": "feature",
+          "settings": {
+            "icon": "star",
+            "title": "Painless & Instant",
+            "text": "The micro-welding process takes just a few seconds. A soft leather barrier protects your skin—completely painless, safe, and magical to watch."
+          }
+        },
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "1. Select Your Chain",
+            "text": "Choose from our curated collection of 14K yellow gold, rose gold, and sterling silver chains including Paperclip, Cuban, Figaro, and Dainty Cable."
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "2. Personalize with Charms",
+            "text": "Add custom engraved initial tags, natural freshwater pearls, birthstone drops, or zodiac connectors to make it uniquely yours."
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "3. Custom Tailored Fit",
+            "text": "We measure the chain directly on your wrist, ankle, or neck to achieve the perfect balance between comfortable drape and secure elegance."
           }
         },
         "step_4": {
           "type": "step",
           "settings": {
-            "title": "Choose your chain",
-            "text": "Pick from gold and silver chains and add charms if you like."
+            "title": "4. The Micro-Weld Spark",
+            "text": "With protective eyewear and a soft leather shield in place, our master artisan welds the jump ring permanently closed with a quick, safe spark."
           }
         },
         "step_5": {
           "type": "step",
           "settings": {
-            "title": "Get it fitted",
-            "text": "We measure the chain around your wrist, ankle or neck for a comfortable fit."
-          }
-        },
-        "step_6": {
-          "type": "step",
-          "settings": {
-            "title": "Welded closed",
-            "text": "A quick, gentle weld seals the chain. It takes seconds and does not hurt."
-          }
-        },
-        "step_7": {
-          "type": "step",
-          "settings": {
-            "title": "Wear it every day",
-            "text": "No clasp, no taking it off. Care is simple and we are here for any adjustment."
-          }
-        },
-        "stat_1": {
-          "type": "stat",
-          "settings": {
-            "number": "100%",
-            "label": "Waterproof"
-          }
-        },
-        "stat_2": {
-          "type": "stat",
-          "settings": {
-            "number": "24-48h",
-            "label": "Dispatch time"
-          }
-        },
-        "stat_3": {
-          "type": "stat",
-          "settings": {
-            "number": "14 days",
-            "label": "Easy returns"
-          }
-        },
-        "stat_4": {
-          "type": "stat",
-          "settings": {
-            "number": "Hypoallergenic",
-            "label": "Skin friendly"
-          }
-        },
-        "value_1": {
-          "type": "value",
-          "settings": {
-            "icon": "star",
-            "title": "Made to last",
-            "text": "Durable materials and careful finishing, so your jewelry looks good for years."
-          }
-        },
-        "value_2": {
-          "type": "value",
-          "settings": {
-            "icon": "heart",
-            "title": "Personal by design",
-            "text": "Engraving and custom lengths turn a simple piece into something that is yours."
-          }
-        },
-        "value_3": {
-          "type": "value",
-          "settings": {
-            "icon": "shield",
-            "title": "Honest and simple",
-            "text": "Clear prices, easy returns and a team that answers your messages."
+            "title": "5. Forever Effortless",
+            "text": "No clasp, no maintenance. Wear it 24/7 as an enduring symbol of friendship, love, a personal milestone, or everyday luxury."
           }
         }
       },
       "block_order": [
-        "faq_1",
-        "faq_2",
-        "faq_3",
-        "faq_4",
-        "faq_5",
-        "faq_6",
-        "faq_7",
-        "faq_8",
-        "faq_9",
-        "faq_10",
-        "feat_1",
-        "feat_2",
-        "feat_3",
+        "feat_waterproof",
+        "feat_claspless",
+        "feat_bespoke",
+        "feat_painless",
+        "step_1",
+        "step_2",
+        "step_3",
         "step_4",
-        "step_5",
-        "step_6",
-        "step_7",
-        "stat_1",
-        "stat_2",
-        "stat_3",
-        "stat_4",
-        "value_1",
-        "value_2",
-        "value_3"
+        "step_5"
       ],
       "settings": {
-        "color_scheme": "",
-        "side_menu": "",
-        "faq_accordion": true,
-        "about_eyebrow": "Our story",
-        "about_heading": "",
-        "about_lead": "Fine jewelry made to be worn every day: waterproof, hypoallergenic and designed to last. Simple pieces with a personal touch.",
-        "about_image": "shopify://shop_images/Luna_Paperclip_Bar_Chain_Supply_03-Macro.webp",
-        "about_button_label": "Shop the collection",
-        "about_button_link": "",
-        "about_story_title": "Jewelry that moves with your life",
-        "about_story": "<p>We design jewelry for the moments in between: the commute, the beach, the birthday dinner. Every piece is finished by hand and checked before it reaches you.</p>",
-        "about_cta_title": "Find your piece",
-        "about_cta_text": "Explore our collection, or write to us if you need help choosing the perfect gift.",
-        "about_cta_label": "Get in touch",
-        "about_cta_link": "",
-        "perm_heading": "",
-        "perm_lead": "A bracelet, anklet or necklace fitted to you and welded closed, with no clasp. Made to be worn every day, in the shower, at the beach, always.",
-        "perm_button_label": "Book a session",
-        "perm_button_link": "",
-        "perm_cta_title": "Ready for yours?",
-        "perm_cta_text": "Tell us about your event, studio visit or group booking and we will find a date that works.",
-        "perm_cta_label": "Get in touch",
-        "perm_cta_link": "",
-        "faq_intro": "Quick answers about orders, engraving, sizing and care.",
-        "faq_cta_title": "Still have questions?",
-        "faq_cta_text": "Our team is happy to help with sizing, engraving and orders.",
-        "faq_cta_label": "Contact us",
-        "faq_cta_link": "",
-        "contact_intro": "Questions about an order, engraving or sizing? Send us a message and our team will help you.",
-        "contact_email": "info@bssoln.com",
-        "contact_phone": "",
-        "contact_address": "",
-        "contact_hours": "Mon - Fri: 09:00 - 17:00",
-        "form_title": "Send us a message",
-        "button_label": "Send message",
-        "box_radius": 4,
+        "color_scheme": "scheme-1",
+        "perm_eyebrow": "Aurelle Atelier Experience",
+        "perm_heading": "Permanent Jewelry On-Site",
+        "perm_lead": "A bespoke bracelet, anklet or necklace measured to your exact dimensions and welded closed without a clasp. Engineered from hypoallergenic 14K gold-filled and waterproof steel, made to stay with you always.",
+        "perm_image": "shopify://shop_images/Luna_Paperclip_Bar_Chain_Supply_03-Macro.webp",
+        "perm_button_label": "Book an Appointment",
+        "perm_button_link": "/pages/contact",
+        "perm_steps_eyebrow": "The On-Site Atelier Process",
+        "perm_steps_title": "How Permanent Welding Works",
+        "perm_cta_title": "Ready for Your Permanent Piece?",
+        "perm_cta_text": "Join us at our studio or book a private permanent jewelry bar for bridal showers, birthdays, or corporate celebrations. Contact us to reserve your private date.",
+        "perm_cta_label": "Book Your Session",
+        "perm_cta_link": "/pages/contact",
         "padding_top": 40,
-        "padding_bottom": 70
+        "padding_bottom": 40
+      }
+    },
+    "featured_products": {
+      "type": "section-collection",
+      "settings": {
+        "title": "Signature Chain Styles",
+        "subtitle": "Explore the fine chains & bespoke pieces featured in our welding bar",
+        "collection": "all",
+        "limit": 2,
+        "shuffle_products": true,
+        "grid_columns_desktop": 2,
+        "grid_columns_1024": 2,
+        "grid_columns_960": 2,
+        "grid_columns_768": 2,
+        "grid_columns_650": "2",
+        "grid_columns_mobile": "1",
+        "padding_top": 35,
+        "padding_bottom": 50
       }
     }
   },
   "order": [
-    "main"
+    "main",
+    "featured_products"
   ]
 }
