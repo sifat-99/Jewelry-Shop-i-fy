@@ -407,11 +407,12 @@
            height="{{ cfg.about_image.height }}"
            loading="lazy">
     {%- else -%}
-      <img src="{{ 'split_banner_1.jpg' | asset_url }}"
-           alt="Aurelle Fine Jewelry Atelier Craftsmanship"
+      <img src="{{ 'mosaic_1.jpg' | asset_url }}"
+           alt="Aurelle Fine Jewelry - Everyday Elegance"
            width="1200"
            height="1200"
-           loading="lazy">
+           loading="lazy"
+           onerror="this.src='{{ 'split_banner_2.jpg' | asset_url }}'">
     {%- endif -%}
   </div>
   <div>
