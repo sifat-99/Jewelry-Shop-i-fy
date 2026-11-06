@@ -692,10 +692,48 @@
     var rotator = document.getElementById('aboutMediaRotator');
     if (!rotator) return;
 
-    var slides = rotator.querySelectorAll('.about-slide');
-    var dots = rotator.querySelectorAll('.about-slide-dot');
-    if (slides.length <= 1) return;
+    var slides = Array.prototype.slice.call(rotator.querySelectorAll('.about-slide'));
+    var dotsContainer = document.getElementById('aboutSlideDots');
+    if (slides.length <= 1) {
+      if (dotsContainer) dotsContainer.style.display = 'none';
+      return;
+    }
 
+    // Random shuffle product slides on every page visit so varied product 2nd images are featured
+    {%- if cfg.about_image == blank -%}
+      for (var s = slides.length - 1; s > 0; s--) {
+        var rand = Math.floor(Math.random() * (s + 1));
+        var temp = slides[s];
+        slides[s] = slides[rand];
+        slides[rand] = temp;
+      }
+      slides.forEach(function(slide, idx) {
+        slide.setAttribute('data-slide-index', idx);
+        if (idx === 0) {
+          slide.classList.add('is-active');
+        } else {
+          slide.classList.remove('is-active');
+        }
+        if (dotsContainer) {
+          rotator.insertBefore(slide, dotsContainer);
+        } else {
+          rotator.appendChild(slide);
+        }
+      });
+    {%- endif -%}
+
+    // Generate dots navigation to match slides
+    if (dotsContainer) {
+      dotsContainer.innerHTML = '';
+      slides.forEach(function(_, idx) {
+        var dot = document.createElement('span');
+        dot.className = 'about-slide-dot' + (idx === 0 ? ' is-active' : '');
+        dot.setAttribute('data-dot-idx', idx);
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    var dots = dotsContainer ? dotsContainer.querySelectorAll('.about-slide-dot') : [];
     var currentIndex = 0;
     var timer = null;
     var intervalMs = 3800; // change every 3.8s
@@ -741,13 +779,16 @@
     rotator.addEventListener('touchstart', stopTimer, { passive: true });
     rotator.addEventListener('touchend', startTimer, { passive: true });
 
-    for (var k = 0; k < dots.length; k++) {
-      (function(idx) {
-        dots[idx].addEventListener('click', function() {
+    if (dotsContainer) {
+      dotsContainer.addEventListener('click', function(e) {
+        var dot = e.target.closest('.about-slide-dot');
+        if (!dot) return;
+        var idx = parseInt(dot.getAttribute('data-dot-idx'), 10);
+        if (!isNaN(idx)) {
           showSlide(idx);
           startTimer();
-        });
-      })(k);
+        }
+      });
     }
 
     startTimer();

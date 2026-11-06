@@ -610,97 +610,119 @@
 
   <div class="sl-hero__media">
     <div class="perm-media-rotator" id="permMediaRotator">
-      <!-- Slide 1: Welded Paperclip Bracelet -->
-      <div class="perm-slide is-active" data-slide-index="0">
-        {%- if cfg.perm_image != blank -%}
+      {%- if cfg.perm_image != blank -%}
+        <!-- Custom Hero Slides Configured in Theme Settings -->
+        <div class="perm-slide is-active" data-slide-index="0">
           <img src="{{ cfg.perm_image | image_url: width: 1200 }}"
                alt="{{ cfg.perm_image.alt | default: cfg.perm_slide_1_title | default: 'Aurelle Permanent Welded Bracelet' | escape }}"
                width="1200" height="1200"
                loading="eager">
-        {%- else -%}
-          <img src="{{ 'menu_bracelet.jpg' | asset_url }}"
-               alt="Aurelle Permanent Welded Bracelet"
-               width="1200" height="1200"
-               loading="eager">
-        {%- endif -%}
-        <div class="perm-slide__overlay"></div>
-        <div class="perm-slide__card">
-          <div>
-            <span class="perm-slide__badge">Atelier Spotlight</span>
-            <span class="perm-slide__title">{{ cfg.perm_slide_1_title | default: 'Welded Paperclip Bracelet' }}</span>
+          <div class="perm-slide__overlay"></div>
+          <div class="perm-slide__card">
+            <div>
+              <span class="perm-slide__badge">Atelier Spotlight</span>
+              <span class="perm-slide__title">{{ cfg.perm_slide_1_title | default: 'Welded Paperclip Bracelet' }}</span>
+            </div>
+            <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">Book Session</span></a>
           </div>
-          <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">Book Session</span></a>
         </div>
-      </div>
 
-      <!-- Slide 2: 14K Gold & Silver Chain Assortment -->
-      <div class="perm-slide" data-slide-index="1">
         {%- if cfg.perm_image_2 != blank -%}
-          <img src="{{ cfg.perm_image_2 | image_url: width: 1200 }}"
-               alt="{{ cfg.perm_image_2.alt | default: cfg.perm_slide_2_title | default: '14K Gold & Silver Permanent Chains' | escape }}"
-               width="1200" height="1200"
-               loading="lazy">
-        {%- else -%}
-          <img src="{{ 'menu_chain.jpg' | asset_url }}"
-               alt="14K Gold & Silver Permanent Chains"
-               width="1200" height="1200"
-               loading="lazy">
-        {%- endif -%}
-        <div class="perm-slide__overlay"></div>
-        <div class="perm-slide__card">
-          <div>
-            <span class="perm-slide__badge">Atelier Spotlight</span>
-            <span class="perm-slide__title">{{ cfg.perm_slide_2_title | default: 'Dainty Cable & Figaro Chains' }}</span>
+          <div class="perm-slide" data-slide-index="1">
+            <img src="{{ cfg.perm_image_2 | image_url: width: 1200 }}"
+                 alt="{{ cfg.perm_image_2.alt | default: cfg.perm_slide_2_title | default: '14K Gold & Silver Permanent Chains' | escape }}"
+                 width="1200" height="1200"
+                 loading="lazy">
+            <div class="perm-slide__overlay"></div>
+            <div class="perm-slide__card">
+              <div>
+                <span class="perm-slide__badge">Atelier Spotlight</span>
+                <span class="perm-slide__title">{{ cfg.perm_slide_2_title | default: 'Dainty Cable & Figaro Chains' }}</span>
+              </div>
+              <a href="{{ shop_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">View Chains</span></a>
+            </div>
           </div>
-          <a href="{{ shop_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">View Chains</span></a>
-        </div>
-      </div>
+        {%- endif -%}
 
-      <!-- Slide 3: Clasp-Free Stacked Layers -->
-      <div class="perm-slide" data-slide-index="2">
         {%- if cfg.perm_image_3 != blank -%}
-          <img src="{{ cfg.perm_image_3 | image_url: width: 1200 }}"
-               alt="{{ cfg.perm_image_3.alt | default: cfg.perm_slide_3_title | default: 'Claspless Everyday Fine Jewelry Layers' | escape }}"
-               width="1200" height="1200"
-               loading="lazy">
-        {%- else -%}
-          <img src="{{ 'mosaic_1.jpg' | asset_url }}"
-               alt="Claspless Everyday Fine Jewelry Layers"
-               width="1200" height="1200"
-               loading="lazy">
-        {%- endif -%}
-        <div class="perm-slide__overlay"></div>
-        <div class="perm-slide__card">
-          <div>
-            <span class="perm-slide__badge">Atelier Spotlight</span>
-            <span class="perm-slide__title">{{ cfg.perm_slide_3_title | default: 'Claspless Everyday Layers' }}</span>
+          <div class="perm-slide" data-slide-index="2">
+            <img src="{{ cfg.perm_image_3 | image_url: width: 1200 }}"
+                 alt="{{ cfg.perm_image_3.alt | default: cfg.perm_slide_3_title | default: 'Claspless Everyday Layers' | escape }}"
+                 width="1200" height="1200"
+                 loading="lazy">
+            <div class="perm-slide__overlay"></div>
+            <div class="perm-slide__card">
+              <div>
+                <span class="perm-slide__badge">Atelier Spotlight</span>
+                <span class="perm-slide__title">{{ cfg.perm_slide_3_title | default: 'Claspless Everyday Layers' }}</span>
+              </div>
+              <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">Book Session</span></a>
+            </div>
           </div>
-          <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">Book Session</span></a>
-        </div>
-      </div>
+        {%- endif -%}
 
-      <!-- Slide 4: Micro-Laser & Precision Welds -->
-      <div class="perm-slide" data-slide-index="3">
         {%- if cfg.perm_image_4 != blank -%}
-          <img src="{{ cfg.perm_image_4 | image_url: width: 1200 }}"
-               alt="{{ cfg.perm_image_4.alt | default: cfg.perm_slide_4_title | default: 'Atelier Micro-Welding Precision' | escape }}"
-               width="1200" height="1200"
-               loading="lazy">
-        {%- else -%}
-          <img src="{{ 'split_banner_1.jpg' | asset_url }}"
-               alt="Atelier Micro-Welding Precision"
-               width="1200" height="1200"
-               loading="lazy">
-        {%- endif -%}
-        <div class="perm-slide__overlay"></div>
-        <div class="perm-slide__card">
-          <div>
-            <span class="perm-slide__badge">Atelier Spotlight</span>
-            <span class="perm-slide__title">{{ cfg.perm_slide_4_title | default: 'Micro-Pulse Arc Welding' }}</span>
+          <div class="perm-slide" data-slide-index="3">
+            <img src="{{ cfg.perm_image_4 | image_url: width: 1200 }}"
+                 alt="{{ cfg.perm_image_4.alt | default: cfg.perm_slide_4_title | default: 'Micro-Pulse Arc Welding' | escape }}"
+                 width="1200" height="1200"
+                 loading="lazy">
+            <div class="perm-slide__overlay"></div>
+            <div class="perm-slide__card">
+              <div>
+                <span class="perm-slide__badge">Atelier Spotlight</span>
+                <span class="perm-slide__title">{{ cfg.perm_slide_4_title | default: 'Micro-Pulse Arc Welding' }}</span>
+              </div>
+              <a href="#how-it-works" class="perm-slide__btn"><span class="perm-slide__btn-text">Learn How</span></a>
+            </div>
           </div>
-          <a href="#how-it-works" class="perm-slide__btn"><span class="perm-slide__btn-text">Learn How</span></a>
-        </div>
-      </div>
+        {%- endif -%}
+
+      {%- else -%}
+        <!-- Store Products 2nd Image Dynamic Slides (Random / Shuffled) -->
+        {%- assign perm_items = collections['permanent-jewelry'].products -%}
+        {%- if perm_items == blank or perm_items.size == 0 -%}
+          {%- assign perm_items = collections.all.products -%}
+        {%- endif -%}
+
+        {%- assign found_perm_slides = 0 -%}
+        {%- for prod in perm_items -%}
+          {%- assign current_img = nil -%}
+          {%- if prod.images.size > 1 -%}
+            {%- assign current_img = prod.images[1] -%}
+          {%- elsif prod.featured_image != blank -%}
+            {%- assign current_img = prod.featured_image -%}
+          {%- endif -%}
+
+          {%- if current_img != blank -%}
+            <div class="perm-slide{% if found_perm_slides == 0 %} is-active{% endif %}" data-slide-index="{{ found_perm_slides }}">
+              <img src="{{ current_img | image_url: width: 1200 }}"
+                   srcset="{{ current_img | image_url: width: 600 }} 600w, {{ current_img | image_url: width: 900 }} 900w, {{ current_img | image_url: width: 1200 }} 1200w"
+                   sizes="(min-width: 901px) 46vw, 100vw"
+                   alt="{{ prod.title | escape }}"
+                   width="{{ current_img.width }}"
+                   height="{{ current_img.height }}"
+                   loading="{% if found_perm_slides == 0 %}eager{% else %}lazy{% endif %}">
+              <div class="perm-slide__overlay"></div>
+              <div class="perm-slide__card">
+                <div>
+                  <span class="perm-slide__badge">Atelier Spotlight</span>
+                  <a href="{{ prod.url }}" class="perm-slide__title">{{ prod.title }}</a>
+                </div>
+                <a href="{{ prod.url }}" class="perm-slide__btn"><span class="perm-slide__btn-text">View Piece</span></a>
+              </div>
+            </div>
+            {%- assign found_perm_slides = found_perm_slides | plus: 1 -%}
+            {%- if found_perm_slides >= 10 -%}{%- break -%}{%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if found_perm_slides == 0 -%}
+          <div class="perm-slide is-active">
+            <img src="{{ 'menu_bracelet.jpg' | asset_url }}" alt="Aurelle Permanent Welded Bracelet" width="1200" height="1200" loading="eager">
+          </div>
+        {%- endif -%}
+      {%- endif -%}
 
       <!-- Rotator Dots Navigation -->
       <div class="perm-slide-nav" id="permSlideDots">
@@ -892,10 +914,48 @@
     var rotator = document.getElementById('permMediaRotator');
     if (!rotator) return;
 
-    var slides = rotator.querySelectorAll('.perm-slide');
-    var dots = rotator.querySelectorAll('.perm-slide-dot');
-    if (slides.length <= 1) return;
+    var slides = Array.prototype.slice.call(rotator.querySelectorAll('.perm-slide'));
+    var dotsContainer = document.getElementById('permSlideDots');
+    if (slides.length <= 1) {
+      if (dotsContainer) dotsContainer.style.display = 'none';
+      return;
+    }
 
+    // Random shuffle product slides on every page visit so varied product 2nd images are featured
+    {%- if cfg.perm_image == blank -%}
+      for (var s = slides.length - 1; s > 0; s--) {
+        var rand = Math.floor(Math.random() * (s + 1));
+        var temp = slides[s];
+        slides[s] = slides[rand];
+        slides[rand] = temp;
+      }
+      slides.forEach(function(slide, idx) {
+        slide.setAttribute('data-slide-index', idx);
+        if (idx === 0) {
+          slide.classList.add('is-active');
+        } else {
+          slide.classList.remove('is-active');
+        }
+        if (dotsContainer) {
+          rotator.insertBefore(slide, dotsContainer);
+        } else {
+          rotator.appendChild(slide);
+        }
+      });
+    {%- endif -%}
+
+    // Generate dots navigation to match slides
+    if (dotsContainer) {
+      dotsContainer.innerHTML = '';
+      slides.forEach(function(_, idx) {
+        var dot = document.createElement('span');
+        dot.className = 'perm-slide-dot' + (idx === 0 ? ' is-active' : '');
+        dot.setAttribute('data-dot-idx', idx);
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    var dots = dotsContainer ? dotsContainer.querySelectorAll('.perm-slide-dot') : [];
     var currentIndex = 0;
     var timer = null;
     var intervalMs = 3800; // change every 3.8s
@@ -941,13 +1001,16 @@
     rotator.addEventListener('touchstart', stopTimer, { passive: true });
     rotator.addEventListener('touchend', startTimer, { passive: true });
 
-    for (var k = 0; k < dots.length; k++) {
-      (function(idx) {
-        dots[idx].addEventListener('click', function() {
+    if (dotsContainer) {
+      dotsContainer.addEventListener('click', function(e) {
+        var dot = e.target.closest('.perm-slide-dot');
+        if (!dot) return;
+        var idx = parseInt(dot.getAttribute('data-dot-idx'), 10);
+        if (!isNaN(idx)) {
           showSlide(idx);
           startTimer();
-        });
-      })(k);
+        }
+      });
     }
 
     startTimer();
