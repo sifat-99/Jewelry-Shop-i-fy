@@ -1,5 +1,6 @@
 {%- comment -%}
-  About us landing layout. Accepts: blocks ('stat' and 'value' types), cfg (section.settings), page_title, page_content
+  About us landing layout with auto-rotating product secondary images slideshow.
+  Accepts: blocks, cfg (section.settings), page_title, page_content
 {%- endcomment -%}
 {%- liquid
   assign shop_link = cfg.about_button_link
@@ -10,6 +11,7 @@
   if cta_link == blank
     assign cta_link = routes.root_url | append: 'pages/contact'
   endif
+
   assign has_stats = false
   assign has_values = false
   for block in blocks
@@ -22,29 +24,227 @@
 -%}
 {% render 'landing-css' %}
 
+<style>
+  /* Dynamic Product Rotating Slider Styles */
+  .about-media-rotator {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    max-height: 580px;
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--ct-radius, 6px);
+    background: #111111;
+    border: 1px solid rgba(var(--color-foreground, 17, 17, 17), 0.12);
+    box-shadow: 0 20px 48px -20px rgba(0, 0, 0, 0.35);
+  }
+  .about-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.03);
+    transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.85s;
+    pointer-events: none;
+  }
+  .about-slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    pointer-events: auto;
+    z-index: 2;
+  }
+  .about-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .about-slide__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.68) 100%);
+    pointer-events: none;
+  }
+  .about-slide__card {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 20px;
+    background: rgba(18, 18, 18, 0.84);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 4;
+  }
+  .about-slide__badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #d4af37;
+    margin-bottom: 2px;
+  }
+  .about-slide__title {
+    display: block;
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #ffffff;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 240px;
+  }
+  .about-slide__btn {
+    flex: none;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #0d0d0d !important;
+    background: #d4af37;
+    padding: 7px 14px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+  .about-slide__btn:hover {
+    background: #e5c358;
+  }
+  .about-slide-nav {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 5;
+    background: rgba(0,0,0,0.5);
+    padding: 5px 8px;
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .about-slide-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .about-slide-dot.is-active {
+    background: #d4af37;
+    width: 20px;
+    border-radius: 4px;
+  }
+  .about-quote-box {
+    margin: 64px 0 76px;
+    padding: 44px 36px;
+    text-align: center;
+    background: color-mix(in srgb, var(--text, #111) 3%, var(--bg, #fff));
+    border-left: 3px solid #d4af37;
+    border-right: 3px solid #d4af37;
+    border-radius: var(--ct-radius, 4px);
+  }
+  .about-quote-text {
+    margin: 0 auto;
+    max-width: 680px;
+    font-size: clamp(17px, 2.2vw, 22px);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+    color: var(--text, #111);
+    font-style: italic;
+  }
+  .about-quote-author {
+    margin: 16px 0 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #d4af37;
+  }
+</style>
+
+<!-- HERO SECTION: STORY ON LEFT, ROTATING 2ND PRODUCT IMAGES ON RIGHT -->
 <section class="sl-hero">
   <div class="sl-hero__copy">
-    <p class="sl-hero__eyebrow">{{ cfg.about_eyebrow | default: 'Our story' }}</p>
-    <h1 class="sl-hero__title">{{ cfg.about_heading | default: page_title }}</h1>
-    <p class="sl-hero__lead">{{ cfg.about_lead | default: 'Fine jewelry made to be worn every day: waterproof, hypoallergenic and designed to last. Simple pieces with a personal touch.' }}</p>
+    <p class="sl-hero__eyebrow">{{ cfg.about_eyebrow | default: 'Our Heritage & Philosophy' }}</p>
+    <h1 class="sl-hero__title">{{ cfg.about_heading | default: 'Crafted for Everyday Elegance' }}</h1>
+    <p class="sl-hero__lead">
+      {{ cfg.about_lead | default: "Aurelle was founded with a singular conviction: fine jewelry shouldn't be reserved for velvet boxes and special occasions. We forge waterproof, tarnish-free, and hypoallergenic heirlooms designed to accompany you through every shower, swim, milestone, and quiet morning." }}
+    </p>
     <div class="sl-hero__btns">
-      <a href="{{ shop_link }}" class="btn btn--primary btn-sliding-hover sl-btn"><span class="btn__text-content">{{ cfg.about_button_label | default: 'Shop the collection' }}</span></a>
-      <a href="{{ routes.root_url }}pages/contact" class="btn btn-sliding-hover sl-btn"><span class="btn__text-content">Contact us</span></a>
+      <a href="{{ shop_link }}" class="btn btn--primary btn-sliding-hover sl-btn"><span class="btn__text-content">{{ cfg.about_button_label | default: 'Explore The Collection' }}</span></a>
+      <a href="{{ routes.root_url }}pages/contact" class="btn btn-sliding-hover sl-btn"><span class="btn__text-content">Contact Atelier</span></a>
     </div>
   </div>
+
   <div class="sl-hero__media">
-    {%- if cfg.about_image != blank -%}
-      <img src="{{ cfg.about_image | image_url: width: 1200 }}" srcset="{{ cfg.about_image | image_url: width: 600 }} 600w, {{ cfg.about_image | image_url: width: 900 }} 900w, {{ cfg.about_image | image_url: width: 1200 }} 1200w" sizes="(min-width: 901px) 46vw, 100vw" alt="{{ cfg.about_image.alt | default: page_title | escape }}" width="{{ cfg.about_image.width }}" height="{{ cfg.about_image.height }}" loading="eager">
-    {%- else -%}
-      <div class="sl-hero__ph" aria-hidden="true">
-        <svg viewBox="0 0 100 100" fill="none" stroke="#8d6e63" stroke-width="1.6" stroke-linejoin="round"><polygon points="50,8 92,50 50,92 8,50"/><polygon points="50,24 76,50 50,76 24,50"/><rect x="40" y="40" width="20" height="20" fill="#8d6e63" stroke="none"/></svg>
-      </div>
-    {%- endif -%}
+    <div class="about-media-rotator" id="aboutMediaRotator">
+      {%- assign found_slides = 0 -%}
+      {%- for prod in collections.all.products -%}
+        {%- assign current_img = nil -%}
+        {%- if prod.images.size > 1 -%}
+          {%- assign current_img = prod.images[1] -%}
+        {%- elsif prod.featured_image != blank -%}
+          {%- assign current_img = prod.featured_image -%}
+        {%- endif -%}
+
+        {%- if current_img != blank -%}
+          <div class="about-slide{% if found_slides == 0 %} is-active{% endif %}" data-slide-index="{{ found_slides }}">
+            <img src="{{ current_img | image_url: width: 1200 }}"
+                 srcset="{{ current_img | image_url: width: 600 }} 600w, {{ current_img | image_url: width: 900 }} 900w, {{ current_img | image_url: width: 1200 }} 1200w"
+                 sizes="(min-width: 901px) 46vw, 100vw"
+                 alt="{{ prod.title | escape }}"
+                 width="{{ current_img.width }}"
+                 height="{{ current_img.height }}"
+                 loading="{% if found_slides == 0 %}eager{% else %}lazy{% endif %}">
+            <div class="about-slide__overlay"></div>
+            <div class="about-slide__card">
+              <div>
+                <span class="about-slide__badge">✦ Atelier Spotlight</span>
+                <a href="{{ prod.url }}" class="about-slide__title">{{ prod.title }}</a>
+              </div>
+              <a href="{{ prod.url }}" class="about-slide__btn">View Piece</a>
+            </div>
+          </div>
+          {%- assign found_slides = found_slides | plus: 1 -%}
+          {%- if found_slides >= 8 -%}{%- break -%}{%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if found_slides == 0 -%}
+        <div class="about-slide is-active">
+          <img src="{{ '1-13.webp' | asset_url }}" alt="Aurelle Atelier">
+        </div>
+      {%- endif -%}
+
+      {%- if found_slides > 1 -%}
+        <div class="about-slide-nav" id="aboutSlideDots">
+          {%- for i in (1..found_slides) -%}
+            <span class="about-slide-dot{% if forloop.first %} is-active{% endif %}" data-dot-idx="{{ forloop.index0 }}"></span>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
   </div>
 </section>
 
-{%- if has_stats -%}
-  <section class="ab-stats">
+<!-- ATELIER TRUST STATS -->
+<section class="ab-stats">
+  {%- if has_stats -%}
     {%- for block in blocks -%}
       {%- if block.type == 'stat' -%}
         <div class="ab-stat" {{ block.shopify_attributes }}>
@@ -53,29 +253,72 @@
         </div>
       {%- endif -%}
     {%- endfor -%}
-  </section>
-{%- endif -%}
-
-{%- if cfg.about_story != blank or page_content != blank -%}
-  <section class="ab-story{% if cfg.about_image_2 == blank %} ab-story--single{% endif %}">
-    {%- if cfg.about_image_2 != blank -%}
-      <div class="ab-story__media"><img src="{{ cfg.about_image_2 | image_url: width: 1000 }}" alt="{{ cfg.about_image_2.alt | default: page_title | escape }}" width="{{ cfg.about_image_2.width }}" height="{{ cfg.about_image_2.height }}" loading="lazy"></div>
-    {%- endif -%}
-    <div>
-      <p class="sl-sec__eyebrow">{{ cfg.about_story_eyebrow | default: 'Why Aurelle' }}</p>
-      <h2 class="ab-story__title">{{ cfg.about_story_title | default: 'Jewelry that moves with your life' }}</h2>
-      <div class="rte ab-story__body">{{ cfg.about_story }}{{ page_content }}</div>
+  {%- else -%}
+    <div class="ab-stat">
+      <p class="ab-stat__num">100%</p>
+      <p class="ab-stat__label">Waterproof & Sweat-Proof</p>
     </div>
-  </section>
-{%- endif -%}
-
-{%- if has_values -%}
-  <section class="sl-sec">
-    <div class="sl-sec__head">
-      <p class="sl-sec__eyebrow">What we believe</p>
-      <h2 class="sl-sec__title">{{ cfg.about_values_title | default: 'Our values' }}</h2>
+    <div class="ab-stat">
+      <p class="ab-stat__num">18K Gold</p>
+      <p class="ab-stat__label">Molecular PVD Vacuum Bonded</p>
     </div>
-    <div class="sl-features">
+    <div class="ab-stat">
+      <p class="ab-stat__num">Lifetime</p>
+      <p class="ab-stat__label">Color & Tarnish Warranty</p>
+    </div>
+    <div class="ab-stat">
+      <p class="ab-stat__num">0% Nickel</p>
+      <p class="ab-stat__label">Hypoallergenic & Sensitive Safe</p>
+    </div>
+  {%- endif -%}
+</section>
+
+<!-- THE AURELLE STORY & METALLURGY -->
+<section class="ab-story">
+  <div class="ab-story__media">
+    <img src="{{ 'Luna_Paperclip_Bar_Chain_Supply_03-Macro.webp' | asset_url }}"
+         alt="Aurelle Jewelry Craftsmanship"
+         width="1000" height="1000" loading="lazy"
+         onerror="this.src='{{ '1-13.webp' | asset_url }}'">
+  </div>
+  <div>
+    <p class="sl-sec__eyebrow">{{ cfg.about_story_eyebrow | default: 'Behind the Craft' }}</p>
+    <h2 class="ab-story__title">{{ cfg.about_story_title | default: 'Waterproof Innovation Meets Laser Artistry' }}</h2>
+    <div class="rte ab-story__body">
+      {%- if cfg.about_story != blank -%}
+        {{ cfg.about_story }}
+      {%- else -%}
+        <p>
+          Every piece in the Aurelle collection begins with surgical-grade 316L stainless steel—the exact metal celebrated in luxury Swiss horology for its supreme tensile strength and imperviousness to corrosion.
+        </p>
+        <p>
+          Through Physical Vapor Deposition (PVD), real 18-karat gold is vaporized and molecularly bonded within high-vacuum chambers. The resulting finish is up to 10 times more resilient than traditional electroplating, allowing your jewelry to withstand ocean saltwater, chlorinated pools, daily perfumes, and workout sweat without ever tarnishing, flaking, or turning skin green.
+        </p>
+        <p>
+          In our private atelier, our master artisans finish, polish, and laser-engrave every piece individually. From meaningful coordinates and Roman numerals to loved ones' initials, we turn metal into memory.
+        </p>
+      {%- endif -%}
+      {{ page_content }}
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE CALLOUT -->
+<div class="about-quote-box">
+  <p class="about-quote-text">
+    "We don't create jewelry to be locked away in velvet boxes. We forge pieces you put on once, and never have to take off."
+  </p>
+  <p class="about-quote-author">✦ The Aurelle Design Philosophy ✦</p>
+</div>
+
+<!-- VALUES SECTION -->
+<section class="sl-sec">
+  <div class="sl-sec__head">
+    <p class="sl-sec__eyebrow">Our Guiding Values</p>
+    <h2 class="sl-sec__title">{{ cfg.about_values_title | default: 'What Defines Aurelle' }}</h2>
+  </div>
+  <div class="sl-features">
+    {%- if has_values -%}
       {%- for block in blocks -%}
         {%- if block.type == 'value' -%}
           <div class="sl-feature" {{ block.shopify_attributes }}>
@@ -93,14 +336,105 @@
           </div>
         {%- endif -%}
       {%- endfor -%}
-    </div>
-  </section>
-{%- endif -%}
+    {%- else -%}
+      <div class="sl-feature">
+        <span class="sl-feature__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+        </span>
+        <h3 class="sl-feature__title">Engineered to Last</h3>
+        <p class="sl-feature__text">Forged from surgical-grade 316L stainless steel that will never oxidize, rust, or turn skin green—even with daily wear in water.</p>
+      </div>
+      <div class="sl-feature">
+        <span class="sl-feature__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1Z"/></svg>
+        </span>
+        <h3 class="sl-feature__title">Bespoke Laser Artistry</h3>
+        <p class="sl-feature__text">Every custom initial, anniversary date, and meaningful coordinate is permanently etched in-house using micro-laser precision.</p>
+      </div>
+      <div class="sl-feature">
+        <span class="sl-feature__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7L12 3Z"/></svg>
+        </span>
+        <h3 class="sl-feature__title">Direct Luxury, Honest Pricing</h3>
+        <p class="sl-feature__text">We eliminate traditional luxury markups, delivering heirloom-quality pieces directly from our atelier into your hands.</p>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
 
+<!-- BOTTOM CTA -->
 <section class="sl-cta">
   <div>
-    <h2 class="sl-cta__title">{{ cfg.about_cta_title | default: 'Find your piece' }}</h2>
-    <p class="sl-cta__text">{{ cfg.about_cta_text | default: 'Explore our collection, or write to us if you need help choosing the perfect gift.' }}</p>
+    <h2 class="sl-cta__title">{{ cfg.about_cta_title | default: 'Discover Your Signature Piece' }}</h2>
+    <p class="sl-cta__text">{{ cfg.about_cta_text | default: 'Explore our curated collection of waterproof rings, necklaces, and engravable keepsakes, or consult our concierge team for bespoke inquiries.' }}</p>
   </div>
-  <a href="{{ cta_link }}" class="sl-cta__btn">{{ cfg.about_cta_label | default: 'Get in touch' }}</a>
+  <a href="{{ cta_link }}" class="sl-cta__btn">{{ cfg.about_cta_label | default: 'Explore Collection' }}</a>
 </section>
+
+<!-- ROTATING HERO SLIDER SCRIPT -->
+<script>
+  (function() {
+    var rotator = document.getElementById('aboutMediaRotator');
+    if (!rotator) return;
+
+    var slides = rotator.querySelectorAll('.about-slide');
+    var dots = rotator.querySelectorAll('.about-slide-dot');
+    if (slides.length <= 1) return;
+
+    var currentIndex = 0;
+    var timer = null;
+    var intervalMs = 3800; // change every 3.8s
+
+    function showSlide(index) {
+      if (index < 0) index = slides.length - 1;
+      if (index >= slides.length) index = 0;
+      currentIndex = index;
+
+      for (var i = 0; i < slides.length; i++) {
+        if (i === currentIndex) {
+          slides[i].classList.add('is-active');
+        } else {
+          slides[i].classList.remove('is-active');
+        }
+      }
+
+      for (var j = 0; j < dots.length; j++) {
+        if (j === currentIndex) {
+          dots[j].classList.add('is-active');
+        } else {
+          dots[j].classList.remove('is-active');
+        }
+      }
+    }
+
+    function startTimer() {
+      stopTimer();
+      timer = setInterval(function() {
+        showSlide(currentIndex + 1);
+      }, intervalMs);
+    }
+
+    function stopTimer() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    rotator.addEventListener('mouseenter', stopTimer);
+    rotator.addEventListener('mouseleave', startTimer);
+    rotator.addEventListener('touchstart', stopTimer, { passive: true });
+    rotator.addEventListener('touchend', startTimer, { passive: true });
+
+    for (var k = 0; k < dots.length; k++) {
+      (function(idx) {
+        dots[idx].addEventListener('click', function() {
+          showSlide(idx);
+          startTimer();
+        });
+      })(k);
+    }
+
+    startTimer();
+  })();
+</script>
