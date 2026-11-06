@@ -255,87 +255,105 @@
     color: var(--pp-muted, rgba(var(--color-foreground, 0, 0, 0), 0.62)) !important;
   }
 
-  /* Harmonized Luxury CTA Section */
-  .sl-cta {
+  /* Harmonized Luxury CTA Section (Ultra-High Specificity Overrides) */
+  .sl-cta,
+  html body .pg-page .sl-cta,
+  html body .sl-cta {
     display: block !important;
     text-align: center !important;
-    padding: 56px 36px !important;
-    margin: 0 0 76px !important;
-    background: var(--pp-soft, color-mix(in srgb, var(--text, #000) 3%, var(--bg, #fff))) !important;
-    border: 1px solid var(--pp-line, rgba(var(--color-foreground, 0, 0, 0), 0.12)) !important;
-    border-radius: var(--card-radius, 0px) !important;
-    color: var(--text, #000000) !important;
+    padding: 72px 24px !important;
+    margin: 0 auto 76px !important;
+    max-width: 860px !important;
+    background: transparent !important;
+    border: none !important;
+    border-top: 1px solid var(--pp-line, rgba(var(--color-foreground, 0, 0, 0), 0.12)) !important;
+    border-bottom: 1px solid var(--pp-line, rgba(var(--color-foreground, 0, 0, 0), 0.12)) !important;
+    border-radius: 0px !important;
+    color: #000000 !important;
     box-shadow: none !important;
   }
   @media (max-width: 640px) {
-    .sl-cta {
-      padding: 40px 20px !important;
+    .sl-cta,
+    html body .pg-page .sl-cta,
+    html body .sl-cta {
+      padding: 48px 16px !important;
       margin-bottom: 52px !important;
     }
   }
-  .sl-cta__inner {
-    max-width: 620px;
-    margin: 0 auto;
+  .sl-cta__inner,
+  html body .pg-page .sl-cta .sl-cta__inner {
+    max-width: 620px !important;
+    margin: 0 auto !important;
+    text-align: center !important;
   }
-  .sl-cta__eyebrow {
-    margin: 0 0 10px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--pp-muted, rgba(var(--color-foreground, 0, 0, 0), 0.62));
+  .sl-cta__eyebrow,
+  .sl-cta .sl-cta__eyebrow,
+  html body .pg-page .sl-cta .sl-cta__eyebrow {
+    margin: 0 0 12px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.24em !important;
+    text-transform: uppercase !important;
+    color: var(--pp-muted, #777777) !important;
+    display: block !important;
   }
-  .sl-cta__title {
-    margin: 0 0 14px !important;
-    font-size: clamp(22px, 3.2vw, 34px) !important;
+  .sl-cta__title,
+  .sl-cta .sl-cta__title,
+  html body .pg-page .sl-cta .sl-cta__title {
+    margin: 0 0 16px !important;
+    font-size: clamp(24px, 3.4vw, 36px) !important;
     font-weight: 600 !important;
     letter-spacing: 0.12em !important;
     text-transform: uppercase !important;
     line-height: 1.25 !important;
-    color: var(--text, #000000) !important;
+    color: #000000 !important;
+    opacity: 1 !important;
   }
-  .sl-cta__text {
-    margin: 0 auto 30px !important;
+  .sl-cta__text,
+  .sl-cta .sl-cta__text,
+  html body .pg-page .sl-cta .sl-cta__text {
+    margin: 0 auto 32px !important;
     max-width: 520px !important;
     font-size: 15px !important;
     line-height: 1.8 !important;
-    color: var(--pp-muted, rgba(var(--color-foreground, 0, 0, 0), 0.65)) !important;
+    color: #444444 !important;
     opacity: 1 !important;
   }
-  .sl-cta__actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 14px;
+  .sl-cta__actions,
+  html body .pg-page .sl-cta .sl-cta__actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
   }
   .sl-cta__btn-primary,
-  .sl-cta__btn-secondary {
+  .sl-cta .sl-cta__btn-primary,
+  html body .pg-page .sl-cta .sl-cta__btn-primary {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    min-height: var(--ctl-h-lg, 48px) !important;
-    padding: 0 32px !important;
-    border-radius: var(--btn-radius, 0px) !important;
+    min-height: 48px !important;
+    padding: 0 34px !important;
+    border-radius: 0px !important;
     font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
     font-size: 11.5px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.14em !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.16em !important;
     text-transform: uppercase !important;
     text-decoration: none !important;
     cursor: pointer !important;
-    transition: background-color var(--btn-animation-duration, 350ms) var(--btn-ease, ease), color var(--btn-animation-duration, 350ms) var(--btn-ease, ease), border-color var(--btn-animation-duration, 350ms) var(--btn-ease, ease) !important;
-  }
-  .sl-cta__btn-primary {
     background-color: #000000 !important;
     color: #ffffff !important;
     border: 1px solid #000000 !important;
+    transition: all 0.3s ease !important;
   }
   .sl-cta__btn-primary span,
   .sl-cta__btn-primary .btn__text-content {
     color: #ffffff !important;
   }
-  .sl-cta__btn-primary:hover {
+  .sl-cta__btn-primary:hover,
+  html body .pg-page .sl-cta .sl-cta__btn-primary:hover {
     background-color: #ffffff !important;
     color: #000000 !important;
     border-color: #000000 !important;
@@ -344,16 +362,33 @@
   .sl-cta__btn-primary:hover .btn__text-content {
     color: #000000 !important;
   }
-  .sl-cta__btn-secondary {
-    background-color: #ffffff !important;
+  .sl-cta__btn-secondary,
+  .sl-cta .sl-cta__btn-secondary,
+  html body .pg-page .sl-cta .sl-cta__btn-secondary {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 48px !important;
+    padding: 0 34px !important;
+    border-radius: 0px !important;
+    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.16em !important;
+    text-transform: uppercase !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    background-color: transparent !important;
     color: #000000 !important;
-    border: 1px solid var(--pp-line, rgba(var(--color-foreground, 0, 0, 0), 0.18)) !important;
+    border: 1px solid #000000 !important;
+    transition: all 0.3s ease !important;
   }
   .sl-cta__btn-secondary span,
   .sl-cta__btn-secondary .btn__text-content {
     color: #000000 !important;
   }
-  .sl-cta__btn-secondary:hover {
+  .sl-cta__btn-secondary:hover,
+  html body .pg-page .sl-cta .sl-cta__btn-secondary:hover {
     background-color: #000000 !important;
     color: #ffffff !important;
     border-color: #000000 !important;
@@ -576,15 +611,15 @@
 <!-- BOTTOM CTA -->
 <section class="sl-cta">
   <div class="sl-cta__inner">
-    <p class="sl-cta__eyebrow">Atelier Concierge</p>
-    <h2 class="sl-cta__title">{{ cfg.about_cta_title | default: 'Find Your Signature Piece' }}</h2>
-    <p class="sl-cta__text">{{ cfg.about_cta_text | default: 'Explore our curated collection of waterproof rings, necklaces, and engravable keepsakes, or consult our concierge team for personalized guidance.' }}</p>
+    <p class="sl-cta__eyebrow" style="color: var(--pp-muted, #777777) !important;">Atelier Concierge</p>
+    <h2 class="sl-cta__title" style="color: #000000 !important; opacity: 1 !important;">{{ cfg.about_cta_title | default: 'Find Your Signature Piece' }}</h2>
+    <p class="sl-cta__text" style="color: #444444 !important; opacity: 1 !important;">{{ cfg.about_cta_text | default: 'Explore our curated collection of waterproof rings, necklaces, and engravable keepsakes, or consult our concierge team for personalized guidance.' }}</p>
     <div class="sl-cta__actions">
       <a href="{{ shop_link }}" class="btn btn--primary btn-sliding-hover sl-cta__btn-primary">
         <span class="btn__text-content">{{ cfg.about_cta_label | default: 'Explore Collection' }}</span>
       </a>
       <a href="{{ cta_link }}" class="btn btn-sliding-hover sl-cta__btn-secondary">
-        <span class="btn__text-content">Contact Atelier</span>
+        <span class="btn__text-content">Contact Concierge</span>
       </a>
     </div>
   </div>
