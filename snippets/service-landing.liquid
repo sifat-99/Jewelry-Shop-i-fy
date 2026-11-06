@@ -1,6 +1,6 @@
 {%- comment -%}
-  Landing layout for the "Permanent jewelry on-site" service page.
-  Accepts: blocks (section.blocks: 'feature' and 'step' types), cfg (section.settings), page_title
+  Permanent Jewelry On-Site Landing Layout with Auto-Rotating Atelier Showcase.
+  Accepts: blocks, cfg (section.settings), page_title, page_content
 {%- endcomment -%}
 {%- liquid
   assign book_link = cfg.perm_button_link
@@ -11,85 +11,892 @@
   if cta_link == blank
     assign cta_link = book_link
   endif
+  assign shop_link = routes.all_products_collection_url
 -%}
 {% render 'landing-css' %}
 
+<style>
+  /* === Theme Design System Synchronization for Permanent Jewelry === */
+  :root, .pg-page {
+    --ct-radius: var(--card-radius, 0px);
+    --pp-line: rgba(var(--color-foreground, 0, 0, 0), 0.12);
+    --pp-muted: rgba(var(--color-foreground, 0, 0, 0), 0.62);
+    --pp-soft: color-mix(in srgb, var(--text, #000) 4%, var(--bg, #fff));
+  }
+
+  /* Dynamic Permanent Jewelry Rotating Slider Styles */
+  .perm-media-rotator {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    max-height: 580px;
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--media-radius, 0px) !important;
+    background: var(--pp-soft);
+    border: 1px solid var(--pp-line);
+    box-shadow: none !important;
+  }
+  .perm-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.02);
+    transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.85s;
+    pointer-events: none;
+    border-radius: var(--media-radius, 0px) !important;
+  }
+  .perm-slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    pointer-events: auto;
+    z-index: 2;
+  }
+  .perm-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--media-radius, 0px) !important;
+  }
+  .perm-slide__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.08) 55%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+  }
+  .perm-slide__card {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    background: var(--bg, #ffffff);
+    border: 1px solid var(--pp-line);
+    border-radius: var(--card-radius, 0px) !important;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    z-index: 4;
+  }
+  .perm-slide__badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--pp-muted);
+    margin-bottom: 3px;
+  }
+  .perm-slide__title {
+    display: block;
+    margin: 0;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text, #000000);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 230px;
+    transition: opacity 0.2s ease;
+  }
+  .perm-slide__title:hover {
+    opacity: 0.7;
+  }
+  .perm-slide__btn {
+    flex: none;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.16em !important;
+    text-transform: uppercase !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    color: #ffffff !important;
+    background: #000000 !important;
+    border: 1px solid #000000 !important;
+    border-radius: 0px !important;
+    padding: 10px 18px !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease !important;
+  }
+  .perm-slide__btn span,
+  .perm-slide__btn .perm-slide__btn-text {
+    color: #ffffff !important;
+    display: inline-block !important;
+    line-height: 1 !important;
+    position: relative !important;
+    z-index: 2 !important;
+  }
+  .perm-slide__btn:hover {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+  }
+  .perm-slide__btn:hover span,
+  .perm-slide__btn:hover .perm-slide__btn-text {
+    color: #000000 !important;
+  }
+  .perm-slide-nav {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 5;
+    background: rgba(var(--color-background, 255, 255, 255), 0.92);
+    padding: 6px 10px;
+    border: 1px solid var(--pp-line);
+    border-radius: var(--card-radius, 0px) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .perm-slide-dot {
+    width: 14px;
+    height: 2px;
+    border-radius: 0 !important;
+    background: rgba(var(--color-foreground, 0, 0, 0), 0.25);
+    cursor: pointer;
+    transition: width 0.3s ease, background-color 0.3s ease;
+  }
+  .perm-slide-dot.is-active {
+    background: var(--text, #000000);
+    width: 24px;
+  }
+
+  /* Quote Box Theme Styling */
+  .perm-quote-box {
+    margin: 64px 0 76px;
+    padding: 44px 36px;
+    text-align: center;
+    background: var(--pp-soft) !important;
+    border-left: 2px solid var(--text, #000000) !important;
+    border-right: 2px solid var(--text, #000000) !important;
+    border-top: 1px solid var(--pp-line) !important;
+    border-bottom: 1px solid var(--pp-line) !important;
+    border-radius: var(--card-radius, 0px) !important;
+  }
+  .perm-quote-text {
+    margin: 0 auto;
+    max-width: 720px;
+    font-size: clamp(17px, 2.2vw, 22px);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+    color: var(--text, #000000) !important;
+    font-style: italic;
+  }
+  .perm-quote-author {
+    margin: 18px 0 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--pp-muted) !important;
+  }
+
+  /* Theme Layout & Radius Overrides */
+  .sl-hero__media,
+  .ab-story__media {
+    border-radius: var(--media-radius, 0px) !important;
+    border: 1px solid var(--pp-line) !important;
+    background: var(--pp-soft) !important;
+  }
+  .sl-hero__media img,
+  .ab-story__media img {
+    border-radius: var(--media-radius, 0px) !important;
+  }
+
+  /* Trust Stats */
+  .ab-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    margin: 0 0 76px;
+    border-top: 1px solid var(--pp-line) !important;
+    border-bottom: 1px solid var(--pp-line) !important;
+  }
+  @media (max-width: 800px) {
+    .ab-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-bottom: 56px;
+    }
+  }
+  .ab-stat {
+    padding: 34px 18px;
+    text-align: center;
+    border-left: 1px solid var(--pp-line) !important;
+    color: var(--text, #000000) !important;
+  }
+  .ab-stat:first-child {
+    border-left: 0 !important;
+  }
+  @media (max-width: 800px) {
+    .ab-stat:nth-child(odd) {
+      border-left: 0 !important;
+    }
+    .ab-stat:nth-child(n+3) {
+      border-top: 1px solid var(--pp-line) !important;
+    }
+  }
+  .ab-stat__num {
+    margin: 0 0 6px;
+    font-size: clamp(26px, 3.4vw, 42px);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1.1;
+    color: var(--text, #000000) !important;
+  }
+  .ab-stat__label {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--pp-muted) !important;
+  }
+
+  /* Story & Metallurgy Section */
+  .ab-story {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 64px;
+    align-items: center;
+    margin: 0 0 76px;
+  }
+  @media (max-width: 900px) {
+    .ab-story {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
+      margin-bottom: 56px;
+    }
+  }
+  .ab-story__media {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--pp-soft);
+  }
+  .ab-story__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .ab-story__title {
+    margin: 0 0 20px;
+    font-size: clamp(22px, 2.8vw, 32px);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.25;
+    color: var(--text, #000000);
+  }
+  .ab-story__body {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--pp-muted);
+  }
+  .ab-story__body p {
+    margin: 0 0 1.2em;
+  }
+
+  /* Steps Section: Luxury Step Cards */
+  .sl-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 20px;
+    counter-reset: sl;
+  }
+  .sl-step {
+    position: relative;
+    padding: 30px 24px 26px;
+    border: 1px solid var(--pp-line) !important;
+    border-radius: var(--card-radius, 0px) !important;
+    background: var(--bg, #ffffff) !important;
+    counter-increment: sl;
+    transition: transform 0.35s cubic-bezier(0.22, 0.8, 0.3, 1), box-shadow 0.35s ease;
+  }
+  @media (hover: hover) {
+    .sl-step:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 28px -16px rgba(0, 0, 0, 0.18);
+    }
+  }
+  .sl-step::before {
+    content: counter(sl, decimal-leading-zero);
+    display: block;
+    margin: 0 0 14px;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    color: var(--text, #000000);
+    opacity: 0.35;
+  }
+  .sl-step__title {
+    margin: 0 0 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text, #000000);
+  }
+  .sl-step__text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--pp-muted);
+  }
+
+  /* Features Grid */
+  .sl-features {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  @media (max-width: 800px) {
+    .sl-features {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .sl-feature {
+    padding: 32px 26px;
+    text-align: center;
+    border: 1px solid var(--pp-line) !important;
+    border-radius: var(--card-radius, 0px) !important;
+    background: var(--pp-soft) !important;
+  }
+  .sl-feature__icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--pp-line) !important;
+    border-radius: var(--card-radius, 0px) !important;
+    background: var(--bg, #ffffff) !important;
+    color: var(--text, #000000) !important;
+  }
+  .sl-feature__icon svg {
+    width: 22px;
+    height: 22px;
+  }
+  .sl-feature__title {
+    margin: 0 0 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text, #000000) !important;
+  }
+  .sl-feature__text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--pp-muted) !important;
+  }
+
+  /* Harmonized Luxury CTA Section (Full-Width Bleed with Theme Soft Tint) */
+  .pg-page {
+    padding-bottom: 0px !important;
+  }
+  .sl-cta,
+  html body .pg-page .sl-cta,
+  html body .sl-cta {
+    display: block !important;
+    text-align: center !important;
+    padding: 56px var(--outer, 24px) 52px !important;
+    margin: 0 calc(-1 * var(--outer, 24px)) 0px !important;
+    width: calc(100% + (2 * var(--outer, 24px))) !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    background: var(--pp-soft) !important;
+    border-top: 1px solid var(--pp-line) !important;
+    border-bottom: 1px solid var(--pp-line) !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0px !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+  }
+  @media (max-width: 640px) {
+    .sl-cta,
+    html body .pg-page .sl-cta,
+    html body .sl-cta {
+      padding: 42px var(--outer, 16px) 38px !important;
+      margin: 0 calc(-1 * var(--outer, 16px)) 0px !important;
+      width: calc(100% + (2 * var(--outer, 16px))) !important;
+    }
+  }
+  .sl-cta__inner,
+  html body .pg-page .sl-cta .sl-cta__inner {
+    max-width: 640px !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+  .sl-cta__eyebrow,
+  .sl-cta .sl-cta__eyebrow,
+  html body .pg-page .sl-cta .sl-cta__eyebrow {
+    margin: 0 0 12px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.24em !important;
+    text-transform: uppercase !important;
+    color: var(--pp-muted, #777777) !important;
+    display: block !important;
+  }
+  .sl-cta__title,
+  .sl-cta .sl-cta__title,
+  html body .pg-page .sl-cta .sl-cta__title {
+    margin: 0 0 16px !important;
+    font-size: clamp(24px, 3.4vw, 36px) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    line-height: 1.25 !important;
+    color: #000000 !important;
+    opacity: 1 !important;
+  }
+  .sl-cta__text,
+  .sl-cta .sl-cta__text,
+  html body .pg-page .sl-cta .sl-cta__text {
+    margin: 0 auto 32px !important;
+    max-width: 540px !important;
+    font-size: 15px !important;
+    line-height: 1.8 !important;
+    color: #444444 !important;
+    opacity: 1 !important;
+  }
+  .sl-cta__actions,
+  html body .pg-page .sl-cta .sl-cta__actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 14px !important;
+  }
+
+  /* Base CTA Buttons */
+  .sl-cta .sl-btn,
+  html body .pg-page .sl-cta .sl-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 48px !important;
+    padding: 0 34px !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.16em !important;
+    text-transform: uppercase !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transform: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+  .sl-cta .sl-btn .btn__text-content {
+    position: relative !important;
+    z-index: 3 !important;
+    transition: color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+
+  /* Primary Button: Book Atelier Session */
+  .sl-cta__btn-primary,
+  .sl-cta .sl-cta__btn-primary,
+  html body .pg-page .sl-cta .sl-cta__btn-primary {
+    background-color: #000000 !important;
+    border: 1px solid #000000 !important;
+    color: #ffffff !important;
+  }
+  .sl-cta__btn-primary .btn__text-content,
+  .sl-cta__btn-primary span {
+    color: #ffffff !important;
+  }
+  .sl-cta__btn-primary::before {
+    background-color: #ffffff !important;
+  }
+  .sl-cta__btn-primary:hover,
+  html body .pg-page .sl-cta .sl-cta__btn-primary:hover {
+    border-color: #000000 !important;
+    background-color: #000000 !important;
+  }
+  .sl-cta__btn-primary:hover .btn__text-content,
+  html body .pg-page .sl-cta .sl-cta__btn-primary:hover .btn__text-content,
+  .sl-cta__btn-primary:hover span,
+  html body .pg-page .sl-cta .sl-cta__btn-primary:hover span {
+    color: #000000 !important;
+  }
+
+  /* Secondary Button: Inquire Private Event */
+  .sl-cta__btn-secondary,
+  .sl-cta .sl-cta__btn-secondary,
+  html body .pg-page .sl-cta .sl-cta__btn-secondary {
+    background-color: var(--bg, #ffffff) !important;
+    border: var(--btn-border-thickness, 1px) solid var(--btn-regular-border, #D1D1D1) !important;
+    color: var(--text, #000000) !important;
+  }
+  .sl-cta__btn-secondary .btn__text-content,
+  .sl-cta__btn-secondary span {
+    color: var(--text, #000000) !important;
+  }
+  .sl-cta__btn-secondary::before {
+    background-color: var(--btn-regular-hover-bg, #000000) !important;
+  }
+  .sl-cta__btn-secondary:hover,
+  html body .pg-page .sl-cta .sl-cta__btn-secondary:hover {
+    border-color: var(--btn-regular-hover-border, #000000) !important;
+  }
+  .sl-cta__btn-secondary:hover .btn__text-content,
+  html body .pg-page .sl-cta .sl-cta__btn-secondary:hover .btn__text-content,
+  .sl-cta__btn-secondary:hover span,
+  html body .pg-page .sl-cta .sl-cta__btn-secondary:hover span {
+    color: var(--btn-regular-hover-text, #ffffff) !important;
+  }
+
+  .sl-btn, .btn {
+    border-radius: var(--btn-radius, 0px) !important;
+  }
+</style>
+
+<!-- HERO SECTION: COPY ON LEFT, ROTATING SHOWCASE ON RIGHT -->
 <section class="sl-hero">
   <div class="sl-hero__copy">
-    <p class="sl-hero__eyebrow">{{ cfg.perm_eyebrow | default: 'Permanent jewelry' }}</p>
-    <h1 class="sl-hero__title">{{ cfg.perm_heading | default: page_title }}</h1>
-    <p class="sl-hero__lead">{{ cfg.perm_lead | default: 'A bracelet, anklet or necklace fitted to you and welded closed, with no clasp. Made to be worn every day, in the shower, at the beach, always.' }}</p>
+    <p class="sl-hero__eyebrow">{{ cfg.perm_eyebrow | default: 'Aurelle Atelier Experience' }}</p>
+    <h1 class="sl-hero__title">{% if cfg.perm_heading != blank %}{{ cfg.perm_heading }}{% else %}{{ page_title | default: 'Permanent Jewelry On-Site' }}{% endif %}</h1>
+    <p class="sl-hero__lead">
+      {%- if cfg.perm_lead != blank and cfg.perm_lead != 'A bracelet, anklet or necklace fitted to you and welded closed, with no clasp. Made to be worn every day, in the shower, at the beach, always.' -%}
+        {{ cfg.perm_lead }}
+      {%- else -%}
+        An intimate in-person jewelry experience. We measure, custom-fit, and permanently micro-weld a clasp-free 14K gold-filled or surgical-grade 316L chain directly around your wrist, neck, or ankle. Designed to accompany you through every shower, swim, milestone, and quiet morning—without ever tarnishing or fading.
+      {%- endif -%}
+    </p>
     <div class="sl-hero__btns">
-      <a href="{{ book_link }}" class="btn btn--primary btn-sliding-hover sl-btn"><span class="btn__text-content">{{ cfg.perm_button_label | default: 'Book a session' }}</span></a>
-      <a href="#how-it-works" class="btn btn-sliding-hover sl-btn"><span class="btn__text-content">How it works</span></a>
+      <a href="{{ book_link }}" class="btn btn--primary btn-sliding-hover sl-btn">
+        <span class="btn__text-content">
+          {%- if cfg.perm_button_label != blank and cfg.perm_button_label != 'Book a session' -%}
+            {{ cfg.perm_button_label }}
+          {%- else -%}
+            Book An Appointment
+          {%- endif -%}
+        </span>
+      </a>
+      <a href="#how-it-works" class="btn btn-sliding-hover sl-btn">
+        <span class="btn__text-content">The Welding Process</span>
+      </a>
     </div>
   </div>
+
   <div class="sl-hero__media">
-    {%- if cfg.perm_image != blank -%}
-      <img src="{{ cfg.perm_image | image_url: width: 1200 }}" srcset="{{ cfg.perm_image | image_url: width: 600 }} 600w, {{ cfg.perm_image | image_url: width: 900 }} 900w, {{ cfg.perm_image | image_url: width: 1200 }} 1200w" sizes="(min-width: 901px) 46vw, 100vw" alt="{{ cfg.perm_image.alt | default: page_title | escape }}" width="{{ cfg.perm_image.width }}" height="{{ cfg.perm_image.height }}" loading="eager">
-    {%- else -%}
-      <div class="sl-hero__ph" aria-hidden="true">
-        <svg viewBox="0 0 100 100" fill="none" stroke="#8d6e63" stroke-width="1.6" stroke-linejoin="round"><polygon points="50,8 92,50 50,92 8,50"/><polygon points="50,24 76,50 50,76 24,50"/><rect x="40" y="40" width="20" height="20" fill="#8d6e63" stroke="none"/></svg>
+    <div class="perm-media-rotator" id="permMediaRotator">
+      <!-- Slide 1: Welded Paperclip Bracelet -->
+      <div class="perm-slide is-active" data-slide-index="0">
+        <img src="{{ 'menu_bracelet.jpg' | asset_url }}"
+             alt="Aurelle Permanent Welded Bracelet"
+             width="1200" height="1200"
+             loading="eager">
+        <div class="perm-slide__overlay"></div>
+        <div class="perm-slide__card">
+          <div>
+            <span class="perm-slide__badge">Atelier Spotlight</span>
+            <span class="perm-slide__title">Welded Paperclip Bracelet</span>
+          </div>
+          <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">Book Session</span></a>
+        </div>
       </div>
-    {%- endif -%}
+
+      <!-- Slide 2: 14K Gold & Silver Chain Assortment -->
+      <div class="perm-slide" data-slide-index="1">
+        <img src="{{ 'menu_chain.jpg' | asset_url }}"
+             alt="14K Gold & Silver Permanent Chains"
+             width="1200" height="1200"
+             loading="lazy">
+        <div class="perm-slide__overlay"></div>
+        <div class="perm-slide__card">
+          <div>
+            <span class="perm-slide__badge">Atelier Spotlight</span>
+            <span class="perm-slide__title">Dainty Cable & Figaro Chains</span>
+          </div>
+          <a href="{{ shop_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">View Chains</span></a>
+        </div>
+      </div>
+
+      <!-- Slide 3: Clasp-Free Stacked Layers -->
+      <div class="perm-slide" data-slide-index="2">
+        <img src="{{ 'mosaic_1.jpg' | asset_url }}"
+             alt="Claspless Everyday Fine Jewelry Layers"
+             width="1200" height="1200"
+             loading="lazy">
+        <div class="perm-slide__overlay"></div>
+        <div class="perm-slide__card">
+          <div>
+            <span class="perm-slide__badge">Atelier Spotlight</span>
+            <span class="perm-slide__title">Claspless Everyday Layers</span>
+          </div>
+          <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">Book Session</span></a>
+        </div>
+      </div>
+
+      <!-- Slide 4: Micro-Laser & Precision Welds -->
+      <div class="perm-slide" data-slide-index="3">
+        <img src="{{ 'split_banner_1.jpg' | asset_url }}"
+             alt="Atelier Micro-Welding Precision"
+             width="1200" height="1200"
+             loading="lazy">
+        <div class="perm-slide__overlay"></div>
+        <div class="perm-slide__card">
+          <div>
+            <span class="perm-slide__badge">Atelier Spotlight</span>
+            <span class="perm-slide__title">Micro-Pulse Arc Welding</span>
+          </div>
+          <a href="#how-it-works" class="perm-slide__btn"><span class="perm-slide__btn-text">Learn How</span></a>
+        </div>
+      </div>
+
+      <!-- Rotator Dots Navigation -->
+      <div class="perm-slide-nav" id="permSlideDots">
+        <span class="perm-slide-dot is-active" data-dot-idx="0"></span>
+        <span class="perm-slide-dot" data-dot-idx="1"></span>
+        <span class="perm-slide-dot" data-dot-idx="2"></span>
+        <span class="perm-slide-dot" data-dot-idx="3"></span>
+      </div>
+    </div>
   </div>
 </section>
 
-{%- assign has_features = false -%}
-{%- for block in blocks -%}{%- if block.type == 'feature' -%}{%- assign has_features = true -%}{%- endif -%}{%- endfor -%}
-{%- if has_features -%}
-  <section class="sl-sec">
-    <div class="sl-features">
-      {%- for block in blocks -%}
-        {%- if block.type == 'feature' -%}
-          <div class="sl-feature" {{ block.shopify_attributes }}>
-            <span class="sl-feature__icon">
-              {%- case block.settings.icon -%}
-                {%- when 'drop' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.2 6 10.5A6 6 0 0 1 6 13.5C6 9.2 12 3 12 3Z"/></svg>
-                {%- when 'clock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                {%- when 'shield' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
-                {%- when 'heart' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1Z"/></svg>
-                {%- else -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7L12 3Z"/></svg>
-              {%- endcase -%}
-            </span>
-            <h3 class="sl-feature__title">{{ block.settings.title }}</h3>
-            <p class="sl-feature__text">{{ block.settings.text }}</p>
-          </div>
-        {%- endif -%}
-      {%- endfor -%}
-    </div>
-  </section>
-{%- endif -%}
+<!-- ATELIER TRUST STATS -->
+<section class="ab-stats">
+  <div class="ab-stat">
+    <p class="ab-stat__num">100%</p>
+    <p class="ab-stat__label">Waterproof & Sweat-Proof</p>
+  </div>
+  <div class="ab-stat">
+    <p class="ab-stat__num">14K & Steel</p>
+    <p class="ab-stat__label">Solid Gold-Filled & 316L Core</p>
+  </div>
+  <div class="ab-stat">
+    <p class="ab-stat__num">Claspless</p>
+    <p class="ab-stat__label">Precision Micro-Pulse Welded</p>
+  </div>
+  <div class="ab-stat">
+    <p class="ab-stat__num">Lifetime</p>
+    <p class="ab-stat__label">Free Re-Welds & Color Warranty</p>
+  </div>
+</section>
 
-{%- assign has_steps = false -%}
-{%- for block in blocks -%}{%- if block.type == 'step' -%}{%- assign has_steps = true -%}{%- endif -%}{%- endfor -%}
-{%- if has_steps -%}
-  <section class="sl-sec" id="how-it-works">
-    <div class="sl-sec__head">
-      <p class="sl-sec__eyebrow">{{ cfg.perm_steps_eyebrow | default: 'The experience' }}</p>
-      <h2 class="sl-sec__title">{{ cfg.perm_steps_title | default: 'How it works' }}</h2>
+<!-- THE PERMANENT JEWELRY EXPERIENCE & METALLURGY -->
+<section class="ab-story">
+  <div class="ab-story__media">
+    <img src="{{ 'menu_bracelet.jpg' | asset_url }}"
+         alt="Permanent Welded Jewelry Experience - Aurelle Fine Jewelry"
+         width="1200"
+         height="1200"
+         loading="lazy"
+         onerror="this.src='{{ 'split_banner_1.jpg' | asset_url }}'">
+  </div>
+  <div>
+    <p class="sl-sec__eyebrow">Behind the Craft</p>
+    <h2 class="ab-story__title">Welded to last. Designed to never take off.</h2>
+    <div class="rte ab-story__body">
+      <p>
+        Permanent jewelry is the modern evolution of classic friendship jewelry—elevated into heirloom-grade fine metals. In our private studio, our certified jewelry artisans measure an unbroken chain directly around your wrist, ankle, or neck to achieve an exact millimeter drape tailored to your lifestyle.
+      </p>
+      <p>
+        Using a specialized jeweler's micro-pulse arc welder, we connect the jump ring with a quick, safe, and painless flash of light. No clasps that twist around, snag on delicate knitwear, or accidentally come undone. Because our chains are forged from non-magnetic medical-grade metals, they pass effortlessly through TSA airport security scanners.
+      </p>
+      <p>
+        Should you ever need your permanent chain removed for a medical MRI or surgery, it can be gently snipped at the welded jump ring with standard scissors. Whenever you are ready, simply bring it back to our atelier—we provide complimentary lifetime re-welds for all Aurelle permanent pieces.
+      </p>
     </div>
-    <div class="sl-steps">
-      {%- for block in blocks -%}
-        {%- if block.type == 'step' -%}
-          <div class="sl-step" {{ block.shopify_attributes }}>
-            <h3 class="sl-step__title">{{ block.settings.title }}</h3>
-            <p class="sl-step__text">{{ block.settings.text }}</p>
-          </div>
-        {%- endif -%}
-      {%- endfor -%}
+  </div>
+</section>
+
+<!-- QUOTE CALLOUT -->
+<div class="perm-quote-box">
+  <p class="perm-quote-text">
+    "A permanent welded piece isn't just jewelry. It's a memory you wear forever—an unbroken bond that stays with you through every chapter."
+  </p>
+  <p class="perm-quote-author">The Aurelle Atelier Philosophy</p>
+</div>
+
+<!-- HOW IT WORKS: 5-STEP JOURNEY -->
+<section class="sl-sec" id="how-it-works">
+  <div class="sl-sec__head">
+    <p class="sl-sec__eyebrow">{{ cfg.perm_steps_eyebrow | default: 'The On-Site Atelier Process' }}</p>
+    <h2 class="sl-sec__title">{{ cfg.perm_steps_title | default: 'How Permanent Welding Works' }}</h2>
+  </div>
+  <div class="sl-steps">
+    <div class="sl-step">
+      <h3 class="sl-step__title">1. Select Your Chain</h3>
+      <p class="sl-step__text">Choose from our curated assortment of 14K yellow gold, rose gold, and surgical steel chains, from minimalist cable to bold paperclip and figaro links.</p>
     </div>
-  </section>
-{%- endif -%}
+    <div class="sl-step">
+      <h3 class="sl-step__title">2. Personalize with Charms</h3>
+      <p class="sl-step__text">Elevate your piece with custom laser-engraved initial discs, genuine freshwater pearls, sparkling birthstones, or celestial tokens.</p>
+    </div>
+    <div class="sl-step">
+      <h3 class="sl-step__title">3. Custom Tailored Fit</h3>
+      <p class="sl-step__text">Our artisan measures the chain directly against your skin to find your ideal fit—whether you prefer a snug tailored drape or effortless movement.</p>
+    </div>
+    <div class="sl-step">
+      <h3 class="sl-step__title">4. The Micro-Weld Spark</h3>
+      <p class="sl-step__text">With protective eyewear and a soft leather shield placed over your skin, a gentle pulse of light fuses the ring closed in less than a second. 100% painless and safe.</p>
+    </div>
+    <div class="sl-step">
+      <h3 class="sl-step__title">5. Forever Claspless</h3>
+      <p class="sl-step__text">Walk away with a seamless heirloom designed for 24/7 wear. Shower, swim, sweat, and sleep in your piece without a second thought.</p>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES & COMMITMENTS -->
+<section class="sl-sec">
+  <div class="sl-sec__head">
+    <p class="sl-sec__eyebrow">Crafted Without Compromise</p>
+    <h2 class="sl-sec__title">Why Choose Aurelle Permanent</h2>
+  </div>
+  <div class="sl-features">
+    <div class="sl-feature">
+      <span class="sl-feature__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+      </span>
+      <h3 class="sl-feature__title">Medical-Grade & Hypoallergenic</h3>
+      <p class="sl-feature__text">Crafted with zero nickel and zero lead. Biocompatible metals that are gentle on sensitive skin and guaranteed never to turn skin green or irritate.</p>
+    </div>
+    <div class="sl-feature">
+      <span class="sl-feature__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7L12 3Z"/></svg>
+      </span>
+      <h3 class="sl-feature__title">Private Events & Pop-Ups</h3>
+      <p class="sl-feature__text">Book our mobile permanent jewelry bar for bridal showers, bachelorette trips, birthdays, or corporate celebrations. We bring the full studio to you.</p>
+    </div>
+    <div class="sl-feature">
+      <span class="sl-feature__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1Z"/></svg>
+      </span>
+      <h3 class="sl-feature__title">Free Lifetime Re-Welds</h3>
+      <p class="sl-feature__text">Need to remove your permanent chain for surgery or medical imaging? Simply snip the jump ring and bring it back—we re-weld it for free, always.</p>
+    </div>
+  </div>
+</section>
 
 {%- if page_content != blank -%}
   <section class="sl-content"><div class="rte pg-page__body">{{ page_content }}</div></section>
 {%- endif -%}
 
+<!-- BOTTOM CTA: FULL BLEED WITH THEME SOFT TINT & HARMONIZED BUTTONS -->
 <section class="sl-cta">
-  <div>
-    <h2 class="sl-cta__title">{{ cfg.perm_cta_title | default: 'Ready for yours?' }}</h2>
-    <p class="sl-cta__text">{{ cfg.perm_cta_text | default: 'Tell us about your event, studio visit or group booking and we will find a date that works.' }}</p>
+  <div class="sl-cta__inner">
+    <p class="sl-cta__eyebrow" style="color: var(--pp-muted, #777777) !important;">Atelier Bookings & Concierge</p>
+    <h2 class="sl-cta__title" style="color: #000000 !important; opacity: 1 !important;">
+      {%- if cfg.perm_cta_title != blank and cfg.perm_cta_title != 'Ready for yours?' -%}
+        {{ cfg.perm_cta_title }}
+      {%- else -%}
+        Ready For Your Permanent Piece?
+      {%- endif -%}
+    </h2>
+    <p class="sl-cta__text" style="color: #444444 !important; opacity: 1 !important;">
+      {%- if cfg.perm_cta_text != blank and cfg.perm_cta_text != 'Tell us about your event, studio visit or group booking and we will find a date that works.' -%}
+        {{ cfg.perm_cta_text }}
+      {%- else -%}
+        Join us at our studio or book a private permanent jewelry bar for bridal showers, birthdays, or celebrations. Contact our concierge to reserve your date.
+      {%- endif -%}
+    </p>
+    <div class="sl-cta__actions">
+      <a href="{{ cta_link }}" class="btn btn--primary btn-sliding-hover sl-btn sl-cta__btn-primary">
+        <span class="btn__text-content">
+          {%- if cfg.perm_cta_label != blank and cfg.perm_cta_label != 'Get in touch' -%}
+            {{ cfg.perm_cta_label }}
+          {%- else -%}
+            Book Your Session
+          {%- endif -%}
+        </span>
+      </a>
+      <a href="{{ routes.root_url }}pages/contact" class="btn btn-sliding-hover sl-btn sl-cta__btn-secondary">
+        <span class="btn__text-content">Inquire Private Event</span>
+      </a>
+    </div>
   </div>
-  <a href="{{ cta_link }}" class="sl-cta__btn">{{ cfg.perm_cta_label | default: 'Get in touch' }}</a>
 </section>
+
+<!-- ROTATING HERO SLIDER SCRIPT -->
+<script>
+  (function() {
+    var rotator = document.getElementById('permMediaRotator');
+    if (!rotator) return;
+
+    var slides = rotator.querySelectorAll('.perm-slide');
+    var dots = rotator.querySelectorAll('.perm-slide-dot');
+    if (slides.length <= 1) return;
+
+    var currentIndex = 0;
+    var timer = null;
+    var intervalMs = 3800; // change every 3.8s
+
+    function showSlide(index) {
+      if (index < 0) index = slides.length - 1;
+      if (index >= slides.length) index = 0;
+      currentIndex = index;
+
+      for (var i = 0; i < slides.length; i++) {
+        if (i === currentIndex) {
+          slides[i].classList.add('is-active');
+        } else {
+          slides[i].classList.remove('is-active');
+        }
+      }
+
+      for (var j = 0; j < dots.length; j++) {
+        if (j === currentIndex) {
+          dots[j].classList.add('is-active');
+        } else {
+          dots[j].classList.remove('is-active');
+        }
+      }
+    }
+
+    function startTimer() {
+      stopTimer();
+      timer = setInterval(function() {
+        showSlide(currentIndex + 1);
+      }, intervalMs);
+    }
+
+    function stopTimer() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    rotator.addEventListener('mouseenter', stopTimer);
+    rotator.addEventListener('mouseleave', startTimer);
+    rotator.addEventListener('touchstart', stopTimer, { passive: true });
+    rotator.addEventListener('touchend', startTimer, { passive: true });
+
+    for (var k = 0; k < dots.length; k++) {
+      (function(idx) {
+        dots[idx].addEventListener('click', function() {
+          showSlide(idx);
+          startTimer();
+        });
+      })(k);
+    }
+
+    startTimer();
+  })();
+</script>
