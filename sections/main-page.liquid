@@ -1,7 +1,8 @@
 <!-- /sections/main-page.liquid  (standard pages + a designed Contact layout) -->
 {%- liquid
+  assign p_title_lower = page.title | downcase
   assign is_contact = false
-  if page.handle contains 'contact' or template.suffix == 'contact'
+  if page.handle contains 'contact' or template.suffix == 'contact' or p_title_lower contains 'contact'
     assign is_contact = true
   endif
   assign c_email = section.settings.contact_email | default: shop.email
@@ -11,15 +12,15 @@
     assign has_side = true
   endif
   assign is_faq_page = false
-  if page.handle contains 'faq' or template.suffix == 'faq'
+  if page.handle contains 'faq' or template.suffix == 'faq' or p_title_lower contains 'faq'
     assign is_faq_page = true
   endif
   assign is_perm = false
-  if page.handle contains 'permanent' or template.suffix == 'permanent'
+  if page.handle contains 'permanent' or template.suffix == 'permanent' or p_title_lower contains 'permanent'
     assign is_perm = true
   endif
   assign is_about = false
-  if page.handle contains 'about' or template.suffix == 'about'
+  if page.handle contains 'about' or template.suffix == 'about' or p_title_lower contains 'about'
     assign is_about = true
   endif
   assign faq_blocks = false
