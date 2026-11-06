@@ -364,25 +364,28 @@
     transition: color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
   }
 
-  /* Primary Button: Explore Collection (High-Contrast White Sliding Hover) */
+  /* Primary Button: Explore Collection */
   .sl-cta__btn-primary,
   .sl-cta .sl-cta__btn-primary,
   html body .pg-page .sl-cta .sl-cta__btn-primary {
     background-color: #000000 !important;
     border: 1px solid #000000 !important;
     color: #ffffff !important;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
   }
   .sl-cta__btn-primary .btn__text-content,
   .sl-cta__btn-primary span {
     color: #ffffff !important;
+    transition: color 0.3s ease !important;
   }
   .sl-cta__btn-primary::before {
-    background-color: #ffffff !important;
+    display: none !important;
   }
   .sl-cta__btn-primary:hover,
   html body .pg-page .sl-cta .sl-cta__btn-primary:hover {
     border-color: #000000 !important;
-    background-color: #000000 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
   }
   .sl-cta__btn-primary:hover .btn__text-content,
   html body .pg-page .sl-cta .sl-cta__btn-primary:hover .btn__text-content,
@@ -391,30 +394,34 @@
     color: #000000 !important;
   }
 
-  /* Secondary Button: Get In Touch (Matches Global Border Token #D1D1D1) */
+  /* Secondary Button: Get In Touch (Matches Global Border #D1D1D1) */
   .sl-cta__btn-secondary,
   .sl-cta .sl-cta__btn-secondary,
   html body .pg-page .sl-cta .sl-cta__btn-secondary {
-    background-color: var(--bg, #ffffff) !important;
-    border: var(--btn-border-thickness, 1px) solid var(--btn-regular-border, #D1D1D1) !important;
-    color: var(--text, #000000) !important;
+    background-color: #ffffff !important;
+    border: 1px solid #D1D1D1 !important;
+    color: #000000 !important;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
   }
   .sl-cta__btn-secondary .btn__text-content,
   .sl-cta__btn-secondary span {
-    color: var(--text, #000000) !important;
+    color: #000000 !important;
+    transition: color 0.3s ease !important;
   }
   .sl-cta__btn-secondary::before {
-    background-color: var(--btn-regular-hover-bg, #000000) !important;
+    display: none !important;
   }
   .sl-cta__btn-secondary:hover,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover {
-    border-color: var(--btn-regular-hover-border, #000000) !important;
+    border-color: #000000 !important;
+    background-color: #000000 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
   }
   .sl-cta__btn-secondary:hover .btn__text-content,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover .btn__text-content,
   .sl-cta__btn-secondary:hover span,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover span {
-    color: var(--btn-regular-hover-text, #ffffff) !important;
+    color: #ffffff !important;
   }
 
   .sl-btn, .btn {
@@ -438,54 +445,89 @@
 
   <div class="sl-hero__media">
     <div class="about-media-rotator" id="aboutMediaRotator">
-      {%- assign found_slides = 0 -%}
-      {%- for prod in collections.all.products -%}
-        {%- assign current_img = nil -%}
-        {%- if prod.images.size > 1 -%}
-          {%- assign current_img = prod.images[1] -%}
-        {%- elsif prod.featured_image != blank -%}
-          {%- assign current_img = prod.featured_image -%}
-        {%- endif -%}
+      {%- if cfg.about_image != blank -%}
+        <!-- Custom Hero Slide 1 configured by merchant in Theme Settings -->
+        <div class="about-slide is-active" data-slide-index="0">
+          <img src="{{ cfg.about_image | image_url: width: 1200 }}"
+               alt="{{ cfg.about_image.alt | default: cfg.about_heading | default: 'Aurelle Fine Jewelry' | escape }}"
+               width="1200" height="1200"
+               loading="eager">
+          <div class="about-slide__overlay"></div>
+          <div class="about-slide__card">
+            <div>
+              <span class="about-slide__badge">Atelier Spotlight</span>
+              <span class="about-slide__title">{{ cfg.about_heading | default: 'Aurelle Fine Jewelry' }}</span>
+            </div>
+            <a href="{{ shop_link }}" class="about-slide__btn"><span class="about-slide__btn-text">Shop Collection</span></a>
+          </div>
+        </div>
 
-        {%- if current_img != blank -%}
-          <div class="about-slide{% if found_slides == 0 %} is-active{% endif %}" data-slide-index="{{ found_slides }}">
-            <img src="{{ current_img | image_url: width: 1200 }}"
-                 srcset="{{ current_img | image_url: width: 600 }} 600w, {{ current_img | image_url: width: 900 }} 900w, {{ current_img | image_url: width: 1200 }} 1200w"
-                 sizes="(min-width: 901px) 46vw, 100vw"
-                 alt="{{ prod.title | escape }}"
-                 width="{{ current_img.width }}"
-                 height="{{ current_img.height }}"
-                 loading="{% if found_slides == 0 %}eager{% else %}lazy{% endif %}">
+        {%- if cfg.about_image_slide_2 != blank -%}
+          <!-- Custom Hero Slide 2 configured by merchant in Theme Settings -->
+          <div class="about-slide" data-slide-index="1">
+            <img src="{{ cfg.about_image_slide_2 | image_url: width: 1200 }}"
+                 alt="{{ cfg.about_image_slide_2.alt | default: 'Waterproof Fine Jewelry' | escape }}"
+                 width="1200" height="1200"
+                 loading="lazy">
             <div class="about-slide__overlay"></div>
             <div class="about-slide__card">
               <div>
                 <span class="about-slide__badge">Atelier Spotlight</span>
-                <a href="{{ prod.url }}" class="about-slide__title">{{ prod.title }}</a>
+                <span class="about-slide__title">Waterproof Fine Jewelry</span>
               </div>
-              <a href="{{ prod.url }}" class="about-slide__btn"><span class="about-slide__btn-text">View Piece</span></a>
+              <a href="{{ shop_link }}" class="about-slide__btn"><span class="about-slide__btn-text">Explore Pieces</span></a>
             </div>
           </div>
-          {%- assign found_slides = found_slides | plus: 1 -%}
-          {%- if found_slides >= 8 -%}{%- break -%}{%- endif -%}
+          <div class="about-slide-nav" id="aboutSlideDots">
+            <span class="about-slide-dot is-active" data-dot-idx="0"></span>
+            <span class="about-slide-dot" data-dot-idx="1"></span>
+          </div>
         {%- endif -%}
-      {%- endfor -%}
-
-      {%- if found_slides == 0 -%}
-        <div class="about-slide is-active">
-          {%- if cfg.about_image != blank -%}
-            <img src="{{ cfg.about_image | image_url: width: 1200 }}" alt="{{ cfg.about_heading | default: 'Aurelle Atelier' | escape }}" width="1200" height="960" loading="eager">
-          {%- else -%}
-            <img src="{{ 'split_banner_2.jpg' | asset_url }}" alt="Aurelle Atelier" width="1200" height="960" loading="eager">
+      {%- else -%}
+        <!-- Dynamic Product Slides from Store Catalog -->
+        {%- assign found_slides = 0 -%}
+        {%- for prod in collections.all.products -%}
+          {%- assign current_img = nil -%}
+          {%- if prod.images.size > 1 -%}
+            {%- assign current_img = prod.images[1] -%}
+          {%- elsif prod.featured_image != blank -%}
+            {%- assign current_img = prod.featured_image -%}
           {%- endif -%}
-        </div>
-      {%- endif -%}
 
-      {%- if found_slides > 1 -%}
-        <div class="about-slide-nav" id="aboutSlideDots">
-          {%- for i in (1..found_slides) -%}
-            <span class="about-slide-dot{% if forloop.first %} is-active{% endif %}" data-dot-idx="{{ forloop.index0 }}"></span>
-          {%- endfor -%}
-        </div>
+          {%- if current_img != blank -%}
+            <div class="about-slide{% if found_slides == 0 %} is-active{% endif %}" data-slide-index="{{ found_slides }}">
+              <img src="{{ current_img | image_url: width: 1200 }}"
+                   srcset="{{ current_img | image_url: width: 600 }} 600w, {{ current_img | image_url: width: 900 }} 900w, {{ current_img | image_url: width: 1200 }} 1200w"
+                   sizes="(min-width: 901px) 46vw, 100vw"
+                   alt="{{ prod.title | escape }}"
+                   width="{{ current_img.width }}"
+                   height="{{ current_img.height }}"
+                   loading="{% if found_slides == 0 %}eager{% else %}lazy{% endif %}">
+              <div class="about-slide__overlay"></div>
+              <div class="about-slide__card">
+                <div>
+                  <span class="about-slide__badge">Atelier Spotlight</span>
+                  <a href="{{ prod.url }}" class="about-slide__title">{{ prod.title }}</a>
+                </div>
+                <a href="{{ prod.url }}" class="about-slide__btn"><span class="about-slide__btn-text">View Piece</span></a>
+              </div>
+            </div>
+            {%- assign found_slides = found_slides | plus: 1 -%}
+            {%- if found_slides >= 8 -%}{%- break -%}{%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if found_slides == 0 -%}
+          <div class="about-slide is-active">
+            <img src="{{ 'split_banner_2.jpg' | asset_url }}" alt="Aurelle Atelier" width="1200" height="960" loading="eager">
+          </div>
+        {%- elsif found_slides > 1 -%}
+          <div class="about-slide-nav" id="aboutSlideDots">
+            {%- for i in (1..found_slides) -%}
+              <span class="about-slide-dot{% if forloop.first %} is-active{% endif %}" data-dot-idx="{{ forloop.index0 }}"></span>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
       {%- endif -%}
     </div>
   </div>

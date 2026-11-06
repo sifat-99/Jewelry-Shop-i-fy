@@ -522,18 +522,21 @@
     background-color: #000000 !important;
     border: 1px solid #000000 !important;
     color: #ffffff !important;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
   }
   .sl-cta__btn-primary .btn__text-content,
   .sl-cta__btn-primary span {
     color: #ffffff !important;
+    transition: color 0.3s ease !important;
   }
   .sl-cta__btn-primary::before {
-    background-color: #ffffff !important;
+    display: none !important;
   }
   .sl-cta__btn-primary:hover,
   html body .pg-page .sl-cta .sl-cta__btn-primary:hover {
     border-color: #000000 !important;
-    background-color: #000000 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
   }
   .sl-cta__btn-primary:hover .btn__text-content,
   html body .pg-page .sl-cta .sl-cta__btn-primary:hover .btn__text-content,
@@ -542,30 +545,34 @@
     color: #000000 !important;
   }
 
-  /* Secondary Button: Inquire Private Event */
+  /* Secondary Button: Inquire Private Event (Matches Global Border #D1D1D1) */
   .sl-cta__btn-secondary,
   .sl-cta .sl-cta__btn-secondary,
   html body .pg-page .sl-cta .sl-cta__btn-secondary {
-    background-color: var(--bg, #ffffff) !important;
-    border: var(--btn-border-thickness, 1px) solid var(--btn-regular-border, #D1D1D1) !important;
-    color: var(--text, #000000) !important;
+    background-color: #ffffff !important;
+    border: 1px solid #D1D1D1 !important;
+    color: #000000 !important;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
   }
   .sl-cta__btn-secondary .btn__text-content,
   .sl-cta__btn-secondary span {
-    color: var(--text, #000000) !important;
+    color: #000000 !important;
+    transition: color 0.3s ease !important;
   }
   .sl-cta__btn-secondary::before {
-    background-color: var(--btn-regular-hover-bg, #000000) !important;
+    display: none !important;
   }
   .sl-cta__btn-secondary:hover,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover {
-    border-color: var(--btn-regular-hover-border, #000000) !important;
+    border-color: #000000 !important;
+    background-color: #000000 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
   }
   .sl-cta__btn-secondary:hover .btn__text-content,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover .btn__text-content,
   .sl-cta__btn-secondary:hover span,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover span {
-    color: var(--btn-regular-hover-text, #ffffff) !important;
+    color: #ffffff !important;
   }
 
   .sl-btn, .btn {
@@ -605,15 +612,22 @@
     <div class="perm-media-rotator" id="permMediaRotator">
       <!-- Slide 1: Welded Paperclip Bracelet -->
       <div class="perm-slide is-active" data-slide-index="0">
-        <img src="{{ 'menu_bracelet.jpg' | asset_url }}"
-             alt="Aurelle Permanent Welded Bracelet"
-             width="1200" height="1200"
-             loading="eager">
+        {%- if cfg.perm_image != blank -%}
+          <img src="{{ cfg.perm_image | image_url: width: 1200 }}"
+               alt="{{ cfg.perm_image.alt | default: cfg.perm_slide_1_title | default: 'Aurelle Permanent Welded Bracelet' | escape }}"
+               width="1200" height="1200"
+               loading="eager">
+        {%- else -%}
+          <img src="{{ 'menu_bracelet.jpg' | asset_url }}"
+               alt="Aurelle Permanent Welded Bracelet"
+               width="1200" height="1200"
+               loading="eager">
+        {%- endif -%}
         <div class="perm-slide__overlay"></div>
         <div class="perm-slide__card">
           <div>
             <span class="perm-slide__badge">Atelier Spotlight</span>
-            <span class="perm-slide__title">Welded Paperclip Bracelet</span>
+            <span class="perm-slide__title">{{ cfg.perm_slide_1_title | default: 'Welded Paperclip Bracelet' }}</span>
           </div>
           <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">Book Session</span></a>
         </div>
@@ -621,15 +635,22 @@
 
       <!-- Slide 2: 14K Gold & Silver Chain Assortment -->
       <div class="perm-slide" data-slide-index="1">
-        <img src="{{ 'menu_chain.jpg' | asset_url }}"
-             alt="14K Gold & Silver Permanent Chains"
-             width="1200" height="1200"
-             loading="lazy">
+        {%- if cfg.perm_image_2 != blank -%}
+          <img src="{{ cfg.perm_image_2 | image_url: width: 1200 }}"
+               alt="{{ cfg.perm_image_2.alt | default: cfg.perm_slide_2_title | default: '14K Gold & Silver Permanent Chains' | escape }}"
+               width="1200" height="1200"
+               loading="lazy">
+        {%- else -%}
+          <img src="{{ 'menu_chain.jpg' | asset_url }}"
+               alt="14K Gold & Silver Permanent Chains"
+               width="1200" height="1200"
+               loading="lazy">
+        {%- endif -%}
         <div class="perm-slide__overlay"></div>
         <div class="perm-slide__card">
           <div>
             <span class="perm-slide__badge">Atelier Spotlight</span>
-            <span class="perm-slide__title">Dainty Cable & Figaro Chains</span>
+            <span class="perm-slide__title">{{ cfg.perm_slide_2_title | default: 'Dainty Cable & Figaro Chains' }}</span>
           </div>
           <a href="{{ shop_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">View Chains</span></a>
         </div>
@@ -637,15 +658,22 @@
 
       <!-- Slide 3: Clasp-Free Stacked Layers -->
       <div class="perm-slide" data-slide-index="2">
-        <img src="{{ 'mosaic_1.jpg' | asset_url }}"
-             alt="Claspless Everyday Fine Jewelry Layers"
-             width="1200" height="1200"
-             loading="lazy">
+        {%- if cfg.perm_image_3 != blank -%}
+          <img src="{{ cfg.perm_image_3 | image_url: width: 1200 }}"
+               alt="{{ cfg.perm_image_3.alt | default: cfg.perm_slide_3_title | default: 'Claspless Everyday Fine Jewelry Layers' | escape }}"
+               width="1200" height="1200"
+               loading="lazy">
+        {%- else -%}
+          <img src="{{ 'mosaic_1.jpg' | asset_url }}"
+               alt="Claspless Everyday Fine Jewelry Layers"
+               width="1200" height="1200"
+               loading="lazy">
+        {%- endif -%}
         <div class="perm-slide__overlay"></div>
         <div class="perm-slide__card">
           <div>
             <span class="perm-slide__badge">Atelier Spotlight</span>
-            <span class="perm-slide__title">Claspless Everyday Layers</span>
+            <span class="perm-slide__title">{{ cfg.perm_slide_3_title | default: 'Claspless Everyday Layers' }}</span>
           </div>
           <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">Book Session</span></a>
         </div>
@@ -653,15 +681,22 @@
 
       <!-- Slide 4: Micro-Laser & Precision Welds -->
       <div class="perm-slide" data-slide-index="3">
-        <img src="{{ 'split_banner_1.jpg' | asset_url }}"
-             alt="Atelier Micro-Welding Precision"
-             width="1200" height="1200"
-             loading="lazy">
+        {%- if cfg.perm_image_4 != blank -%}
+          <img src="{{ cfg.perm_image_4 | image_url: width: 1200 }}"
+               alt="{{ cfg.perm_image_4.alt | default: cfg.perm_slide_4_title | default: 'Atelier Micro-Welding Precision' | escape }}"
+               width="1200" height="1200"
+               loading="lazy">
+        {%- else -%}
+          <img src="{{ 'split_banner_1.jpg' | asset_url }}"
+               alt="Atelier Micro-Welding Precision"
+               width="1200" height="1200"
+               loading="lazy">
+        {%- endif -%}
         <div class="perm-slide__overlay"></div>
         <div class="perm-slide__card">
           <div>
             <span class="perm-slide__badge">Atelier Spotlight</span>
-            <span class="perm-slide__title">Micro-Pulse Arc Welding</span>
+            <span class="perm-slide__title">{{ cfg.perm_slide_4_title | default: 'Micro-Pulse Arc Welding' }}</span>
           </div>
           <a href="#how-it-works" class="perm-slide__btn"><span class="perm-slide__btn-text">Learn How</span></a>
         </div>
@@ -701,26 +736,44 @@
 <!-- THE PERMANENT JEWELRY EXPERIENCE & METALLURGY -->
 <section class="ab-story">
   <div class="ab-story__media">
-    <img src="{{ 'menu_bracelet.jpg' | asset_url }}"
-         alt="Permanent Welded Jewelry Experience - Aurelle Fine Jewelry"
-         width="1200"
-         height="1200"
-         loading="lazy"
-         onerror="this.src='{{ 'split_banner_1.jpg' | asset_url }}'">
+    {%- if cfg.perm_story_image != blank -%}
+      <img src="{{ cfg.perm_story_image | image_url: width: 1200 }}"
+           alt="{{ cfg.perm_story_image.alt | default: cfg.perm_story_title | default: 'Permanent Welded Jewelry Experience' | escape }}"
+           width="1200"
+           height="1200"
+           loading="lazy">
+    {%- elsif cfg.perm_image != blank -%}
+      <img src="{{ cfg.perm_image | image_url: width: 1200 }}"
+           alt="{{ cfg.perm_story_title | default: 'Permanent Welded Jewelry Experience' | escape }}"
+           width="1200"
+           height="1200"
+           loading="lazy">
+    {%- else -%}
+      <img src="{{ 'menu_bracelet.jpg' | asset_url }}"
+           alt="Permanent Welded Jewelry Experience - Aurelle Fine Jewelry"
+           width="1200"
+           height="1200"
+           loading="lazy"
+           onerror="this.src='{{ 'split_banner_1.jpg' | asset_url }}'">
+    {%- endif -%}
   </div>
   <div>
     <p class="sl-sec__eyebrow">Behind the Craft</p>
-    <h2 class="ab-story__title">Welded to last. Designed to never take off.</h2>
+    <h2 class="ab-story__title">{{ cfg.perm_story_title | default: 'Welded to last. Designed to never take off.' }}</h2>
     <div class="rte ab-story__body">
-      <p>
-        Permanent jewelry is the modern evolution of classic friendship jewelry—elevated into heirloom-grade fine metals. In our private studio, our certified jewelry artisans measure an unbroken chain directly around your wrist, ankle, or neck to achieve an exact millimeter drape tailored to your lifestyle.
-      </p>
-      <p>
-        Using a specialized jeweler's micro-pulse arc welder, we connect the jump ring with a quick, safe, and painless flash of light. No clasps that twist around, snag on delicate knitwear, or accidentally come undone. Because our chains are forged from non-magnetic medical-grade metals, they pass effortlessly through TSA airport security scanners.
-      </p>
-      <p>
-        Should you ever need your permanent chain removed for a medical MRI or surgery, it can be gently snipped at the welded jump ring with standard scissors. Whenever you are ready, simply bring it back to our atelier—we provide complimentary lifetime re-welds for all Aurelle permanent pieces.
-      </p>
+      {%- if cfg.perm_story_body != blank -%}
+        {{ cfg.perm_story_body }}
+      {%- else -%}
+        <p>
+          Permanent jewelry is the modern evolution of classic friendship jewelry—elevated into heirloom-grade fine metals. In our private studio, our certified jewelry artisans measure an unbroken chain directly around your wrist, ankle, or neck to achieve an exact millimeter drape tailored to your lifestyle.
+        </p>
+        <p>
+          Using a specialized jeweler's micro-pulse arc welder, we connect the jump ring with a quick, safe, and painless flash of light. No clasps that twist around, snag on delicate knitwear, or accidentally come undone. Because our chains are forged from non-magnetic medical-grade metals, they pass effortlessly through TSA airport security scanners.
+        </p>
+        <p>
+          Should you ever need your permanent chain removed for a medical MRI or surgery, it can be gently snipped at the welded jump ring with standard scissors. Whenever you are ready, simply bring it back to our atelier—we provide complimentary lifetime re-welds for all Aurelle permanent pieces.
+        </p>
+      {%- endif -%}
     </div>
   </div>
 </section>

@@ -123,11 +123,16 @@
   .ct-alert--err { background: #fbeceb; color: #8f1d17; border: 1px solid #f0bcb8; }
   .ct-alert ul { margin: 6px 0 0; padding-left: 18px; }
   .ct-privacy { margin: 14px 0 0; font-size: 12px; color: var(--pp-muted); text-align: center; }
+  .pg-page--landing { padding-bottom: 0px !important; }
+  .pg-page--landing + .shopify-section .section-collection,
+  .pg-page--landing ~ .shopify-section .section-collection { padding-top: 0px !important; }
+  .pg-page--landing + .shopify-section .section-padding,
+  .pg-page--landing ~ .shopify-section .section-padding { padding-top: 36px !important; }
 </style>
 
-<div class="pg-page color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
+<div class="pg-page color-{{ section.settings.color_scheme | default: 'scheme-1' }}{% if is_about or is_perm %} pg-page--landing{% endif %}"
   data-section-id="{{ section.id }}"
-  style="--pp-t: {{ section.settings.padding_top | default: 40 }}px; --pp-b: {{ section.settings.padding_bottom | default: 70 }}px; --ct-radius: {{ section.settings.box_radius | default: 4 }}px;">
+  style="--pp-t: {{ section.settings.padding_top | default: 40 }}px; --pp-b: {% if is_about or is_perm %}0px{% else %}{{ section.settings.padding_bottom | default: 70 }}px{% endif %}; --ct-radius: {{ section.settings.box_radius | default: 4 }}px;">
   <div class="pg-page__inner">
 
     {% render 'breadcrumb', current: page.title %}
@@ -330,7 +335,14 @@
     {
       "type": "image_picker",
       "id": "about_image",
-      "label": "Hero image"
+      "label": "Hero Slide 1 image",
+      "info": "Upload custom hero image for the About page. Recommended: 1200x1200px."
+    },
+    {
+      "type": "image_picker",
+      "id": "about_image_slide_2",
+      "label": "Hero Slide 2 image (optional)",
+      "info": "Upload second custom slide image for the hero rotator."
     },
     {
       "type": "text",
@@ -359,8 +371,8 @@
     {
       "type": "image_picker",
       "id": "about_image_2",
-      "label": "Story image",
-      "info": "Optional. Shown next to the story text."
+      "label": "Story / Craftsmanship section image",
+      "info": "Upload custom image shown next to 'Jewelry that moves with your life'. Recommended: 1200x1200px."
     },
     {
       "type": "text",
@@ -400,42 +412,115 @@
       "type": "textarea",
       "id": "perm_lead",
       "label": "Intro text",
-      "default": "A bracelet, anklet or necklace fitted to you and welded closed, with no clasp. Made to be worn every day, in the shower, at the beach, always."
+      "default": "An intimate in-person jewelry experience. We measure, custom-fit, and permanently micro-weld a clasp-free 14K gold-filled or surgical-grade 316L chain directly around your wrist, neck, or ankle. Designed to accompany you through every shower, swim, milestone, and quiet morning—without ever tarnishing or fading."
+    },
+    {
+      "type": "header",
+      "content": "Permanent Jewelry - Hero Showcase Images"
     },
     {
       "type": "image_picker",
       "id": "perm_image",
-      "label": "Hero image"
+      "label": "Hero Slide 1 image",
+      "info": "Upload custom image for Slide 1 (Welded Bracelet). Recommended: 1200x1200px."
+    },
+    {
+      "type": "text",
+      "id": "perm_slide_1_title",
+      "label": "Hero Slide 1 title",
+      "default": "Welded Paperclip Bracelet"
+    },
+    {
+      "type": "image_picker",
+      "id": "perm_image_2",
+      "label": "Hero Slide 2 image",
+      "info": "Upload custom image for Slide 2 (Chains). Recommended: 1200x1200px."
+    },
+    {
+      "type": "text",
+      "id": "perm_slide_2_title",
+      "label": "Hero Slide 2 title",
+      "default": "Dainty Cable & Figaro Chains"
+    },
+    {
+      "type": "image_picker",
+      "id": "perm_image_3",
+      "label": "Hero Slide 3 image",
+      "info": "Upload custom image for Slide 3 (Layers). Recommended: 1200x1200px."
+    },
+    {
+      "type": "text",
+      "id": "perm_slide_3_title",
+      "label": "Hero Slide 3 title",
+      "default": "Claspless Everyday Layers"
+    },
+    {
+      "type": "image_picker",
+      "id": "perm_image_4",
+      "label": "Hero Slide 4 image",
+      "info": "Upload custom image for Slide 4 (Welding process). Recommended: 1200x1200px."
+    },
+    {
+      "type": "text",
+      "id": "perm_slide_4_title",
+      "label": "Hero Slide 4 title",
+      "default": "Micro-Pulse Arc Welding"
+    },
+    {
+      "type": "header",
+      "content": "Permanent Jewelry - Story / Metallurgy Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "perm_story_image",
+      "label": "Story / Craftsmanship section image",
+      "info": "Upload custom image shown next to 'Welded to last. Designed to never take off.' Recommended: 1200x1200px."
+    },
+    {
+      "type": "text",
+      "id": "perm_story_title",
+      "label": "Story section title",
+      "default": "Welded to last. Designed to never take off."
+    },
+    {
+      "type": "richtext",
+      "id": "perm_story_body",
+      "label": "Story section custom text (optional)",
+      "info": "Leave empty to use the default artisanal craftsmanship description."
+    },
+    {
+      "type": "header",
+      "content": "Permanent Jewelry - Buttons & CTA"
     },
     {
       "type": "text",
       "id": "perm_button_label",
-      "label": "Main button",
-      "default": "Book a session"
+      "label": "Main hero button",
+      "default": "Book An Appointment"
     },
     {
       "type": "url",
       "id": "perm_button_link",
-      "label": "Main button link",
+      "label": "Main hero button link",
       "info": "Leave empty to link to /pages/contact."
     },
     {
       "type": "text",
       "id": "perm_cta_title",
       "label": "Bottom banner title",
-      "default": "Ready for yours?"
+      "default": "Ready For Your Permanent Piece?"
     },
     {
       "type": "textarea",
       "id": "perm_cta_text",
       "label": "Bottom banner text",
-      "default": "Tell us about your event, studio visit or group booking and we will find a date that works."
+      "default": "Join us at our studio or book a private permanent jewelry bar for bridal showers, birthdays, or celebrations. Contact our concierge to reserve your date."
     },
     {
       "type": "text",
       "id": "perm_cta_label",
       "label": "Bottom banner button",
-      "default": "Get in touch"
+      "default": "Book Your Session"
     },
     {
       "type": "url",
