@@ -473,9 +473,9 @@
       {%- if found_slides == 0 -%}
         <div class="about-slide is-active">
           {%- if cfg.about_image != blank -%}
-            <img src="{{ cfg.about_image | image_url: width: 1200 }}" alt="{{ cfg.about_heading | default: 'Aurelle Atelier' | escape }}">
+            <img src="{{ cfg.about_image | image_url: width: 1200 }}" alt="{{ cfg.about_heading | default: 'Aurelle Atelier' | escape }}" width="1200" height="960" loading="eager">
           {%- else -%}
-            <img src="{{ 'split_banner_2.jpg' | asset_url }}" alt="Aurelle Atelier">
+            <img src="{{ 'split_banner_2.jpg' | asset_url }}" alt="Aurelle Atelier" width="1200" height="960" loading="eager">
           {%- endif -%}
         </div>
       {%- endif -%}
