@@ -36,7 +36,7 @@
 {%- if cnt == 0 and form_on == false and request.design_mode == false -%}
   {%- comment -%}nothing to show{%- endcomment -%}
 {%- else -%}
-<div id="cf-{{ section.id }}" class="cf color-{{ section.settings.color_scheme | default: 'scheme-1' }} cf--{{ layout }}" style="--cf-cols: {{ cols }}; --PT: {{ section.settings.padding_top | default: 48 }}px; --PB: {{ section.settings.padding_bottom | default: 48 }}px;" data-cf data-autoplay="{{ section.settings.autoplay }}" data-speed="{{ section.settings.autoplay_speed | default: 5 }}">
+<div id="cf-{{ section.id }}" class="cf color-{{ section.settings.color_scheme | default: 'scheme-1' }} cf--{{ layout }}" style="--cf-cols-d: {{ cols }}; --PT: {{ section.settings.padding_top | default: 48 }}px; --PB: {{ section.settings.padding_bottom | default: 48 }}px;" data-cf data-autoplay="{{ section.settings.autoplay }}" data-speed="{{ section.settings.autoplay_speed | default: 5 }}">
   <div class="cf__inner wrapper--full section-padding">
     {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
       <div class="cf__head">
@@ -80,11 +80,17 @@
     {%- if form_on -%}
       {%- render 'review-form', endpoint: api_endpoint, sid: section.id, product_id: product.id, product_title: product.title, button_label: section.settings.form_button_label -%}
     {%- endif -%}
+    {%- if section.settings.show_divider -%}<hr class="cf__divider">{%- endif -%}
   </div>
 </div>
 
 <style>
-  #cf-{{ section.id }} { padding: var(--PT) 0 var(--PB); background: var(--bg, #fff); color: var(--text, #111); --cf-accent: var(--lv-accent, #9b7c53); --cf-gap: 20px; --cf-line: var(--hairline, rgba(0, 0, 0, 0.14)); }
+  #cf-{{ section.id }} .cf__inner { padding-top: 0 !important; padding-bottom: 0 !important; }
+  #cf-{{ section.id }} .cf__divider { height: 1px; margin: calc(var(--PB) * .7) 0 0; border: 0; background: color-mix(in srgb, var(--text, #111) 28%, transparent); }
+  {%- if section.settings.show_divider %}
+  #cf-{{ section.id }} { padding-bottom: 0; }
+  {%- endif %}
+  #cf-{{ section.id }} { --cf-cols: var(--cf-cols-d); padding: var(--PT) 0 var(--PB); background: var(--bg, #fff); color: var(--text, #111); --cf-accent: var(--lv-accent, #9b7c53); --cf-gap: 20px; --cf-line: var(--hairline, rgba(0, 0, 0, 0.14)); }
   #cf-{{ section.id }} .cf__head { text-align: center; max-width: 680px; margin: 0 auto clamp(26px, 4vw, 44px); }
   #cf-{{ section.id }} .cf__title { margin: 0 0 10px; font-size: clamp(22px, 3vw, 32px); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; line-height: 1.2; }
   #cf-{{ section.id }} .cf__sub { margin: 0 0 14px; font-size: 14.5px; line-height: 1.7; opacity: .75; }
@@ -110,8 +116,8 @@
   #cf-{{ section.id }} .cf-card__avatar--initial { display: inline-flex; align-items: center; justify-content: center; background: var(--text, #111); color: var(--bg, #fff); font-size: 16px; font-weight: 700; }
   #cf-{{ section.id }} .cf-card__who { min-width: 0; }
   #cf-{{ section.id }} .cf-card__name { margin: 0; font-size: 13.5px; font-weight: 700; letter-spacing: .04em; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
-  #cf-{{ section.id }} .cf-card__verified { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--cf-accent); }
-  #cf-{{ section.id }} .cf-card__verified svg { width: 13px; height: 13px; }
+  #cf-{{ section.id }} .cf-card__verified { display: inline-flex; align-items: center; color: var(--cf-accent); cursor: help; }
+  #cf-{{ section.id }} .cf-card__verified svg { width: 20px; height: 20px; }
   #cf-{{ section.id }} .cf-card__meta { margin: 2px 0 0; font-size: 12px; opacity: .65; }
 
   #cf-{{ section.id }} .cf__arrow { position: absolute; top: 50%; z-index: 3; width: 42px; height: 42px; transform: translateY(-50%); display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--cf-line); background: var(--bg, #fff); color: var(--text, #111); cursor: pointer; padding: 0; transition: background-color .3s ease, color .3s ease, opacity .3s ease; }
@@ -120,7 +126,13 @@
   #cf-{{ section.id }} .cf__arrow--prev { left: -18px; }
   #cf-{{ section.id }} .cf__arrow--next { right: -18px; }
   #cf-{{ section.id }} .cf__arrow[disabled] { opacity: 0; pointer-events: none; }
-  @media (max-width: 960px) { #cf-{{ section.id }} .cf__arrow--prev { left: 4px; } #cf-{{ section.id }} .cf__arrow--next { right: 4px; } }
+  /* small screens: arrows sit in a row under the cards instead of covering the text */
+  @media (max-width: 960px) {
+    #cf-{{ section.id }}.cf--carousel .cf__wrap { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 18px 14px; }
+    #cf-{{ section.id }}.cf--carousel .cf__track { order: 1; flex: 0 0 100%; min-width: 0; }
+    #cf-{{ section.id }}.cf--carousel .cf__arrow { position: static; transform: none; order: 2; margin: 0; }
+    #cf-{{ section.id }}.cf--carousel .cf__arrow[disabled] { opacity: .35; pointer-events: none; }
+  }
 </style>
 
 <script>
@@ -206,6 +218,7 @@
     { "type": "range", "id": "columns", "min": 1, "max": 4, "step": 1, "label": "Columns (desktop)", "default": 3 },
     { "type": "checkbox", "id": "autoplay", "label": "Autoplay (carousel)", "default": false },
     { "type": "range", "id": "autoplay_speed", "min": 3, "max": 10, "step": 1, "unit": "s", "label": "Autoplay speed", "default": 5 },
+    { "type": "checkbox", "id": "show_divider", "label": "Show divider line at the bottom", "default": true, "info": "When on, the bottom padding is used as the gap above the line." },
     { "type": "range", "id": "padding_top", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Top padding", "default": 48 },
     { "type": "range", "id": "padding_bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Bottom padding", "default": 48 }
   ],

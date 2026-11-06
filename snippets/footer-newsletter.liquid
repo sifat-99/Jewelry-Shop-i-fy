@@ -1,0 +1,84 @@
+{%- comment -%}
+  Newsletter signup band at the top of the footer. Uses Shopify's built-in customer form
+  (the email becomes a Customer with email marketing consent + tag "newsletter").
+  Settings: Footer section > Newsletter.
+  Accepts: s (section.settings)
+{%- endcomment -%}
+{%- assign nl_code = s.newsletter_discount_code | strip -%}
+<div class="fnl">
+  <div class="fnl__copy">
+    {%- if s.newsletter_show_discount and s.newsletter_discount_badge != blank -%}
+      <span class="fnl__badge">{{ s.newsletter_discount_badge | escape }}</span>
+    {%- endif -%}
+    {%- if s.newsletter_heading != blank -%}<h3 class="fnl__title">{{ s.newsletter_heading | escape }}</h3>{%- endif -%}
+    {%- if s.newsletter_text != blank -%}<p class="fnl__text">{{ s.newsletter_text | escape }}</p>{%- endif -%}
+  </div>
+  <div class="fnl__box">
+    {%- form 'customer', id: 'footer-newsletter', class: 'fnl__form' -%}
+      {%- if form.posted_successfully? -%}
+        <div class="fnl__ok" role="status">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
+          <div>
+            <p class="fnl__ok-title">{{ s.newsletter_success | default: 'Thank you for subscribing!' | escape }}</p>
+            {%- if s.newsletter_show_discount and nl_code != blank -%}
+              <p class="fnl__ok-code">Your code: <strong>{{ nl_code | escape }}</strong></p>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- else -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <label class="fnl__sr" for="fnl-email">Email</label>
+        <div class="fnl__row">
+          <input id="fnl-email" class="fnl__input" type="email" name="contact[email]" required autocomplete="email" placeholder="{{ s.newsletter_placeholder | default: 'Your email address' | escape }}" value="{{ form.email }}">
+          <button type="submit" class="btn btn--primary fnl__btn"><span class="btn__text-content">{{ s.newsletter_button | default: 'Subscribe' | escape }}</span></button>
+        </div>
+        {%- if form.errors -%}
+          <p class="fnl__err" role="alert">{{ form.errors.messages['email'] | default: 'Please enter a valid email address.' }}</p>
+        {%- endif -%}
+        {%- if s.newsletter_note != blank -%}<p class="fnl__note">{{ s.newsletter_note | escape }}</p>{%- endif -%}
+      {%- endif -%}
+    {%- endform -%}
+  </div>
+</div>
+<script>
+  (function() {
+    var form = document.getElementById('footer-newsletter');
+    if (!form) return;
+    form.addEventListener('submit', function() {
+      var input = document.getElementById('fnl-email');
+      var email = input ? input.value : '';
+      if (email && email.indexOf('@') > -1) {
+        try {
+          fetch('https://le-velair-reviews-api.vercel.app/api/welcome-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email.trim() }),
+            keepalive: true
+          }).catch(function(){});
+        } catch(e) {}
+      }
+    });
+  })();
+</script>
+<style>
+  .fnl { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 64px); align-items: center; margin: 0 0 clamp(12px, 2vw, 20px); padding: clamp(40px, 5vw, 64px) 0 clamp(36px, 4.5vw, 52px); border-bottom: 1px solid color-mix(in srgb, var(--text-dark, #111) 20%, transparent); text-align: left; }
+  .fnl__badge { display: inline-block; margin: 0 0 12px; padding: 5px 12px; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--bg, #fff); background: var(--text-dark, #111); }
+  .fnl__title { margin: 0 0 8px; font-size: clamp(18px, 2.2vw, 24px); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; line-height: 1.25; color: var(--text-dark, #111); }
+  .fnl__text { margin: 0; max-width: 480px; font-size: 14px; line-height: 1.7; opacity: .8; }
+  .fnl__form { margin: 0; }
+  .fnl__row { display: flex; align-items: stretch; gap: 0; }
+  .fnl__input { flex: 1 1 auto; min-width: 0; height: var(--ctl-h-lg, 52px); box-sizing: border-box; margin: 0 !important; padding: 0 16px; font: inherit; font-size: 14px; color: var(--text-dark, #111); background: var(--bg, #fff); border: 1px solid color-mix(in srgb, var(--text-dark, #111) 45%, transparent); border-right: 0; border-radius: 0; outline: none; }
+  .fnl__input:focus { border-color: var(--text-dark, #111); }
+  .fnl__btn { flex: none; height: var(--ctl-h-lg, 52px); min-height: 0; padding: 0 28px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  .fnl__note { margin: 10px 0 0; font-size: 12px; opacity: .65; }
+  .fnl__err { margin: 10px 0 0; font-size: 13px; font-weight: 600; color: #b3261e; }
+  .fnl__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .fnl__ok { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border: 1px solid color-mix(in srgb, var(--text-dark, #111) 30%, transparent); }
+  .fnl__ok svg { width: 34px; height: 34px; flex: none; }
+  .fnl__ok p { margin: 0; }
+  .fnl__ok-title { font-size: 14px; font-weight: 700; letter-spacing: .06em; }
+  .fnl__ok-code { margin-top: 4px !important; font-size: 13px; }
+  .fnl__ok-code strong { letter-spacing: .12em; }
+  @media (max-width: 820px) { .fnl { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 480px) { .fnl__row { flex-direction: column; gap: 10px; } .fnl__input { border-right: 1px solid color-mix(in srgb, var(--text-dark, #111) 45%, transparent); } .fnl__btn { width: 100%; } }
+</style>

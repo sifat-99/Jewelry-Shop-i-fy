@@ -19,7 +19,7 @@
         "footer_menu": "footer",
         "show_social_column": true,
         "social_column_title": "Social",
-        "padding_top": 50,
+        "padding_top": 40,
         "padding_bottom": 40
       }
     },

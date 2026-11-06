@@ -5,6 +5,7 @@
   style="--PT: {{ section.settings.padding_top | default: 50 }}px; --PB: {{ section.settings.padding_bottom | default: 40 }}px;">
   <div class="footer__holder">
     <div class="wrapper--full section-padding-custom">
+      {%- if section.settings.show_newsletter -%}{%- render 'footer-newsletter', s: section.settings -%}{%- endif -%}
       <div class="footer__container footer__container--reversed">
         <div class="footer__content">
           <div class="footer__content__inner">
@@ -249,6 +250,18 @@
       "label": "Social column heading",
       "default": "Social"
     },
+    { "type": "header", "content": "Newsletter" },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Show newsletter signup", "default": true },
+    { "type": "text", "id": "newsletter_heading", "label": "Heading", "default": "Join the Aurelle list" },
+    { "type": "textarea", "id": "newsletter_text", "label": "Text", "default": "Be the first to hear about new collections, engraving offers and private sales." },
+    { "type": "text", "id": "newsletter_placeholder", "label": "Email placeholder", "default": "Your email address" },
+    { "type": "text", "id": "newsletter_button", "label": "Button label", "default": "Subscribe" },
+    { "type": "text", "id": "newsletter_note", "label": "Small note under the form", "default": "No spam. Unsubscribe anytime." },
+    { "type": "text", "id": "newsletter_success", "label": "Success message", "default": "Thank you for subscribing!" },
+    { "type": "header", "content": "Newsletter discount" },
+    { "type": "checkbox", "id": "newsletter_show_discount", "label": "Show discount offer", "default": true },
+    { "type": "text", "id": "newsletter_discount_badge", "label": "Badge text", "default": "10% off your first order" },
+    { "type": "text", "id": "newsletter_discount_code", "label": "Discount code", "default": "WELCOME10", "info": "Shown after signup. Create the same code in Shopify admin > Discounts." },
     {
       "type": "range",
       "id": "padding_top",

@@ -687,6 +687,8 @@
     .pv-sticky .btn { flex: 0 0 auto; height: 46px; min-height: 46px; padding: 0 22px; white-space: nowrap; }
     .pv-sticky .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     @media (max-width: 1024px) { .pv-sticky[data-enabled="true"] { display: flex; } }
+    /* keep the Shopify Inbox chat button above the sticky add-to-cart bar (tablet / mobile) */
+    @media (max-width: 1024px) { body.template-product { --shopify-chat-activator-offset: 88px; } }
 
     /* ---------- Lightbox ---------- */
     .pv-lightbox {

@@ -391,54 +391,6 @@
         "image_border_radius": 0
       }
     },
-    "trust_icons": {
-      "type": "section-icons",
-      "blocks": {
-        "trust_1": {
-          "type": "trust_item",
-          "settings": {
-            "icon_name": "shipping",
-            "title": "Free Shipping from ৳4000",
-            "text": "Fast dispatch within 24-48 hours"
-          }
-        },
-        "trust_2": {
-          "type": "trust_item",
-          "settings": {
-            "icon_name": "waterproof",
-            "title": "100% Waterproof",
-            "text": "Stainless steel, never discolors or tarnishes"
-          }
-        },
-        "trust_3": {
-          "type": "trust_item",
-          "settings": {
-            "icon_name": "engraving",
-            "title": "Personal Touch",
-            "text": "Custom engraving crafted with precision"
-          }
-        },
-        "trust_4": {
-          "type": "trust_item",
-          "settings": {
-            "icon_name": "returns",
-            "title": "14 Days Returns",
-            "text": "Hassle-free return policy"
-          }
-        }
-      },
-      "block_order": [
-        "trust_1",
-        "trust_2",
-        "trust_3",
-        "trust_4"
-      ],
-      "settings": {
-        "color_scheme": "scheme-2",
-        "padding_top": 35,
-        "padding_bottom": 35
-      }
-    },
     "customer_feedback_qqhYpM": {
       "type": "customer-feedback",
       "blocks": {
@@ -493,12 +445,64 @@
         "source": "auto",
         "metaobject_type": "review",
         "limit": 12,
+        "show_form": true,
+        "form_endpoint": "https://le-velair-reviews-api.vercel.app/api/review",
+        "form_button_label": "Write a review",
         "layout": "carousel",
         "columns": 3,
         "autoplay": false,
-        "autoplay_speed": 5,
+        "autoplay_speed": 4,
+        "show_divider": false,
         "padding_top": 48,
-        "padding_bottom": 48
+        "padding_bottom": 40
+      }
+    },
+    "trust_icons": {
+      "type": "section-icons",
+      "blocks": {
+        "trust_1": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "shipping",
+            "title": "Free Shipping from €39",
+            "text": "Fast dispatch within 24-48 hours"
+          }
+        },
+        "trust_2": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "waterproof",
+            "title": "100% Waterproof",
+            "text": "Stainless steel, never discolors or tarnishes"
+          }
+        },
+        "trust_3": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "engraving",
+            "title": "Personal Touch",
+            "text": "Custom engraving crafted with precision"
+          }
+        },
+        "trust_4": {
+          "type": "trust_item",
+          "settings": {
+            "icon_name": "returns",
+            "title": "14 Days Returns",
+            "text": "Hassle-free return policy"
+          }
+        }
+      },
+      "block_order": [
+        "trust_1",
+        "trust_2",
+        "trust_3",
+        "trust_4"
+      ],
+      "settings": {
+        "color_scheme": "scheme-2",
+        "padding_top": 35,
+        "padding_bottom": 35
       }
     }
   },
@@ -512,7 +516,7 @@
     "section_richtext_PtYik4",
     "split_rings",
     "instagram_feed",
-    "trust_icons",
-    "customer_feedback_qqhYpM"
+    "customer_feedback_qqhYpM",
+    "trust_icons"
   ]
 }
