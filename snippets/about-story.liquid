@@ -255,35 +255,112 @@
     color: var(--pp-muted, rgba(var(--color-foreground, 0, 0, 0), 0.62)) !important;
   }
 
+  /* Harmonized Luxury CTA Section */
   .sl-cta {
+    display: block !important;
+    text-align: center !important;
+    padding: 56px 36px !important;
+    margin: 0 0 76px !important;
+    background: var(--pp-soft, color-mix(in srgb, var(--text, #000) 3%, var(--bg, #fff))) !important;
+    border: 1px solid var(--pp-line, rgba(var(--color-foreground, 0, 0, 0), 0.12)) !important;
     border-radius: var(--card-radius, 0px) !important;
-    background: var(--text, #000000) !important;
-    color: var(--bg, #ffffff) !important;
-    border: 1px solid var(--text, #000000) !important;
+    color: var(--text, #000000) !important;
+    box-shadow: none !important;
+  }
+  @media (max-width: 640px) {
+    .sl-cta {
+      padding: 40px 20px !important;
+      margin-bottom: 52px !important;
+    }
+  }
+  .sl-cta__inner {
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .sl-cta__eyebrow {
+    margin: 0 0 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--pp-muted, rgba(var(--color-foreground, 0, 0, 0), 0.62));
   }
   .sl-cta__title {
-    color: var(--bg, #ffffff) !important;
+    margin: 0 0 14px !important;
+    font-size: clamp(22px, 3.2vw, 34px) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    line-height: 1.25 !important;
+    color: var(--text, #000000) !important;
   }
   .sl-cta__text {
-    color: var(--bg, #ffffff) !important;
-    opacity: 0.85 !important;
+    margin: 0 auto 30px !important;
+    max-width: 520px !important;
+    font-size: 15px !important;
+    line-height: 1.8 !important;
+    color: var(--pp-muted, rgba(var(--color-foreground, 0, 0, 0), 0.65)) !important;
+    opacity: 1 !important;
   }
-  .sl-cta__btn {
+  .sl-cta__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .sl-cta__btn-primary,
+  .sl-cta__btn-secondary {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: var(--ctl-h-lg, 48px) !important;
+    padding: 0 32px !important;
     border-radius: var(--btn-radius, 0px) !important;
-    background: var(--bg, #ffffff) !important;
-    color: var(--text, #000000) !important;
-    border: 1px solid var(--bg, #ffffff) !important;
     font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
     font-size: 11.5px !important;
     font-weight: 600 !important;
     letter-spacing: 0.14em !important;
     text-transform: uppercase !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
     transition: background-color var(--btn-animation-duration, 350ms) var(--btn-ease, ease), color var(--btn-animation-duration, 350ms) var(--btn-ease, ease), border-color var(--btn-animation-duration, 350ms) var(--btn-ease, ease) !important;
   }
-  .sl-cta__btn:hover {
-    background: transparent !important;
-    color: var(--bg, #ffffff) !important;
-    border-color: var(--bg, #ffffff) !important;
+  .sl-cta__btn-primary {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #000000 !important;
+  }
+  .sl-cta__btn-primary span,
+  .sl-cta__btn-primary .btn__text-content {
+    color: #ffffff !important;
+  }
+  .sl-cta__btn-primary:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+  }
+  .sl-cta__btn-primary:hover span,
+  .sl-cta__btn-primary:hover .btn__text-content {
+    color: #000000 !important;
+  }
+  .sl-cta__btn-secondary {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid var(--pp-line, rgba(var(--color-foreground, 0, 0, 0), 0.18)) !important;
+  }
+  .sl-cta__btn-secondary span,
+  .sl-cta__btn-secondary .btn__text-content {
+    color: #000000 !important;
+  }
+  .sl-cta__btn-secondary:hover {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
+  }
+  .sl-cta__btn-secondary:hover span,
+  .sl-cta__btn-secondary:hover .btn__text-content {
+    color: #ffffff !important;
   }
 
   .sl-btn, .btn {
@@ -498,11 +575,19 @@
 
 <!-- BOTTOM CTA -->
 <section class="sl-cta">
-  <div>
-    <h2 class="sl-cta__title">{{ cfg.about_cta_title | default: 'Discover Your Signature Piece' }}</h2>
-    <p class="sl-cta__text">{{ cfg.about_cta_text | default: 'Explore our curated collection of waterproof rings, necklaces, and engravable keepsakes, or consult our concierge team for bespoke inquiries.' }}</p>
+  <div class="sl-cta__inner">
+    <p class="sl-cta__eyebrow">Atelier Concierge</p>
+    <h2 class="sl-cta__title">{{ cfg.about_cta_title | default: 'Find Your Signature Piece' }}</h2>
+    <p class="sl-cta__text">{{ cfg.about_cta_text | default: 'Explore our curated collection of waterproof rings, necklaces, and engravable keepsakes, or consult our concierge team for personalized guidance.' }}</p>
+    <div class="sl-cta__actions">
+      <a href="{{ shop_link }}" class="btn btn--primary btn-sliding-hover sl-cta__btn-primary">
+        <span class="btn__text-content">{{ cfg.about_cta_label | default: 'Explore Collection' }}</span>
+      </a>
+      <a href="{{ cta_link }}" class="btn btn-sliding-hover sl-cta__btn-secondary">
+        <span class="btn__text-content">Contact Atelier</span>
+      </a>
+    </div>
   </div>
-  <a href="{{ cta_link }}" class="sl-cta__btn">{{ cfg.about_cta_label | default: 'Explore Collection' }}</a>
 </section>
 
 <!-- ROTATING HERO SLIDER SCRIPT -->
