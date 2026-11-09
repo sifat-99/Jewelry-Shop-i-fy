@@ -1200,6 +1200,44 @@
       },
       {
         "type": "header",
+        "content": "Product Card Price"
+      },
+      {
+        "type": "select",
+        "id": "card_price_design",
+        "label": "Current price design",
+        "options": [
+          {
+            "value": "classic",
+            "label": "Clean classic"
+          },
+          {
+            "value": "editorial_serif",
+            "label": "Editorial serif"
+          },
+          {
+            "value": "modern_bold",
+            "label": "Modern bold"
+          },
+          {
+            "value": "gold_accent",
+            "label": "Fine gold underline"
+          }
+        ],
+        "default": "classic"
+      },
+      {
+        "type": "range",
+        "id": "card_price_size",
+        "min": 13,
+        "max": 22,
+        "step": 1,
+        "unit": "px",
+        "label": "Current price size",
+        "default": 15
+      },
+      {
+        "type": "header",
         "content": "Sale Badge"
       },
       {
@@ -1211,7 +1249,7 @@
       {
         "type": "select",
         "id": "sale_badge_type",
-        "label": "Sale badge style",
+        "label": "Sale badge text",
         "options": [
           {
             "value": "percentage",
@@ -1223,6 +1261,30 @@
           }
         ],
         "default": "percentage"
+      },
+      {
+        "type": "select",
+        "id": "sale_badge_design",
+        "label": "Sale badge design",
+        "options": [
+          {
+            "value": "classic_ribbon",
+            "label": "Classic ribbon (current)"
+          },
+          {
+            "value": "fine_jewelry_tag",
+            "label": "Fine jewelry tag"
+          },
+          {
+            "value": "heritage_seal",
+            "label": "Heritage seal"
+          },
+          {
+            "value": "minimal_capsule",
+            "label": "Minimal capsule"
+          }
+        ],
+        "default": "classic_ribbon"
       },
       {
         "type": "color",

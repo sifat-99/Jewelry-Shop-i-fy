@@ -21,11 +21,59 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -2px 0 rgba(0, 0, 0, 0.22);
     clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 50%, 100% 100%, 0 100%);
   }
+  .lv-sale-badge[data-design="fine_jewelry_tag"] { filter: drop-shadow(0 2px 3px rgba(69, 48, 28, 0.12)); }
+  .lv-sale-badge[data-design="fine_jewelry_tag"] .lv-sale-badge__inner {
+    padding: 6px 11px;
+    color: #4c3b2d;
+    text-shadow: none;
+    background: linear-gradient(135deg, #fbf7ed 0%, #eee2c8 100%);
+    border: 1px solid #c5a76a;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.55), 0 1px 2px rgba(69, 48, 28, 0.08);
+    clip-path: none;
+  }
+  .lv-sale-badge[data-design="heritage_seal"] {
+    width: 62px;
+    height: 62px;
+    filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.2));
+  }
+  .lv-sale-badge[data-design="heritage_seal"] .lv-sale-badge__inner {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border: 1px solid #d7bd80;
+    border-radius: 50%;
+    font-size: 9px;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-align: center;
+    white-space: normal;
+    clip-path: none;
+    background: radial-gradient(circle at 35% 25%, #a34b5c 0%, var(--lv-badge-bg) 58%, #64202f 100%);
+  }
+  .lv-sale-badge[data-design="minimal_capsule"] { filter: drop-shadow(0 2px 4px rgba(48, 36, 25, 0.12)); }
+  .lv-sale-badge[data-design="minimal_capsule"] .lv-sale-badge__inner {
+    padding: 6px 12px;
+    color: var(--lv-badge-bg);
+    text-shadow: none;
+    background: rgba(255, 252, 246, 0.96);
+    border: 1px solid rgba(197, 167, 106, 0.72);
+    border-radius: 999px;
+    box-shadow: inset 0 1px 0 #fff;
+    clip-path: none;
+  }
   .lv-sale-badge--lg { top: 14px; }
   .lv-sale-badge--lg .lv-sale-badge__inner { font-size: 12.5px; padding: 8px 18px 8px 14px; }
   @media (max-width: 640px) {
     .lv-sale-badge { top: 8px; }
     .lv-sale-badge__inner { font-size: 10px; padding: 4px 11px 4px 8px; }
+    .lv-sale-badge[data-design="fine_jewelry_tag"] .lv-sale-badge__inner { padding: 4px 9px; }
+    .lv-sale-badge[data-design="heritage_seal"] { width: 54px; height: 54px; }
+    .lv-sale-badge[data-design="heritage_seal"] .lv-sale-badge__inner { padding: 4px; font-size: 8px; }
+    .lv-sale-badge[data-design="minimal_capsule"] .lv-sale-badge__inner { padding: 4px 10px; }
     .lv-sale-badge--lg { top: 10px; }
     .lv-sale-badge--lg .lv-sale-badge__inner { font-size: 11px; padding: 6px 14px 6px 10px; }
   }

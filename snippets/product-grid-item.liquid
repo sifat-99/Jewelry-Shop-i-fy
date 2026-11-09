@@ -740,6 +740,32 @@
         padding: 0 4px !important;
       }
     }
+
+    .product__grid__price[data-price-design] .price-item--regular {
+      display: inline-block;
+      font-family: 'Quicksand', sans-serif;
+      font-size: var(--card-price-size, 15px);
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--text, #171717);
+    }
+    .product__grid__price[data-price-design="editorial_serif"] .price-item--regular {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .product__grid__price[data-price-design="modern_bold"] .price-item--regular { font-weight: 700; }
+    .product__grid__price[data-price-design="gold_accent"] .price-item--regular {
+      padding-bottom: 2px;
+      border-bottom: 1px solid #c5a76a;
+    }
+    .product__grid__price[data-on-sale="true"] .price-item--regular { color: #8c2b3f; }
+    .product__grid__price .price-item--compare {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 12px;
+      line-height: 1.35;
+      color: #999999;
+    }
   </style>
 
   <div class="lv-card-media-wrap">
@@ -964,8 +990,8 @@
         </p>
       </div>
 
-      <div class="product__grid__price" style="display: flex; align-items: center; gap: 8px;">
-        <span class="price-item price-item--regular" style="font-family: 'Quicksand', sans-serif; font-size: 13px; font-weight: 600; color: {% if on_sale %}#8c2b3f{% else %}var(--text){% endif %};">
+      <div class="product__grid__price" data-price-design="{{ settings.card_price_design | default: 'classic' | escape }}" data-on-sale="{% if on_sale %}true{% else %}false{% endif %}" style="--card-price-size: {{ settings.card_price_size | default: 15 }}px; display: flex; align-items: baseline; gap: 8px;">
+        <span class="price-item price-item--regular">
           {%- if product.price -%}
             {{ product.price | money }}
           {%- else -%}
@@ -974,9 +1000,9 @@
         </span>
 
         {%- if on_sale and demo_compare != blank -%}
-          <s class="price-item price-item--compare" style="font-family: 'Quicksand', sans-serif; font-size: 12px; color: #999999;">€{{ demo_compare }}</s>
+          <s class="price-item price-item--compare">€{{ demo_compare }}</s>
         {%- elsif on_sale and product.compare_at_price > product.price -%}
-          <s class="price-item price-item--compare" style="font-family: 'Quicksand', sans-serif; font-size: 12px; color: #999999;">
+          <s class="price-item price-item--compare">
             {{ product.compare_at_price | money }}
           </s>
         {%- endif -%}
