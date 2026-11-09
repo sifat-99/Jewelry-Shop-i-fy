@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -84,14 +93,11 @@
       ],
       "settings": {
         "color_scheme": "scheme-1",
-        "perm_eyebrow": "Aurelle Atelier Experience",
         "perm_heading": "Permanent Jewelry On-Site",
         "perm_lead": "A bespoke bracelet, anklet or necklace measured to your exact dimensions and welded closed without a clasp. Engineered from hypoallergenic 14K gold-filled and waterproof steel, made to stay with you always.",
         "perm_image": "",
         "perm_button_label": "Book an Appointment",
         "perm_button_link": "/pages/contact",
-        "perm_steps_eyebrow": "The On-Site Atelier Process",
-        "perm_steps_title": "How Permanent Welding Works",
         "perm_cta_title": "Ready for Your Permanent Piece?",
         "perm_cta_text": "Join us at our studio or book a private permanent jewelry bar for bridal showers, birthdays, or corporate celebrations. Contact us to reserve your private date.",
         "perm_cta_label": "Book Your Session",

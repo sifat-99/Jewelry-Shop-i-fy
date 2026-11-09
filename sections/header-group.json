@@ -48,7 +48,7 @@
         "color_scheme": "",
         "logo_width": 140,
         "mobile_logo_alignment": "center",
-        "padding_vertical": 18,
+        "padding_vertical": 6,
         "sticky_header_type": "always",
         "main_menu_link_list": "main-menu",
         "dropdown_global_bg": "#ffffff",

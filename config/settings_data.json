@@ -68,7 +68,7 @@
     "card_arrow_icon_color": "#000000",
     "card_arrow_border_color": "#000000",
     "card_arrow_hover_background": "#000000",
-    "card_arrow_hover_icon_color": "#ffffff",
+    "card_arrow_hover_icon_color": "#000000",
     "card_arrow_hover_border_color": "#FFFFFF",
     "card_arrow_show_shadow": false,
     "engraving_card_action": "page",

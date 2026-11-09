@@ -14,7 +14,7 @@
       "settings": {
         "color_scheme": "",
         "gallery_layout": "thumbs",
-        "engrave_layout": "classic",
+        "engrave_layout": "card",
         "engrave_scheme": "",
         "thumbnail_position": "left",
         "gallery_grid_columns": "2",
