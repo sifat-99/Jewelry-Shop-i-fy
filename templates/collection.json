@@ -23,7 +23,7 @@
         "show_products_count": true,
         "show_description": true,
         "custom_description": "",
-        "products_per_page": 24,
+        "products_per_page": 12,
         "grid_columns_desktop": 4,
         "grid_columns_1024": 3,
         "grid_columns_960": 3,

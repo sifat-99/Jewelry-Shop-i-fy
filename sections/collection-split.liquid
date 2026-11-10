@@ -4,7 +4,6 @@
   if target_collection == blank or target_collection.products_count == 0
     assign target_collection = collections.all
   endif
-
   comment
     Banner / products column widths. For "image right" the visual order is reversed (products first), so the tracks are swapped.
   endcomment
@@ -35,11 +34,12 @@
   endif
 -%}
 
-<div class="collection-split{% if banner_fill %} collection-split--fill{% endif %} color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
+<div
+  class="collection-split{% if banner_fill %} collection-split--fill{% endif %} color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
   data-section-id="{{ section.id }}"
   data-section-type="collection-row"
-  style="--PT: {{ section.settings.padding_top | default: 36 }}px; --PB: {{ section.settings.padding_bottom | default: 36 }}px; --card-radius: {{ section.settings.card_border_radius | default: settings.card_border_radius | default: 0 }}px; --split-template: {{ split_template }}; --split-banner-ratio: {{ banner_ratio }}; --split-pad: {{ content_pad }}px;">
-
+  style="--PT: {{ section.settings.padding_top | default: 36 }}px; --PB: {{ section.settings.padding_bottom | default: 36 }}px; --card-radius: {{ section.settings.card_border_radius | default: settings.card_border_radius | default: 0 }}px; --split-template: {{ split_template }}; --split-banner-ratio: {{ banner_ratio }}; --split-pad: {{ content_pad }}px;"
+>
   {{ 'product-grid.css' | asset_url | stylesheet_tag }}
   <style>
     #shopify-section-{{ section.id }} .collection-split-container {
@@ -248,6 +248,22 @@
         object-position: center !important;
       }
     }
+    /* Tablet portrait (iPad upright): a half-width column cannot hold a tall pinned banner, so stack it: banner on top, products in 2 columns below */
+    @media only screen and (min-width: 769px) and (max-width: 1100px) and (orientation: portrait) {
+      #shopify-section-{{ section.id }} .collection-split__grid { grid-template-columns: minmax(0, 1fr) !important; row-gap: 24px; }
+      #shopify-section-{{ section.id }} .collection-split__item:has(.collection-split__block--banner) { order: -1 !important; }
+      #shopify-section-{{ section.id }} .collection-split__block--banner,
+      #shopify-section-{{ section.id }} .collection-split--fill .collection-split__block--banner {
+        position: relative !important;
+        top: auto !important;
+        aspect-ratio: 4 / 3 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+      }
+      #shopify-section-{{ section.id }} .collection-split__products { padding: 0 var(--outer, 24px) !important; }
+      #shopify-section-{{ section.id }} .collection-split-products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 24px 16px !important; }
+    }
 
     /* ---------- Product showcase banner (selected products + moving animation) ---------- */
     #shopify-section-{{ section.id }} .collection-split__block--showcase .image-overlay { pointer-events: none; }
@@ -332,7 +348,10 @@
           const dots = Array.from(root.querySelectorAll('[data-showcase-dot]'));
           const speed = parseInt(root.dataset.speed, 10) || 4500;
           const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          let current = 0, timer = null, visible = true, hovering = false;
+          let current = 0,
+            timer = null,
+            visible = true,
+            hovering = false;
 
           const show = (n) => {
             const next = (n + slides.length) % slides.length;
@@ -340,24 +359,43 @@
             slides.forEach((el, i) => {
               el.classList.toggle('is-active', i === next);
               el.classList.toggle('is-prev', i === current);
-              const link = el.querySelector('a'); if (link) link.tabIndex = i === next ? 0 : -1;
+              const link = el.querySelector('a');
+              if (link) link.tabIndex = i === next ? 0 : -1;
             });
             dots.forEach((d, i) => d.classList.toggle('is-active', i === next));
             current = next;
           };
-          const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
+          const stop = () => {
+            if (timer) {
+              clearInterval(timer);
+              timer = null;
+            }
+          };
           const start = () => {
             stop();
             if (root.dataset.autoplay !== 'true' || reduced || !visible || hovering || document.hidden) return;
             timer = setInterval(() => show(current + 1), speed);
           };
-          dots.forEach((d) => d.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); show(parseInt(d.dataset.showcaseDot, 10)); start(); }));
+          dots.forEach((d) =>
+            d.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              show(parseInt(d.dataset.showcaseDot, 10));
+              start();
+            })
+          );
 
           /* swipe / drag */
-          let sx = 0, sy = 0, dragging = false, moved = false;
+          let sx = 0,
+            sy = 0,
+            dragging = false,
+            moved = false;
           root.addEventListener('pointerdown', (e) => {
             if (e.target.closest('[data-showcase-dot]') || (e.pointerType === 'mouse' && e.button !== 0)) return;
-            dragging = true; moved = false; sx = e.clientX; sy = e.clientY;
+            dragging = true;
+            moved = false;
+            sx = e.clientX;
+            sy = e.clientY;
           });
           root.addEventListener('pointermove', (e) => {
             if (dragging && Math.abs(e.clientX - sx) > 8) moved = true;
@@ -365,25 +403,56 @@
           const end = (e) => {
             if (!dragging) return;
             dragging = false;
-            const dx = e.clientX - sx, dy = e.clientY - sy;
-            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { show(current + (dx < 0 ? 1 : -1)); start(); }
+            const dx = e.clientX - sx,
+              dy = e.clientY - sy;
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+              show(current + (dx < 0 ? 1 : -1));
+              start();
+            }
           };
           root.addEventListener('pointerup', end);
-          root.addEventListener('pointercancel', () => { dragging = false; });
+          root.addEventListener('pointercancel', () => {
+            dragging = false;
+          });
           root.addEventListener('dragstart', (e) => e.preventDefault());
-          root.addEventListener('click', (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+          root.addEventListener(
+            'click',
+            (e) => {
+              if (moved) {
+                e.preventDefault();
+                e.stopPropagation();
+                moved = false;
+              }
+            },
+            true
+          );
 
-          root.addEventListener('mouseenter', () => { hovering = true; stop(); });
-          root.addEventListener('mouseleave', () => { hovering = false; start(); });
+          root.addEventListener('mouseenter', () => {
+            hovering = true;
+            stop();
+          });
+          root.addEventListener('mouseleave', () => {
+            hovering = false;
+            start();
+          });
           document.addEventListener('visibilitychange', start);
           if ('IntersectionObserver' in window) {
-            new IntersectionObserver((e) => { visible = e[0].isIntersecting; start(); }, { threshold: 0.2 }).observe(root);
+            new IntersectionObserver(
+              (e) => {
+                visible = e[0].isIntersecting;
+                start();
+              },
+              { threshold: 0.2 }
+            ).observe(root);
           }
           start();
         };
         /* the script sits above the markup, so wait until the banner exists */
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-        document.addEventListener('shopify:section:load', (e) => { if (e.target && e.target.id === 'shopify-section-{{ section.id }}') init(); });
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+        else init();
+        document.addEventListener('shopify:section:load', (e) => {
+          if (e.target && e.target.id === 'shopify-section-{{ section.id }}') init();
+        });
       })();
     </script>
   {%- endif -%}
@@ -410,26 +479,48 @@
         -%}
         <div class="collection-split__block collection-split__block--banner text--white{% if use_showcase %} collection-split__block--showcase{% elsif banner_url != blank %} collection-split__block--clickable{% endif %}">
           {%- assign has_banner_content = false -%}
-          {%- if section.settings.title != blank or section.settings.subtitle != blank or section.settings.button_label != blank -%}
+          {%- if section.settings.title != blank
+            or section.settings.subtitle != blank
+            or section.settings.button_label != blank
+          -%}
             {%- assign has_banner_content = true -%}
           {%- endif -%}
 
           {%- if banner_url != blank and use_showcase == false -%}
-            <a href="{{ banner_url }}" class="split-banner-full-link" aria-label="{{ section.settings.title | default: target_collection.title | default: 'Collection' | escape }}"></a>
+            <a
+              href="{{ banner_url }}"
+              class="split-banner-full-link"
+              aria-label="{{ section.settings.title | default: target_collection.title | default: 'Collection' | escape }}"
+            ></a>
           {%- endif -%}
 
           {%- if has_banner_content -%}
-            <div class="hero__content__wrapper align--middle-center" style="position: relative; z-index: 6; pointer-events: none;">
+            <div
+              class="hero__content__wrapper align--middle-center"
+              style="position: relative; z-index: 6; pointer-events: none;"
+            >
               <div>
                 {%- if section.settings.title != blank -%}
                   <h2 class="hero__title" data-aos="hero" data-aos-order="2">{{ section.settings.title }}</h2>
                 {%- endif -%}
                 {%- if section.settings.subtitle != blank -%}
-                  <p class="hero__subtitle" data-aos="hero" data-aos-order="2" style="font-family: 'Quicksand', sans-serif; font-size: 13.5px; font-weight: 500; letter-spacing: 0.06em; line-height: 1.5; margin: 10px auto 0 auto; max-width: 420px; opacity: 1;">{{ section.settings.subtitle }}</p>
+                  <p
+                    class="hero__subtitle"
+                    data-aos="hero"
+                    data-aos-order="2"
+                    style="font-family: 'Quicksand', sans-serif; font-size: 13.5px; font-weight: 500; letter-spacing: 0.06em; line-height: 1.5; margin: 10px auto 0 auto; max-width: 420px; opacity: 1;"
+                  >
+                    {{ section.settings.subtitle }}
+                  </p>
                 {%- endif -%}
                 {%- if section.settings.button_label != blank -%}
                   <div class="hero__btn__wrap">
-                    <a class="hero__btn btn btn--white btn-sliding-hover" href="{{ button_url }}" data-aos="hero" data-aos-order="3">
+                    <a
+                      class="hero__btn btn btn--white btn-sliding-hover"
+                      href="{{ button_url }}"
+                      data-aos="hero"
+                      data-aos-order="3"
+                    >
                       <span class="btn__text-content">{{ section.settings.button_label }}</span>
                     </a>
                   </div>
@@ -440,22 +531,35 @@
 
           {%- assign overlay_val = section.settings.overlay_opacity | default: 0 -%}
           {%- if overlay_val > 0 -%}
-            <div class="image-overlay" style="--bg: #000000; opacity: {{ overlay_val | divided_by: 100.0 }}; z-index: 2;"></div>
+            <div
+              class="image-overlay"
+              style="--bg: #000000; opacity: {{ overlay_val | divided_by: 100.0 }}; z-index: 2;"
+            ></div>
           {%- endif -%}
           <div class="collection-split__media-wrapper">
             {%- if use_showcase -%}
               {%- assign show_caption = section.settings.showcase_show_caption -%}
               {%- assign slide_count = section.settings.showcase_products.size -%}
-              <div class="split-showcase"
+              <div
+                class="split-showcase"
                 data-split-showcase
                 data-effect="{{ section.settings.showcase_effect | default: 'fade_zoom' }}"
                 data-autoplay="{{ section.settings.showcase_autoplay | default: true }}"
-                data-speed="{{ section.settings.showcase_speed | default: 4500 }}">
+                data-speed="{{ section.settings.showcase_speed | default: 4500 }}"
+              >
                 {%- for product in section.settings.showcase_products -%}
                   <div class="split-showcase__slide{% if forloop.first %} is-active{% endif %}" data-showcase-slide>
-                    <a href="{{ product.url }}" class="split-showcase__link" aria-label="{{ product.title | escape }}"{% unless forloop.first %} tabindex="-1"{% endunless %}>
+                    <a
+                      href="{{ product.url }}"
+                      class="split-showcase__link"
+                      aria-label="{{ product.title | escape }}"
+                      {% unless forloop.first %}
+                        tabindex="-1"
+                      {% endunless %}
+                    >
                       {%- if product.featured_image != blank -%}
-                        <img src="{{ product.featured_image | image_url: width: 1200 }}"
+                        <img
+                          src="{{ product.featured_image | image_url: width: 1200 }}"
                           srcset="{{ product.featured_image | image_url: width: 600 }} 600w, {{ product.featured_image | image_url: width: 900 }} 900w, {{ product.featured_image | image_url: width: 1200 }} 1200w, {{ product.featured_image | image_url: width: 1600 }} 1600w, {{ product.featured_image | image_url: width: 2400 }} 2400w"
                           sizes="(min-width: 769px) 50vw, 100vw"
                           alt="{{ product.featured_image.alt | default: product.title | escape }}"
@@ -463,7 +567,8 @@
                           height="{{ product.featured_image.height }}"
                           loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
                           decoding="async"
-                          class="split-showcase__img">
+                          class="split-showcase__img"
+                        >
                       {%- else -%}
                         {{ 'product-1' | placeholder_svg_tag: 'split-showcase__img' }}
                       {%- endif -%}
@@ -480,7 +585,12 @@
                 {%- if slide_count > 1 and section.settings.showcase_show_dots -%}
                   <div class="split-showcase__dots" role="tablist">
                     {%- for product in section.settings.showcase_products -%}
-                      <button type="button" class="split-showcase__dot{% if forloop.first %} is-active{% endif %}" data-showcase-dot="{{ forloop.index0 }}" aria-label="Show {{ product.title | escape }}"></button>
+                      <button
+                        type="button"
+                        class="split-showcase__dot{% if forloop.first %} is-active{% endif %}"
+                        data-showcase-dot="{{ forloop.index0 }}"
+                        aria-label="Show {{ product.title | escape }}"
+                      ></button>
                     {%- endfor -%}
                   </div>
                 {%- endif -%}
@@ -543,19 +653,29 @@
           </div>
         </div>
       </div>
-      
+
       <div class="collection-split__products">
-        <div class="collection-split-products-grid lv-product-grid" style="{% render 'product-grid-vars', settings: section.settings, d_xl: 2, d_1024: 1, d_960: 1, d_768: 2, d_650: 1, d_mobile: 1 %}">
+        <div
+          class="collection-split-products-grid lv-product-grid"
+          style="{% render 'product-grid-vars', settings: section.settings, d_xl: 2, d_1024: 1, d_960: 1, d_768: 2, d_650: 1, d_mobile: 1 %}"
+        >
           {%- if target_collection.products.size > 0 -%}
             {%- for product in target_collection.products limit: section.settings.limit -%}
               <div class="collection-split__product" data-item>
-                {% render 'product-grid-item', product: product, fallback_index: forloop.index, card_border_radius: section.settings.card_border_radius %}
+                {% render 'product-grid-item',
+                  product: product,
+                  fallback_index: forloop.index,
+                  card_border_radius: section.settings.card_border_radius
+                %}
               </div>
             {%- endfor -%}
           {%- else -%}
             {%- for i in (1..section.settings.limit) -%}
               <div class="collection-split__product" data-item>
-                {% render 'product-grid-item', fallback_index: i, card_border_radius: section.settings.card_border_radius %}
+                {% render 'product-grid-item',
+                  fallback_index: i,
+                  card_border_radius: section.settings.card_border_radius
+                %}
               </div>
             {%- endfor -%}
           {%- endif -%}

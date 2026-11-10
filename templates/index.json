@@ -326,6 +326,28 @@
         "padding_bottom": 35
       }
     },
+    "parallax_showcase": {
+      "type": "parallax-showcase",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "eyebrow": "The Aurelle edit",
+        "heading": "Feel the",
+        "heading_accent": "shine",
+        "subheading": "Delicate chains, signet rings and engraved keepsakes, crafted in waterproof steel and 18k gold plating to move with you every day.",
+        "media_type": "image",
+        "button_label": "Shop the collection",
+        "collection": "",
+        "products_per_side": 4,
+        "shuffle_products": true,
+        "cards_devices": "desktop",
+        "auto_scroll": true,
+        "scroll_speed": 40,
+        "parallax_strength": 140,
+        "card_radius": 0,
+        "padding_top": 64,
+        "padding_bottom": 12
+      }
+    },
     "instagram_feed": {
       "type": "instagram-feed",
       "blocks": {
@@ -515,6 +537,7 @@
     "split_engravable",
     "section_richtext_PtYik4",
     "split_rings",
+    "parallax_showcase",
     "instagram_feed",
     "customer_feedback_qqhYpM",
     "trust_icons"

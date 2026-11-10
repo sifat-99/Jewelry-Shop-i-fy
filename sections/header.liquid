@@ -13,6 +13,13 @@
   assign logo_ratio = header_logo.aspect_ratio | default: 2.5
   assign mobile_logo_align = section.settings.mobile_logo_alignment | default: settings.mobile_logo_alignment | default: 'center'
   assign mobile_logo_w = settings.logo_width_mobile | default: 110
+  assign account_dashboard_url = '/pages/account'
+  if customer
+    assign header_account_link = account_dashboard_url
+  else
+    assign account_return_to = account_dashboard_url | url_encode
+    assign header_account_link = '/customer_authentication/login?return_to=' | append: account_return_to
+  endif
   assign sticky_mode = section.settings.sticky_header_type
   if sticky_mode == blank
     if section.settings.sticky_header == false or section.settings.sticky_header == 'none'
@@ -1011,7 +1018,7 @@ data-header-cart-full="false"
 </div>
               <div  data-takes-space class="header__desktop__bar__r">
 <div class="header__desktop__buttons header__desktop__buttons--icons" ><div class="header__desktop__button " >
-        <a href="{{ routes.account_url }}" class="navlink"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-user" viewBox="0 0 24 24"><path d="m1 22 3.3-4h15.4l3.3 4M17.996 8.242a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
+        <a href="{{ header_account_link }}" class="navlink"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-user" viewBox="0 0 24 24"><path d="m1 22 3.3-4h15.4l3.3 4M17.996 8.242a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
             <span class="visually-hidden">My Account</span></a>
       </div>
 
@@ -1065,7 +1072,7 @@ data-header-cart-full="false"
     <div class="drawer__content">
       <div class="drawer__top">
         <div class="drawer__top__left">
-          <a class="drawer__account" href="{{ routes.account_url }}">
+          <a class="drawer__account" href="{{ header_account_link }}">
             <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-user" viewBox="0 0 24 24"><path d="m1 22 3.3-4h15.4l3.3 4M17.996 8.242a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
             <span class="visually-hidden">My Account</span>
           </a>

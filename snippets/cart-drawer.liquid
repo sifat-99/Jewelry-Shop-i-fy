@@ -8,6 +8,91 @@
   data-section-type="cart-drawer"
 >
   <style>
+    :root {
+      --cart-checkout-btn-bg: {{ settings.cart_checkout_button_bg | default: '#1d1a17' }};
+      --cart-checkout-btn-text: {{ settings.cart_checkout_button_text | default: '#ffffff' }};
+      --cart-checkout-btn-border: {{ settings.cart_checkout_button_border | default: '#1d1a17' }};
+      --cart-checkout-btn-hover-bg: {{ settings.cart_checkout_button_hover_bg | default: '#42382d' }};
+      --cart-checkout-btn-hover-text: {{ settings.cart_checkout_button_hover_text | default: '#ffffff' }};
+      --cart-checkout-btn-hover-border: {{ settings.cart_checkout_button_hover_border | default: '#42382d' }};
+    }
+
+    #drawer-cart .checkout__button {
+      width: 100% !important;
+      min-height: {{ settings.cart_checkout_button_height | default: 60 }}px !important;
+      height: auto !important;
+      padding: 14px 20px !important;
+      font-size: {{ settings.cart_checkout_button_text_size | default: 14 }}px !important;
+      font-weight: 700 !important;
+      line-height: 1.3 !important;
+      letter-spacing: 0.1em !important;
+      text-align: center !important;
+      text-decoration: none !important;
+      color: var(--cart-checkout-btn-text) !important;
+      background-color: var(--cart-checkout-btn-bg) !important;
+      border-color: var(--cart-checkout-btn-border) !important;
+    }
+    #drawer-cart .checkout__button::before {
+      background-color: var(--cart-checkout-btn-hover-bg) !important;
+    }
+    #drawer-cart .checkout__button[data-button-style="outline"] {
+      background-color: #ffffff !important;
+      color: var(--cart-checkout-btn-border) !important;
+    }
+    #drawer-cart .checkout__button[data-button-style="champagne"] {
+      --cart-checkout-btn-bg: #c5a76a;
+      --cart-checkout-btn-text: #2f2518;
+      --cart-checkout-btn-border: #b6904f;
+      --cart-checkout-btn-hover-bg: #a98243;
+      --cart-checkout-btn-hover-text: #ffffff;
+      --cart-checkout-btn-hover-border: #a98243;
+    }
+    #drawer-cart .checkout__button:hover {
+      border-color: var(--cart-checkout-btn-hover-border) !important;
+    }
+    #drawer-cart .checkout__button:hover span {
+      color: var(--cart-checkout-btn-hover-text) !important;
+      text-decoration: none !important;
+    }
+    html #drawer-cart.cart__drawer .checkout__button:hover span {
+      color: var(--cart-checkout-btn-hover-text) !important;
+      text-decoration: none !important;
+    }
+
+    #drawer-cart .cart__items__grid[data-item] {
+      grid-template-columns: 90px minmax(0, 1fr) auto !important;
+      grid-template-areas: "image title title" "image price quantity" !important;
+      column-gap: 12px !important;
+      row-gap: 8px !important;
+      align-items: center !important;
+    }
+    #drawer-cart .cart__items__image {
+      grid-area: image !important;
+      width: 90px !important;
+      height: 90px !important;
+    }
+    #drawer-cart .cart__items__title {
+      grid-area: title !important;
+      min-width: 0 !important;
+      padding-right: 26px !important;
+      align-self: start !important;
+    }
+    #drawer-cart .cart__items__price {
+      grid-area: price !important;
+      min-width: 0 !important;
+      align-self: center !important;
+    }
+    #drawer-cart .cart__items__price .line__price { margin: 0 !important; line-height: 1.3 !important; }
+    #drawer-cart .cart__items__quantity {
+      grid-area: quantity !important;
+      display: flex !important;
+      min-width: 96px !important;
+      align-self: center !important;
+      justify-self: end !important;
+    }
+    #drawer-cart .cart__items__quantity .quantity__wrapper { margin: 0 !important; }
+    #drawer-cart .cart__items__savings { grid-column: 2 / -1 !important; }
+
     /* Free-shipping message stays visible (theme JS hides it with .cart--hidden when the cart is empty, which made it flash then vanish) */
     .drawer__body .cart__message[data-cart-message],
     .drawer__body .cart__message[data-cart-message].cart--hidden,
@@ -169,7 +254,7 @@
           </div>
 
           <form id="cart-form" action="{{ routes.cart_url }}" method="post" novalidate class="cart">
-            <button type="submit" name="checkout" class="btn btn--primary btn--large btn--full checkout__button">
+            <button type="submit" name="checkout" class="btn btn--primary btn--large btn--full checkout__button" data-button-style="{{ settings.cart_checkout_button_style | default: 'solid' | escape }}">
               <span>Proceed to Checkout •</span>
               <span data-cart-final style="margin-left: 4px;">
                 {{ cart.total_price | money }}

@@ -63,8 +63,8 @@
   #rf-{{ sid }} .rf__field > span em { font-style: normal; font-weight: 500; text-transform: none; letter-spacing: .02em; opacity: .6; }
   #rf-{{ sid }} .rf__stars { display: inline-flex; flex-direction: row-reverse; justify-content: flex-end; gap: 4px; }
   #rf-{{ sid }} .rf__stars input { position: absolute; opacity: 0; pointer-events: none; }
-  #rf-{{ sid }} .rf__stars label { font-size: 30px; line-height: 1; cursor: pointer; color: color-mix(in srgb, var(--text, #111) 22%, transparent); transition: color .2s ease, transform .2s ease; }
-  #rf-{{ sid }} .rf__stars label:hover, #rf-{{ sid }} .rf__stars label:hover ~ label, #rf-{{ sid }} .rf__stars input:checked ~ label { color: var(--lv-accent, #9b7c53); }
+  #rf-{{ sid }} .rf__stars label { font-size: 30px; line-height: 1; cursor: pointer; color: var(--lv-rating-star-empty, #ded8c8); text-shadow: 0 1px 1px var(--lv-rating-star-shadow, rgba(141, 104, 21, 0.22)); transition: color .2s ease, transform .2s ease, text-shadow .2s ease; }
+  #rf-{{ sid }} .rf__stars label:hover, #rf-{{ sid }} .rf__stars label:hover ~ label, #rf-{{ sid }} .rf__stars input:checked ~ label { color: var(--lv-rating-star-gold, #d4af37); text-shadow: 0 1px 1px var(--lv-rating-star-shadow, rgba(141, 104, 21, 0.22)); }
   #rf-{{ sid }} .rf__stars input:focus-visible + label { outline: 2px solid var(--text, #111); outline-offset: 2px; }
   #rf-{{ sid }} .rf__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   #rf-{{ sid }} .rf__field { display: flex; flex-direction: column; }

@@ -1,0 +1,17 @@
+{%- liquid
+  assign star_rating = rating | default: 0 | plus: 0 | round: 1
+  if star_rating > 5
+    assign star_rating = 5
+  elsif star_rating < 0
+    assign star_rating = 0
+  endif
+  assign star_label = 'Rated ' | append: star_rating | append: ' out of 5'
+-%}
+<span class="lv-rating-stars {{ class_name }}" role="img" aria-label="{{ star_label | escape }}">
+  {%- for star_index in (1..5) -%}
+    {%- assign star_fill = star_rating | minus: star_index | plus: 1 | times: 100 -%}
+    {%- if star_fill > 100 -%}{%- assign star_fill = 100 -%}{%- endif -%}
+    {%- if star_fill < 0 -%}{%- assign star_fill = 0 -%}{%- endif -%}
+    <span class="lv-rating-stars__star" style="--lv-star-fill: {{ star_fill }}%" aria-hidden="true">★</span>
+  {%- endfor -%}
+</span>

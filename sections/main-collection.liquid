@@ -2,6 +2,41 @@
 {%- liquid
   assign current_sort = collection.sort_by | default: collection.default_sort_by
   assign products_per_page = section.settings.products_per_page | default: 24
+  assign pp_options = section.settings.per_page_options | default: '12,24,48' | split: ','
+  assign pp_batch = 12
+  for o in pp_options
+    assign ov = o | strip | plus: 0
+    if ov > pp_batch and ov <= 50
+      assign pp_batch = ov
+    endif
+  endfor
+  assign pp_valid = ''
+  for o in pp_options
+    assign ov = o | strip | plus: 0
+    assign rest = pp_batch | modulo: ov
+    if ov >= 4 and rest == 0
+      assign pp_valid = pp_valid | append: ov | append: ','
+    endif
+  endfor
+  assign pp_valid = pp_valid | split: ','
+  assign pp_default = products_per_page | append: ''
+  unless pp_valid contains pp_default
+    assign pp_default = pp_valid.first
+  endunless
+  assign pp_enabled = section.settings.show_per_page
+  if pp_enabled == nil
+    assign pp_enabled = true
+  endif
+  assign pp_position = section.settings.per_page_position | default: 'top'
+  unless pp_enabled
+    assign pp_batch = products_per_page
+  endunless
+  assign list_cols = section.settings.list_columns | default: 2
+  assign list_img = section.settings.list_image_width | default: 240
+  assign list_desc = section.settings.list_show_description
+  if list_desc == nil
+    assign list_desc = true
+  endif
 
   assign total_active_filters = 0
   for filter in collection.filters
@@ -167,6 +202,51 @@
     html body .collection-sort-container { align-items: center !important; }
     html body .collection-sort-label { line-height: 1 !important; }
 
+    /* Per-page bar (bottom of the product area) */
+    .collection-perpage { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "pager" "info"; justify-items: center; align-items: center; gap: 12px; margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--hairline, rgba(0,0,0,.12)); font-family: 'Quicksand', -apple-system, sans-serif; }
+    .collection-perpage--with-select { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-areas: "info pager select"; justify-items: stretch; gap: 16px; }
+    .collection-perpage--with-select .collection-perpage__info { justify-self: start; }
+    .collection-toolbar__right > .collection-perpage__select { margin-right: 4px; }
+    .collection-perpage__pager { grid-area: pager; display: flex; justify-content: center; }
+    .collection-perpage__pager:empty { display: none; }
+    .collection-perpage__pager .lv-pagination-wrapper { margin: 0; gap: 0; }
+    .collection-perpage__row { display: contents; }
+    .collection-perpage__info { grid-area: info; margin: 0; }
+    .collection-perpage__select { grid-area: select; justify-self: end; display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #333; }
+    .collection-perpage__box { position: relative; display: inline-flex; align-items: center; }
+    .collection-perpage__box select {
+      -webkit-appearance: none; appearance: none; height: 40px; min-width: 76px; padding: 0 32px 0 14px; margin: 0;
+      background: #fff; color: #111; cursor: pointer;
+      border: var(--input-border-thickness, 1px) solid rgba(0,0,0,.16); border-radius: var(--input-radius, var(--btn-radius, 0px));
+      font: inherit; font-size: 12px; font-weight: 700; letter-spacing: .08em; transition: border-color .2s ease;
+    }
+    .collection-perpage__box select:hover, .collection-perpage__box select:focus { border-color: #000; outline: 0; }
+    .collection-perpage__box svg { position: absolute; right: 11px; width: 10px; height: 10px; pointer-events: none; color: #444; }
+    #CollectionResults .lv-product-grid > product-grid-item.is-pp-hidden { display: none !important; }
+    #CollectionResults [data-server-pager].is-hidden { display: none; }
+    button.lv-pagination__link, button.lv-pagination__arrow { font-family: inherit; cursor: pointer; }
+    @media (max-width: 700px) {
+      .collection-perpage--with-select { grid-template-columns: minmax(0, 1fr); grid-template-areas: "pager" "info" "select"; justify-items: center; text-align: center; gap: 14px; }
+      .collection-perpage--with-select .collection-perpage__info { justify-self: center; }
+      .collection-perpage__select { justify-self: center; }
+      .collection-toolbar__right > .collection-perpage__select { display: none; }
+    }
+
+    /* Grid / list view toggle */
+    .collection-view-toggle { display: inline-flex; align-items: center; flex-shrink: 0; }
+    .cvt__btn {
+      width: 40px; height: 40px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+      background: #fff; color: #111; cursor: pointer;
+      border: var(--input-border-thickness, 1px) solid rgba(0,0,0,.16);
+      transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+    }
+    .cvt__btn:first-child { border-radius: var(--input-radius, var(--btn-radius, 0px)) 0 0 var(--input-radius, var(--btn-radius, 0px)); }
+    .cvt__btn:last-child { margin-left: -1px; border-radius: 0 var(--input-radius, var(--btn-radius, 0px)) var(--input-radius, var(--btn-radius, 0px)) 0; }
+    .cvt__btn svg { width: 18px; height: 18px; }
+    .cvt__btn:hover { border-color: #000; position: relative; z-index: 1; }
+    .cvt__btn[aria-pressed="true"] { background: #111; color: #fff; border-color: #111; position: relative; z-index: 2; }
+    .cvt__btn:focus-visible { outline: 2px solid var(--lv-accent, #9b7c53); outline-offset: 2px; position: relative; z-index: 3; }
+
     /* Custom sort dropdown (built by JS from the native select; native select stays as fallback) */
     html body .collection-toolbar { position: relative; z-index: 40; }
     .csd { position: relative; display: inline-block; }
@@ -198,25 +278,52 @@
     }
     .csd__opt:hover, .csd__opt.is-active { background: rgba(0,0,0,.05); color: #000; }
     .csd__opt[aria-selected="true"]::after { content: ""; width: 5px; height: 9px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg) translateY(-2px); flex: none; }
-    /* Mobile toolbar: [Filters] ........ [Sort] on one row, item count underneath */
+    /* Per-page dropdown uses the same custom dropdown (.csd) as Sort by */
+    .csd.is-ready .collection-perpage__box { position: absolute; width: 0; height: 0; overflow: hidden; }
+    .csd--pp .csd__btn { min-width: 0; gap: 10px; }
+    .csd__lead { opacity: .6; margin-right: 6px; }
+    .csd--pp .csd__menu { right: auto; left: 0; min-width: 100%; }
+    .csd--up .csd__menu { top: auto; bottom: calc(100% + 6px); transform: translateY(4px); }
+    .csd--up.is-open .csd__menu { transform: none; }
+    .collection-toolbar__right > .csd--pp { margin-right: 4px; }
+    .cct__lead { display: inline; }
+
+    /* Mobile toolbar:  [Show 12 v]  [N items]  [grid|list]
+                        [   Filter   ] [   Sort by   ]      */
     @media (max-width: 640px) {
       html body .collection-toolbar {
         display: grid !important;
-        grid-template-columns: auto minmax(0, 1fr);
-        grid-template-areas: "f s" "c c";
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-areas: "p p c t" "f f s s";
         align-items: center;
-        gap: 10px 12px;
-        padding: 12px 0;
+        gap: 12px 10px;
+        padding: 14px 0;
         margin-bottom: 18px;
       }
-      html body .collection-toolbar__left { display: contents !important; }
-      html body .collection-filter-toggle-btn { grid-area: f; }
-      html body .collection-count-text { grid-area: c; font-size: 12px; }
-      html body .collection-toolbar__right { grid-area: s; justify-self: end; min-width: 0; }
+      html body .collection-toolbar:not(:has(.csd--pp)) { grid-template-areas: "c c c t" "f f s s"; }
+      html body .collection-toolbar__left,
+      html body .collection-toolbar__right { display: contents !important; }
+      html body .collection-count-text { grid-area: c; text-align: right; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #555; white-space: nowrap; }
+      html body .collection-count-text .cct__lead { display: none; }
+      html body .collection-view-toggle { grid-area: t; justify-self: end; }
+      .cvt__btn { width: 38px; height: 38px; }
+      html body .csd--pp { grid-area: p; justify-self: start; margin: 0; }
+      html body .csd--pp .csd__btn { height: 40px; min-width: 96px; }
+      html body .collection-filter-toggle-btn {
+        grid-area: f; width: 100%; justify-content: center; flex-direction: row-reverse; gap: 10px;
+        height: 44px !important; min-height: 44px !important;
+      }
+      html body .collection-sort-container { grid-area: s; width: 100%; gap: 0 !important; }
       html body .collection-sort-label { display: none !important; }
-      html body .collection-sort-container { gap: 0 !important; }
-      .csd__btn { min-width: 0; width: 100%; max-width: 100%; gap: 10px; }
+      html body .csd:not(.csd--pp) { display: block; width: 100%; }
+      html body .csd:not(.csd--pp) .csd__btn { width: 100%; max-width: 100%; min-width: 0; height: 44px; justify-content: center; gap: 10px; }
+      html body .csd:not(.csd--pp) .csd__btn svg { display: none; }
+      html body .csd:not(.csd--pp) .csd__btn::before {
+        content: ""; width: 14px; height: 14px; flex: none;
+        background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 4v16M3 8l4-4 4 4M17 20V4M13 16l4 4 4-4'/%3E%3C/svg%3E");
+      }
       .csd__menu { max-width: calc(100vw - 32px); }
+      html body .csd:not(.csd--pp) .csd__menu { right: 0; left: auto; }
       html body .collection-sort-select { min-width: 0 !important; }
     }
 
@@ -417,15 +524,35 @@
       color: #000000;
     }
     .filter-drawer__item input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      position: relative;
       width: 18px;
       height: 18px;
-      border: 1.5px solid rgba(0, 0, 0, 0.22);
-      border-radius: 2px;
-      accent-color: #000000;
+      border: var(--fd-bw, 1px) solid color-mix(in srgb, #000 38%, transparent);
+      border-radius: var(--input-radius, 0px);
+      background: #fff;
       cursor: pointer;
       margin: 0;
       flex-shrink: 0;
+      transition: background-color .18s ease, border-color .18s ease;
     }
+    .filter-drawer__item input[type="checkbox"]:hover { border-color: #000; }
+    .filter-drawer__item input[type="checkbox"]:checked {
+      background: var(--lv-accent, #9b7c53);
+      border-color: var(--lv-accent, #9b7c53);
+    }
+    .filter-drawer__item input[type="checkbox"]:checked::after {
+      content: "";
+      position: absolute;
+      left: 5px; top: 1px;
+      width: 5px; height: 10px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    .filter-drawer__item input[type="checkbox"]:focus-visible { outline: 2px solid var(--lv-accent, #9b7c53); outline-offset: 2px; }
+    .filter-drawer__item label:has(input:checked) { color: #000; font-weight: 700; }
     .filter-drawer__show-more-btn {
       background: none;
       border: none;
@@ -445,112 +572,121 @@
       opacity: 0.65;
     }
 
-    /* Dual-Range Price Slider (Image 1:1 match) */
-    .filter-price-slider-wrap {
-      padding: 6px 2px 8px 2px;
-    }
+    /* Dual-range price slider: thumbs are 18px, so the visual bar is inset 9px each side and the fill is computed on that inner width (thumb centre == value) */
+    .filter-price-slider-wrap { padding: 4px 0 6px; }
     .price-slider-track-container {
       position: relative;
       width: 100%;
-      height: 24px;
-      display: flex;
-      align-items: center;
+      height: 28px;
+      margin: 2px 0 4px;
     }
-    .price-slider-bar {
-      position: absolute;
-      width: 100%;
-      height: 3px;
-      background: #e2e2e2;
-      border-radius: 2px;
-    }
+    .price-slider-bar,
     .price-slider-fill {
       position: absolute;
-      height: 3px;
-      background: #000000;
+      top: 50%;
+      height: 2px;
+      transform: translateY(-50%);
       border-radius: 2px;
-      left: 0%;
-      right: 0%;
     }
+    .price-slider-bar { left: 9px; right: 9px; background: color-mix(in srgb, #000 16%, transparent); }
+    .price-slider-fill { left: 9px; right: 9px; background: var(--lv-accent, #9b7c53); }
     .price-slider-range {
       position: absolute;
+      left: 0; top: 0;
       width: 100%;
-      height: 24px;
-      background: none;
+      height: 28px;
+      margin: 0;
+      padding: 0;
+      background: transparent;
       pointer-events: none;
       -webkit-appearance: none;
       appearance: none;
-      margin: 0;
+      outline: none;
       z-index: 3;
     }
+    .price-slider-range::-webkit-slider-runnable-track { height: 28px; background: transparent; border: 0; }
+    .price-slider-range::-moz-range-track { height: 28px; background: transparent; border: 0; }
     .price-slider-range::-webkit-slider-thumb {
       pointer-events: auto;
       -webkit-appearance: none;
       appearance: none;
-      width: 18px;
-      height: 18px;
-      background: #000000;
-      border: 2px solid #000000;
+      width: 18px; height: 18px;
+      margin-top: 5px;
+      background: #fff;
+      border: 2px solid var(--lv-accent, #9b7c53);
       border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-      transition: transform 0.1s ease;
-    }
-    .price-slider-range::-webkit-slider-thumb:hover {
-      transform: scale(1.15);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
+      cursor: grab;
+      transition: transform .15s ease, box-shadow .15s ease;
     }
     .price-slider-range::-moz-range-thumb {
       pointer-events: auto;
-      width: 18px;
-      height: 18px;
-      background: #000000;
-      border: 2px solid #000000;
+      box-sizing: border-box;
+      width: 18px; height: 18px;
+      background: #fff;
+      border: 2px solid var(--lv-accent, #9b7c53);
       border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
+      cursor: grab;
     }
+    .price-slider-range:active::-webkit-slider-thumb { cursor: grabbing; transform: scale(1.12); }
+    .price-slider-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px color-mix(in srgb, var(--lv-accent, #9b7c53) 28%, transparent); }
+    .price-slider-range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px color-mix(in srgb, var(--lv-accent, #9b7c53) 28%, transparent); }
     .filter-price-inputs-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-top: 14px;
+      gap: 10px;
+      margin-top: 12px;
     }
     .price-input-box {
-      flex: 1;
       display: flex;
       align-items: center;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-      padding-bottom: 4px;
+      gap: 6px;
+      height: 40px;
+      padding: 0 12px;
+      box-sizing: border-box;
+      background: #fff;
+      border: var(--fd-bw, 1px) solid color-mix(in srgb, #000 30%, transparent);
+      border-radius: var(--input-radius, 0px);
+      transition: border-color .2s ease;
     }
+    .price-input-box:focus-within { border-color: #000; }
     .price-input-box .currency-symbol {
-      font-size: 14px;
-      font-weight: 500;
-      color: #111111;
-      margin-right: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #777;
+      line-height: 1;
     }
     .price-input-box input {
+      flex: 1 1 auto;
+      min-width: 0;
       width: 100%;
-      border: none !important;
+      height: auto !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
       outline: none !important;
       box-shadow: none !important;
       background: transparent !important;
       font-family: 'Quicksand', -apple-system, sans-serif;
       font-size: 14px;
-      font-weight: 500;
-      color: #555555;
-      text-align: right;
-      padding: 0;
+      font-weight: 600;
+      line-height: 1.2;
+      color: #111;
+      text-align: left;
       -moz-appearance: textfield;
+      appearance: textfield;
     }
     .price-input-box input::-webkit-outer-spin-button,
-    .price-input-box input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    .price-separator {
-      color: #777777;
-      font-size: 16px;
-    }
+    .price-input-box input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .price-separator { color: #999; font-size: 14px; }
+
+    /* Live (auto-apply) filtering state */
+    #CollectionResults { transition: opacity .2s ease; }
+    #CollectionResults.is-loading { opacity: .45; pointer-events: none; }
+    .filter-drawer__apply-btn[disabled] { opacity: .7; }
 
     .filter-drawer__footer {
       padding: 16px 24px;
@@ -774,29 +910,50 @@
 
       <!-- Responsive Toolbar -->
       <div class="collection-toolbar">
-        
+
         <!-- Left: Filters Trigger & Count -->
         <div class="collection-toolbar__left">
           {%- if section.settings.enable_filtering -%}
             <button type="button" class="collection-filter-toggle-btn" id="CollectionFiltersToggle" aria-haspopup="dialog" aria-expanded="false">
               <span>Filters</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M21 7H3M18 12H6M15 17H9"/></svg>
-              {%- if total_active_filters > 0 -%}
-                <span class="badge-count">{{ total_active_filters }}</span>
-              {%- endif -%}
+              <span class="badge-count"{% if total_active_filters == 0 %} style="display:none"{% endif %}>{{ total_active_filters }}</span>
             </button>
           {%- endif -%}
 
           {%- if section.settings.show_products_count -%}
             <div class="collection-count-text">
-              Showing <strong>{{ collection.products_count }}</strong> items
+              <strong>{{ collection.products_count }}</strong> items
             </div>
           {%- endif -%}
         </div>
 
+        {%- capture pp_select_html -%}
+          <label class="collection-perpage__select">
+            <span class="collection-perpage__box">
+              <select data-pp-select data-default="{{ pp_default }}" aria-label="Products per page">
+                {%- for ov in pp_valid -%}<option value="{{ ov }}"{% if ov == pp_default %} selected{% endif %}>{{ ov }}</option>{%- endfor -%}
+              </select>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+            {% comment %} <span class="collection-perpage__tail">per page</span> {% endcomment %}
+          </label>
+        {%- endcapture -%}
+
         <!-- Right: Sort By (Guaranteed Zero-Wrap) -->
-        {%- if section.settings.enable_sorting -%}
-          <div class="collection-toolbar__right">
+        <div class="collection-toolbar__right">
+          {%- if pp_enabled and pp_position == 'top' -%}{{ pp_select_html }}{%- endif -%}
+          {%- if section.settings.enable_view_toggle -%}
+            <div class="collection-view-toggle" role="group" aria-label="Product layout">
+              <button type="button" class="cvt__btn" data-view-btn="grid" aria-pressed="true" aria-label="Grid view" title="Grid view">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7"/><rect x="13.5" y="3.5" width="7" height="7"/><rect x="3.5" y="13.5" width="7" height="7"/><rect x="13.5" y="13.5" width="7" height="7"/></svg>
+              </button>
+              <button type="button" class="cvt__btn" data-view-btn="list" aria-pressed="false" aria-label="List view" title="List view">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="4.5" height="4.5"/><rect x="3.5" y="15.5" width="4.5" height="4.5"/><path d="M12 6.25h8.5M12 17.75h8.5M12 9.5h5M12 21h5" stroke-width="1.6"/></svg>
+              </button>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.enable_sorting -%}
             <div class="collection-sort-container">
               <label for="CollectionSortBy" class="collection-sort-label">Sort by:</label>
               <div class="collection-sort-select-wrapper">
@@ -812,11 +969,12 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
               </div>
             </div>
-          </div>
-        {%- endif -%}
+          {%- endif -%}
+        </div>
 
       </div>
 
+      <div id="CollectionResults" aria-live="polite" data-view="{{ section.settings.default_view | default: 'grid' }}" data-default-view="{{ section.settings.default_view | default: 'grid' }}" data-list-desc="{{ list_desc }}" style="--lv-list-cols: {{ list_cols }}; --lv-list-img: {{ list_img }}px;">
       <!-- Active Filters Badges Bar -->
       {%- if total_active_filters > 0 -%}
         <div class="active-filters-bar">
@@ -842,7 +1000,7 @@
       {%- endif -%}
 
       <!-- Products Grid -->
-      {%- paginate collection.products by products_per_page -%}
+      {%- paginate collection.products by pp_batch -%}
         {%- if collection.products.size > 0 -%}
           <div class="collection-products-grid lv-product-grid" style="{% render 'product-grid-vars', settings: section.settings %}">
             {%- for product in collection.products -%}
@@ -851,7 +1009,7 @@
           </div>
 
           {%- if paginate.pages > 1 -%}
-            {% render 'pagination', paginate: paginate %}
+            <div data-server-pager>{% render 'pagination', paginate: paginate %}</div>
           {%- endif -%}
         {%- elsif collection.all_products_count == 0 -%}
           {%- comment -%} Store has no products yet: show EUR demo pieces so the theme still looks complete {%- endcomment -%}
@@ -873,7 +1031,19 @@
             </a>
           </div>
         {%- endif -%}
+      {%- if pp_enabled and collection.products_count > 0 -%}
+        <div class="collection-perpage{% if pp_position == 'bottom' %} collection-perpage--with-select{% endif %}" data-perpage-bar data-batch="{{ pp_batch }}" data-total="{{ paginate.items }}" data-server-page="{{ paginate.current_page }}" data-server-pages="{{ paginate.pages }}">
+          {%- render 'pagination-css' -%}
+          <div class="collection-perpage__pager" data-pp-pager></div>
+          <div class="collection-perpage__row">
+            <p class="collection-perpage__info lv-pagination__summary" data-pp-info aria-live="polite"></p>
+            {%- if pp_position == 'bottom' -%}{{ pp_select_html }}{%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
       {%- endpaginate -%}
+
+      </div>
 
     </div>
   </div>
@@ -882,15 +1052,13 @@
   {%- if section.settings.enable_filtering -%}
     <div class="filter-drawer-underlay" id="CollectionFilterUnderlay" aria-hidden="true"></div>
 
-    <aside class="filter-drawer" id="CollectionFilterDrawer" role="dialog" aria-modal="true" aria-label="Filters">
-      
+    <aside class="filter-drawer" id="CollectionFilterDrawer" role="dialog" aria-modal="true" aria-label="Filters" style="--fd-bw: {{ settings.input_border_thickness | default: 1 }}px;">
+
       <!-- Drawer Header -->
       <div class="filter-drawer__header">
         <h2 class="filter-drawer__title">
           <span>Filters</span>
-          {%- if total_active_filters > 0 -%}
-            <span class="badge-count" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:#000; color:#fff; font-size:10px;">{{ total_active_filters }}</span>
-          {%- endif -%}
+          <span class="badge-count" style="display:{% if total_active_filters > 0 %}inline-flex{% else %}none{% endif %}; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; border-radius:var(--badge-radius, 9px); background:#000; color:#fff; font-size:10px;">{{ total_active_filters }}</span>
         </h2>
         <button type="button" class="filter-drawer__close" id="CollectionFilterClose" aria-label="Close filters">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -1119,8 +1287,8 @@
 
       <!-- Drawer Footer Action Buttons -->
       <div class="filter-drawer__footer">
-        <button type="submit" form="CollectionFilterForm" class="filter-drawer__apply-btn btn btn--primary">
-          <span>Apply Filters</span>
+        <button type="button" class="filter-drawer__apply-btn btn btn--primary" id="FilterViewResults">
+          <span>View <span id="FilterResultCount">{{ collection.products_count }}</span> results</span>
         </button>
         <a href="{{ collection.url }}?sort_by={{ current_sort }}" class="filter-drawer__clear-btn btn--soft" id="FilterResetBtn">
           <span>Clear</span>
@@ -1242,8 +1410,9 @@
           var leftPercent = ((minVal - sliderMin) / sliderSpan) * 100;
           var rightPercent = 100 - ((maxVal - sliderMin) / sliderSpan) * 100;
 
-          trackFill.style.left = leftPercent + '%';
-          trackFill.style.right = rightPercent + '%';
+          trackFill.style.left = 'calc(9px + (100% - 18px) * ' + (leftPercent / 100) + ')';
+          trackFill.style.right = 'calc(9px + (100% - 18px) * ' + (rightPercent / 100) + ')';
+          rangeMin.style.zIndex = (minVal > sliderMin + sliderSpan * 0.5) ? '4' : '3';
 
           if (inputMin) inputMin.value = Math.round(minVal);
           if (inputMax) inputMax.value = Math.round(maxVal);
@@ -1251,12 +1420,15 @@
 
         rangeMin.addEventListener('input', updatePriceSlider);
         rangeMax.addEventListener('input', updatePriceSlider);
+        rangeMin.addEventListener('change', function () { scheduleApply(120); });
+        rangeMax.addEventListener('change', function () { scheduleApply(120); });
 
         if (inputMin) {
           inputMin.addEventListener('change', function() {
             var val = Math.min(Math.max(parseFloat(this.value) || sliderMin, sliderMin), sliderMax);
             rangeMin.value = val;
             updatePriceSlider();
+            scheduleApply(300);
           });
         }
 
@@ -1265,20 +1437,12 @@
             var val = Math.min(Math.max(parseFloat(this.value) || sliderMax, sliderMin), sliderMax);
             rangeMax.value = val;
             updatePriceSlider();
+            scheduleApply(300);
           });
         }
 
         updatePriceSlider();
 
-        // Untouched price range = no price filter: keep the URL clean
-        if (filterForm) {
-          filterForm.addEventListener('submit', function () {
-            if (inputMin && inputMax && parseFloat(inputMin.value) <= sliderMin && parseFloat(inputMax.value) >= sliderMax) {
-              inputMin.disabled = true;
-              inputMax.disabled = true;
-            }
-          });
-        }
       }
 
       // 4. URL State Synchronization & Active Badges
@@ -1420,13 +1584,93 @@
 
       applyClientSideFiltering();
 
-      // Clear button: reset the filter form only (no page reload)
+      // ---- Live filtering: any change updates the products behind the open drawer (no Apply click) ----
+      var resultsEl = document.getElementById('CollectionResults');
+      var viewBtn = document.getElementById('FilterViewResults');
+      var applyTimer = null;
+      var applyCtrl = null;
+
+      function priceUntouched() {
+        if (!rangeMin || !inputMin || !inputMax) return true;
+        return parseFloat(inputMin.value) <= parseFloat(rangeMin.getAttribute('min')) && parseFloat(inputMax.value) >= parseFloat(rangeMax.getAttribute('max'));
+      }
+
+      function buildFilterUrl() {
+        var params = new URLSearchParams();
+        new FormData(filterForm).forEach(function (v, k) { if (v !== '') params.append(k, v); });
+        if (priceUntouched() && inputMin && inputMax) { params.delete(inputMin.name); params.delete(inputMax.name); }
+        var q = params.toString();
+        return (filterForm.getAttribute('action') || window.location.pathname) + (q ? '?' + q : '');
+      }
+
+      function activeCount() {
+        var n = filterForm.querySelectorAll('input[type="checkbox"]:checked').length;
+        if (!priceUntouched()) n += 1;
+        return n;
+      }
+
+      function updateBadges() {
+        var n = activeCount();
+        var toggleBadge = document.querySelector('.collection-filter-toggle-btn .badge-count');
+        var drawerBadge = document.querySelector('.filter-drawer__title .badge-count');
+        [toggleBadge, drawerBadge].forEach(function (b) {
+          if (!b) return;
+          b.textContent = n;
+          b.style.display = n > 0 ? 'inline-flex' : 'none';
+        });
+      }
+
+      function applyFilters() {
+        if (!filterForm || !resultsEl || !window.fetch) { if (filterForm) filterForm.submit(); return; }
+        var url = buildFilterUrl();
+        if (applyCtrl) applyCtrl.abort();
+        applyCtrl = window.AbortController ? new AbortController() : null;
+        resultsEl.classList.add('is-loading');
+        fetch(url, { credentials: 'same-origin', signal: applyCtrl ? applyCtrl.signal : undefined })
+          .then(function (r) { if (!r.ok) throw new Error('bad'); return r.text(); })
+          .then(function (html) {
+            var doc = new DOMParser().parseFromString(html, 'text/html');
+            var fresh = doc.getElementById('CollectionResults');
+            if (!fresh) throw new Error('no results');
+            resultsEl.innerHTML = fresh.innerHTML;
+            var oldCount = document.querySelector('.collection-count-text');
+            var newCount = doc.querySelector('.collection-count-text');
+            if (oldCount && newCount) oldCount.innerHTML = newCount.innerHTML;
+            var strong = newCount && newCount.querySelector('strong');
+            var total = strong ? strong.textContent.trim() : null;
+            var rc = document.getElementById('FilterResultCount');
+            if (rc && total !== null) rc.textContent = total;
+            history.replaceState(null, '', url);
+            updateBadges();
+            if (window.lvInitPerPage) window.lvInitPerPage();
+          })
+          .catch(function (err) {
+            if (err && err.name === 'AbortError') return;
+            window.location.href = url;
+          })
+          .then(function () { resultsEl.classList.remove('is-loading'); });
+      }
+
+      function scheduleApply(delay) {
+        clearTimeout(applyTimer);
+        applyTimer = setTimeout(applyFilters, delay == null ? 150 : delay);
+      }
+
+      if (filterForm) {
+        filterForm.addEventListener('change', function (e) {
+          if (e.target && e.target.type === 'checkbox') { updateBadges(); scheduleApply(150); }
+        });
+        filterForm.addEventListener('submit', function (e) { e.preventDefault(); scheduleApply(0); });
+      }
+      if (viewBtn) viewBtn.addEventListener('click', function () { clearTimeout(applyTimer); closeDrawer(); });
+
+      // Clear: reset every control, then refresh the products
       var clearBtn = document.getElementById('FilterResetBtn');
       if (clearBtn) {
-        clearBtn.addEventListener('click', function(e) {
+        clearBtn.addEventListener('click', function (e) {
           e.preventDefault();
           if (filterForm) {
-            filterForm.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(function(i) { i.checked = false; });
+            filterForm.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(function (i) { i.checked = false; });
           }
           if (rangeMin && rangeMax) {
             rangeMin.value = rangeMin.getAttribute('min') || 0;
@@ -1434,6 +1678,8 @@
             rangeMin.dispatchEvent(new Event('input', { bubbles: true }));
             rangeMax.dispatchEvent(new Event('input', { bubbles: true }));
           }
+          updateBadges();
+          scheduleApply(0);
         });
       }
 
@@ -1527,6 +1773,214 @@
       initFiltersAndSort();
     }
   })();
+
+  /* Grid / list view switch (state lives on #CollectionResults, so it survives live filtering) */
+  (function () {
+    var KEY = 'lv-collection-view';
+    var box = document.getElementById('CollectionResults');
+    var btns = document.querySelectorAll('[data-view-btn]');
+    if (!box) return;
+    function set(view, save) {
+      box.setAttribute('data-view', view);
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-view-btn') === view ? 'true' : 'false'); });
+      if (save) { try { localStorage.setItem(KEY, view); } catch (e) {} }
+    }
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    set(btns.length && (saved === 'grid' || saved === 'list') ? saved : (box.getAttribute('data-default-view') || 'grid'), false);
+    btns.forEach(function (b) { b.addEventListener('click', function () { set(b.getAttribute('data-view-btn'), true); }); });
+  })();
+
+  /* "Products per page": ONE pager in the theme's original style; slices the loaded batch, navigates to the next batch when needed */
+  (function () {
+    var KEY = 'lv-collection-perpage';
+    var ARROW_L = '<svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>';
+    var ARROW_R = '<svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>';
+
+    /* Same custom dropdown as "Sort by" (classes .csd*), built from the native select (which stays as the fallback) */
+    function buildDropdown(sel) {
+      if (sel.__csdSync) { sel.__csdSync(); return; }
+      var label = sel.closest('label');
+      var boxEl = sel.closest('.collection-perpage__box');
+      if (!label || !boxEl) return;
+      var inBar = !!sel.closest('[data-perpage-bar]');
+      var wrap = document.createElement('div');
+      wrap.className = 'csd csd--pp' + (inBar ? ' csd--up' : '');
+      label.parentNode.insertBefore(wrap, label);
+      wrap.appendChild(boxEl);
+      label.parentNode.removeChild(label);
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'csd__btn';
+      btn.setAttribute('aria-haspopup', 'listbox');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.innerHTML = '<span><span class="csd__lead">Show</span><span data-csd-val></span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+      var menu = document.createElement('ul');
+      menu.className = 'csd__menu';
+      menu.setAttribute('role', 'listbox');
+      var opts = [];
+      Array.prototype.forEach.call(sel.options, function (o) {
+        var li = document.createElement('li');
+        li.className = 'csd__opt';
+        li.setAttribute('role', 'option');
+        li.setAttribute('data-value', o.value);
+        li.textContent = o.value;
+        menu.appendChild(li);
+        opts.push(li);
+      });
+      wrap.appendChild(btn);
+      wrap.appendChild(menu);
+      sel.setAttribute('tabindex', '-1');
+      sel.setAttribute('aria-hidden', 'true');
+      wrap.classList.add('is-ready');
+
+      function sync() {
+        btn.querySelector('[data-csd-val]').textContent = sel.value;
+        opts.forEach(function (li) { li.setAttribute('aria-selected', li.getAttribute('data-value') === sel.value ? 'true' : 'false'); });
+      }
+      function setOpen(open) {
+        wrap.classList.toggle('is-open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      btn.addEventListener('click', function (e) { e.stopPropagation(); setOpen(!wrap.classList.contains('is-open')); });
+      menu.addEventListener('click', function (e) {
+        var li = e.target.closest('.csd__opt');
+        if (!li) return;
+        setOpen(false);
+        if (li.getAttribute('data-value') !== sel.value) {
+          sel.value = li.getAttribute('data-value');
+          sync();
+          if (typeof sel.onchange === 'function') sel.onchange();
+        }
+      });
+      document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) setOpen(false); });
+      wrap.addEventListener('keydown', function (e) { if (e.key === 'Escape') { setOpen(false); btn.focus(); } });
+      sel.__csdSync = sync;
+      sync();
+    }
+
+    function init() {
+      var bar = document.querySelector('[data-perpage-bar]');
+      var grid = document.querySelector('#CollectionResults .collection-products-grid');
+      if (!bar || !grid) return;
+      var sel = document.querySelector('[data-pp-select]');
+      if (!sel) return;
+      var info = bar.querySelector('[data-pp-info]');
+      var pagerBox = bar.querySelector('[data-pp-pager]');
+      var serverPager = document.querySelector('#CollectionResults [data-server-pager]');
+      var B = parseInt(bar.getAttribute('data-batch'), 10) || 24;
+      var total = parseInt(bar.getAttribute('data-total'), 10) || 0;
+      var serverPage = parseInt(bar.getAttribute('data-server-page'), 10) || 1;
+      var cards = Array.prototype.filter.call(grid.children, function (c) { return c.tagName === 'PRODUCT-GRID-ITEM'; });
+      if (serverPager) serverPager.classList.add('is-hidden');
+
+      var allowed = Array.prototype.map.call(sel.options, function (o) { return o.value; });
+      var saved = null;
+      try { saved = localStorage.getItem(KEY); } catch (e) {}
+      var n = parseInt(allowed.indexOf(saved) > -1 ? saved : sel.getAttribute('data-default'), 10) || parseInt(allowed[0], 10) || 12;
+      sel.value = String(n);
+      buildDropdown(sel);
+
+      var firstOfBatch = Math.floor(((serverPage - 1) * B) / n) + 1;
+      var perBatch = Math.max(1, Math.round(B / n));
+      var v = firstOfBatch;
+      var want = parseInt(new URLSearchParams(window.location.search).get('pg'), 10);
+      if (want && want >= firstOfBatch && want < firstOfBatch + perBatch) v = want;
+
+      function pages() { return Math.max(1, Math.ceil(total / n)); }
+
+      function go(target) {
+        var s = Math.ceil((target * n) / B);
+        if (s === serverPage) { v = target; render(true); return; }
+        var u = new URL(window.location.href);
+        u.searchParams.set('page', s);
+        u.searchParams.set('pg', target);
+        window.location.href = u.toString();
+      }
+
+      function pageBtn(label, target, cls, aria, disabled) {
+        var li = document.createElement('li');
+        li.className = 'lv-pagination__item';
+        var el;
+        if (disabled) {
+          el = document.createElement('span');
+          el.setAttribute('aria-disabled', 'true');
+        } else {
+          el = document.createElement('button');
+          el.type = 'button';
+          el.addEventListener('click', function () { go(target); });
+        }
+        el.className = cls + (disabled ? ' is-disabled' : '');
+        if (aria) el.setAttribute('aria-label', aria);
+        el.innerHTML = label;
+        li.appendChild(el);
+        return li;
+      }
+
+      function buildPager() {
+        pagerBox.innerHTML = '';
+        var last = pages();
+        if (last <= 1) return;
+        var nav = document.createElement('nav');
+        nav.className = 'lv-pagination-wrapper';
+        nav.setAttribute('aria-label', 'Pagination');
+        var ul = document.createElement('ul');
+        ul.className = 'lv-pagination';
+        ul.setAttribute('role', 'list');
+        ul.appendChild(pageBtn(ARROW_L + '<span class="lv-pagination__arrow-text">Prev</span>', v - 1, 'lv-pagination__arrow lv-pagination__prev', 'Previous page', v === 1));
+        var list = [];
+        for (var i = 1; i <= last; i++) { if (i === 1 || i === last || Math.abs(i - v) <= 1) list.push(i); }
+        var prev = 0;
+        list.forEach(function (i) {
+          if (prev && i - prev > 1) {
+            var gap = document.createElement('li');
+            gap.className = 'lv-pagination__item';
+            gap.innerHTML = '<span class="lv-pagination__ellipsis" aria-hidden="true">&hellip;</span>';
+            ul.appendChild(gap);
+          }
+          if (i === v) {
+            var cur = document.createElement('li');
+            cur.className = 'lv-pagination__item';
+            cur.innerHTML = '<span class="lv-pagination__current" aria-current="page">' + i + '</span>';
+            ul.appendChild(cur);
+          } else {
+            ul.appendChild(pageBtn(String(i), i, 'lv-pagination__link', 'Page ' + i, false));
+          }
+          prev = i;
+        });
+        ul.appendChild(pageBtn('<span class="lv-pagination__arrow-text">Next</span>' + ARROW_R, v + 1, 'lv-pagination__arrow lv-pagination__next', 'Next page', v === last));
+        nav.appendChild(ul);
+        pagerBox.appendChild(nav);
+      }
+
+      function render(scroll) {
+        var offset = (v - 1) * n - (serverPage - 1) * B;
+        cards.forEach(function (c, idx) { c.classList.toggle('is-pp-hidden', idx < offset || idx >= offset + n); });
+        info.textContent = total ? ('Page ' + v + ' of ' + pages() + ' (' + total + ' total)') : '';
+        buildPager();
+        try {
+          var u = new URL(window.location.href);
+          u.searchParams.set('pg', v);
+          history.replaceState(null, '', u.toString());
+        } catch (e) {}
+        if (scroll) {
+          var top = grid.getBoundingClientRect().top + window.pageYOffset - 140;
+          window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        }
+      }
+
+      sel.onchange = function () {
+        n = parseInt(sel.value, 10) || n;
+        try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+        v = Math.floor(((serverPage - 1) * B) / n) + 1;
+        render(false);
+      };
+      render(false);
+    }
+    window.lvInitPerPage = init;
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  })();
 </script>
 
 {% schema %}
@@ -1606,6 +2060,23 @@
     },
     {
       "type": "checkbox",
+      "id": "enable_view_toggle",
+      "label": "Show grid / list view switch",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "default_view",
+      "label": "Default product view",
+      "info": "Visitors can switch; their choice is remembered.",
+      "options": [
+        { "value": "grid", "label": "Grid" },
+        { "value": "list", "label": "List" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "checkbox",
       "id": "show_products_count",
       "label": "Show products count",
       "default": true
@@ -1628,8 +2099,62 @@
       "min": 12,
       "max": 48,
       "step": 4,
-      "label": "Products per page",
-      "default": 24
+      "label": "Default products per page",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "show_per_page",
+      "label": "Show \"products per page\" dropdown",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "per_page_position",
+      "label": "Per-page dropdown position",
+      "info": "Top = next to Sort by (hidden on phones). Bottom = beside the pagination.",
+      "options": [
+        { "value": "top", "label": "Top (next to Sort by)" },
+        { "value": "bottom", "label": "Bottom (beside pagination)" }
+      ],
+      "default": "top"
+    },
+    {
+      "type": "text",
+      "id": "per_page_options",
+      "label": "Per-page choices",
+      "info": "Comma separated, up to 50. Every value must divide the largest one (e.g. 12,24,48 or 10,20,40). Others are ignored.",
+      "default": "12,24,48,72,100"
+    },
+    {
+      "type": "header",
+      "content": "List view"
+    },
+    {
+      "type": "select",
+      "id": "list_columns",
+      "label": "List view columns (desktop)",
+      "options": [
+        { "value": "1", "label": "1 column" },
+        { "value": "2", "label": "2 columns" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "range",
+      "id": "list_image_width",
+      "min": 120,
+      "max": 320,
+      "step": 10,
+      "unit": "px",
+      "label": "List image width",
+      "default": 220
+    },
+    {
+      "type": "checkbox",
+      "id": "list_show_description",
+      "label": "Show description in list view",
+      "default": true
     },
     {
       "type": "header",

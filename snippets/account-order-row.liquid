@@ -1,0 +1,21 @@
+{%- comment -%} One order row for the account dashboard. Expects: order {%- endcomment -%}
+<div class="ad-order">
+  <div class="ad-order__id">
+    <a href="{{ order.customer_url }}" class="ad-order__num">{{ order.name }}</a>
+    <p class="ad-order__date">{{ order.created_at | date: '%B %d, %Y' }}</p>
+    <div class="ad-order__thumbs">
+      {%- for item in order.line_items limit: 4 -%}
+        {%- if item.image -%}<img src="{{ item.image | image_url: width: 120 }}" alt="{{ item.title | escape }}" title="{{ item.title | escape }}" class="ad-order__thumb" width="52" height="52" loading="lazy">{%- endif -%}
+      {%- endfor -%}
+      {%- if order.line_items.size > 4 -%}<span class="ad-order__more">+{{ order.line_items.size | minus: 4 }} more</span>{%- endif -%}
+    </div>
+  </div>
+  <div class="ad-order__status">
+    <span class="ad-pill ad-pill--{{ order.financial_status }}">{{ order.financial_status_label }}</span>
+    <span class="ad-pill ad-pill--{{ order.fulfillment_status }}">{{ order.fulfillment_status_label }}</span>
+  </div>
+  <div class="ad-order__buy">
+    <span class="ad-order__total">{{ order.total_price | money_with_currency }}</span>
+    <a href="{{ order.customer_url }}" class="btn btn-sliding-hover ad-btn ad-btn--sm">View order</a>
+  </div>
+</div>

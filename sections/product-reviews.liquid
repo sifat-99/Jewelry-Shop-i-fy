@@ -20,7 +20,7 @@
       {%- if cnt > 0 -%}
         <div class="pr__sum">
           <p class="pr__avg">{{ avg }}</p>
-          <span class="lv-stars pr__sumstars" style="--r: {{ avg }}" aria-hidden="true">★★★★★</span>
+          {%- render 'rating-stars', rating: avg, class_name: 'lv-stars pr__sumstars' -%}
           <p class="pr__count">Based on {{ cnt }} {% if cnt == 1 %}review{% else %}reviews{% endif %}</p>
         </div>
         <div class="pr__bars">
@@ -28,7 +28,7 @@
             {%- assign star = 5 | minus: i -%}
             {%- assign idx = i | plus: 2 -%}
             {%- assign n = st[idx] | plus: 0 -%}
-            <div class="pr__bar"><span>{{ star }} ★</span><div class="pr__track"><i style="width: {{ n | times: 100.0 | divided_by: cnt }}%"></i></div><span>{{ n }}</span></div>
+            <div class="pr__bar"><span>{{ star }} <span class="pr__bar__star" aria-hidden="true">★</span></span><div class="pr__track"><i style="width: {{ n | times: 100.0 | divided_by: cnt }}%"></i></div><span>{{ n }}</span></div>
           {%- endfor -%}
         </div>
       {%- else -%}
@@ -78,7 +78,8 @@
   #product-reviews .pr__item[hidden] { display: none; }
   #product-reviews .pr__more { text-align: center; margin-top: 28px; }
   #product-reviews .cf-card { display: flex; flex-direction: column; gap: 12px; width: 100%; box-sizing: border-box; padding: 24px 22px 20px; background: color-mix(in srgb, var(--text, #111) 3%, var(--bg, #fff)); border: 1px solid var(--cf-line); border-radius: var(--card-radius, 0); }
-  #product-reviews .cf-stars { display: inline-block; font-size: 17px; letter-spacing: 2px; line-height: 1; color: transparent; background: linear-gradient(90deg, var(--cf-accent) calc(var(--r, 5) / 5 * 100%), color-mix(in srgb, var(--text, #111) 18%, transparent) 0); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  #product-reviews .cf-stars { font-size: 20px; }
+  #product-reviews .pr__bar__star { color: var(--lv-rating-star-gold, #d4af37); }
   #product-reviews .cf-card__title { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; line-height: 1.4; }
   #product-reviews .cf-card__text { margin: 0; font-size: 14.5px; line-height: 1.75; flex: 1 1 auto; }
   #product-reviews .cf-card__by { display: flex; align-items: center; gap: 12px; margin-top: 6px; padding-top: 16px; border-top: 1px solid var(--cf-line); }

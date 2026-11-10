@@ -43,7 +43,12 @@
         {%- if section.settings.heading != blank -%}<h2 class="cf__title kicker-flourished">{{ section.settings.heading | escape }}</h2>{%- endif -%}
         {%- if section.settings.subheading != blank -%}<p class="cf__sub">{{ section.settings.subheading | escape }}</p>{%- endif -%}
         {%- if section.settings.show_summary and cnt > 0 -%}
-          <p class="cf__summary"><span class="cf-stars" style="--r: {{ avg }}" aria-hidden="true">★★★★★</span> <strong>{{ avg }}</strong> / 5 &middot; {{ cnt }} {% if cnt == 1 %}review{% else %}reviews{% endif %}</p>
+          <p class="cf__summary">
+            {%- render 'rating-stars', rating: avg, class_name: 'cf-stars' -%}
+            <span class="cf__summary-score"><strong>{{ avg }}</strong><span>/ 5</span></span>
+            <span class="cf__summary-divider" aria-hidden="true"></span>
+            <span class="cf__summary-count">{{ cnt }} {% if cnt == 1 %}review{% else %}reviews{% endif %}</span>
+          </p>
         {%- endif -%}
       </div>
     {%- endif -%}
@@ -60,14 +65,14 @@
             {%- for entry in entries limit: limit -%}
               {%- unless entry.approved == false -%}
                 <div class="cf__item">
-                  {%- render 'feedback-card', name: entry.name, rating: entry.rating.value, title: entry.title, body: entry.body, photo: entry.photo.value, product_title: entry.product.value.title, verified: entry.verified.value, date: entry.date.value -%}
+                  {%- render 'feedback-card', name: entry.name, rating: entry.rating.value, title: entry.title, body: entry.body, photo: entry.photo.value, reviewed_product: entry.product.value, product_title: entry.product.value.title, verified: entry.verified.value, date: entry.date.value -%}
                 </div>
               {%- endunless -%}
             {%- endfor -%}
           {%- else -%}
             {%- for block in section.blocks -%}
               <div class="cf__item" {{ block.shopify_attributes }}>
-                {%- render 'feedback-card', name: block.settings.name, rating: block.settings.rating, title: block.settings.title, body: block.settings.text, photo: block.settings.photo, product_title: block.settings.product, verified: block.settings.verified, date: block.settings.date -%}
+                {%- render 'feedback-card', name: block.settings.name, rating: block.settings.rating, title: block.settings.title, body: block.settings.text, photo: block.settings.photo, reviewed_product: block.settings.product_link, product_title: block.settings.product, verified: block.settings.verified, date: block.settings.date -%}
               </div>
             {%- endfor -%}
           {%- endif -%}
@@ -94,10 +99,14 @@
   #cf-{{ section.id }} .cf__head { text-align: center; max-width: 680px; margin: 0 auto clamp(26px, 4vw, 44px); }
   #cf-{{ section.id }} .cf__title { margin: 0 0 10px; font-size: clamp(22px, 3vw, 32px); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; line-height: 1.2; }
   #cf-{{ section.id }} .cf__sub { margin: 0 0 14px; font-size: 14.5px; line-height: 1.7; opacity: .75; }
-  #cf-{{ section.id }} .cf__summary { margin: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
-  #cf-{{ section.id }} .cf__summary .cf-stars { font-size: 18px; }
+  #cf-{{ section.id }} .cf__summary { margin: 0; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; white-space: nowrap; }
+  #cf-{{ section.id }} .cf__summary-score { display: inline-flex; align-items: baseline; gap: 4px; }
+  #cf-{{ section.id }} .cf__summary-score strong { font-weight: 700; }
+  #cf-{{ section.id }} .cf__summary-divider { width: 1px; height: 14px; flex: none; background: var(--cf-line); }
+  #cf-{{ section.id }} .cf__summary-count { opacity: .8; }
+  #cf-{{ section.id }} .cf__summary .cf-stars { font-size: 21px; }
   #cf-{{ section.id }} .cf__empty { text-align: center; opacity: .6; font-size: 14px; margin: 0; }
-  #cf-{{ section.id }} .cf-stars { display: inline-block; font-size: 17px; letter-spacing: 2px; line-height: 1; color: transparent; background: linear-gradient(90deg, var(--cf-accent) calc(var(--r, 5) / 5 * 100%), color-mix(in srgb, var(--text, #111) 18%, transparent) 0); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  #cf-{{ section.id }} .cf-stars { font-size: 20px; }
 
   #cf-{{ section.id }} .cf__wrap { position: relative; }
   #cf-{{ section.id }} .cf__track { display: flex; gap: var(--cf-gap); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; padding: 2px 0; justify-content: safe center; }
@@ -109,6 +118,8 @@
   @media (max-width: 650px) { #cf-{{ section.id }} { --cf-cols: 1; } }
 
   #cf-{{ section.id }} .cf-card { display: flex; flex-direction: column; gap: 12px; width: 100%; box-sizing: border-box; padding: 26px 24px 22px; background: color-mix(in srgb, var(--text, #111) 3%, var(--bg, #fff)); border: 1px solid var(--cf-line); border-radius: var(--card-radius, 0); }
+  #cf-{{ section.id }} .cf-card__rating { display: inline-flex; align-items: center; gap: 8px; }
+  #cf-{{ section.id }} .cf-card__rating-value { font-size: 12.5px; font-weight: 600; }
   #cf-{{ section.id }} .cf-card__title { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; line-height: 1.4; }
   #cf-{{ section.id }} .cf-card__text { margin: 0; font-size: 14.5px; line-height: 1.75; flex: 1 1 auto; display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
   #cf-{{ section.id }} .cf-card__by { display: flex; align-items: center; gap: 12px; margin-top: 6px; padding-top: 16px; border-top: 1px solid var(--cf-line); }
@@ -118,7 +129,9 @@
   #cf-{{ section.id }} .cf-card__name { margin: 0; font-size: 13.5px; font-weight: 700; letter-spacing: .04em; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
   #cf-{{ section.id }} .cf-card__verified { display: inline-flex; align-items: center; color: var(--cf-accent); cursor: help; }
   #cf-{{ section.id }} .cf-card__verified svg { width: 20px; height: 20px; }
-  #cf-{{ section.id }} .cf-card__meta { margin: 2px 0 0; font-size: 12px; opacity: .65; }
+  #cf-{{ section.id }} .cf-card__meta { margin: 2px 0 0; font-size: 12px; opacity: .78; }
+  #cf-{{ section.id }} .cf-card__product { color: inherit; text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 2px; }
+  #cf-{{ section.id }} .cf-card__product:hover, #cf-{{ section.id }} .cf-card__product:focus-visible { text-decoration-color: currentColor; }
 
   #cf-{{ section.id }} .cf__arrow { position: absolute; top: 50%; z-index: 3; width: 42px; height: 42px; transform: translateY(-50%); display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--cf-line); background: var(--bg, #fff); color: var(--text, #111); cursor: pointer; padding: 0; transition: background-color .3s ease, color .3s ease, opacity .3s ease; }
   #cf-{{ section.id }} .cf__arrow:hover { background: var(--text, #111); color: var(--bg, #fff); }
@@ -228,11 +241,12 @@
       "name": "Review",
       "settings": [
         { "type": "text", "id": "name", "label": "Customer name", "default": "Sarah M." },
-        { "type": "range", "id": "rating", "min": 1, "max": 5, "step": 1, "label": "Rating", "default": 5 },
+        { "type": "range", "id": "rating", "min": 1, "max": 5, "step": 0.5, "label": "Rating", "default": 5 },
         { "type": "text", "id": "title", "label": "Review title" },
         { "type": "textarea", "id": "text", "label": "Review", "default": "Beautiful quality and it arrived beautifully packed. I get compliments every time I wear it." },
         { "type": "image_picker", "id": "photo", "label": "Customer photo" },
-        { "type": "text", "id": "product", "label": "Product" },
+        { "type": "text", "id": "product", "label": "Product name" },
+        { "type": "product", "id": "product_link", "label": "Link to product page" },
         { "type": "text", "id": "date", "label": "Date" },
         { "type": "checkbox", "id": "verified", "label": "Verified buyer", "default": true }
       ]

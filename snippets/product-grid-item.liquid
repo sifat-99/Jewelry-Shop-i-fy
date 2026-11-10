@@ -1007,6 +1007,9 @@
           </s>
         {%- endif -%}
       </div>
+      {%- if product.description != blank -%}
+        <p class="lv-card-desc">{{ product.description | strip_html | strip_newlines | truncate: 170 }}</p>
+      {%- endif -%}
     </a>
   </div>
 </product-grid-item>

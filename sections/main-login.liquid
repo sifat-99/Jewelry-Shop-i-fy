@@ -159,6 +159,7 @@
         </div>
 
         {%- form 'customer_login', class: 'lg__form', novalidate: 'novalidate' -%}
+          <input type="hidden" name="return_to" value="/pages/account">
           {%- if form.errors -%}
             <div class="lg__msg lg__msg--error" role="alert">{{ form.errors | default_errors }}</div>
           {%- endif -%}

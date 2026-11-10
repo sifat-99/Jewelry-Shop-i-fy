@@ -30,7 +30,7 @@
         <label class="fnl__sr" for="fnl-email">Email</label>
         <div class="fnl__row">
           <input id="fnl-email" class="fnl__input" type="email" name="contact[email]" required autocomplete="email" placeholder="{{ s.newsletter_placeholder | default: 'Your email address' | escape }}" value="{{ form.email }}">
-          <button type="submit" class="btn btn--primary fnl__btn"><span class="btn__text-content">{{ s.newsletter_button | default: 'Subscribe' | escape }}</span></button>
+          <button type="submit" class="btn btn--primary fnl__btn" data-button-style="{{ s.newsletter_button_style | default: 'secondary' | escape }}"><span class="btn__text-content">{{ s.newsletter_button | default: 'Subscribe' | escape }}</span></button>
         </div>
         {%- if form.errors -%}
           <p class="fnl__err" role="alert">{{ form.errors.messages['email'] | default: 'Please enter a valid email address.' }}</p>
@@ -70,6 +70,31 @@
   .fnl__input { flex: 1 1 auto; min-width: 0; height: var(--ctl-h-lg, 52px); box-sizing: border-box; margin: 0 !important; padding: 0 16px; font: inherit; font-size: 14px; color: var(--text-dark, #111); background: var(--bg, #fff); border: 1px solid color-mix(in srgb, var(--text-dark, #111) 45%, transparent); border-right: 0; border-radius: 0; outline: none; }
   .fnl__input:focus { border-color: var(--text-dark, #111); }
   .fnl__btn { flex: none; height: var(--ctl-h-lg, 52px); min-height: 0; padding: 0 28px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  #footer-newsletter .fnl__btn[data-button-style="secondary"] {
+    background-color: var(--btn-regular-text, #000) !important;
+    color: var(--btn-regular-bg, #fff) !important;
+    border-color: var(--btn-regular-text, #000) !important;
+  }
+  #footer-newsletter .fnl__btn[data-button-style="secondary"]::before { background-color: var(--btn-regular-bg, #fff) !important; }
+  html #footer-newsletter .fnl__btn[data-button-style="secondary"]:hover span { color: var(--btn-regular-text, #000) !important; text-decoration: none !important; }
+  #footer-newsletter .fnl__btn[data-button-style="champagne"] {
+    --fnl-button-hover-bg: #a98243;
+    background-color: #c5a76a !important;
+    color: #2f2518 !important;
+    border-color: #b6904f !important;
+  }
+  #footer-newsletter .fnl__btn[data-button-style="champagne"]::before { background-color: var(--fnl-button-hover-bg) !important; }
+  html #footer-newsletter .fnl__btn[data-button-style="champagne"]:hover span { color: #fff !important; text-decoration: none !important; }
+  #footer-newsletter .fnl__btn[data-button-style="outline"] {
+    background-color: transparent !important;
+    color: var(--btn-regular-text, #000) !important;
+    border-color: var(--btn-regular-text, #000) !important;
+  }
+  #footer-newsletter .fnl__btn[data-button-style="soft"] {
+    background-color: color-mix(in srgb, var(--bg, #fff) 88%, var(--btn-regular-text, #000) 12%) !important;
+    color: var(--btn-regular-text, #000) !important;
+    border-color: color-mix(in srgb, var(--btn-regular-text, #000) 28%, transparent) !important;
+  }
   .fnl__note { margin: 10px 0 0; font-size: 12px; opacity: .65; }
   .fnl__err { margin: 10px 0 0; font-size: 13px; font-weight: 600; color: #b3261e; }
   .fnl__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

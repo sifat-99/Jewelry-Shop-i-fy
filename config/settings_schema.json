@@ -1414,6 +1414,86 @@
         "info": "Fixed keeps the button always visible. After products moves it (with the shipping note and payment icons) under the last item, so it follows the list as products are added."
       },
       {
+        "type": "header",
+        "content": "Cart Drawer Checkout Button"
+      },
+      {
+        "type": "select",
+        "id": "cart_checkout_button_style",
+        "label": "Button style",
+        "options": [
+          {
+            "value": "solid",
+            "label": "Solid dark"
+          },
+          {
+            "value": "outline",
+            "label": "Outlined"
+          },
+          {
+            "value": "champagne",
+            "label": "Champagne gold"
+          }
+        ],
+        "default": "solid"
+      },
+      {
+        "type": "color",
+        "id": "cart_checkout_button_bg",
+        "label": "Button background",
+        "default": "#1d1a17"
+      },
+      {
+        "type": "color",
+        "id": "cart_checkout_button_text",
+        "label": "Button text color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "cart_checkout_button_border",
+        "label": "Button border color",
+        "default": "#1d1a17"
+      },
+      {
+        "type": "color",
+        "id": "cart_checkout_button_hover_bg",
+        "label": "Hover background",
+        "default": "#42382d"
+      },
+      {
+        "type": "color",
+        "id": "cart_checkout_button_hover_text",
+        "label": "Hover text color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "cart_checkout_button_hover_border",
+        "label": "Hover border color",
+        "default": "#42382d"
+      },
+      {
+        "type": "range",
+        "id": "cart_checkout_button_height",
+        "min": 48,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Button height",
+        "default": 60
+      },
+      {
+        "type": "range",
+        "id": "cart_checkout_button_text_size",
+        "min": 11,
+        "max": 18,
+        "step": 1,
+        "unit": "px",
+        "label": "Button text size",
+        "default": 14
+      },
+      {
         "type": "checkbox",
         "id": "show_cart_note",
         "label": "Enable cart notes / special instructions",

@@ -1,0 +1,455 @@
+{%- comment -%}
+  Parallax showcase: heading + video / image in the middle, the theme's normal product cards in two side columns.
+  The columns scroll by themselves (one up, one down). Hover pauses them, and the mouse wheel over a column then
+  moves the two columns in opposite directions.
+  Products: a random selection from ALL products (or the chosen collection), different on every page load.
+{%- endcomment -%}
+{%- liquid
+  assign radius = section.settings.card_radius | default: 0
+  assign source = collections[section.settings.collection]
+  if source == blank or source.products_count == 0
+    assign source = collections.all
+  endif
+  assign strength = section.settings.parallax_strength | default: 140
+  assign btn_url = section.settings.button_link | default: routes.all_products_collection_url
+  assign gap = section.settings.column_gap | default: 24
+  assign stage_h = section.settings.stage_height | default: 780
+  assign side = section.settings.side_width | default: 'medium'
+  assign grid_cols = 'minmax(0, .8fr) minmax(0, 1.4fr) minmax(0, .8fr)'
+  if side == 'narrow'
+    assign grid_cols = 'minmax(0, .66fr) minmax(0, 1.68fr) minmax(0, .66fr)'
+  elsif side == 'wide'
+    assign grid_cols = 'minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr)'
+  endif
+  assign cards_a = ''
+  assign cards_b = ''
+  assign half = 2
+-%}
+{%- paginate source.products by 250 -%}
+  {%- liquid
+    assign total = source.products.size
+    assign want = section.settings.products_count | default: 12
+    if want > total
+      assign want = total
+    endif
+    assign half = want | plus: 1 | divided_by: 2
+    assign want_last = want | minus: 1
+
+    assign seed = 'now' | date: '%s' | plus: 0
+    assign start = 0
+    assign stride = 1
+    if total > 0
+      assign start = seed | modulo: total
+      assign primes = '7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,233,239,241,251' | split: ','
+      assign pstart = seed | divided_by: 3 | modulo: primes.size
+      assign found = false
+      for p in primes
+        assign pi = forloop.index0 | plus: pstart | modulo: primes.size
+        assign cand = primes[pi] | plus: 0
+        assign rem = total | modulo: cand
+        if rem != 0 and found == false
+          assign stride = cand
+          assign found = true
+        endif
+      endfor
+    endif
+
+    assign chosen = '|'
+    for k in (0..want_last)
+      if section.settings.shuffle_products
+        assign idx = k | times: stride | plus: start | modulo: total
+      else
+        assign idx = k
+      endif
+      assign chosen = chosen | append: idx | append: '|'
+    endfor
+
+    assign n = 0
+    for product in source.products
+      assign key = '|' | append: forloop.index0 | append: '|'
+      if chosen contains key
+        assign n = n | plus: 1
+        capture card
+          render 'product-grid-item', product: product, fallback_index: n, card_border_radius: radius, extra_class: 'dp-pg'
+        endcapture
+        if n <= half
+          assign cards_a = cards_a | append: card
+        else
+          assign cards_b = cards_b | append: card
+        endif
+      endif
+    endfor
+  -%}
+{%- endpaginate -%}
+
+<div id="dp-{{ section.id }}" class="dp color-{{ section.settings.color_scheme | default: 'scheme-1' }}{% unless section.settings.edge_fade %} dp--nofade{% endunless %}" style="--dp-radius: {{ radius }}px; --dp-gap: {{ gap }}px; --dp-cols: {{ grid_cols }}; --dp-max-h: {{ stage_h }}px; --dp-pin: {{ section.settings.pin_distance | default: 100 }}; --PT: {{ section.settings.padding_top | default: 64 }}px; --PB: {{ section.settings.padding_bottom | default: 24 }}px;" data-dp data-strength="{{ strength }}" data-per-side="{{ half }}" data-shuffle="{{ section.settings.shuffle_products }}" data-cards="{{ section.settings.cards_devices | default: 'desktop' }}" data-auto="{{ section.settings.auto_scroll }}" data-speed="{{ section.settings.scroll_speed | default: 40 }}" data-dir="{{ section.settings.scroll_direction | default: 'up_down' }}" data-pause="{{ section.settings.pause_on_hover }}" data-wheel="{{ section.settings.wheel_scroll }}" data-wheelspeed="{{ section.settings.wheel_speed | default: 3 }}">
+  <div class="wrapper--full dp__inner">
+
+    <div class="dp__stage">
+      <div class="dp__track">
+      <div class="dp__pin">
+      <div class="dp__grid">
+
+        <div class="dp__clip" data-dp-clip>
+          <div class="dp__col dp__col--a" data-dp-col="a">
+            {%- if cards_a != blank -%}
+              {{ cards_a }}
+            {%- else -%}
+              {%- for i in (1..2) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
+            {%- endif -%}
+          </div>
+        </div>
+
+        <div class="dp__center">
+          <div class="dp__sticky">
+            <header class="dp__head">
+              {%- if section.settings.eyebrow != blank -%}<p class="dp__eyebrow">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+              {%- if section.settings.heading != blank or section.settings.heading_accent != blank -%}
+                <h2 class="dp__title">{{ section.settings.heading | escape }}{% if section.settings.heading_accent != blank %} <em class="dp__accent">{{ section.settings.heading_accent | escape }}</em>{% endif %}</h2>
+              {%- endif -%}
+              {%- if section.settings.subheading != blank -%}<p class="dp__sub">{{ section.settings.subheading | escape }}</p>{%- endif -%}
+            </header>
+            <div class="dp__media" data-dp-media>
+              {%- if section.settings.media_type == 'video' and section.settings.video != blank -%}
+                {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true, preload: 'metadata', image_size: '1200x', class: 'dp__video' }}
+              {%- elsif section.settings.image != blank -%}
+                <img class="dp__img" src="{{ section.settings.image | image_url: width: 1200 }}" srcset="{{ section.settings.image | image_url: width: 700 }} 700w, {{ section.settings.image | image_url: width: 1000 }} 1000w, {{ section.settings.image | image_url: width: 1400 }} 1400w, {{ section.settings.image | image_url: width: 2000 }} 2000w" sizes="(min-width: 801px) 44vw, 92vw" alt="{{ section.settings.image.alt | default: section.settings.heading | escape }}" width="{{ section.settings.image.width }}" height="{{ section.settings.image.height }}" loading="eager">
+              {%- else -%}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'dp__img dp__img--ph' }}
+              {%- endif -%}
+            </div>
+            {%- if section.settings.button_label != blank -%}
+              <a class="btn btn--primary dp__btn" href="{{ btn_url }}">
+                <span class="btn__text-content">{{ section.settings.button_label | escape }}</span>
+                <span class="dp__btn-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <div class="dp__clip" data-dp-clip>
+          <div class="dp__col dp__col--b" data-dp-col="b">
+            {%- if cards_b != blank -%}
+              {{ cards_b }}
+            {%- else -%}
+              {%- for i in (3..4) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
+            {%- endif -%}
+          </div>
+        </div>
+
+      </div>
+      </div>
+      </div>
+
+      <div class="dp__list" data-dp-list></div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  #dp-{{ section.id }} { padding: var(--PT) 0 var(--PB); background: var(--bg, #fff); color: var(--text, #111); --dp-accent: var(--lv-accent, #9b7c53); --dp-stage-h: min(calc(100vh - 110px), var(--dp-max-h, 780px)); overflow: clip; }
+  @supports (height: 100svh) { #dp-{{ section.id }} { --dp-stage-h: min(calc(100svh - 110px), var(--dp-max-h, 780px)); } }
+  #dp-{{ section.id }} .dp__head { text-align: center; max-width: 560px; margin: 0 auto 22px; }
+  #dp-{{ section.id }} .dp__eyebrow { margin: 0 0 10px; font-size: 11px; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--dp-accent); }
+  #dp-{{ section.id }} .dp__title { margin: 0 0 10px; font-size: clamp(34px, 5.4vw, 64px); font-weight: 600; letter-spacing: .02em; line-height: 1.05; color: var(--text, #111); }
+  #dp-{{ section.id }} .dp__accent { font-style: italic; font-family: Georgia, 'Times New Roman', serif; font-weight: 400; background: linear-gradient(95deg, #8a6a3f 0%, #c9a46a 45%, #e3cba0 70%, #9b7c53 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; padding-right: .08em; }
+  #dp-{{ section.id }} .dp__sub { margin: 0 auto; max-width: 560px; font-size: clamp(14px, 1.4vw, 16px); line-height: 1.7; opacity: .72; }
+  @media (min-width: 1025px) {
+    #dp-{{ section.id }} .dp__title { font-size: clamp(30px, 3.4vw, 50px); }
+    #dp-{{ section.id }} .dp__sub { font-size: 14px; max-width: 480px; }
+  }
+
+  #dp-{{ section.id }} .dp__stage { position: relative; }
+  /* desktop: the section sticks to the screen first (columns keep scrolling), then the page moves on after the hold distance */
+  #dp-{{ section.id }} .dp__track { position: relative; height: calc(var(--dp-stage-h) + var(--dp-pin, 100) * 1vh); }
+  #dp-{{ section.id }} .dp__pin { position: sticky; top: var(--dp-top, 96px); height: var(--dp-stage-h); }
+  #dp-{{ section.id }} .dp__grid { display: grid; grid-template-columns: var(--dp-cols); gap: var(--dp-gap); align-items: stretch; height: var(--dp-stage-h); }
+  #dp-{{ section.id }} .dp__clip { height: 100%; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 6%, #000 94%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 6%, #000 94%, transparent 100%); }
+  #dp-{{ section.id }}.dp--nofade .dp__clip { -webkit-mask-image: none; mask-image: none; }
+  #dp-{{ section.id }} .dp__col { display: flex; flex-direction: column; gap: var(--dp-gap); will-change: transform; }
+  #dp-{{ section.id }} .dp__center { align-self: center; }
+  #dp-{{ section.id }} .dp__sticky { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  #dp-{{ section.id }} .dp__media { position: relative; width: 100%; height: max(240px, calc(var(--dp-stage-h) - 330px)); overflow: hidden; background: color-mix(in srgb, var(--text, #111) 6%, var(--bg, #fff)); border-radius: var(--dp-radius); }
+  #dp-{{ section.id }} .dp__video, #dp-{{ section.id }} .dp__img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+  #dp-{{ section.id }} .dp__img--ph { background: color-mix(in srgb, var(--text, #111) 8%, var(--bg, #fff)); }
+  #dp-{{ section.id }} .dp__btn { display: inline-flex; align-items: center; gap: 14px; padding: 0 10px 0 28px; min-height: var(--ctl-h-lg, 52px); font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  #dp-{{ section.id }} .dp__btn-arrow { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--bg, #fff); color: var(--text, #111); transition: transform .35s ease; }
+  #dp-{{ section.id }} .dp__btn-arrow svg { width: 16px; height: 16px; }
+  #dp-{{ section.id }} .dp__btn:hover .dp__btn-arrow { transform: translateX(4px); }
+  /* the global button hover turns every child white: keep the arrow circle white with a dark arrow in every state */
+  html body #dp-{{ section.id }} .dp__btn .dp__btn-arrow,
+  html body #dp-{{ section.id }} .dp__btn:hover .dp__btn-arrow,
+  html body #dp-{{ section.id }} .dp__btn:focus-visible .dp__btn-arrow { background: #ffffff !important; color: #111111 !important; -webkit-text-fill-color: #111111 !important; }
+  html body #dp-{{ section.id }} .dp__btn .dp__btn-arrow svg,
+  html body #dp-{{ section.id }} .dp__btn:hover .dp__btn-arrow svg,
+  html body #dp-{{ section.id }} .dp__btn:hover .dp__btn-arrow svg * { stroke: #111111 !important; color: #111111 !important; fill: none !important; }
+
+  /* ---------- tablet & phone: heading + media on top, product grid below (3 / 2 / 1 columns like the other grids) ---------- */
+  #dp-{{ section.id }} .dp__list { display: none; }
+  #dp-{{ section.id }}.dp--list .dp__list:empty { display: none; }
+  #dp-{{ section.id }}.dp--list .dp__grid { display: block; height: auto; }
+  #dp-{{ section.id }}.dp--list .dp__clip { display: none; }
+  #dp-{{ section.id }}.dp--list .dp__media { height: min(56vw, 540px); }
+  #dp-{{ section.id }}.dp--list .dp__list { display: grid; grid-template-columns: repeat(var(--dp-list-cols, 3), minmax(0, 1fr)); gap: 40px 18px; margin-top: 38px; padding: 20px 0 36px; }
+  @media (max-width: 650px) {
+    #dp-{{ section.id }}.dp--list .dp__media { height: min(92vw, 480px); }
+    #dp-{{ section.id }}.dp--list .dp__list { gap: 30px 14px; margin-top: 28px; padding: 0 0 20px; }
+    #dp-{{ section.id }} .dp__btn { padding-left: 22px; }
+  }
+  /* <=1024px: no side columns, normal flow */
+  @media (max-width: 1024px) {
+    #dp-{{ section.id }} .dp__track { height: auto; }
+    #dp-{{ section.id }} .dp__pin { position: static; height: auto; }
+    #dp-{{ section.id }} .dp__grid { height: auto; }
+    #dp-{{ section.id }} .dp__clip { height: auto; overflow: visible; -webkit-mask-image: none; mask-image: none; }
+    #dp-{{ section.id }} .dp__center { align-self: stretch; }
+  }
+  /* cards only on desktop (or desktop + tablet): hide them on smaller screens even before JS runs */
+  @media (max-width: 1024px) { #dp-{{ section.id }}[data-cards="desktop"] .dp__clip { display: none; } }
+  @media (max-width: 650px) { #dp-{{ section.id }}[data-cards="tablet"] .dp__clip { display: none; } }
+  /* no-JS fallback for small screens: media on top, the two columns side by side */
+  @media (max-width: 1024px) {
+    #dp-{{ section.id }}:not(.dp--list) .dp__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #dp-{{ section.id }}:not(.dp--list) .dp__center { grid-column: 1 / -1; order: -1; }
+    #dp-{{ section.id }}:not(.dp--list) .dp__media { height: min(56vw, 480px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #dp-{{ section.id }} .dp__col { transform: none !important; }
+  }
+</style>
+
+<script>
+  (function () {
+    var init = function () {
+      var root = document.getElementById('dp-{{ section.id }}');
+      if (!root || root.dataset.ready) return;
+      root.dataset.ready = '1';
+      var colA = root.querySelector('[data-dp-col="a"]');
+      var colB = root.querySelector('[data-dp-col="b"]');
+      var clips = root.querySelectorAll('[data-dp-clip]');
+      var list = root.querySelector('[data-dp-list]');
+      var per = parseInt(root.dataset.perSide, 10) || 4;
+      var base = parseFloat(root.dataset.strength) || 140;
+      var speed = parseFloat(root.dataset.speed) || 40;
+      var autoOn = root.dataset.auto !== 'false';
+      var pauseOn = root.dataset.pause !== 'false';
+      var wheelOn = root.dataset.wheel !== 'false';
+      var wheelK = (parseFloat(root.dataset.wheelspeed) || 3) * 0.01;
+      var dirSign = root.dataset.dir === 'down_up' ? -1 : 1; /* 1: left column up, right column down */
+      var cardsOn = root.dataset.cards || 'desktop'; /* desktop | tablet | all */
+      if (!colA || !colB || !list) return;
+      var extra = document.createElement('div'); extra.hidden = true; root.querySelector('.dp__stage').appendChild(extra);
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* all product cards, shuffled again in the browser so every visitor sees a different order */
+      var pool = Array.prototype.slice.call(root.querySelectorAll('.dp-pg'));
+      if (root.dataset.shuffle === 'true') {
+        for (var i = pool.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = pool[i]; pool[i] = pool[j]; pool[j] = t;
+        }
+      }
+
+      /* >1024px: side columns that scroll by themselves. <=1024px: 3 columns (6 products), <=768px: 2 (4), <=650px: 1 (2), same as the product grids */
+      var spec = function () {
+        var w = window.innerWidth;
+        if (w <= 650) return { mode: 'list', cols: 1, show: cardsOn === 'all' ? 2 : 0 };
+        if (w <= 768) return { mode: 'list', cols: 2, show: cardsOn === 'desktop' ? 0 : 4 };
+        if (w <= 1024) return { mode: 'list', cols: 3, show: cardsOn === 'desktop' ? 0 : 6 };
+        return { mode: 'side', cols: 0, show: pool.length };
+      };
+      var cur = null, curKey = '';
+
+      /* ---------- side columns: endless loop by recycling cards (no clones) ---------- */
+      var offA = 0, offB = 0, boost = 0, paused = false, visible = true, last = 0, raf = 0;
+      var clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
+
+      /* only the product cards are moved (the snippet also leaves script and style nodes between them) */
+      var cardsOf = function (col) { return col.querySelectorAll(':scope > .dp-pg'); };
+      var normalize = function (col, off) {
+        var cs = cardsOf(col);
+        if (cs.length < 2) return off;
+        var gap = parseFloat(getComputedStyle(col).rowGap) || 0;
+        var guard = 0, el;
+        while (guard++ < 12 && off <= -(cs[0].offsetHeight + gap)) {
+          el = cs[0]; off += el.offsetHeight + gap; col.appendChild(el); cs = cardsOf(col);
+        }
+        guard = 0;
+        while (guard++ < 12 && off > 0) {
+          el = cs[cs.length - 1]; off -= el.offsetHeight + gap; col.insertBefore(el, cs[0]); cs = cardsOf(col);
+        }
+        return off;
+      };
+
+      var frame = function (now) {
+        raf = 0;
+        if (!cur || cur.mode !== 'side' || reduce || !visible) { last = 0; return; }
+        var dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
+        last = now;
+        var move = (autoOn && !paused ? speed * dt : 0) + boost;
+        boost *= Math.exp(-6 * dt);
+        if (Math.abs(boost) < 0.05) boost = 0;
+        if (move !== 0) {
+          offA = normalize(colA, offA - move * dirSign);
+          offB = normalize(colB, offB + move * dirSign);
+          colA.style.transform = 'translate3d(0,' + offA.toFixed(1) + 'px,0)';
+          colB.style.transform = 'translate3d(0,' + offB.toFixed(1) + 'px,0)';
+        }
+        raf = requestAnimationFrame(frame);
+      };
+      var start = function () { if (!raf && cur && cur.mode === 'side' && !reduce) { last = 0; raf = requestAnimationFrame(frame); } };
+
+      clips.forEach(function (clip) {
+        if (pauseOn) {
+          clip.addEventListener('pointerenter', function () { paused = true; });
+          clip.addEventListener('pointerleave', function () { paused = false; });
+        }
+        /* while hovering a column the mouse wheel moves the two columns in opposite directions */
+        if (wheelOn) clip.addEventListener('wheel', function (e) {
+          if (!cur || cur.mode !== 'side' || reduce) return;
+          e.preventDefault();
+          boost = clamp(boost + e.deltaY * wheelK, -40, 40);
+          start();
+        }, { passive: false });
+      });
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (en) { visible = en[0].isIntersecting; if (visible) start(); }, { threshold: 0.05 }).observe(root);
+      }
+
+      var layout = function () {
+        var s = spec();
+        var key = s.mode + s.cols + '-' + s.show;
+        if (key === curKey) return;
+        curKey = key; cur = s;
+        offA = offB = boost = 0;
+        colA.style.transform = ''; colB.style.transform = '';
+        pool.forEach(function (c) { c.style.transform = ''; });
+        if (s.mode === 'side') {
+          root.classList.remove('dp--list');
+          pool.forEach(function (c, k) { (k < per ? colA : colB).appendChild(c); });
+          start();
+        } else {
+          root.classList.add('dp--list');
+          list.style.setProperty('--dp-list-cols', s.cols);
+          var a = pool.slice(0, per), b = pool.slice(per), order = [];
+          for (var k = 0; k < per; k++) { if (a[k]) order.push(a[k]); if (b[k]) order.push(b[k]); }
+          pool.forEach(function (c) { extra.appendChild(c); });
+          order.slice(0, s.show).forEach(function (c) { list.appendChild(c); });
+          drift();
+        }
+      };
+
+      /* tablet / large phone grid: neighbouring columns drift in opposite directions while the page scrolls */
+      var ticking = false;
+      var drift = function () {
+        ticking = false;
+        if (!cur || cur.mode !== 'list' || reduce || cur.cols < 2 || cur.show < 1) return;
+        var rect = root.getBoundingClientRect();
+        var vh = window.innerHeight;
+        var q = clamp((vh - rect.top) / (rect.height + vh), 0, 1);
+        var amp = Math.min(34, base * 0.24);
+        var items = list.children;
+        for (var n = 0; n < items.length; n++) {
+          var dir = (n % cur.cols) % 2 === 0 ? 1 : -1;
+          items[n].style.transform = 'translate3d(0,' + (dir * amp * (1 - 2 * q)).toFixed(1) + 'px,0)';
+        }
+      };
+      var onScroll = function () { if (!ticking && cur && cur.mode === 'list') { ticking = true; requestAnimationFrame(drift); } };
+
+      layout();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', function () { layout(); onScroll(); });
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+    document.addEventListener('shopify:section:load', function (e) {
+      if (e.target && e.target.id === 'shopify-section-{{ section.id }}') { var r = document.getElementById('dp-{{ section.id }}'); if (r) delete r.dataset.ready; init(); }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Parallax showcase",
+  "tag": "section",
+  "class": "section-parallax-showcase",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "header", "content": "Heading" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "The Aurelle edit" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Feel the" },
+    { "type": "text", "id": "heading_accent", "label": "Highlighted word", "default": "shine", "info": "Shown in italic gold gradient after the heading." },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Delicate chains, signet rings and engraved keepsakes, crafted in waterproof steel and 18k gold plating to move with you every day." },
+    { "type": "header", "content": "Middle media" },
+    {
+      "type": "select",
+      "id": "media_type",
+      "label": "Media",
+      "options": [
+        { "value": "video", "label": "Video" },
+        { "value": "image", "label": "Image" }
+      ],
+      "default": "image"
+    },
+    { "type": "video", "id": "video", "label": "Video", "info": "Upload a short MP4 under Settings > Files. It plays muted on loop." },
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "Also used when no video is chosen." },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop the collection" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "header", "content": "Products" },
+    { "type": "collection", "id": "collection", "label": "Collection", "info": "Leave empty to pick from all products (up to the first 250)." },
+    { "type": "range", "id": "products_count", "min": 4, "max": 40, "step": 2, "label": "Products to show", "default": 12, "info": "Total number, split evenly between the left and right column." },
+    { "type": "checkbox", "id": "shuffle_products", "label": "Pick random products", "default": true, "info": "A different random selection (and order) on every page load." },
+    {
+      "type": "select",
+      "id": "cards_devices",
+      "label": "Show product cards on",
+      "options": [
+        { "value": "desktop", "label": "Desktop only" },
+        { "value": "tablet", "label": "Desktop and tablet" },
+        { "value": "all", "label": "All screens" }
+      ],
+      "default": "desktop",
+      "info": "On the other screens only the heading, media and button are shown."
+    },
+    { "type": "header", "content": "Scrolling" },
+    { "type": "range", "id": "pin_distance", "min": 0, "max": 300, "step": 20, "unit": "%", "label": "Hold on screen (% of screen height)", "default": 100, "info": "Desktop: the section sticks to the screen for this much scrolling while the columns keep moving, then the page continues. 0 turns the hold off." },
+    { "type": "checkbox", "id": "auto_scroll", "label": "Columns scroll by themselves", "default": true },
+    { "type": "range", "id": "scroll_speed", "min": 10, "max": 160, "step": 5, "unit": "px", "label": "Auto-scroll speed (px per second)", "default": 40 },
+    {
+      "type": "select",
+      "id": "scroll_direction",
+      "label": "Direction",
+      "options": [
+        { "value": "up_down", "label": "Left column up, right column down" },
+        { "value": "down_up", "label": "Left column down, right column up" }
+      ],
+      "default": "up_down"
+    },
+    { "type": "checkbox", "id": "pause_on_hover", "label": "Pause when hovering a column", "default": true },
+    { "type": "checkbox", "id": "wheel_scroll", "label": "Mouse wheel moves the columns while hovering", "default": true, "info": "Scrolls the two columns in opposite directions. The page scrolls normally everywhere else." },
+    { "type": "range", "id": "wheel_speed", "min": 1, "max": 10, "step": 1, "label": "Mouse wheel sensitivity", "default": 3 },
+    { "type": "range", "id": "parallax_strength", "min": 40, "max": 280, "step": 10, "unit": "px", "label": "Tablet drift distance", "default": 140, "info": "Only changes the soft drift of the product grid on tablets." },
+    { "type": "header", "content": "Layout & style" },
+    { "type": "range", "id": "stage_height", "min": 520, "max": 960, "step": 20, "unit": "px", "label": "Maximum height of the scrolling area", "default": 780 },
+    {
+      "type": "select",
+      "id": "side_width",
+      "label": "Side column width",
+      "options": [
+        { "value": "narrow", "label": "Narrow (bigger middle)" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "wide", "label": "Wide (bigger cards)" }
+      ],
+      "default": "medium"
+    },
+    { "type": "range", "id": "column_gap", "min": 8, "max": 64, "step": 4, "unit": "px", "label": "Gap between cards and columns", "default": 24 },
+    { "type": "checkbox", "id": "edge_fade", "label": "Fade the top and bottom edges", "default": true },
+    { "type": "range", "id": "card_radius", "min": 0, "max": 28, "step": 2, "unit": "px", "label": "Corner radius", "default": 0 },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 140, "step": 4, "unit": "px", "label": "Top padding", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 140, "step": 4, "unit": "px", "label": "Bottom padding", "default": 24 }
+  ],
+  "presets": [
+    { "name": "Parallax showcase" }
+  ]
+}
+{% endschema %}
