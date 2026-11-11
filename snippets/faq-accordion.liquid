@@ -1,3 +1,9 @@
+{% doc %}
+  FAQ layout: category list + search on the left, animated accordion on the right, contact CTA. Accepts: blocks (section.blocks of type 'faq'), cfg (section.settings)
+
+  @param [blocks] - Optional blocks passed by the parent file
+  @param [cfg] - Optional cfg passed by the parent file
+{% enddoc %}
 {%- comment -%}
   FAQ layout: category list + search on the left, animated accordion on the right, contact CTA.
   Accepts: blocks (section.blocks of type 'faq'), cfg (section.settings)
@@ -38,7 +44,7 @@
   .faq__cats { display: grid; gap: 2px; padding: 8px; background: var(--pp-soft); border: 1px solid var(--pp-line); border-radius: var(--ct-radius, 4px); }
   .faq__cat { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 12px 12px; margin: 0; font: inherit; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-align: left; color: var(--pp-muted); background: transparent; border: 0; border-radius: calc(var(--ct-radius, 4px) - 1px); cursor: pointer; transition: background-color .2s ease, color .2s ease; }
   .faq__cat:hover { color: var(--text, #111); background: color-mix(in srgb, var(--text, #111) 5%, transparent); }
-  .faq__cat.is-active { color: var(--bg, #fff); background: var(--text, #111); }
+  .faq__cat.is-active { color: var(--btn-selected-text, #fff); background: var(--btn-selected-bg, #111); }
   .faq__cat small { font-size: 11px; font-weight: 700; opacity: .65; }
   @media (max-width: 900px) {
     .faq__cats { display: flex; gap: 8px; padding: 0; background: transparent; border: 0; overflow-x: auto; scrollbar-width: none; margin: 0 calc(var(--outer, 16px) * -1); padding: 0 var(--outer, 16px); }

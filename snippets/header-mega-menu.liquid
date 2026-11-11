@@ -1,3 +1,11 @@
+{% doc %}
+  Snippet "header-mega-menu" used by the theme sections.
+
+  @param [section] - Optional section passed by the parent file
+  @param [link] - Optional link passed by the parent file
+  @param [item_id] - Optional item id passed by the parent file
+  @param [custom_block] - Optional custom block passed by the parent file
+{% enddoc %}
 <!-- /snippets/header-mega-menu.liquid -->
 {%- liquid
   assign style = 'columns'
@@ -9,7 +17,7 @@
   assign menu_gap = section.settings.dropdown_gap | default: 24
   assign menu_bg = section.settings.dropdown_global_bg | default: '#ffffff'
   assign menu_text = section.settings.dropdown_global_text | default: '#111111'
-  assign menu_border = section.settings.dropdown_global_border | default: '#e8e2d9'
+  assign menu_border = section.settings.dropdown_global_border | default: 'var(--lv-border)'
   assign menu_radius = section.settings.dropdown_global_radius | default: 0
   assign menu_theme = 'light'
   assign promo_img = blank

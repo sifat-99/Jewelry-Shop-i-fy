@@ -27,7 +27,7 @@
 -%}
 
 <style>
-  .cp { --cp-line: rgba(var(--color-foreground, 17, 17, 17), 0.12); --cp-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62); --cp-soft: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)); font-family: 'Quicksand', -apple-system, sans-serif; }
+  .cp { --cp-line: var(--lv-border); --cp-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62); --cp-soft: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)); font-family: 'Quicksand', -apple-system, sans-serif; }
   .cp__inner { width: 100%; max-width: none; margin: 0 auto; padding-left: var(--outer, 24px); padding-right: var(--outer, 24px); box-sizing: border-box; }
   .cp__head { text-align: center; margin: 0 0 28px; }
   .cp__title { margin: 0 0 8px; font-size: clamp(24px, 3.4vw, 36px); font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.15; }
@@ -66,7 +66,7 @@
   .cp-item__total s { display: block; font-size: 12px; font-weight: 500; opacity: .5; }
   .cp-item__disc { display: block; font-size: 11px; font-weight: 600; color: #8c2b3f; }
 
-  .cp-qty { display: inline-flex; align-items: center; height: 40px; border: var(--btn-border-thickness, 1px) solid var(--btn-regular-border, rgba(0,0,0,.2)); border-radius: var(--btn-radius, 0px); box-sizing: border-box; overflow: hidden; }
+  .cp-qty { display: inline-flex; align-items: center; height: 40px; border: var(--btn-border-thickness, 1px) solid var(--btn-regular-border, var(--lv-border)); border-radius: var(--btn-radius, 0px); box-sizing: border-box; overflow: hidden; }
   .cp-qty__btn { width: 36px; height: 100%; display: flex; align-items: center; justify-content: center; color: inherit; text-decoration: none; transition: background-color var(--btn-animation-duration, 350ms) ease, color var(--btn-animation-duration, 350ms) ease; }
   .cp-qty__btn:hover { background: var(--btn-regular-hover-bg, #111); color: var(--btn-regular-hover-text, #fff); }
   .cp-qty__val { min-width: 34px; text-align: center; font-size: 14px; font-weight: 600; }
@@ -167,7 +167,7 @@
                     {%- for prop in item.properties -%}
                       {%- assign first_char = prop.first | slice: 0 -%}
                       {%- if prop.last != blank and first_char != '_' -%}
-                        <p class="cp-item__meta"><strong>{{ prop.first }}:</strong> {{ prop.last }}</p>
+                        <p class="cp-item__meta"><strong>{{ prop.first | escape }}:</strong> {{ prop.last | escape }}</p>
                       {%- endif -%}
                     {%- endfor -%}
                     <p class="cp-item__price">
@@ -212,7 +212,7 @@
 
             {%- if section.settings.show_order_note -%}
               <label class="cp-sum__label" for="cart-note">Order note</label>
-              <textarea class="cp-sum__textarea" id="cart-note" name="note" placeholder="Anything we should know? (optional)">{{ cart.note }}</textarea>
+              <textarea class="cp-sum__textarea" id="cart-note" name="note" placeholder="Anything we should know? (optional)">{{ cart.note | escape }}</textarea>
             {%- endif -%}
 
             <button type="submit" name="checkout" class="btn btn--primary btn-sliding-hover cp-sum__btn checkout__button">

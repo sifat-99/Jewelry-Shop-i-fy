@@ -1,3 +1,10 @@
+{% doc %}
+  About us landing layout with auto-rotating product secondary images slideshow. Accepts: blocks, cfg (section.settings), page_title, page_content
+
+  @param [blocks] - Optional blocks passed by the parent file
+  @param [cfg] - Optional cfg passed by the parent file
+  @param [page_content] - Optional page content passed by the parent file
+{% enddoc %}
 {%- comment -%}
   About us landing layout with auto-rotating product secondary images slideshow.
   Accepts: blocks, cfg (section.settings), page_title, page_content
@@ -127,10 +134,10 @@
     text-transform: uppercase !important;
     line-height: 1 !important;
     white-space: nowrap !important;
-    color: #ffffff !important;
-    background: #000000 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 0px !important;
+    color: var(--btn-regular-text, #ffffff) !important;
+    background: var(--btn-regular-bg, #000000) !important;
+    border: 1px solid var(--btn-regular-border, #000000) !important;
+    border-radius: var(--btn-radius, 0px) !important;
     padding: 10px 18px !important;
     text-decoration: none !important;
     cursor: pointer !important;
@@ -138,20 +145,20 @@
   }
   .about-slide__btn span,
   .about-slide__btn .about-slide__btn-text {
-    color: #ffffff !important;
+    color: var(--btn-regular-text, #ffffff) !important;
     display: inline-block !important;
     line-height: 1 !important;
     position: relative !important;
     z-index: 2 !important;
   }
   .about-slide__btn:hover {
-    background: #ffffff !important;
-    color: #000000 !important;
-    border-color: #000000 !important;
+    background: var(--btn-regular-hover-bg, #ffffff) !important;
+    color: var(--btn-regular-hover-text, #000000) !important;
+    border-color: var(--btn-regular-hover-border, #000000) !important;
   }
   .about-slide__btn:hover span,
   .about-slide__btn:hover .about-slide__btn-text {
-    color: #000000 !important;
+    color: var(--btn-regular-hover-text, #000000) !important;
   }
   .about-slide-nav {
     position: absolute;
@@ -277,7 +284,7 @@
     border-left: none !important;
     border-right: none !important;
     border-radius: 0px !important;
-    color: #000000 !important;
+    color: var(--text, #000000) !important;
     box-shadow: none !important;
   }
   @media (max-width: 640px) {
@@ -315,7 +322,7 @@
     letter-spacing: 0.12em !important;
     text-transform: uppercase !important;
     line-height: 1.25 !important;
-    color: #000000 !important;
+    color: var(--text, #000000) !important;
     opacity: 1 !important;
   }
   .sl-cta__text,
@@ -325,7 +332,7 @@
     max-width: 520px !important;
     font-size: 15px !important;
     line-height: 1.8 !important;
-    color: #444444 !important;
+    color: color-mix(in srgb, var(--text, #444444) 88%, transparent) !important;
     opacity: 1 !important;
   }
   .sl-cta__actions,
@@ -368,14 +375,14 @@
   .sl-cta__btn-primary,
   .sl-cta .sl-cta__btn-primary,
   html body .pg-page .sl-cta .sl-cta__btn-primary {
-    background-color: #000000 !important;
-    border: 1px solid #000000 !important;
-    color: #ffffff !important;
+    background-color: var(--btn-regular-bg, #000000) !important;
+    border: 1px solid var(--btn-regular-border, #000000) !important;
+    color: var(--btn-regular-text, #ffffff) !important;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
   }
   .sl-cta__btn-primary .btn__text-content,
   .sl-cta__btn-primary span {
-    color: #ffffff !important;
+    color: var(--btn-regular-text, #ffffff) !important;
     transition: color 0.3s ease !important;
   }
   .sl-cta__btn-primary::before {
@@ -383,29 +390,29 @@
   }
   .sl-cta__btn-primary:hover,
   html body .pg-page .sl-cta .sl-cta__btn-primary:hover {
-    border-color: #000000 !important;
-    background-color: #ffffff !important;
+    border-color: var(--btn-regular-hover-border, #000000) !important;
+    background-color: var(--btn-regular-hover-bg, #ffffff) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
   }
   .sl-cta__btn-primary:hover .btn__text-content,
   html body .pg-page .sl-cta .sl-cta__btn-primary:hover .btn__text-content,
   .sl-cta__btn-primary:hover span,
   html body .pg-page .sl-cta .sl-cta__btn-primary:hover span {
-    color: #000000 !important;
+    color: var(--btn-regular-hover-text, #000000) !important;
   }
 
   /* Secondary Button: Get In Touch (Matches Global Border #D1D1D1) */
   .sl-cta__btn-secondary,
   .sl-cta .sl-cta__btn-secondary,
   html body .pg-page .sl-cta .sl-cta__btn-secondary {
-    background-color: #ffffff !important;
-    border: 1px solid #D1D1D1 !important;
-    color: #000000 !important;
+    background-color: var(--bg, #ffffff) !important;
+    border: 1px solid var(--border, var(--lv-border)) !important;
+    color: var(--text, #000000) !important;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
   }
   .sl-cta__btn-secondary .btn__text-content,
   .sl-cta__btn-secondary span {
-    color: #000000 !important;
+    color: var(--text, #000000) !important;
     transition: color 0.3s ease !important;
   }
   .sl-cta__btn-secondary::before {
@@ -413,15 +420,15 @@
   }
   .sl-cta__btn-secondary:hover,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover {
-    border-color: #000000 !important;
-    background-color: #000000 !important;
+    border-color: var(--btn-regular-hover-border, #000000) !important;
+    background-color: var(--btn-regular-hover-bg, #000000) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
   }
   .sl-cta__btn-secondary:hover .btn__text-content,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover .btn__text-content,
   .sl-cta__btn-secondary:hover span,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover span {
-    color: #ffffff !important;
+    color: var(--btn-regular-hover-text, #ffffff) !important;
   }
 
   .sl-btn, .btn {
@@ -673,8 +680,8 @@
 <section class="sl-cta">
   <div class="sl-cta__inner">
     <p class="sl-cta__eyebrow" style="color: var(--pp-muted, #777777) !important;">Atelier Concierge</p>
-    <h2 class="sl-cta__title" style="color: #000000 !important; opacity: 1 !important;">{{ cfg.about_cta_title | default: 'Find Your Signature Piece' }}</h2>
-    <p class="sl-cta__text" style="color: #444444 !important; opacity: 1 !important;">{{ cfg.about_cta_text | default: 'Explore our curated collection of waterproof rings, necklaces, and engravable keepsakes, or consult our concierge team for personalized guidance.' }}</p>
+    <h2 class="sl-cta__title" style="color: var(--text, #000000) !important; opacity: 1 !important;">{{ cfg.about_cta_title | default: 'Find Your Signature Piece' }}</h2>
+    <p class="sl-cta__text" style="color: color-mix(in srgb, var(--text, #444444) 88%, transparent) !important; opacity: 1 !important;">{{ cfg.about_cta_text | default: 'Explore our curated collection of waterproof rings, necklaces, and engravable keepsakes, or consult our concierge team for personalized guidance.' }}</p>
     <div class="sl-cta__actions">
       <a href="{{ shop_link }}" class="btn btn--primary btn-sliding-hover sl-btn sl-cta__btn-primary">
         <span class="btn__text-content">Explore Collection</span>

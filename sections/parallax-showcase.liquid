@@ -180,10 +180,10 @@
   /* the global button hover turns every child white: keep the arrow circle white with a dark arrow in every state */
   html body #dp-{{ section.id }} .dp__btn .dp__btn-arrow,
   html body #dp-{{ section.id }} .dp__btn:hover .dp__btn-arrow,
-  html body #dp-{{ section.id }} .dp__btn:focus-visible .dp__btn-arrow { background: #ffffff !important; color: #111111 !important; -webkit-text-fill-color: #111111 !important; }
+  html body #dp-{{ section.id }} .dp__btn:focus-visible .dp__btn-arrow { background: var(--bg, #ffffff) !important; color: var(--text, #111111) !important; -webkit-text-fill-color: var(--text, #111111) !important; }
   html body #dp-{{ section.id }} .dp__btn .dp__btn-arrow svg,
   html body #dp-{{ section.id }} .dp__btn:hover .dp__btn-arrow svg,
-  html body #dp-{{ section.id }} .dp__btn:hover .dp__btn-arrow svg * { stroke: #111111 !important; color: #111111 !important; fill: none !important; }
+  html body #dp-{{ section.id }} .dp__btn:hover .dp__btn-arrow svg * { stroke: var(--text, #111111) !important; color: var(--text, #111111) !important; fill: none !important; }
 
   /* ---------- tablet & phone: heading + media on top, product grid below (3 / 2 / 1 columns like the other grids) ---------- */
   #dp-{{ section.id }} .dp__list { display: none; }

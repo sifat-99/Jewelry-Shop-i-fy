@@ -1,8 +1,32 @@
 <!-- /sections/announcement.liquid -->
+{%- liquid
+  comment
+    Colors come from the chosen color scheme (which the Theme Palette drives). Background / text overrides are optional;
+    a text color that cannot be read on the background is replaced automatically.
+  endcomment
+  assign ann_bg = section.settings.bg_color
+  assign ann_text = section.settings.text_color
+  if ann_bg != blank
+    assign ann_ratio = 21
+    if ann_text != blank
+      assign ann_ratio = ann_bg | color_contrast: ann_text
+    endif
+    if ann_text == blank or ann_ratio < 3
+      assign ann_dark = ann_bg | color_contrast: '#1a1a1a'
+      assign ann_light = ann_bg | color_contrast: '#ffffff'
+      if ann_dark >= ann_light
+        assign ann_text = '#1a1a1a'
+      else
+        assign ann_text = '#ffffff'
+      endif
+    endif
+  endif
+-%}
 <style>
   .announcement {
-    background-color: var(--COLOR-ANNOUNCEMENT-BG, #f7f5f0);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: var(--ann-bg, var(--bg));
+    color: var(--ann-text, var(--text));
+    border-bottom: 1px solid color-mix(in srgb, var(--ann-text, var(--text)) 10%, transparent);
   }
   .announcement [data-ticker-text],
   .announcement [data-ticker-text] p,
@@ -12,7 +36,7 @@
     font-size: 12.5px !important;
     font-weight: 600 !important;
     letter-spacing: 0.12em !important;
-    color: #111111 !important;
+    color: var(--ann-text, var(--text)) !important;
     text-transform: uppercase !important;
   }
 </style>
@@ -22,6 +46,8 @@
     --PT: {{ section.settings.padding_top | default: 8 }}px;
     --PB: {{ section.settings.padding_bottom | default: 8 }}px;
     --underline: calc(var(--font-2) * var(--FONT-ADJUST-ACCENT));
+    {% if ann_bg != blank %}--ann-bg: {{ ann_bg }};{% endif %}
+    {% if ann_text != blank %}--ann-text: {{ ann_text }};{% endif %}
   "
   data-announcement-bar
   data-section-id="{{ section.id }}"
@@ -101,14 +127,14 @@
     {
       "type": "color",
       "id": "bg_color",
-      "label": "Background color",
-      "default": "#f7f5f0"
+      "label": "Background color (optional)",
+      "info": "Leave empty to use the color scheme."
     },
     {
       "type": "color",
       "id": "text_color",
-      "label": "Text color",
-      "default": "#000000"
+      "label": "Text color (optional)",
+      "info": "Leave empty to use the color scheme. Unreadable colors are replaced automatically."
     },
     {
       "type": "range",

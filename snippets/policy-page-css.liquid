@@ -1,3 +1,6 @@
+{% doc %}
+  Styles Shopify's built-in /policies/* pages (refund, shipping, privacy, terms) to match the theme.
+{% enddoc %}
 {%- comment -%} Styles Shopify's built-in /policies/* pages (refund, shipping, privacy, terms) to match the theme. {%- endcomment -%}
 <style>
   .shopify-policy__container {
@@ -17,7 +20,7 @@
     background: rgba(var(--color-foreground, 17, 17, 17), .035); border-radius: var(--ct-radius, 4px);
   }
   .shopify-policy__body h2 {
-    margin: 44px 0 14px !important; padding-top: 28px; border-top: 1px solid var(--hairline, rgba(0, 0, 0, .14));
+    margin: 44px 0 14px !important; padding-top: 28px; border-top: 1px solid var(--hairline, var(--lv-border));
     font-size: 15px !important; font-weight: 700 !important; letter-spacing: .16em !important; text-transform: uppercase; line-height: 1.4;
   }
   .shopify-policy__body h2:first-of-type { margin-top: 0 !important; }

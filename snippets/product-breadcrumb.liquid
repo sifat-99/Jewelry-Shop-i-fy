@@ -1,3 +1,9 @@
+{% doc %}
+  Breadcrumb for the product page: Home / (collection or All products) / product. Accepts: product, collection
+
+  @param {product} [product] - Optional product passed by the parent file
+  @param {collection} [collection] - Optional collection passed by the parent file
+{% enddoc %}
 {%- comment -%} Breadcrumb for the product page: Home / (collection or All products) / product. Accepts: product, collection {%- endcomment -%}
 {%- liquid
   assign bc_parent = collection

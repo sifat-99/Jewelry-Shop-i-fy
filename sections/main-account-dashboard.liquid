@@ -36,7 +36,7 @@
 
 <style>
   .ad-wrap {
-    --ad-line: var(--hairline, color-mix(in srgb, var(--text) 14%, transparent));
+    --ad-line: var(--lv-border);
     --ad-surface: color-mix(in srgb, var(--text) 3%, var(--bg));
     --ad-surface-2: color-mix(in srgb, var(--text) 6%, var(--bg));
     --ad-muted: color-mix(in srgb, var(--text) 62%, transparent);
@@ -48,7 +48,7 @@
     --ad-media-r: var(--media-radius, 0px);
     --ad-input-r: {{ settings.input_border_radius | default: 0 }}px;
     --ad-input-bw: {{ settings.input_border_thickness | default: 1 }}px;
-    --ad-input-line: color-mix(in srgb, var(--text) 38%, transparent);
+    --ad-input-line: var(--lv-border);
     font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
     color: var(--text);
     background: var(--bg);
@@ -95,8 +95,8 @@
   .ad-hero__meta { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13px; color: var(--ad-muted); }
   .ad-hero__meta span { overflow-wrap: anywhere; }
   .ad-badge { display: inline-block; padding: 3px 10px; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ad-accent); border: 1px solid color-mix(in srgb, var(--ad-accent) 45%, transparent); border-radius: var(--ad-badge-r); background: color-mix(in srgb, var(--ad-accent) 8%, transparent); white-space: nowrap; }
-  .ad-signout { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text); text-decoration: none; border: var(--ad-btn-bw) solid var(--ad-input-line); border-radius: var(--ad-btn-r); background: var(--bg); transition: border-color .25s, background .25s; white-space: nowrap; }
-  .ad-signout:hover { border-color: var(--text); background: var(--ad-surface-2); }
+  .ad-signout { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--btn-regular-text); text-decoration: none; border: var(--ad-btn-bw) solid var(--btn-regular-border); border-radius: var(--ad-btn-r); background: var(--btn-regular-bg); transition: border-color .25s, background .25s; white-space: nowrap; }
+  .ad-signout:hover { color: var(--btn-regular-hover-text); border-color: var(--btn-regular-hover-border); background: var(--btn-regular-hover-bg); }
   .ad-signout svg.ad-i { width: 16px; height: 16px; }
 
   /* ---------- Layout + nav ---------- */
@@ -415,7 +415,7 @@
         <div class="ad-hero__text">
           <span class="ad-eyebrow">Welcome back</span>
           <h1 class="ad-hero__title">{{ customer.name | default: 'Atelier Member' }}</h1>
-          <p class="ad-hero__meta"><span>{{ customer.email }}</span><span class="ad-badge">VIP Member</span></p>
+          <p class="ad-hero__meta"><span>{{ customer.email | escape }}</span><span class="ad-badge">VIP Member</span></p>
         </div>
         <a href="{{ routes.account_logout_url }}" class="ad-signout">
           <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -641,51 +641,51 @@
             <div class="ad-field-row">
               <div class="ad-field">
                 <label for="AddressFirstNameNew">First Name</label>
-                <input type="text" id="AddressFirstNameNew" name="address[first_name]" value="{{ form.first_name }}" autocomplete="given-name" required>
+                <input type="text" id="AddressFirstNameNew" name="address[first_name]" value="{{ form.first_name | escape }}" autocomplete="given-name" required>
               </div>
               <div class="ad-field">
                 <label for="AddressLastNameNew">Last Name</label>
-                <input type="text" id="AddressLastNameNew" name="address[last_name]" value="{{ form.last_name }}" autocomplete="family-name" required>
+                <input type="text" id="AddressLastNameNew" name="address[last_name]" value="{{ form.last_name | escape }}" autocomplete="family-name" required>
               </div>
             </div>
             <div class="ad-field">
               <label for="AddressCompanyNew">Company (optional)</label>
-              <input type="text" id="AddressCompanyNew" name="address[company]" value="{{ form.company }}" autocomplete="organization">
+              <input type="text" id="AddressCompanyNew" name="address[company]" value="{{ form.company | escape }}" autocomplete="organization">
             </div>
             <div class="ad-field">
               <label for="AddressAddress1New">Address line 1</label>
-              <input type="text" id="AddressAddress1New" name="address[address1]" value="{{ form.address1 }}" autocomplete="address-line1" required>
+              <input type="text" id="AddressAddress1New" name="address[address1]" value="{{ form.address1 | escape }}" autocomplete="address-line1" required>
             </div>
             <div class="ad-field">
               <label for="AddressAddress2New">Apartment, suite, etc. (optional)</label>
-              <input type="text" id="AddressAddress2New" name="address[address2]" value="{{ form.address2 }}" autocomplete="address-line2">
+              <input type="text" id="AddressAddress2New" name="address[address2]" value="{{ form.address2 | escape }}" autocomplete="address-line2">
             </div>
             <div class="ad-field-row">
               <div class="ad-field">
                 <label for="AddressCityNew">City</label>
-                <input type="text" id="AddressCityNew" name="address[city]" value="{{ form.city }}" autocomplete="address-level2" required>
+                <input type="text" id="AddressCityNew" name="address[city]" value="{{ form.city | escape }}" autocomplete="address-level2" required>
               </div>
               <div class="ad-field">
                 <label for="AddressZipNew">Postal / ZIP Code</label>
-                <input type="text" id="AddressZipNew" name="address[zip]" value="{{ form.zip }}" autocomplete="postal-code" required>
+                <input type="text" id="AddressZipNew" name="address[zip]" value="{{ form.zip | escape }}" autocomplete="postal-code" required>
               </div>
             </div>
             <div class="ad-field-row">
               <div class="ad-field">
                 <label for="AddressCountryNew">Country</label>
-                <select id="AddressCountryNew" name="address[country]" data-default="{{ form.country }}" data-ad-country autocomplete="country">
+                <select id="AddressCountryNew" name="address[country]" data-default="{{ form.country | escape }}" data-ad-country autocomplete="country">
                   {{ all_country_option_tags }}
                 </select>
               </div>
               <div class="ad-field" id="AddressProvinceContainerNew" style="display: none;">
                 <label for="AddressProvinceNew">Region / State</label>
-                <select id="AddressProvinceNew" name="address[province]" data-default="{{ form.province }}" data-ad-province autocomplete="address-level1">
+                <select id="AddressProvinceNew" name="address[province]" data-default="{{ form.province | escape }}" data-ad-province autocomplete="address-level1">
                 </select>
               </div>
             </div>
             <div class="ad-field">
               <label for="AddressPhoneNew">Phone (optional)</label>
-              <input type="tel" id="AddressPhoneNew" name="address[phone]" value="{{ form.phone }}" autocomplete="tel">
+              <input type="tel" id="AddressPhoneNew" name="address[phone]" value="{{ form.phone | escape }}" autocomplete="tel">
             </div>
             <label class="ad-check" for="address_default_address_new">
               <input type="checkbox" id="address_default_address_new" name="address[default]" value="1">
@@ -710,33 +710,33 @@
               <div class="ad-field-row">
                 <div class="ad-field">
                   <label for="AddressFirstName_{{ addr.id }}">First Name</label>
-                  <input type="text" id="AddressFirstName_{{ addr.id }}" name="address[first_name]" value="{{ form.first_name }}" autocomplete="given-name" required>
+                  <input type="text" id="AddressFirstName_{{ addr.id }}" name="address[first_name]" value="{{ form.first_name | escape }}" autocomplete="given-name" required>
                 </div>
                 <div class="ad-field">
                   <label for="AddressLastName_{{ addr.id }}">Last Name</label>
-                  <input type="text" id="AddressLastName_{{ addr.id }}" name="address[last_name]" value="{{ form.last_name }}" autocomplete="family-name" required>
+                  <input type="text" id="AddressLastName_{{ addr.id }}" name="address[last_name]" value="{{ form.last_name | escape }}" autocomplete="family-name" required>
                 </div>
               </div>
               <div class="ad-field">
                 <label for="AddressCompany_{{ addr.id }}">Company (optional)</label>
-                <input type="text" id="AddressCompany_{{ addr.id }}" name="address[company]" value="{{ form.company }}" autocomplete="organization">
+                <input type="text" id="AddressCompany_{{ addr.id }}" name="address[company]" value="{{ form.company | escape }}" autocomplete="organization">
               </div>
               <div class="ad-field">
                 <label for="AddressAddress1_{{ addr.id }}">Address line 1</label>
-                <input type="text" id="AddressAddress1_{{ addr.id }}" name="address[address1]" value="{{ form.address1 }}" autocomplete="address-line1" required>
+                <input type="text" id="AddressAddress1_{{ addr.id }}" name="address[address1]" value="{{ form.address1 | escape }}" autocomplete="address-line1" required>
               </div>
               <div class="ad-field">
                 <label for="AddressAddress2_{{ addr.id }}">Apartment, suite, etc. (optional)</label>
-                <input type="text" id="AddressAddress2_{{ addr.id }}" name="address[address2]" value="{{ form.address2 }}" autocomplete="address-line2">
+                <input type="text" id="AddressAddress2_{{ addr.id }}" name="address[address2]" value="{{ form.address2 | escape }}" autocomplete="address-line2">
               </div>
               <div class="ad-field-row">
                 <div class="ad-field">
                   <label for="AddressCity_{{ addr.id }}">City</label>
-                  <input type="text" id="AddressCity_{{ addr.id }}" name="address[city]" value="{{ form.city }}" autocomplete="address-level2" required>
+                  <input type="text" id="AddressCity_{{ addr.id }}" name="address[city]" value="{{ form.city | escape }}" autocomplete="address-level2" required>
                 </div>
                 <div class="ad-field">
                   <label for="AddressZip_{{ addr.id }}">Postal / ZIP Code</label>
-                  <input type="text" id="AddressZip_{{ addr.id }}" name="address[zip]" value="{{ form.zip }}" autocomplete="postal-code" required>
+                  <input type="text" id="AddressZip_{{ addr.id }}" name="address[zip]" value="{{ form.zip | escape }}" autocomplete="postal-code" required>
                 </div>
               </div>
               <div class="ad-field-row">
@@ -754,7 +754,7 @@
               </div>
               <div class="ad-field">
                 <label for="AddressPhone_{{ addr.id }}">Phone (optional)</label>
-                <input type="tel" id="AddressPhone_{{ addr.id }}" name="address[phone]" value="{{ form.phone }}" autocomplete="tel">
+                <input type="tel" id="AddressPhone_{{ addr.id }}" name="address[phone]" value="{{ form.phone | escape }}" autocomplete="tel">
               </div>
               <label class="ad-check" for="address_default_address_{{ addr.id }}">
                 <input type="checkbox" id="address_default_address_{{ addr.id }}" name="address[default]" value="1"{% if addr == customer.default_address %} checked{% endif %}>

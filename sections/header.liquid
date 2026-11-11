@@ -30,6 +30,42 @@
       assign sticky_mode = 'always'
     endif
   endif
+
+  comment
+    Aurelle transparent header: the nav floats over the hero (home / product / collection, set per page in the
+    section settings) with a soft dark gradient behind it, and turns solid on scroll, on menu hover or when the drawer opens.
+  endcomment
+  assign header_design = section.settings.header_design | default: 'classic'
+  assign modern = false
+  if header_design == 'modern'
+    assign modern = true
+  endif
+  assign transparent_header = false
+  if modern
+    if template.name == 'index' and section.settings.transparent_home
+      assign transparent_header = true
+    elsif template.name == 'product' and section.settings.transparent_product
+      assign transparent_header = true
+    elsif template.name == 'collection' and section.settings.transparent_collection
+      assign transparent_header = true
+    endif
+  endif
+  assign tr_text_color = section.settings.transparent_text_color | default: '#ffffff'
+  assign tr_gradient = section.settings.transparent_gradient
+  if tr_gradient == nil
+    assign tr_gradient = 36
+  endif
+  assign tr_gradient_alpha = tr_gradient | divided_by: 100.0
+  assign inverse_logo = section.settings.inverse_logo
+  assign inverse_w_mobile = mobile_logo_w | times: 2
+  assign inverse_w_desktop = header_logo_width | times: 2
+  assign hover_dim = section.settings.header_hover_dim
+  if hover_dim == nil
+    assign hover_dim = true
+  endif
+  unless modern
+    assign hover_dim = false
+  endunless
 -%}
 <style data-shopify>
   :root {
@@ -92,7 +128,7 @@
   {%- endif -%}
   .theme__header {
     position: relative !important;
-    border-bottom: 1px solid var(--border, #f0f0f0);
+    border-bottom: 1px solid var(--border, var(--lv-border));
     display: flex;
     flex-wrap: wrap;
     width: 100%;
@@ -231,7 +267,7 @@
     align-items: center !important;
     justify-content: space-between !important;
     padding: 14px 18px !important;
-    border-bottom: 1px solid var(--border, #f0f0f0) !important;
+    border-bottom: 1px solid var(--border, var(--lv-border)) !important;
   }
   .header__drawer .drawer__top__center {
     display: flex !important;
@@ -301,7 +337,7 @@
     font-size: 13px !important;
     font-weight: 600 !important;
     letter-spacing: 0.09em !important;
-    color: #111111 !important;
+    color: var(--text, #111111) !important;
     opacity: 1 !important;
     text-transform: uppercase !important;
   }
@@ -310,7 +346,7 @@
     font-size: 13px !important;
     font-weight: 600 !important;
     letter-spacing: 0.09em !important;
-    color: #111111 !important;
+    color: var(--text, #111111) !important;
   }
   .header__menu__inner .menu__item .navlink--toplevel {
     opacity: 1 !important;
@@ -320,17 +356,17 @@
   }
   .header__menu__inner .menu__item:hover .navlink--toplevel {
     opacity: 1 !important;
-    color: #000000 !important;
+    color: var(--text, #000000) !important;
   }
   .header__desktop__button .navlink,
   .header__mobile__button {
-    color: #111111 !important;
+    color: var(--text, #111111) !important;
     opacity: 1 !important;
   }
   .header__desktop__button svg,
   .header__mobile__button svg {
-    color: #111111 !important;
-    stroke: #111111 !important;
+    color: var(--text, #111111) !important;
+    stroke: var(--text, #111111) !important;
   }
 
   /* Icon buttons (account / search / cart): the link itself is a 44px circle, so the hover background can never be clipped */
@@ -384,7 +420,7 @@
     --lv-dd-global-bg: {{ section.settings.dropdown_global_bg | default: '#ffffff' }};
     --lv-dd-global-text: {{ section.settings.dropdown_global_text | default: '#111111' }};
     --lv-dd-global-hover: {{ section.settings.dropdown_global_hover | default: '#666666' }};
-    --lv-dd-global-border: {{ section.settings.dropdown_global_border | default: '#e8e2d9' }};
+    --lv-dd-global-border: {{ section.settings.dropdown_global_border | default: 'var(--lv-border)' }};
     --lv-dd-global-radius: {{ section.settings.dropdown_global_radius | default: 0 }}px;
     --lv-dd-pad-y: {{ section.settings.dropdown_padding_y | default: 24 }}px;
     --lv-dd-link-size: {{ section.settings.dropdown_link_size | default: 12 }}px;
@@ -408,7 +444,7 @@
   .header__dropdown {
     background-color: var(--lv-dd-bg, var(--lv-dd-global-bg, #ffffff)) !important;
     color: var(--lv-dd-text, var(--lv-dd-global-text, #111111)) !important;
-    border: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, #e8e2d9)) !important;
+    border: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, var(--lv-border))) !important;
     box-shadow: var(--lv-dd-global-shadow, 0 10px 30px rgba(0, 0, 0, 0.05)) !important;
     border-radius: var(--lv-dd-radius, var(--lv-dd-global-radius, 0px)) !important;
     padding-top: var(--lv-dd-pad-y, 24px) !important;
@@ -439,7 +475,7 @@
     letter-spacing: 0.12em !important;
     margin-bottom: 10px !important;
     padding-bottom: 6px !important;
-    border-bottom: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, #e8e2d9)) !important;
+    border-bottom: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, var(--lv-border))) !important;
     display: inline-block !important;
   }
   .header__dropdown .dropdown__family--grandchild .navlink--grandchild {
@@ -452,7 +488,7 @@
     width: auto !important;
     min-width: 220px !important;
     left: auto !important;
-    border: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, #e8e2d9)) !important;
+    border: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, var(--lv-border))) !important;
     border-radius: var(--lv-dd-radius, var(--lv-dd-global-radius, 0px)) !important;
     box-shadow: var(--lv-dd-global-shadow, 0 10px 30px rgba(0, 0, 0, 0.08)) !important;
     padding: var(--lv-dd-pad-y, 24px) 0 !important;
@@ -504,7 +540,7 @@
   .lv-header-dropdown {
     background-color: var(--lv-dd-bg, var(--lv-dd-global-bg, #ffffff)) !important;
     color: var(--lv-dd-text, var(--lv-dd-global-text, #111111)) !important;
-    border: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, #e8e2d9)) !important;
+    border: 1px solid var(--lv-dd-border, var(--lv-dd-global-border, var(--lv-border))) !important;
     border-radius: var(--lv-dd-radius, var(--lv-dd-global-radius, 0px)) !important;
     padding: var(--lv-dd-pad-y, 24px) 0 !important;
     box-shadow: var(--lv-dd-global-shadow, 0 8px 24px rgba(0, 0, 0, 0.06)) !important;
@@ -882,6 +918,135 @@
     color: inherit !important;
     transition: color var(--btn-animation-duration, 350ms) ease-in-out !important;
   }
+
+  /* =============================================================
+     Aurelle header design: mega menu fade + hover focus
+     ============================================================= */
+  {%- if modern -%}
+  /* The open mega menu panel fades in and out (same feel as the nav underlay) instead of snapping */
+  .menu__item .header__dropdown {
+    transition: opacity 0.3s cubic-bezier(0.5, 1, 0.89, 1), visibility 0s linear 0.3s;
+  }
+  .menu__item .header__dropdown.is-visible,
+  .menu__item:hover > .header__dropdown {
+    transition: opacity 0.35s cubic-bezier(0.5, 1, 0.89, 1), visibility 0s linear 0s;
+  }
+
+  /* Modern layout (desktop): row 1 = logo in the middle + utility icons on the right, row 2 = the full nav centered.
+     Fits long jewelry menus and keeps the mega menu full width under the whole header. */
+  .header__wrapper[data-header-design="modern"] .header__desktop {
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding-top: {{ header_padding | plus: 6 }}px !important;
+    padding-bottom: 0 !important;
+  }
+  .header__wrapper[data-header-design="modern"] .header__desktop::before {
+    content: '';
+    order: 1;
+    flex: 1 1 0;
+  }
+  .header__wrapper[data-header-design="modern"] .header__desktop__bar__l {
+    order: 2;
+    flex: 0 0 auto;
+    justify-content: center;
+  }
+  .header__wrapper[data-header-design="modern"] .header__desktop__bar__r {
+    order: 3;
+    flex: 1 1 0;
+    justify-content: flex-end;
+  }
+  .header__wrapper[data-header-design="modern"] .header__desktop__bar__c {
+    order: 4;
+    flex: 0 0 100%;
+    justify-content: center;
+    margin-top: {{ header_padding | plus: 2 }}px;
+    border-top: 1px solid var(--border, var(--lv-border));
+  }
+  .header__wrapper[data-header-design="modern"] .header__menu__inner {
+    justify-content: center;
+  }
+  {%- endif -%}
+  {%- if hover_dim -%}
+    /* Hover focus: while one item is hovered the others in the same group soften (nav, utility icons, mega menu links and cards) */
+    .header__desktop__button,
+    .header__mobile__button,
+    .lv-dropdown-col,
+    .lv-dropdown-product,
+    .dropdown__family {
+      transition: opacity 0.25s ease;
+    }
+    .header__desktop__buttons:hover .header__desktop__button:not(:hover) {
+      opacity: 0.72;
+    }
+    .lv-header-dropdown__inner:hover .lv-dropdown-col:not(:hover),
+    .lv-dropdown-products:hover .lv-dropdown-product:not(:hover),
+    .lv-split-links-grid:hover .dropdown__family:not(:hover),
+    .header__dropdown__inner:hover > .dropdown__family:not(:hover) {
+      opacity: 0.72;
+    }
+  {%- endif -%}
+
+  {%- if transparent_header -%}
+    /* ----- Aurelle transparent header -----
+       State "top" = page at the top, no menu hover, drawer closed. Any other state is the normal solid header. */
+    :root {
+      --lv-tr-text: {{ tr_text_color }};
+    }
+    #shopify-section-{{ section.id }} {
+      margin-bottom: calc(var(--lv-header-h, 0px) * -1) !important;
+    }
+    {%- if sticky_mode == 'none' -%}
+      #shopify-section-{{ section.id }} {
+        position: relative !important;
+        z-index: 6000 !important;
+      }
+    {%- endif -%}
+    /* Soft dark gradient behind the nav so white text stays readable on any hero image */
+    #shopify-section-{{ section.id }}::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      display: block;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(43, 38, 34, {{ tr_gradient_alpha }}), rgba(43, 38, 34, 0));
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    {%- assign lv_t = 'html:not([data-lv-scrolled]) #shopify-section-' | append: section.id | append: ':has(.header__wrapper[data-lv-transparent="true"]):not(:has(.menu__item.parent:hover)):not(:has([aria-expanded="true"]))' -%}
+    {{ lv_t }}::before {
+      opacity: 1;
+    }
+    {{ lv_t }},
+    {{ lv_t }} .header__wrapper,
+    {{ lv_t }} .theme__header {
+      background: transparent !important;
+      background-color: transparent !important;
+      box-shadow: none !important;
+      border-color: transparent !important;
+    }
+    {{ lv_t }} .navlink--toplevel,
+    {{ lv_t }} .navlink--toplevel .navtext,
+    {{ lv_t }} .header__desktop__button .navlink,
+    {{ lv_t }} .header__mobile__button,
+    {{ lv_t }} .header__cart__status,
+    {{ lv_t }} .header__cart__status span {
+      color: var(--lv-tr-text) !important;
+    }
+    {{ lv_t }} .header__desktop__button svg,
+    {{ lv_t }} .header__mobile__button svg {
+      color: var(--lv-tr-text) !important;
+      stroke: var(--lv-tr-text) !important;
+    }
+    {%- if inverse_logo != blank -%}
+      .logo__img--inverse { display: none !important; }
+      {{ lv_t }} .logo__img--inverse { display: block !important; }
+      {{ lv_t }} .logo__img--color { display: none !important; }
+    {%- else -%}
+      /* No inverse logo uploaded: turn the dark logo white */
+      {{ lv_t }} .header__logo .logo__img--color { filter: brightness(0) invert(1); }
+    {%- endif -%}
+  {%- endif -%}
 </style>
 
 
@@ -906,6 +1071,8 @@
   data-header-wrapper
   style="--bar-opacity: 0; --bar-width: 0; --bar-left: 0;"
   data-header-transparent="false"
+  data-lv-transparent="{{ transparent_header }}"
+  data-header-design="{{ header_design }}"
   data-underline-current="true"
   data-header-sticky="{% if sticky_mode == 'none' %}none{% else %}sticky{% endif %}"
   data-header-style="menu_center"
@@ -949,6 +1116,9 @@ data-header-cart-full="false"
             style="max-width: {{ mobile_logo_w }}px; height: auto; -webkit-backface-visibility: hidden; image-rendering: -webkit-optimize-contrast;">
         {%- else -%}
           <img src="{{ 'aurelle_fine_jewelry_logo_transparent.png' | asset_url }}" alt="{{ shop.name | escape }}" width="{{ mobile_logo_w }}" height="{{ mobile_logo_w | divided_by: 4.1 | round }}" loading="eager" class="logo__img logo__img--color" style="max-width: {{ mobile_logo_w }}px; height: auto;">
+        {%- endif -%}
+        {%- if inverse_logo != blank -%}
+          <img src="{{ inverse_logo | image_url: width: inverse_w_mobile }}" alt="{{ shop.name | escape }}" width="{{ mobile_logo_w }}" height="{{ mobile_logo_w | divided_by: inverse_logo.aspect_ratio | round }}" loading="eager" class="logo__img logo__img--inverse" style="max-width: {{ mobile_logo_w }}px; height: auto;">
         {%- endif -%}
       </a>
     </div>
@@ -997,6 +1167,9 @@ data-header-cart-full="false"
             style="max-width: {{ header_logo_width }}px; height: auto; -webkit-backface-visibility: hidden; image-rendering: -webkit-optimize-contrast;">
         {%- else -%}
           <img src="{{ 'aurelle_fine_jewelry_logo_transparent.png' | asset_url }}" alt="{{ shop.name | escape }}" width="{{ header_logo_width }}" height="{{ header_logo_width | divided_by: 4.1 | round }}" loading="eager" class="logo__img logo__img--color" style="max-width: {{ header_logo_width }}px; height: auto;">
+        {%- endif -%}
+        {%- if inverse_logo != blank -%}
+          <img src="{{ inverse_logo | image_url: width: inverse_w_desktop }}" alt="{{ shop.name | escape }}" width="{{ header_logo_width }}" height="{{ header_logo_width | divided_by: inverse_logo.aspect_ratio | round }}" loading="eager" class="logo__img logo__img--inverse" style="max-width: {{ header_logo_width }}px; height: auto;">
         {%- endif -%}
       </a>
     </div>
@@ -1302,23 +1475,67 @@ data-header-cart-full="false"
   </script>
 {%- endif -%}
 
+{%- if transparent_header -%}
+<script>
+  /* Aurelle transparent header: flag the page as scrolled (header turns solid) and keep the hero pulled up by the real header height */
+  (function () {
+    var section = document.getElementById('shopify-section-{{ section.id }}');
+    if (!section) return;
+    var root = document.documentElement;
+    function onScroll() {
+      if ((window.pageYOffset || document.documentElement.scrollTop || 0) > 8) root.setAttribute('data-lv-scrolled', '');
+      else root.removeAttribute('data-lv-scrolled');
+    }
+    function measure() {
+      var bar = section.querySelector('.theme__header') || section;
+      root.style.setProperty('--lv-header-h', bar.offsetHeight + 'px');
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', measure);
+    if (window.ResizeObserver) new ResizeObserver(measure).observe(section.querySelector('.theme__header') || section);
+    onScroll();
+    measure();
+  })();
+</script>
+{%- endif -%}
+
 {% schema %}
 {
   "name": "Header",
   "settings": [
     { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "header_design",
+      "label": "Header design",
+      "info": "Classic keeps the current header. Modern = centered logo with the menu on a second row, transparent-over-hero option, hover focus and a fading mega menu.",
+      "options": [
+        { "value": "classic", "label": "Classic (current)" },
+        { "value": "modern", "label": "Modern (new)" }
+      ],
+      "default": "classic"
+    },
     { "type": "image_picker", "id": "logo", "label": "Logo image", "info": "Leave blank to use the global logo from Theme Settings > Logo" },
     { "type": "range", "id": "logo_width", "min": 50, "max": 300, "step": 5, "unit": "px", "label": "Custom logo width", "default": 140 },
     { "type": "select", "id": "mobile_logo_alignment", "label": "Mobile logo alignment", "options": [ { "value": "center", "label": "Center" }, { "value": "left", "label": "Left (Next to Menu)" } ], "default": "center" },
     { "type": "range", "id": "padding_vertical", "min": 0, "max": 30, "step": 2, "unit": "px", "label": "Header vertical padding", "default": 8 },
     { "type": "header", "content": "Sticky Header" },
     { "type": "select", "id": "sticky_header_type", "label": "Sticky header behavior", "options": [ { "value": "always", "label": "Always sticky (Fixed at top)" }, { "value": "scroll_up", "label": "Sticky on scroll up" }, { "value": "none", "label": "Disabled (Normal scroll)" } ], "default": "always" },
+    { "type": "header", "content": "Modern header options" },
+    { "type": "paragraph", "content": "Used only when Header design is set to Modern." },
+    { "type": "checkbox", "id": "transparent_home", "label": "Transparent on home page", "default": false, "visible_if": "{{ section.settings.header_design == 'modern' }}" },
+    { "type": "checkbox", "id": "transparent_product", "label": "Transparent on product pages", "default": false, "visible_if": "{{ section.settings.header_design == 'modern' }}" },
+    { "type": "checkbox", "id": "transparent_collection", "label": "Transparent on collection pages", "default": false, "visible_if": "{{ section.settings.header_design == 'modern' }}" },
+    { "type": "color", "id": "transparent_text_color", "label": "Text and icon color on transparent header", "default": "#ffffff", "visible_if": "{{ section.settings.header_design == 'modern' }}" },
+    { "type": "range", "id": "transparent_gradient", "min": 0, "max": 60, "step": 4, "unit": "%", "label": "Dark gradient behind the nav", "info": "Keeps the text readable on bright hero images. Fades out when the header turns solid.", "default": 36, "visible_if": "{{ section.settings.header_design == 'modern' }}" },
+    { "type": "image_picker", "id": "inverse_logo", "label": "Light logo for transparent header", "info": "Optional. If empty, the normal logo is turned white automatically.", "visible_if": "{{ section.settings.header_design == 'modern' }}" },
+    { "type": "checkbox", "id": "header_hover_dim", "label": "Soften other items on hover", "info": "Nav links, header icons and mega menu cards/links.", "default": true, "visible_if": "{{ section.settings.header_design == 'modern' }}" },
     { "type": "link_list", "id": "main_menu_link_list", "label": "Navigation menu", "default": "main-menu", "info": "Choose the menu to display in the header from Online Store > Navigation" },
     { "type": "header", "content": "Global Dropdown Styling" },
     { "type": "color", "id": "dropdown_global_bg", "label": "Dropdown background", "default": "#ffffff" },
     { "type": "color", "id": "dropdown_global_text", "label": "Dropdown text color", "default": "#111111" },
     { "type": "color", "id": "dropdown_global_hover", "label": "Dropdown hover color", "default": "#666666" },
-    { "type": "color", "id": "dropdown_global_border", "label": "Dropdown border color", "default": "#e8e2d9" },
+    { "type": "color", "id": "dropdown_global_border", "label": "Dropdown border color", "info": "Leave empty to use the global border color." },
     { "type": "range", "id": "dropdown_global_radius", "min": 0, "max": 24, "step": 1, "unit": "px", "label": "Dropdown corner radius", "default": 0 },
     { "type": "select", "id": "dropdown_global_shadow", "label": "Dropdown shadow", "options": [ { "value": "none", "label": "None" }, { "value": "subtle", "label": "Subtle shadow" }, { "value": "medium", "label": "Medium shadow" }, { "value": "deep", "label": "Deep shadow" } ], "default": "subtle" },
     { "type": "range", "id": "dropdown_padding_y", "min": 16, "max": 60, "step": 2, "unit": "px", "label": "Dropdown vertical padding", "default": 24 },
@@ -1327,9 +1544,7 @@ data-header-cart-full="false"
     { "type": "select", "id": "dropdown_font_weight", "label": "Dropdown link font weight", "options": [ { "value": "400", "label": "Regular" }, { "value": "500", "label": "Medium" }, { "value": "600", "label": "Semi-bold" } ], "default": "500" },
     { "type": "select", "id": "dropdown_text_transform", "label": "Dropdown link text style", "options": [ { "value": "uppercase", "label": "Uppercase" }, { "value": "capitalize", "label": "Capitalize" }, { "value": "none", "label": "None" } ], "default": "uppercase" },
     { "type": "select", "id": "dropdown_button_style", "label": "Menu card link style", "options": [ { "value": "outline", "label": "Outline" }, { "value": "solid", "label": "Solid" }, { "value": "pill", "label": "Pill" }, { "value": "arrow_link", "label": "Text with arrow" } ], "default": "solid" },
-    { "type": "select", "id": "dropdown_image_ratio", "label": "Menu image ratio", "options": [ { "value": "1/1", "label": "Square (1:1)" }, { "value": "4/5", "label": "Portrait (4:5)" }, { "value": "3/4", "label": "Tall (3:4)" }, { "value": "16/9", "label": "Landscape (16:9)" }, { "value": "adapt", "label": "Adapt to image" } ], "default": "1/1" },
     { "type": "range", "id": "dropdown_card_radius", "min": 0, "max": 30, "step": 1, "unit": "px", "label": "Menu image radius", "default": 0 },
-    { "type": "range", "id": "dropdown_overlay_opacity", "min": 0, "max": 80, "step": 5, "unit": "%", "label": "Menu image overlay", "default": 0 },
     { "type": "range", "id": "dropdown_gap", "min": 8, "max": 40, "step": 4, "unit": "px", "label": "Menu item spacing", "default": 24 }
   ],
   "blocks": [

@@ -20,10 +20,10 @@
       {%- if total_results > 0 -%}
         {{ total_results }} results: {{ predictive_search.resources.products.size }} products
       {%- else -%}
-        No results found for “{{ predictive_search.terms }}”. Check the spelling or use a different word or phrase.
+        No results found for “{{ predictive_search.terms | escape }}”. Check the spelling or use a different word or phrase.
       {%- endif -%}
     </span>
-    <div class="search__results__wrapper" id="predictive-search-results" role="listbox" aria-label="Search for “{{ predictive_search.terms }}”">
+    <div class="search__results__wrapper" id="predictive-search-results" role="listbox" aria-label="Search for “{{ predictive_search.terms | escape }}”">
       {%- if total_results > 0 -%}
         <div class="search__results__outer">
           <div class="search__results__other">
@@ -98,7 +98,7 @@
           <div aria-live="polite">
             <p>
               No results for
-              <em>{{ predictive_search.terms }}</em>
+              <em>{{ predictive_search.terms | escape }}</em>
             </p>
           </div>
         </div>
@@ -113,7 +113,7 @@
           type="button"
           onclick="this.closest('form').submit();"
         >
-          <span data-predictive-search-search-for-text>Search for “{{ predictive_search.terms }}”</span>
+          <span data-predictive-search-search-for-text>Search for “{{ predictive_search.terms | escape }}”</span>
           <span class="ml-r2 accent-size-5 [&>svg]:inline-block">
             <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
           </span>

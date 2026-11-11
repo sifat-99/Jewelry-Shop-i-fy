@@ -4,6 +4,76 @@
   if target_collection == blank or target_collection.products_count == 0
     assign target_collection = collections.all
   endif
+-%}
+
+{%- if section.settings.design_style == 'new' -%}
+  {%- liquid
+    assign new_image_pos = 'left'
+    if section.settings.layout == 'image_right'
+      assign new_image_pos = 'right'
+    endif
+
+    assign new_media_link = section.settings.banner_link
+    if new_media_link == blank
+      assign new_media_link = section.settings.button_link
+    endif
+
+    assign new_btn_1_link = section.settings.button_link
+    if new_btn_1_link == blank
+      assign new_btn_1_link = section.settings.banner_link
+    endif
+    if new_btn_1_link == blank and target_collection != blank
+      assign new_btn_1_link = target_collection.url
+    endif
+
+    assign new_btn_1_style = 'primary'
+    if section.settings.showcase_content_type == 'image'
+      if section.settings.banner_button_style == 'button'
+        assign new_btn_1_style = 'button'
+      else
+        assign new_btn_1_style = 'link'
+      endif
+    endif
+  -%}
+  {% render 'product-showcase-render',
+    section_id: section.id,
+    section_index: section.index,
+    color_scheme: section.settings.color_scheme,
+    content_type: section.settings.showcase_content_type,
+    media_type: section.settings.banner_type,
+    image: section.settings.image,
+    video: section.settings.video,
+    image_link: new_media_link,
+    image_position: new_image_pos,
+    image_heading: section.settings.title,
+    image_subtitle: section.settings.subtitle,
+    heading: section.settings.title,
+    text: section.settings.showcase_text,
+    text_alignment: section.settings.showcase_text_alignment,
+    button_1_label: section.settings.button_label,
+    button_1_link: new_btn_1_link,
+    button_1_style: new_btn_1_style,
+    button_2_label: section.settings.showcase_button_2_label,
+    button_2_link: section.settings.showcase_button_2_link,
+    button_2_style: 'secondary',
+    collection: target_collection,
+    max_products: section.settings.limit,
+    columns: section.settings.showcase_columns,
+    mobile_columns: '2',
+    columns_gap: 20,
+    rows_gap: 24,
+    card_border_radius: section.settings.card_border_radius,
+    padding_top: section.settings.padding_top,
+    padding_bottom: section.settings.padding_bottom,
+    showcase_products: section.settings.showcase_products,
+    showcase_effect: section.settings.showcase_effect,
+    showcase_autoplay: section.settings.showcase_autoplay,
+    showcase_speed: section.settings.showcase_speed,
+    showcase_show_caption: section.settings.showcase_show_caption,
+    showcase_show_dots: section.settings.showcase_show_dots
+  %}
+{%- else -%}
+{%- liquid
   comment
     Banner / products column widths. For "image right" the visual order is reversed (products first), so the tracks are swapped.
   endcomment
@@ -28,9 +98,22 @@
   if section.settings.banner_type == 'products' and section.settings.showcase_products.size > 0
     assign use_showcase = true
   endif
+  assign use_video = false
+  if section.settings.banner_type == 'video' and section.settings.video != blank
+    assign use_video = true
+  endif
   assign banner_fill = true
   if section.settings.banner_height == 'ratio'
     assign banner_fill = false
+  endif
+  assign banner_pos = section.settings.banner_content_position | default: 'middle_center'
+  assign effective_btn_style = section.settings.banner_button_style | default: 'auto'
+  if effective_btn_style == 'auto'
+    if banner_pos == 'bottom_left'
+      assign effective_btn_style = 'link'
+    else
+      assign effective_btn_style = 'button'
+    endif
   endif
 -%}
 
@@ -265,61 +348,102 @@
       #shopify-section-{{ section.id }} .collection-split-products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 24px 16px !important; }
     }
 
-    /* ---------- Product showcase banner (selected products + moving animation) ---------- */
-    #shopify-section-{{ section.id }} .collection-split__block--showcase .image-overlay { pointer-events: none; }
-    #shopify-section-{{ section.id }} .split-showcase { position: absolute; inset: 0; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; background: #000000; }
-    #shopify-section-{{ section.id }} .split-showcase__slide { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
-    #shopify-section-{{ section.id }} .split-showcase__slide.is-active { pointer-events: auto; }
-    #shopify-section-{{ section.id }} .split-showcase__link { position: absolute; inset: 0; display: block; overflow: hidden; color: #ffffff; }
-    #shopify-section-{{ section.id }} .split-showcase__img {
-      /* overscan 2px: hides the faint edge line some product photos carry on their top/left border */
-      width: calc(100% + 4px) !important;
-      max-width: none !important;
-      height: calc(100% + 4px) !important;
-      margin: -2px !important;
-      object-fit: cover !important;
-      object-position: center !important;
-      display: block !important;
-      -webkit-user-drag: none;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: auto;
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
-      transform: translateZ(0);
-      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    /* ---------- Product showcase & video overlays ---------- */
+    #shopify-section-{{ section.id }} .collection-split__block--showcase .image-overlay,
+    #shopify-section-{{ section.id }} .collection-split__block--video .image-overlay {
+      pointer-events: none;
     }
-    #shopify-section-{{ section.id }} .split-showcase:hover .split-showcase__img {
-      transform: scale(1.03);
-    }
-    #shopify-section-{{ section.id }} .split-showcase__shade {
-      position: absolute; left: 0; right: 0; bottom: 0; height: 50%; z-index: 3; pointer-events: none;
-      background: linear-gradient(to top, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.35) 35%, rgba(0,0,0,0) 100%);
-    }
-    #shopify-section-{{ section.id }} .split-showcase__caption {
-      position: absolute; left: clamp(16px, 3vw, 32px); right: 90px; bottom: clamp(16px, 3vw, 30px); z-index: 4;
-      display: flex; flex-direction: column; gap: 4px; text-align: left; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.6), 0 2px 14px rgba(0,0,0,0.5);
-    }
-    #shopify-section-{{ section.id }} .split-showcase__name { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.35; color: #ffffff; }
-    #shopify-section-{{ section.id }} .split-showcase__price { font-size: 14px; font-weight: 600; letter-spacing: 0.04em; opacity: 1; color: #ffffff; }
-    #shopify-section-{{ section.id }} .split-showcase__dots {
-      position: absolute; right: clamp(14px, 3vw, 28px); bottom: clamp(18px, 3vw, 32px); z-index: 5; display: flex; gap: 8px;
-    }
-    #shopify-section-{{ section.id }} .split-showcase__dot {
-      width: 8px; height: 8px; padding: 0; border-radius: 50%; border: 1px solid #ffffff; background: transparent; cursor: pointer;
-      opacity: 0.8; transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-    #shopify-section-{{ section.id }} .split-showcase__dot.is-active { background: #ffffff; transform: scale(1.25); opacity: 1; }
 
-    /* Effect 1: soft cross-fade */
-    #shopify-section-{{ section.id }} .split-showcase[data-effect="fade_zoom"] .split-showcase__slide { transition: opacity 0.8s ease; }
-    #shopify-section-{{ section.id }} .split-showcase[data-effect="fade_zoom"] .split-showcase__slide.is-active { opacity: 1; z-index: 2; }
-    /* Effect 2: slide */
-    #shopify-section-{{ section.id }} .split-showcase[data-effect="slide"] .split-showcase__slide { opacity: 1; transform: translateX(100%); transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1); }
-    #shopify-section-{{ section.id }} .split-showcase[data-effect="slide"] .split-showcase__slide.is-active { transform: translateX(0); z-index: 2; }
-    #shopify-section-{{ section.id }} .split-showcase[data-effect="slide"] .split-showcase__slide.is-prev { transform: translateX(-100%); }
-    @media (prefers-reduced-motion: reduce) {
-      #shopify-section-{{ section.id }} .split-showcase__slide,
-      #shopify-section-{{ section.id }} .split-showcase__img { transition: none !important; transform: none !important; }
+    /* ---------- Classic Bottom-Left Editorial Position & Underline Link ---------- */
+    #shopify-section-{{ section.id }} .collection-split__block--bottom-left.collection-split__block--has-scrim .collection-split__media-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: linear-gradient(
+        to top,
+        rgba(17, 17, 17, 0.56) 0%,
+        rgba(17, 17, 17, 0.22) 28%,
+        rgba(17, 17, 17, 0) 54%
+      );
+    }
+    #shopify-section-{{ section.id }} .collection-split__block--bottom-left .hero__content__wrapper.align--bottom-left {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0 !important;
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: flex-start !important;
+      text-align: left !important;
+      padding: clamp(22px, 3vw, 40px) clamp(20px, 3.2vw, 38px) !important;
+      box-sizing: border-box !important;
+      z-index: 6 !important;
+      pointer-events: none !important;
+    }
+    #shopify-section-{{ section.id }} .collection-split__block--bottom-left.collection-split__block--showcase .hero__content__wrapper.align--bottom-left,
+    #shopify-section-{{ section.id }} .collection-split__block--bottom-left.collection-split__block--video .hero__content__wrapper.align--bottom-left {
+      padding-inline-end: 84px !important;
+    }
+    #shopify-section-{{ section.id }} .collection-split__block--bottom-left .hero__content__inner {
+      max-width: min(520px, 100%);
+      text-align: left;
+    }
+    #shopify-section-{{ section.id }} .collection-split__block--bottom-left .hero__title {
+      margin: 0 !important;
+      font-family: var(--FONT-STACK-HEADING, 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif) !important;
+      font-size: clamp(22px, 2.5vw, 36px) !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.025em !important;
+      line-height: 1.08 !important;
+      text-transform: uppercase !important;
+      color: #ffffff !important;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.28) !important;
+    }
+    #shopify-section-{{ section.id }} .collection-split__block--bottom-left .hero__subtitle {
+      margin: 8px 0 0 0 !important;
+      text-align: left !important;
+      font-size: 13.5px !important;
+      letter-spacing: 0.02em !important;
+      line-height: 1.48 !important;
+      color: rgba(255, 255, 255, 0.92) !important;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.32) !important;
+    }
+    #shopify-section-{{ section.id }} .hero__btn__wrap--link {
+      margin-top: 10px;
+    }
+    #shopify-section-{{ section.id }} .hero__text-link {
+      display: inline-block;
+      position: relative;
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.015em;
+      line-height: 1.35;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 0 0 3px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.88);
+      pointer-events: auto;
+      transition: opacity 0.25s ease, border-color 0.25s ease;
+    }
+    #shopify-section-{{ section.id }} .hero__text-link:hover {
+      opacity: 0.78;
+      border-bottom-color: #ffffff;
+    }
+    #shopify-section-{{ section.id }} .hero__text-link:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 4px;
+    }
+    @media only screen and (max-width: 768px) {
+      #shopify-section-{{ section.id }} .collection-split__block--bottom-left .hero__content__wrapper.align--bottom-left {
+        padding: 20px 18px !important;
+      }
+      #shopify-section-{{ section.id }} .collection-split__block--bottom-left .hero__title {
+        font-size: clamp(20px, 5.4vw, 28px) !important;
+      }
     }
   </style>
 
@@ -337,124 +461,8 @@
     })();
   </script>
 
-  {%- if use_showcase and section.settings.showcase_products.size > 1 -%}
-    <script>
-      (() => {
-        const init = () => {
-          const root = document.querySelector('#shopify-section-{{ section.id }} [data-split-showcase]');
-          if (!root || root.dataset.ready) return;
-          root.dataset.ready = '1';
-          const slides = Array.from(root.querySelectorAll('[data-showcase-slide]'));
-          const dots = Array.from(root.querySelectorAll('[data-showcase-dot]'));
-          const speed = parseInt(root.dataset.speed, 10) || 4500;
-          const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          let current = 0,
-            timer = null,
-            visible = true,
-            hovering = false;
-
-          const show = (n) => {
-            const next = (n + slides.length) % slides.length;
-            if (next === current) return;
-            slides.forEach((el, i) => {
-              el.classList.toggle('is-active', i === next);
-              el.classList.toggle('is-prev', i === current);
-              const link = el.querySelector('a');
-              if (link) link.tabIndex = i === next ? 0 : -1;
-            });
-            dots.forEach((d, i) => d.classList.toggle('is-active', i === next));
-            current = next;
-          };
-          const stop = () => {
-            if (timer) {
-              clearInterval(timer);
-              timer = null;
-            }
-          };
-          const start = () => {
-            stop();
-            if (root.dataset.autoplay !== 'true' || reduced || !visible || hovering || document.hidden) return;
-            timer = setInterval(() => show(current + 1), speed);
-          };
-          dots.forEach((d) =>
-            d.addEventListener('click', (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              show(parseInt(d.dataset.showcaseDot, 10));
-              start();
-            })
-          );
-
-          /* swipe / drag */
-          let sx = 0,
-            sy = 0,
-            dragging = false,
-            moved = false;
-          root.addEventListener('pointerdown', (e) => {
-            if (e.target.closest('[data-showcase-dot]') || (e.pointerType === 'mouse' && e.button !== 0)) return;
-            dragging = true;
-            moved = false;
-            sx = e.clientX;
-            sy = e.clientY;
-          });
-          root.addEventListener('pointermove', (e) => {
-            if (dragging && Math.abs(e.clientX - sx) > 8) moved = true;
-          });
-          const end = (e) => {
-            if (!dragging) return;
-            dragging = false;
-            const dx = e.clientX - sx,
-              dy = e.clientY - sy;
-            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-              show(current + (dx < 0 ? 1 : -1));
-              start();
-            }
-          };
-          root.addEventListener('pointerup', end);
-          root.addEventListener('pointercancel', () => {
-            dragging = false;
-          });
-          root.addEventListener('dragstart', (e) => e.preventDefault());
-          root.addEventListener(
-            'click',
-            (e) => {
-              if (moved) {
-                e.preventDefault();
-                e.stopPropagation();
-                moved = false;
-              }
-            },
-            true
-          );
-
-          root.addEventListener('mouseenter', () => {
-            hovering = true;
-            stop();
-          });
-          root.addEventListener('mouseleave', () => {
-            hovering = false;
-            start();
-          });
-          document.addEventListener('visibilitychange', start);
-          if ('IntersectionObserver' in window) {
-            new IntersectionObserver(
-              (e) => {
-                visible = e[0].isIntersecting;
-                start();
-              },
-              { threshold: 0.2 }
-            ).observe(root);
-          }
-          start();
-        };
-        /* the script sits above the markup, so wait until the banner exists */
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-        else init();
-        document.addEventListener('shopify:section:load', (e) => {
-          if (e.target && e.target.id === 'shopify-section-{{ section.id }}') init();
-        });
-      })();
-    </script>
+  {%- if use_showcase or use_video -%}
+    <script src="{{ 'product-showcase.js' | asset_url }}" type="module" fetchpriority="low"></script>
   {%- endif -%}
 
   <div class="collection-split-container">
@@ -476,17 +484,17 @@
           if button_url == blank
             assign button_url = routes.all_products_collection_url
           endif
+          assign has_banner_content = false
+          if section.settings.title != blank
+            assign has_banner_content = true
+          elsif section.settings.subtitle != blank
+            assign has_banner_content = true
+          elsif section.settings.button_label != blank
+            assign has_banner_content = true
+          endif
         -%}
-        <div class="collection-split__block collection-split__block--banner text--white{% if use_showcase %} collection-split__block--showcase{% elsif banner_url != blank %} collection-split__block--clickable{% endif %}">
-          {%- assign has_banner_content = false -%}
-          {%- if section.settings.title != blank
-            or section.settings.subtitle != blank
-            or section.settings.button_label != blank
-          -%}
-            {%- assign has_banner_content = true -%}
-          {%- endif -%}
-
-          {%- if banner_url != blank and use_showcase == false -%}
+        <div class="collection-split__block collection-split__block--banner text--white{% if banner_pos == 'bottom_left' %} collection-split__block--bottom-left{% if has_banner_content %} collection-split__block--has-scrim{% endif %}{% endif %}{% if use_showcase %} collection-split__block--showcase{% elsif use_video %} collection-split__block--video{% elsif banner_url != blank %} collection-split__block--clickable{% endif %}">
+          {%- if banner_url != blank and use_showcase == false and use_video == false -%}
             <a
               href="{{ banner_url }}"
               class="split-banner-full-link"
@@ -496,10 +504,10 @@
 
           {%- if has_banner_content -%}
             <div
-              class="hero__content__wrapper align--middle-center"
+              class="hero__content__wrapper {% if banner_pos == 'bottom_left' %}align--bottom-left{% else %}align--middle-center{% endif %}"
               style="position: relative; z-index: 6; pointer-events: none;"
             >
-              <div>
+              <div class="hero__content__inner">
                 {%- if section.settings.title != blank -%}
                   <h2 class="hero__title" data-aos="hero" data-aos-order="2">{{ section.settings.title }}</h2>
                 {%- endif -%}
@@ -508,21 +516,32 @@
                     class="hero__subtitle"
                     data-aos="hero"
                     data-aos-order="2"
-                    style="font-family: 'Quicksand', sans-serif; font-size: 13.5px; font-weight: 500; letter-spacing: 0.06em; line-height: 1.5; margin: 10px auto 0 auto; max-width: 420px; opacity: 1;"
+                    style="font-family: 'Quicksand', sans-serif; font-size: 13.5px; font-weight: 500; letter-spacing: 0.06em; line-height: 1.5; margin: {% if banner_pos == 'bottom_left' %}8px 0 0 0{% else %}10px auto 0 auto{% endif %}; max-width: 420px; opacity: 1;"
                   >
                     {{ section.settings.subtitle }}
                   </p>
                 {%- endif -%}
                 {%- if section.settings.button_label != blank -%}
-                  <div class="hero__btn__wrap">
-                    <a
-                      class="hero__btn btn btn--white btn-sliding-hover"
-                      href="{{ button_url }}"
-                      data-aos="hero"
-                      data-aos-order="3"
-                    >
-                      <span class="btn__text-content">{{ section.settings.button_label }}</span>
-                    </a>
+                  <div class="hero__btn__wrap{% if effective_btn_style == 'link' %} hero__btn__wrap--link{% endif %}">
+                    {%- if effective_btn_style == 'link' -%}
+                      <a
+                        class="hero__text-link"
+                        href="{{ button_url }}"
+                        data-aos="hero"
+                        data-aos-order="3"
+                      >
+                        {{ section.settings.button_label }}
+                      </a>
+                    {%- else -%}
+                      <a
+                        class="hero__btn btn btn--white btn-sliding-hover"
+                        href="{{ button_url }}"
+                        data-aos="hero"
+                        data-aos-order="3"
+                      >
+                        <span class="btn__text-content">{{ section.settings.button_label }}</span>
+                      </a>
+                    {%- endif -%}
                   </div>
                 {%- endif -%}
               </div>
@@ -538,63 +557,22 @@
           {%- endif -%}
           <div class="collection-split__media-wrapper">
             {%- if use_showcase -%}
-              {%- assign show_caption = section.settings.showcase_show_caption -%}
-              {%- assign slide_count = section.settings.showcase_products.size -%}
-              <div
-                class="split-showcase"
-                data-split-showcase
-                data-effect="{{ section.settings.showcase_effect | default: 'fade_zoom' }}"
-                data-autoplay="{{ section.settings.showcase_autoplay | default: true }}"
-                data-speed="{{ section.settings.showcase_speed | default: 4500 }}"
-              >
-                {%- for product in section.settings.showcase_products -%}
-                  <div class="split-showcase__slide{% if forloop.first %} is-active{% endif %}" data-showcase-slide>
-                    <a
-                      href="{{ product.url }}"
-                      class="split-showcase__link"
-                      aria-label="{{ product.title | escape }}"
-                      {% unless forloop.first %}
-                        tabindex="-1"
-                      {% endunless %}
-                    >
-                      {%- if product.featured_image != blank -%}
-                        <img
-                          src="{{ product.featured_image | image_url: width: 1200 }}"
-                          srcset="{{ product.featured_image | image_url: width: 600 }} 600w, {{ product.featured_image | image_url: width: 900 }} 900w, {{ product.featured_image | image_url: width: 1200 }} 1200w, {{ product.featured_image | image_url: width: 1600 }} 1600w, {{ product.featured_image | image_url: width: 2400 }} 2400w"
-                          sizes="(min-width: 769px) 50vw, 100vw"
-                          alt="{{ product.featured_image.alt | default: product.title | escape }}"
-                          width="{{ product.featured_image.width }}"
-                          height="{{ product.featured_image.height }}"
-                          loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-                          decoding="async"
-                          class="split-showcase__img"
-                        >
-                      {%- else -%}
-                        {{ 'product-1' | placeholder_svg_tag: 'split-showcase__img' }}
-                      {%- endif -%}
-                      {%- if show_caption -%}
-                        <span class="split-showcase__shade"></span>
-                        <span class="split-showcase__caption">
-                          <span class="split-showcase__name">{{ product.title }}</span>
-                          <span class="split-showcase__price">{{ product.price | money }}</span>
-                        </span>
-                      {%- endif -%}
-                    </a>
-                  </div>
-                {%- endfor -%}
-                {%- if slide_count > 1 and section.settings.showcase_show_dots -%}
-                  <div class="split-showcase__dots" role="tablist">
-                    {%- for product in section.settings.showcase_products -%}
-                      <button
-                        type="button"
-                        class="split-showcase__dot{% if forloop.first %} is-active{% endif %}"
-                        data-showcase-dot="{{ forloop.index0 }}"
-                        aria-label="Show {{ product.title | escape }}"
-                      ></button>
-                    {%- endfor -%}
-                  </div>
-                {%- endif -%}
-              </div>
+              {% render 'split-showcase-banner',
+                products: section.settings.showcase_products,
+                effect: section.settings.showcase_effect,
+                autoplay: section.settings.showcase_autoplay,
+                speed: section.settings.showcase_speed,
+                show_caption: section.settings.showcase_show_caption,
+                show_dots: section.settings.showcase_show_dots,
+                loading: 'eager'
+              %}
+            {%- elsif use_video -%}
+              {%- assign classic_video_alt = section.settings.title | default: target_collection.title | default: 'Showcase video' -%}
+              {% render 'showcase-video',
+                video: section.settings.video,
+                link: banner_url,
+                alt_label: classic_video_alt
+              %}
             {%- else -%}
               {%- liquid
                 if section.settings.layout == 'image_right'
@@ -684,6 +662,7 @@
     </div>
   </div>
 </div>
+{%- endif -%}
 
 {% schema %}
 {
@@ -696,27 +675,107 @@
       "default": "scheme-1"
     },
     {
+      "type": "select",
+      "id": "design_style",
+      "label": "Design style",
+      "options": [
+        {
+          "value": "classic",
+          "label": "Classic (Split banner)"
+        },
+        {
+          "value": "new",
+          "label": "New (Product showcase)"
+        }
+      ],
+      "default": "classic",
+      "info": "Switch between the Classic Le Velair split layout and the Zorelle-inspired Product Showcase layout."
+    },
+    {
+      "type": "select",
+      "id": "showcase_content_type",
+      "label": "Showcase layout",
+      "options": [
+        {
+          "value": "image",
+          "label": "Sticky media & grid"
+        },
+        {
+          "value": "text",
+          "label": "Editorial header & carousel"
+        }
+      ],
+      "default": "image",
+      "visible_if": "{{ section.settings.design_style == 'new' }}"
+    },
+    {
+      "type": "header",
+      "content": "Banner / Sticky media",
+      "visible_if": "{{ section.settings.design_style == 'classic' or section.settings.showcase_content_type == 'image' }}"
+    },
+    {
       "type": "text",
       "id": "title",
-      "label": "Heading"
+      "label": "Heading",
+      "info": "Used on the Classic banner, the New sticky media caption, and the New carousel header."
     },
     {
       "type": "text",
       "id": "subtitle",
-      "label": "Subheading"
+      "label": "Subheading",
+      "visible_if": "{{ section.settings.design_style == 'classic' or section.settings.showcase_content_type == 'image' }}"
     },
     {
-      "type": "header",
-      "content": "Banner"
+      "type": "select",
+      "id": "banner_content_position",
+      "label": "Heading & button position",
+      "options": [
+        {
+          "value": "middle_center",
+          "label": "Middle center (Classic)"
+        },
+        {
+          "value": "bottom_left",
+          "label": "Bottom left (Editorial)"
+        }
+      ],
+      "default": "middle_center",
+      "info": "Bottom left places bold heading, subheading and underlined link at the lower-left with a soft bottom gradient.",
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
+    },
+    {
+      "type": "select",
+      "id": "banner_button_style",
+      "label": "Banner button design",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Auto (Button in center / Underline at bottom left)"
+        },
+        {
+          "value": "button",
+          "label": "Solid button (Classic)"
+        },
+        {
+          "value": "link",
+          "label": "Underlined text link"
+        }
+      ],
+      "default": "auto",
+      "visible_if": "{{ section.settings.design_style == 'classic' or section.settings.showcase_content_type == 'image' }}"
     },
     {
       "type": "select",
       "id": "banner_type",
-      "label": "Banner content",
+      "label": "Media / Banner content",
       "options": [
         {
           "value": "image",
           "label": "Image"
+        },
+        {
+          "value": "video",
+          "label": "Video"
         },
         {
           "value": "products",
@@ -724,28 +783,36 @@
         }
       ],
       "default": "image",
-      "info": "Heading, subheading and button are used in both modes."
+      "info": "Works in both Classic and New (sticky media) styles.",
+      "visible_if": "{{ section.settings.design_style == 'classic' or section.settings.showcase_content_type == 'image' }}"
     },
     {
       "type": "image_picker",
       "id": "image",
       "label": "Feature banner image (Desktop)",
-      "info": "Recommended: portrait matching the banner ratio below (e.g. 1200 x 1800 px for 2:3). Keep key content near the center.",
+      "info": "Recommended 1600 × 2400 px (2:3 portrait). Cropped automatically to fill the column.",
       "visible_if": "{{ section.settings.banner_type == 'image' }}"
     },
     {
       "type": "image_picker",
       "id": "image_mobile",
       "label": "Feature banner image (Mobile)",
-      "info": "Recommended: square 1:1 (e.g. 1200 × 1200 px). Use a separate mobile crop to keep all important content visible.",
-      "visible_if": "{{ section.settings.banner_type == 'image' }}"
+      "info": "Recommended: square 1:1 (e.g. 1200 × 1200 px). Use a separate mobile crop to keep important content visible.",
+      "visible_if": "{{ section.settings.design_style == 'classic' and section.settings.banner_type == 'image' }}"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Feature video",
+      "info": "Recommended: 2:3 portrait MP4/MOV video. Autoplays muted on loop with an accessible pause/play toggle.",
+      "visible_if": "{{ section.settings.banner_type == 'video' }}"
     },
     {
       "type": "product_list",
       "id": "showcase_products",
       "label": "Showcase products",
       "limit": 8,
-      "info": "Used when Banner content = Selected products. Pick the products shown in the banner (if none are picked, the image banner is used)."
+      "info": "Used when Media / Banner content = Selected products (if none are picked, the fallback image is used)."
     },
     {
       "type": "select",
@@ -799,9 +866,32 @@
     {
       "type": "url",
       "id": "banner_link",
-      "label": "Banner link",
-      "info": "Image banner only: clicking anywhere on the banner opens this link. Defaults to button link or collection.",
-      "visible_if": "{{ section.settings.banner_type == 'image' }}"
+      "label": "Media / Banner link",
+      "info": "Image/Video only: clicking the media opens this link. Defaults to button link or collection.",
+      "visible_if": "{{ section.settings.banner_type != 'products' }}"
+    },
+    {
+      "type": "header",
+      "content": "Editorial header (New carousel mode)",
+      "visible_if": "{{ section.settings.design_style == 'new' and section.settings.showcase_content_type == 'text' }}"
+    },
+    {
+      "type": "richtext",
+      "id": "showcase_text",
+      "label": "Showcase description",
+      "default": "<p>Explore signature silhouettes crafted for everyday ritual and lasting luminescence.</p>",
+      "visible_if": "{{ section.settings.design_style == 'new' and section.settings.showcase_content_type == 'text' }}"
+    },
+    {
+      "type": "select",
+      "id": "showcase_text_alignment",
+      "label": "Header alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.design_style == 'new' and section.settings.showcase_content_type == 'text' }}"
     },
     {
       "type": "text",
@@ -812,7 +902,23 @@
       "type": "url",
       "id": "button_link",
       "label": "Button link",
-      "info": "Link for the button. Defaults to banner link if left blank."
+      "info": "Link for the button. Defaults to banner link or collection if left blank."
+    },
+    {
+      "type": "text",
+      "id": "showcase_button_2_label",
+      "label": "Second button label",
+      "visible_if": "{{ section.settings.design_style == 'new' and section.settings.showcase_content_type == 'text' }}"
+    },
+    {
+      "type": "url",
+      "id": "showcase_button_2_link",
+      "label": "Second button link",
+      "visible_if": "{{ section.settings.design_style == 'new' and section.settings.showcase_content_type == 'text' }}"
+    },
+    {
+      "type": "header",
+      "content": "Collection & layout"
     },
     {
       "type": "collection",
@@ -833,7 +939,8 @@
           "label": "Image right"
         }
       ],
-      "default": "image_left"
+      "default": "image_left",
+      "visible_if": "{{ section.settings.design_style == 'classic' or section.settings.showcase_content_type == 'image' }}"
     },
     {
       "type": "select",
@@ -854,7 +961,8 @@
         }
       ],
       "default": "equal",
-      "info": "Narrower banner gives the product cards more room."
+      "info": "Narrower banner gives the product cards more room.",
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
     },
     {
       "type": "select",
@@ -871,7 +979,8 @@
         }
       ],
       "default": "fill",
-      "info": "Fill keeps the pinned banner as tall as the visible screen so nothing shows underneath it."
+      "info": "Fill keeps the pinned banner as tall as the visible screen so nothing shows underneath it.",
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
     },
     {
       "type": "select",
@@ -897,7 +1006,7 @@
       ],
       "default": "2 / 3",
       "info": "The banner stays pinned while the cards scroll beside it.",
-      "visible_if": "{{ section.settings.banner_height == 'ratio' }}"
+      "visible_if": "{{ section.settings.design_style == 'classic' and section.settings.banner_height == 'ratio' }}"
     },
     {
       "type": "range",
@@ -907,20 +1016,37 @@
       "step": 4,
       "unit": "px",
       "label": "Space beside product cards",
-      "default": 24
+      "default": 24,
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
     },
     {
       "type": "range",
       "id": "limit",
       "min": 2,
-      "max": 8,
-      "step": 2,
+      "max": 16,
+      "step": 1,
       "label": "Products to show",
       "default": 4
     },
     {
       "type": "header",
-      "content": "Product grid columns"
+      "content": "Showcase grid (New style)",
+      "visible_if": "{{ section.settings.design_style == 'new' }}"
+    },
+    {
+      "type": "range",
+      "id": "showcase_columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Desktop columns",
+      "default": 4,
+      "visible_if": "{{ section.settings.design_style == 'new' }}"
+    },
+    {
+      "type": "header",
+      "content": "Product grid columns (Classic style)",
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
     },
     {
       "type": "range",
@@ -930,7 +1056,8 @@
       "step": 1,
       "label": "Columns beside banner: above 1024px",
       "default": 2,
-      "info": "Banner and products sit side by side above 768px; below that the banner is stacked on top."
+      "info": "Banner and products sit side by side above 768px; below that the banner is stacked on top.",
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
     },
     {
       "type": "range",
@@ -939,7 +1066,8 @@
       "max": 6,
       "step": 1,
       "label": "Columns beside banner: 1024px and below",
-      "default": 1
+      "default": 1,
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
     },
     {
       "type": "range",
@@ -948,7 +1076,8 @@
       "max": 6,
       "step": 1,
       "label": "Columns beside banner: 960px and below",
-      "default": 1
+      "default": 1,
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
     },
     {
       "type": "range",
@@ -957,7 +1086,8 @@
       "max": 6,
       "step": 1,
       "label": "Columns when stacked: 768px and below",
-      "default": 2
+      "default": 2,
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
     },
     {
       "type": "select",
@@ -968,7 +1098,8 @@
         { "value": "2", "label": "2 products per row" },
         { "value": "3", "label": "3 products per row" }
       ],
-      "default": "1"
+      "default": "1",
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
     },
     {
       "type": "select",
@@ -988,7 +1119,8 @@
           "label": "3 products per row"
         }
       ],
-      "default": "1"
+      "default": "1",
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
     },
     {
       "type": "range",
@@ -1010,13 +1142,14 @@
       "unit": "%",
       "label": "Banner dark overlay opacity",
       "default": 0,
-      "info": "Controls dark overlay percentage on the banner image (0% = pure bright original image)"
+      "info": "Controls dark overlay percentage on the banner image (0% = pure bright original image)",
+      "visible_if": "{{ section.settings.design_style == 'classic' }}"
     },
     {
       "type": "range",
       "id": "padding_top",
-      "min": 10,
-      "max": 80,
+      "min": 0,
+      "max": 120,
       "step": 5,
       "unit": "px",
       "label": "Padding top",
@@ -1025,8 +1158,8 @@
     {
       "type": "range",
       "id": "padding_bottom",
-      "min": 10,
-      "max": 80,
+      "min": 0,
+      "max": 120,
       "step": 5,
       "unit": "px",
       "label": "Padding bottom",

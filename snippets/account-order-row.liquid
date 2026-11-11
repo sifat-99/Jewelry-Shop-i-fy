@@ -1,3 +1,11 @@
+{% doc %}
+  Renders one order row (number, date, thumbnails, status pills, total, action) for the customer account dashboard.
+
+  @param {order} order - The customer order to render
+
+  @example
+  {% render 'account-order-row', order: order %}
+{% enddoc %}
 {%- comment -%} One order row for the account dashboard. Expects: order {%- endcomment -%}
 <div class="ad-order">
   <div class="ad-order__id">

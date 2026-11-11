@@ -1,0 +1,311 @@
+{% doc %}
+  Renders an animated multi-product moving showcase banner using `<split-showcase-banner>`.
+  Supports fade+zoom or slide transitions, hover/offscreen pause, touch swipe, optional
+  product title/price caption, and pagination dots.
+
+  @param {product[]} products - List of products to cycle through in the showcase banner.
+  @param {string} [effect] - Transition effect: 'fade_zoom' or 'slide'. Defaults to 'fade_zoom'.
+  @param {boolean} [autoplay] - Enables automatic slide advancement. Defaults to true.
+  @param {number} [speed] - Autoplay interval in milliseconds. Defaults to 4500.
+  @param {boolean} [show_caption] - Shows product title and price over a bottom gradient. Defaults to true.
+  @param {boolean} [show_dots] - Shows slide pagination dots when there are multiple products. Defaults to true.
+  @param {string} [loading] - Image loading strategy ('eager' or 'lazy'). Defaults to 'lazy'.
+
+  @example
+  {% render 'split-showcase-banner',
+    products: section.settings.showcase_products,
+    effect: section.settings.showcase_effect,
+    autoplay: section.settings.showcase_autoplay,
+    speed: section.settings.showcase_speed,
+    show_caption: section.settings.showcase_show_caption,
+    show_dots: section.settings.showcase_show_dots
+  %}
+{% enddoc %}
+
+{%- liquid
+  assign banner_effect = effect | default: 'fade_zoom'
+  assign banner_speed = speed | default: 4500
+  assign banner_loading = loading | default: 'lazy'
+
+  assign is_autoplay = false
+  if autoplay == true or autoplay == 'true' or autoplay == nil
+    assign is_autoplay = true
+  endif
+
+  assign should_show_caption = false
+  if show_caption == true or show_caption == 'true' or show_caption == nil
+    assign should_show_caption = true
+  endif
+
+  assign should_show_dots = false
+  if show_dots == true or show_dots == 'true' or show_dots == nil
+    assign should_show_dots = true
+  endif
+
+  assign fetch_priority = 'auto'
+  if banner_loading == 'eager'
+    assign fetch_priority = 'high'
+  endif
+-%}
+
+{%- if products != blank and products.size > 0 -%}
+  <split-showcase-banner
+    class="split-showcase{% if should_show_caption %} split-showcase--has-caption{% endif %}"
+    data-effect="{{ banner_effect }}"
+    data-autoplay="{{ is_autoplay }}"
+    data-speed="{{ banner_speed }}"
+  >
+    {%- for sc_product in products -%}
+      {%- assign slide_loading = 'lazy' -%}
+      {%- assign slide_priority = 'auto' -%}
+      {%- if forloop.first and banner_loading == 'eager' -%}
+        {%- assign slide_loading = 'eager' -%}
+        {%- assign slide_priority = fetch_priority -%}
+      {%- endif -%}
+
+      <div
+        class="split-showcase__slide{% if forloop.first %} is-active{% endif %}"
+        data-showcase-slide
+      >
+        <a
+          href="{{ sc_product.url }}"
+          class="split-showcase__link"
+          tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+          aria-label="{{ sc_product.title | escape }}"
+        >
+          {%- if sc_product.featured_image != blank -%}
+            {{
+              sc_product.featured_image
+              | image_url: width: 1400
+              | image_tag:
+                widths: '400, 600, 800, 1000, 1200, 1400',
+                sizes: '(max-width: 900px) 100vw, 50vw',
+                loading: slide_loading,
+                fetchpriority: slide_priority,
+                class: 'split-showcase__img',
+                alt: sc_product.title
+            }}
+          {%- else -%}
+            {{ 'product-1' | placeholder_svg_tag: 'split-showcase__img' }}
+          {%- endif -%}
+
+          <div class="split-showcase__shade" aria-hidden="true"></div>
+
+          {%- if should_show_caption -%}
+            <div class="split-showcase__caption">
+              <span class="split-showcase__name">{{ sc_product.title }}</span>
+              {%- if sc_product.price -%}
+                <span class="split-showcase__price">{{ sc_product.price | money }}</span>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </a>
+      </div>
+    {%- endfor -%}
+
+    {%- if should_show_dots and products.size > 1 -%}
+      <div class="split-showcase__dots" aria-label="Showcase slides">
+        {%- for sc_product in products -%}
+          <button
+            type="button"
+            class="split-showcase__dot{% if forloop.first %} is-active{% endif %}"
+            data-showcase-dot="{{ forloop.index0 }}"
+            aria-label="View {{ sc_product.title | escape }}"
+          ></button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </split-showcase-banner>
+{%- endif -%}
+
+{% stylesheet %}
+  split-showcase-banner.split-showcase {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg, var(--lv-ivory, #ffffff));
+    user-select: none;
+    touch-action: pan-y;
+  }
+
+  .split-showcase__slide {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 1;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0.8s ease;
+    will-change: opacity, transform;
+  }
+
+  .split-showcase__slide.is-prev {
+    opacity: 0;
+    visibility: visible;
+    z-index: 1;
+  }
+
+  .split-showcase__slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 2;
+  }
+
+  .split-showcase[data-effect='fade_zoom'] .split-showcase__slide {
+    transform: scale(1.06);
+  }
+
+  .split-showcase[data-effect='fade_zoom'] .split-showcase__slide.is-active {
+    transform: scale(1);
+  }
+
+  .split-showcase[data-effect='slide'] .split-showcase__slide {
+    opacity: 1;
+    transform: translateX(100%);
+  }
+
+  .split-showcase[data-effect='slide'] .split-showcase__slide.is-prev {
+    opacity: 1;
+    transform: translateX(-100%);
+  }
+
+  .split-showcase[data-effect='slide'] .split-showcase__slide.is-active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .split-showcase__link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .split-showcase__img {
+    display: block;
+    /* Overscan 2px to hide hairline edges sometimes present on product photography */
+    width: calc(100% + 4px);
+    max-width: none;
+    height: calc(100% + 4px);
+    margin: -2px;
+    object-fit: cover;
+    object-position: center;
+    -webkit-user-drag: none;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  split-showcase-banner.split-showcase:hover .split-showcase__img {
+    transform: scale(1.03);
+  }
+
+  .split-showcase__shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(26, 20, 26, 0.56) 0%,
+      rgba(26, 20, 26, 0.16) 36%,
+      rgba(26, 20, 26, 0) 64%
+    );
+    pointer-events: none;
+  }
+
+  .split-showcase__caption {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 24px;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--lv-ivory, #ffffff);
+    pointer-events: none;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.25);
+  }
+
+  .split-showcase--has-caption .split-showcase__caption {
+    right: 112px;
+  }
+
+  .split-showcase__name {
+    font-family: var(--FONT-STACK-HEADING, inherit);
+    font-size: clamp(16px, 1.35vw, 22px);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+    color: inherit;
+  }
+
+  .split-showcase__price {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    opacity: 0.92;
+    color: inherit;
+  }
+
+  .split-showcase__dots {
+    position: absolute;
+    right: 20px;
+    bottom: 24px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .split-showcase__dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    transition: width 0.25s ease, background-color 0.25s ease;
+  }
+
+  .split-showcase__dot.is-active {
+    width: 20px;
+    background: var(--lv-ivory, #ffffff);
+  }
+
+  .split-showcase__dot:focus-visible {
+    outline: 2px solid var(--lv-ivory, #ffffff);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 768px) {
+    .split-showcase__caption {
+      left: 16px;
+      bottom: 18px;
+    }
+
+    .split-showcase--has-caption .split-showcase__caption {
+      right: 88px;
+    }
+
+    .split-showcase__dots {
+      right: 16px;
+      bottom: 20px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .split-showcase__slide,
+    .split-showcase__dot {
+      transition: none;
+      transform: none;
+    }
+  }
+{% endstylesheet %}

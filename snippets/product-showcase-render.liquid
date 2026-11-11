@@ -1,0 +1,801 @@
+{% doc %}
+  Shared renderer for the Product Showcase layout (editorial text + bleed carousel
+  or sticky portrait media + responsive product grid). Adapted to Le Velair's
+  global color scheme tokens (`--bg`, `--text`, `--color-foreground`,
+  `--color-background`), button animations, and `product-grid-item` cards.
+
+  Used by both `sections/product-showcase.liquid` and the `"new"` design style
+  of `sections/collection-split.liquid`.
+
+  @param {string} section_id - Unique section ID for DOM scoping.
+  @param {number} [section_index] - Section position on the page (`section.index`).
+  @param {object} [color_scheme] - Shopify color scheme (`scheme-1`..`scheme-5`).
+  @param {string} [content_type] - Showcase mode: `'image'` (sticky split) or `'text'` (editorial + carousel).
+  @param {string} [media_type] - Sticky media source in `'image'` mode: `'image'`, `'video'`, or `'products'`.
+  @param {image} [image] - Portrait editorial image (`1600 x 2400 px` 2:3 recommended).
+  @param {video} [video] - Portrait video object.
+  @param {string} [image_link] - Optional URL when clicking the sticky image or video.
+  @param {string} [image_position] - Sticky media placement on desktop: `'left'` or `'right'`.
+  @param {string} [image_heading] - Caption heading overlaid at bottom of sticky image/video.
+  @param {string} [image_subtitle] - Caption subtitle overlaid below `image_heading`.
+  @param {string} [heading] - Editorial header heading for `'text'` mode.
+  @param {string} [text] - Editorial body richtext for `'text'` mode.
+  @param {string} [text_alignment] - Header alignment in `'text'` mode: `'left'` or `'center'`.
+  @param {string} [button_1_label] - Primary action button label.
+  @param {string} [button_1_link] - Primary action button link.
+  @param {string} [button_1_style] - Button style: `'primary'` or `'secondary'`.
+  @param {string} [button_2_label] - Secondary action button label.
+  @param {string} [button_2_link] - Secondary action button link.
+  @param {string} [button_2_style] - Button style: `'primary'` or `'secondary'`.
+  @param {collection} [collection] - Shopify collection object whose products populate the grid/carousel.
+  @param {number} [max_products] - Maximum number of products to display. Defaults to 8.
+  @param {number} [columns] - Desktop columns count. Defaults to 4.
+  @param {string} [mobile_columns] - Mobile columns (`'1'` or `'2'`). Defaults to `'2'`.
+  @param {number} [columns_gap] - Horizontal gap in px. Defaults to 20.
+  @param {number} [rows_gap] - Vertical gap in px. Defaults to 24.
+  @param {number} [card_border_radius] - Product card corner radius in px. Defaults to 0.
+  @param {number} [padding_top] - Top section padding in px. Defaults to 60.
+  @param {number} [padding_bottom] - Bottom section padding in px. Defaults to 60.
+  @param {product[]} [showcase_products] - Selected products for `'products'` moving banner mode.
+  @param {string} [showcase_effect] - Moving showcase effect: `'fade_zoom'` or `'slide'`.
+  @param {boolean} [showcase_autoplay] - Whether moving showcase auto-advances.
+  @param {number} [showcase_speed] - Moving showcase autoplay speed in ms.
+  @param {boolean} [showcase_show_caption] - Shows product title and price in moving showcase.
+  @param {boolean} [showcase_show_dots] - Shows slide pagination dots in moving showcase.
+{% enddoc %}
+
+{%- liquid
+  assign sc_content_type = content_type | default: 'image'
+  assign sc_media_type = media_type | default: 'image'
+  assign sc_image_pos = image_position | default: 'left'
+  assign sc_align = text_alignment | default: 'center'
+  assign sc_cols = columns | default: 4 | plus: 0
+  assign sc_mobile_cols = mobile_columns | default: '2'
+  assign sc_max = max_products | default: 8 | plus: 0
+  assign sc_col_gap = columns_gap | default: 20 | plus: 0
+  assign sc_row_gap = rows_gap | default: 24 | plus: 0
+  assign sc_card_radius = card_border_radius | default: 0 | plus: 0
+  assign sc_pt = padding_top | default: 60 | plus: 0
+  assign sc_pb = padding_bottom | default: 60 | plus: 0
+
+  assign sc_collection = blank
+  if collection != blank
+    if collection.products != blank
+      assign sc_collection = collection
+    else
+      assign sc_collection = collections[collection]
+    endif
+  endif
+
+  assign has_moving_products = false
+  if sc_media_type == 'products'
+    if showcase_products != blank
+      if showcase_products.size > 0
+        assign has_moving_products = true
+      endif
+    endif
+  endif
+
+  assign has_video = false
+  if sc_media_type == 'video'
+    if video != blank
+      assign has_video = true
+    endif
+  endif
+
+  assign show_moving_caption = false
+  if showcase_show_caption == true or showcase_show_caption == 'true' or showcase_show_caption == nil
+    assign show_moving_caption = true
+  endif
+
+  assign render_static_caption = false
+  if image_heading != blank or image_subtitle != blank or button_1_label != blank
+    if has_moving_products
+      unless show_moving_caption
+        assign render_static_caption = true
+      endunless
+    else
+      assign render_static_caption = true
+    endif
+  endif
+
+  assign media_loading = 'lazy'
+  assign media_fetchpriority = 'auto'
+  if section_index != blank and section_index <= 1
+    assign media_loading = 'eager'
+    assign media_fetchpriority = 'high'
+  endif
+
+  assign placeholder_count = sc_max | at_most: 4
+-%}
+
+<section
+  class="showcase color-{{ color_scheme | default: 'scheme-1' }} showcase--{{ sc_content_type }}{% if sc_content_type == 'image' %} showcase--media-{{ sc_image_pos }}{% else %} showcase--align-{{ sc_align }}{% endif %}"
+  data-section-id="{{ section_id }}"
+  style="
+    --showcase-pt: {{ sc_pt }}px;
+    --showcase-pb: {{ sc_pb }}px;
+    --showcase-cols: {{ sc_cols }};
+    --showcase-mobile-cols: {{ sc_mobile_cols }};
+    --showcase-col-gap: {{ sc_col_gap }}px;
+    --showcase-row-gap: {{ sc_row_gap }}px;
+    --showcase-card-radius: {{ sc_card_radius }}px;
+  "
+>
+  <div class="showcase__inner">
+    {%- if sc_content_type == 'image' -%}
+      <div class="showcase__split">
+        <div class="showcase__media-col">
+          <div class="showcase__media">
+            {%- if has_moving_products -%}
+              {% render 'split-showcase-banner',
+                products: showcase_products,
+                effect: showcase_effect,
+                autoplay: showcase_autoplay,
+                speed: showcase_speed,
+                show_caption: showcase_show_caption,
+                show_dots: showcase_show_dots,
+                loading: media_loading
+              %}
+            {%- elsif has_video -%}
+              {%- assign video_alt = image_heading | default: sc_collection.title -%}
+              {% render 'showcase-video',
+                video: video,
+                link: image_link,
+                alt_label: video_alt
+              %}
+            {%- else -%}
+              {%- assign media_alt = image.alt | default: image_heading | default: sc_collection.title | default: 'Showcase image' -%}
+              {%- if image_link != blank -%}
+                <a
+                  href="{{ image_link }}"
+                  class="showcase__media-link"
+                  aria-label="{{ media_alt | escape }}"
+                >
+              {%- endif -%}
+
+              {%- if image != blank -%}
+                {{
+                  image
+                  | image_url: width: 1600
+                  | image_tag:
+                    widths: '400, 600, 800, 1000, 1200, 1600',
+                    sizes: '(max-width: 768px) 100vw, 45vw',
+                    loading: media_loading,
+                    fetchpriority: media_fetchpriority,
+                    class: 'showcase__image',
+                    alt: media_alt
+                }}
+              {%- else -%}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'showcase__image showcase__placeholder' }}
+              {%- endif -%}
+
+              {%- if image_link != blank -%}
+                </a>
+              {%- endif -%}
+            {%- endif -%}
+
+            {%- if render_static_caption -%}
+              <div class="showcase__caption">
+                {%- if image_heading != blank -%}
+                  <h2 class="showcase__caption-heading">{{ image_heading }}</h2>
+                {%- endif -%}
+                {%- if image_subtitle != blank -%}
+                  <p class="showcase__caption-subtitle">{{ image_subtitle }}</p>
+                {%- endif -%}
+                {%- if button_1_label != blank -%}
+                  {%- assign caption_href = button_1_link | default: image_link | default: sc_collection.url | default: '#' -%}
+                  <div class="showcase__caption-actions">
+                    {%- if button_1_style == 'button' -%}
+                      <a href="{{ caption_href }}" class="btn btn--white btn-sliding-hover">
+                        <span class="btn__text-content">{{ button_1_label }}</span>
+                      </a>
+                    {%- else -%}
+                      <a href="{{ caption_href }}" class="showcase__caption-link">{{ button_1_label }}</a>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <div class="showcase__grid-col">
+          <ul class="showcase__grid" role="list">
+            {%- if sc_collection != blank and sc_collection.products_count > 0 -%}
+              {%- for item in sc_collection.products limit: sc_max -%}
+                <li class="showcase__item">
+                  {% render 'product-grid-item',
+                    product: item,
+                    fallback_index: forloop.index,
+                    card_border_radius: sc_card_radius
+                  %}
+                </li>
+              {%- endfor -%}
+            {%- else -%}
+              {%- for i in (1..placeholder_count) -%}
+                <li class="showcase__item">
+                  {% render 'product-grid-item',
+                    product: blank,
+                    fallback_index: i,
+                    card_border_radius: sc_card_radius
+                  %}
+                </li>
+              {%- endfor -%}
+            {%- endif -%}
+          </ul>
+        </div>
+      </div>
+    {%- else -%}
+      {%- if heading != blank or text != blank or button_1_label != blank or button_2_label != blank -%}
+        <header class="showcase__header">
+          {%- if heading != blank -%}
+            <h2 class="showcase__heading">{{ heading }}</h2>
+          {%- endif -%}
+          {%- if text != blank -%}
+            <div class="showcase__text">{{ text }}</div>
+          {%- endif -%}
+          {%- if button_1_label != blank or button_2_label != blank -%}
+            <div class="showcase__actions">
+              {%- if button_1_label != blank -%}
+                <a
+                  href="{{ button_1_link | default: '#' }}"
+                  class="showcase__btn {% if button_1_style == 'secondary' %}showcase__btn-secondary{% else %}btn btn--primary{% endif %}"
+                >
+                  {%- if button_1_style != 'secondary' -%}
+                    <span class="btn__text-content">{{ button_1_label }}</span>
+                  {%- else -%}
+                    {{ button_1_label }}
+                  {%- endif -%}
+                </a>
+              {%- endif -%}
+              {%- if button_2_label != blank -%}
+                <a
+                  href="{{ button_2_link | default: '#' }}"
+                  class="showcase__btn {% if button_2_style == 'secondary' %}showcase__btn-secondary{% else %}btn btn--primary{% endif %}"
+                >
+                  {%- if button_2_style != 'secondary' -%}
+                    <span class="btn__text-content">{{ button_2_label }}</span>
+                  {%- else -%}
+                    {{ button_2_label }}
+                  {%- endif -%}
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </header>
+      {%- endif -%}
+
+      <product-showcase-slider class="showcase__slider">
+        <div class="showcase__track-wrap">
+          <button
+            type="button"
+            class="showcase__arrow showcase__arrow--prev"
+            data-showcase-prev
+            aria-label="Previous products"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <ul class="showcase__track" data-showcase-track role="list">
+            {%- if sc_collection != blank and sc_collection.products_count > 0 -%}
+              {%- for item in sc_collection.products limit: sc_max -%}
+                <li class="showcase__item" data-showcase-item>
+                  {% render 'product-grid-item',
+                    product: item,
+                    fallback_index: forloop.index,
+                    card_border_radius: sc_card_radius
+                  %}
+                </li>
+              {%- endfor -%}
+            {%- else -%}
+              {%- for i in (1..placeholder_count) -%}
+                <li class="showcase__item" data-showcase-item>
+                  {% render 'product-grid-item',
+                    product: blank,
+                    fallback_index: i,
+                    card_border_radius: sc_card_radius
+                  %}
+                </li>
+              {%- endfor -%}
+            {%- endif -%}
+          </ul>
+
+          <button
+            type="button"
+            class="showcase__arrow showcase__arrow--next"
+            data-showcase-next
+            aria-label="Next products"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <div class="showcase__progress" aria-hidden="true">
+          <div class="showcase__progress-thumb"></div>
+        </div>
+      </product-showcase-slider>
+    {%- endif -%}
+  </div>
+</section>
+
+<script src="{{ 'product-showcase.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
+{% stylesheet %}
+  .showcase {
+    --container-max-width: 1800px;
+    --container-gutter: max(1rem, 2vw);
+    --container-width: calc(100% - var(--container-gutter) * 2);
+    --showcase-sticky-top: 24px;
+    background: var(--bg, var(--lv-ivory, #ffffff));
+    color: var(--text, var(--lv-ink, #111111));
+    padding-top: var(--showcase-pt, 60px);
+    padding-bottom: var(--showcase-pb, 60px);
+    overflow-x: clip;
+  }
+
+  .showcase__inner {
+    width: min(var(--container-max-width), var(--container-width));
+    margin-inline: auto;
+  }
+
+  .showcase__header {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: clamp(28px, 3vw, 44px);
+    max-width: 720px;
+  }
+
+  .showcase--align-center .showcase__header {
+    align-items: center;
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .showcase--align-left .showcase__header {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  h2.showcase__heading {
+    margin: 0;
+    font-family: var(--FONT-STACK-HEADING, inherit);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    font-size: clamp(30px, calc(30px + (100vw - 320px) * 22 / 1600), 52px);
+    color: var(--text, var(--lv-ink, #111111)) !important;
+  }
+
+  .showcase__text {
+    margin: 0;
+    font-size: clamp(14px, 1.1vw, 16px);
+    line-height: 1.65;
+    color: rgba(var(--color-foreground, 17, 17, 17), 0.78);
+    max-width: 58ch;
+  }
+
+  .showcase__text p {
+    margin: 0;
+  }
+
+  .showcase__text p + p {
+    margin-top: 0.75em;
+  }
+
+  .showcase__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  .showcase--align-center .showcase__actions {
+    justify-content: center;
+  }
+
+  .showcase__btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 11px 24px;
+    border-radius: var(--btn-radius, 2px);
+    border: var(--btn-border-thickness, 1px) solid rgba(var(--color-foreground, 17, 17, 17), 0.35);
+    background: transparent;
+    color: var(--text, var(--lv-ink, #111111));
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .showcase__btn-secondary:hover {
+    background: var(--text, var(--lv-ink, #111111));
+    color: var(--bg, var(--lv-ivory, #ffffff));
+    border-color: var(--text, var(--lv-ink, #111111));
+  }
+
+  .showcase__btn-secondary:focus-visible {
+    outline: 2px solid var(--text, var(--lv-ink, #111111));
+    outline-offset: 2px;
+  }
+
+  product-showcase-slider.showcase__slider {
+    display: block;
+    position: relative;
+  }
+
+  .showcase__track-wrap {
+    position: relative;
+  }
+
+  .showcase__track {
+    --showcase-inner-width: min(var(--container-max-width), var(--container-width));
+    --showcase-bleed: max(0px, calc((100vw - var(--showcase-inner-width)) / 2));
+    --showcase-pad: calc(var(--showcase-bleed) + var(--container-gutter));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    margin-inline: calc(-1 * var(--showcase-pad));
+    padding-inline: var(--showcase-pad);
+    display: grid;
+    grid-auto-flow: column;
+    gap: var(--showcase-col-gap, 20px);
+    grid-auto-columns: calc(
+      (var(--showcase-inner-width) - (var(--showcase-cols, 4) - 1) * var(--showcase-col-gap, 20px)) /
+        var(--showcase-cols, 4)
+    );
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--showcase-pad);
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+
+  .showcase__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .showcase__item {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .showcase__arrow {
+    position: absolute;
+    top: 38%;
+    z-index: 25;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(var(--color-foreground, 17, 17, 17), 0.14);
+    background: rgba(var(--color-background, 255, 255, 255), 0.94);
+    color: var(--text, var(--lv-ink, #111111));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .showcase__arrow--prev {
+    inset-inline-start: clamp(8px, 1vw, 14px);
+  }
+
+  .showcase__arrow--next {
+    inset-inline-end: clamp(8px, 1vw, 14px);
+  }
+
+  [dir='rtl'] .showcase__arrow svg {
+    transform: rotate(180deg);
+  }
+
+  .showcase__arrow:hover:not(:disabled) {
+    background: var(--text, var(--lv-ink, #111111));
+    color: var(--bg, var(--lv-ivory, #ffffff));
+    border-color: var(--text, var(--lv-ink, #111111));
+  }
+
+  .showcase__arrow:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .showcase__arrow:focus-visible {
+    outline: 2px solid var(--text, var(--lv-ink, #111111));
+    outline-offset: 2px;
+  }
+
+  .showcase__progress {
+    position: relative;
+    width: 100%;
+    height: 2px;
+    margin-top: 24px;
+    background: rgba(var(--color-foreground, 17, 17, 17), 0.12);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .showcase__progress-thumb {
+    position: absolute;
+    top: 0;
+    inset-inline-start: calc(var(--showcase-thumb-offset, 0) * 100%);
+    width: calc(var(--showcase-thumb-size, 1) * 100%);
+    height: 100%;
+    background: var(--text, var(--lv-ink, #111111));
+    border-radius: 999px;
+    transition: inset-inline-start 0.12s linear, width 0.12s linear;
+  }
+
+  product-showcase-slider[data-static] .showcase__arrow,
+  product-showcase-slider[data-static] .showcase__progress {
+    display: none;
+  }
+
+  .showcase__split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: clamp(24px, 3vw, 48px);
+    align-items: start;
+  }
+
+  .showcase--media-right .showcase__split {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+
+  .showcase--media-right .showcase__media-col {
+    order: 2;
+  }
+
+  .showcase--media-right .showcase__grid-col {
+    order: 1;
+  }
+
+  .showcase__media-col {
+    position: sticky;
+    top: var(--showcase-sticky-top, 24px);
+    min-width: 0;
+  }
+
+  .showcase__media {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background: var(--lv-sand, #f3efe8);
+    border-radius: var(--showcase-card-radius, 0px);
+  }
+
+  .showcase__placeholder {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: rgba(var(--color-foreground, 17, 17, 17), 0.05);
+  }
+
+  .showcase__caption {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 4;
+    padding: clamp(20px, 2.5vw, 36px);
+    padding-inline-end: 84px;
+    background: linear-gradient(
+      to top,
+      rgba(26, 20, 26, 0.6) 0%,
+      rgba(26, 20, 26, 0.2) 55%,
+      rgba(26, 20, 26, 0) 100%
+    );
+    pointer-events: none;
+    color: var(--lv-ivory, #ffffff);
+  }
+
+  h2.showcase__caption-heading {
+    margin: 0;
+    font-family: var(--FONT-STACK-HEADING, inherit);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.12;
+    font-size: clamp(24px, 2.2vw, 36px);
+    color: var(--lv-ivory, #ffffff) !important;
+  }
+
+  .showcase__caption-subtitle {
+    margin: 8px 0 0;
+    font-size: clamp(13px, 1vw, 15px);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .showcase__caption-actions {
+    margin-top: 12px;
+    pointer-events: auto;
+  }
+
+  .showcase__caption-link {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.015em;
+    line-height: 1.35;
+    color: var(--lv-ivory, #ffffff);
+    text-decoration: none;
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.85);
+    transition: opacity 0.25s ease, border-color 0.25s ease;
+  }
+
+  .showcase__caption-link:hover {
+    opacity: 0.78;
+    border-bottom-color: var(--lv-ivory, #ffffff);
+  }
+
+  .showcase__caption-link:focus-visible {
+    outline: 2px solid var(--lv-ivory, #ffffff);
+    outline-offset: 4px;
+  }
+
+  .showcase__grid-col {
+    min-width: 0;
+  }
+
+  .showcase__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--showcase-cols, 4), minmax(0, 1fr));
+    column-gap: var(--showcase-col-gap, 20px);
+    row-gap: var(--showcase-row-gap, 24px);
+  }
+
+  @media (max-width: 1440px) {
+    .showcase__split {
+      gap: clamp(20px, 2.5vw, 36px);
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .showcase--image .showcase__grid {
+      grid-template-columns: repeat(min(var(--showcase-cols, 4), 3), minmax(0, 1fr));
+    }
+
+    .showcase--text .showcase__track {
+      grid-auto-columns: calc(
+        (var(--showcase-inner-width) - (min(var(--showcase-cols, 4), 4) - 1) * var(--showcase-col-gap, 20px)) /
+          min(var(--showcase-cols, 4), 4)
+      );
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .showcase__media-col {
+      position: sticky;
+      top: var(--showcase-sticky-top, 24px);
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .showcase__split,
+    .showcase--media-right .showcase__split {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .showcase--image .showcase__grid {
+      grid-template-columns: repeat(min(var(--showcase-cols, 4), 2), minmax(0, 1fr));
+    }
+
+    .showcase--text .showcase__track {
+      grid-auto-columns: calc(
+        (var(--showcase-inner-width) - (min(var(--showcase-cols, 4), 3) - 1) * var(--showcase-col-gap, 20px)) /
+          min(var(--showcase-cols, 4), 3)
+      );
+    }
+  }
+
+  @media (min-width: 769px) {
+    .showcase__header {
+      margin-bottom: clamp(32px, 3vw, 48px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .showcase__split,
+    .showcase--media-right .showcase__split {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
+    }
+
+    .showcase__media-col,
+    .showcase--media-right .showcase__media-col {
+      position: static;
+      order: 0;
+    }
+
+    .showcase--media-right .showcase__grid-col {
+      order: 0;
+    }
+
+    .showcase__media {
+      aspect-ratio: 4 / 5;
+    }
+
+    .showcase--image .showcase__grid {
+      grid-template-columns: repeat(var(--showcase-mobile-cols, 2), minmax(0, 1fr));
+      column-gap: min(var(--showcase-col-gap, 20px), 14px);
+      row-gap: min(var(--showcase-row-gap, 24px), 20px);
+    }
+
+    .showcase--text .showcase__track {
+      gap: min(var(--showcase-col-gap, 20px), 14px);
+      grid-auto-columns: calc(
+        (var(--showcase-inner-width) - (var(--showcase-mobile-cols, 2) - 1) * min(var(--showcase-col-gap, 20px), 14px)) /
+          var(--showcase-mobile-cols, 2)
+      );
+    }
+
+    h2.showcase__heading {
+      font-size: clamp(30px, calc(30px + (100vw - 320px) * 40 / 448), 52px);
+    }
+
+    .showcase__arrow {
+      width: 36px;
+      height: 36px;
+    }
+
+    .showcase__progress {
+      margin-top: 18px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .showcase__caption {
+      padding: 18px;
+      padding-inline-end: 72px;
+    }
+
+    .showcase__btn-secondary {
+      min-height: 42px;
+      padding: 10px 18px;
+    }
+  }
+
+  @media (max-width: 450px) {
+    .showcase__actions {
+      width: 100%;
+    }
+
+    .showcase__arrow {
+      width: 34px;
+      height: 34px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .showcase__track {
+      scroll-behavior: auto;
+    }
+
+    .showcase__arrow,
+    .showcase__btn-secondary,
+    .showcase__progress-thumb {
+      transition: none;
+    }
+  }
+{% endstylesheet %}

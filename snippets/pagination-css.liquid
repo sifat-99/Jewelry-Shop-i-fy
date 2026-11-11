@@ -1,3 +1,9 @@
+{% doc %}
+  Outputs the shared pagination styles (.lv-pagination*). Rendered by the pagination snippet and by the collection page's per-page pager.
+
+  @example
+  {% render 'pagination-css' %}
+{% enddoc %}
 <style>
   .lv-pagination-wrapper {
     margin: 50px 0 30px 0;
@@ -42,22 +48,22 @@
   }
   /* Standard page link */
   .lv-pagination__link {
-    color: #111111;
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    color: var(--text, #111111);
+    background: var(--bg, #ffffff);
+    border: 1px solid var(--lv-border);
   }
   .lv-pagination__link:hover {
-    background: #000000;
-    color: #ffffff;
-    border-color: #000000;
+    background: var(--btn-selected-bg, #000000);
+    color: var(--btn-selected-text, #ffffff);
+    border-color: var(--btn-selected-border, #000000);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   }
   /* Active current page */
   .lv-pagination__current {
-    background: #000000;
-    color: #ffffff;
-    border: 1px solid #000000;
+    background: var(--btn-selected-bg, #000000);
+    color: var(--btn-selected-text, #ffffff);
+    border: 1px solid var(--btn-selected-border, #000000);
     font-weight: 700;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
     cursor: default;
@@ -66,7 +72,7 @@
   .lv-pagination__ellipsis {
     min-width: 32px;
     padding: 0 4px;
-    color: #888888;
+    color: color-mix(in srgb, var(--text, #888888) 62%, transparent);
     border: none;
     background: transparent;
     cursor: default;
@@ -75,9 +81,9 @@
   .lv-pagination__arrow {
     gap: 6px;
     padding: 0 16px;
-    color: #111111;
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.14);
+    color: var(--text, #111111);
+    background: var(--bg, #ffffff);
+    border: 1px solid var(--lv-border);
   }
   .lv-pagination__arrow svg {
     width: 14px;
@@ -88,9 +94,9 @@
     transition: transform 0.2s ease;
   }
   .lv-pagination__arrow:hover {
-    background: #000000;
-    color: #ffffff;
-    border-color: #000000;
+    background: var(--btn-selected-bg, #000000);
+    color: var(--btn-selected-text, #ffffff);
+    border-color: var(--btn-selected-border, #000000);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   }
@@ -103,9 +109,9 @@
   .lv-pagination__arrow.is-disabled {
     opacity: 0.35;
     pointer-events: none;
-    border-color: rgba(0, 0, 0, 0.08);
+    border-color: color-mix(in srgb, var(--text, #000) 8%, transparent);
     background: rgba(0, 0, 0, 0.02);
-    color: #888888;
+    color: color-mix(in srgb, var(--text, #888888) 62%, transparent);
   }
   /* Summary counter text */
   .lv-pagination__summary {
@@ -113,7 +119,7 @@
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #777777;
+    color: color-mix(in srgb, var(--text, #777777) 62%, transparent);
   }
 
   /* Mobile responsiveness */

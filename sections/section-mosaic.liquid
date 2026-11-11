@@ -234,7 +234,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #000000;
+    background-color: var(--lv-ink, #000000);
     pointer-events: none;
     transition: opacity 0.3s ease;
   }
@@ -452,7 +452,7 @@
       <h2 class="kicker-flourished mb-r11">{{ section.settings.heading }}</h2>
     {%- endif -%}
     {%- if section.settings.subheading != blank -%}
-      <p style="text-align: center; font-family: 'Quicksand', sans-serif; font-size: 13.5px; font-weight: 500; color: #2b2622; margin: -6px auto 26px auto; letter-spacing: 0.05em; max-width: 600px; opacity: 1;">{{ section.settings.subheading }}</p>
+      <p style="text-align: center; font-family: 'Quicksand', sans-serif; font-size: 13.5px; font-weight: 500; color: var(--text, #2b2622); margin: -6px auto 26px auto; letter-spacing: 0.05em; max-width: 600px; opacity: 1;">{{ section.settings.subheading }}</p>
     {%- endif -%}
 
     <div class="lv-mosaic-wrap">

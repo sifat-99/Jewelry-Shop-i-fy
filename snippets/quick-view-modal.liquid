@@ -1,3 +1,6 @@
+{% doc %}
+  Snippet "quick-view-modal" used by the theme sections.
+{% enddoc %}
 <!-- /snippets/quick-view-modal.liquid -->
 <div id="QuickViewUnderlay" class="qv-underlay" aria-hidden="true"></div>
 
@@ -57,7 +60,7 @@
     max-width: 94vw;
     height: 86vh;
     max-height: 720px;
-    background: #ffffff;
+    background: var(--bg, #ffffff);
     z-index: 100011;
     border-radius: var(--modal-radius, var(--card-radius, 0px));
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
@@ -94,7 +97,7 @@
     overflow: hidden;
     isolation: isolate;
     background: var(--round-btn-bg, #ffffff);
-    border: 1px solid var(--round-btn-border, rgba(0, 0, 0, 0.14));
+    border: 1px solid var(--round-btn-border, var(--lv-border));
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -174,7 +177,7 @@
     background: #fbfbfb;
     overflow: hidden;
     border-radius: var(--product-gallery-radius, var(--card-radius, 0px));
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--lv-border);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -219,13 +222,13 @@
     overflow: hidden;
     opacity: 0.55;
     transition: all 0.22s ease;
-    background: #f8f8f8;
+    background: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff));
     padding: 0;
   }
   .qv-thumb.is-active,
   .qv-thumb:hover {
     opacity: 1;
-    border-color: #000000;
+    border-color: var(--text, #000000);
   }
   .qv-thumb img {
     width: 100%;
@@ -273,24 +276,24 @@
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #777777;
+    color: color-mix(in srgb, var(--text, #777777) 62%, transparent);
     margin-bottom: -4px;
   }
   .qv-vendor {
-    color: #111111;
+    color: var(--text, #111111);
   }
   .qv-meta-dot {
     color: #cccccc;
   }
   .qv-type {
-    color: #777777;
+    color: color-mix(in srgb, var(--text, #777777) 62%, transparent);
   }
 
   /* Product Title */
   .qv-title {
     font-size: 22px;
     font-weight: 700;
-    color: #111111;
+    color: var(--text, #111111);
     margin: 0;
     line-height: 1.25;
     letter-spacing: 0.05em;
@@ -306,10 +309,10 @@
     font-weight: 700;
   }
   .qv-price {
-    color: #111111;
+    color: var(--text, #111111);
   }
   .qv-compare-price {
-    color: #888888;
+    color: color-mix(in srgb, var(--text, #888888) 62%, transparent);
     text-decoration: line-through;
     font-size: 16px;
     font-weight: 500;
@@ -327,7 +330,7 @@
 
   .qv-tax-note {
     font-size: 11px;
-    color: #777777;
+    color: color-mix(in srgb, var(--text, #777777) 62%, transparent);
     margin-top: -8px;
     letter-spacing: 0.02em;
   }
@@ -358,10 +361,10 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #444444;
+    color: color-mix(in srgb, var(--text, #444444) 88%, transparent);
   }
   .qv-option-current {
-    color: #111111;
+    color: var(--text, #111111);
     font-weight: 800;
   }
   .qv-option-values {
@@ -373,13 +376,13 @@
     height: 36px;
     min-width: 44px;
     padding: 0 14px;
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.18);
+    background: var(--bg, #ffffff);
+    border: 1px solid var(--lv-border);
     border-radius: var(--btn-radius, 0px);
     font-family: inherit;
     font-size: 12px;
     font-weight: 600;
-    color: #111111;
+    color: var(--text, #111111);
     cursor: pointer;
     box-sizing: border-box;
     display: inline-flex;
@@ -388,12 +391,12 @@
     transition: all 0.2s ease;
   }
   .qv-pill-btn:hover {
-    border-color: #000000;
+    border-color: var(--text, #000000);
   }
   .qv-pill-btn.is-selected {
-    background: #000000 !important;
-    color: #ffffff !important;
-    border-color: #000000 !important;
+    background: var(--btn-selected-bg, #000000) !important;
+    color: var(--btn-selected-text, #ffffff) !important;
+    border-color: var(--btn-selected-border, #000000) !important;
   }
   .qv-pill-btn.is-disabled {
     opacity: 0.4;
@@ -411,11 +414,11 @@
   .qv-qty-selector {
     display: inline-flex !important;
     align-items: center !important;
-    border: 1px solid rgba(0, 0, 0, 0.16) !important;
+    border: 1px solid var(--lv-border) !important;
     border-radius: var(--btn-radius, 0px) !important;
     height: 48px !important;
     min-height: 48px !important;
-    background: #ffffff !important;
+    background: var(--bg, #ffffff) !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
   }
@@ -427,7 +430,7 @@
     cursor: pointer !important;
     font-size: 18px !important;
     font-weight: 500 !important;
-    color: #111111 !important;
+    color: var(--text, #111111) !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -438,7 +441,7 @@
     -webkit-user-select: none !important;
   }
   .qv-qty-btn:hover {
-    background-color: #f5f5f5 !important;
+    background-color: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)) !important;
   }
   .qv-qty-input {
     width: 44px !important;
@@ -451,7 +454,7 @@
     font-size: 15px !important;
     font-weight: 600 !important;
     font-family: inherit !important;
-    color: #111111 !important;
+    color: var(--text, #111111) !important;
     padding: 0 !important;
     margin: 0 !important;
     -moz-appearance: textfield !important;
@@ -518,9 +521,9 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     padding: 12px 14px;
-    background: #fafafa;
+    background: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff));
     border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--lv-border);
     margin-top: 2px;
   }
   .qv-highlight-item {
@@ -529,23 +532,23 @@
     gap: 8px;
     font-size: 11px;
     font-weight: 600;
-    color: #222222;
+    color: var(--text, #222222);
     letter-spacing: 0.02em;
   }
   .qv-highlight-item svg {
     flex-shrink: 0;
-    color: #111111;
+    color: var(--text, #111111);
   }
 
   /* Quick View Accordions (Full Product Details) */
   .qv-accordions {
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 1px solid var(--lv-border);
     margin-top: 6px;
     width: 100%;
     box-sizing: border-box;
   }
   .qv-accordion-item {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid var(--lv-border);
   }
   .qv-accordion-trigger {
     width: 100%;
@@ -562,12 +565,12 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    color: #111111;
+    color: var(--text, #111111);
     box-sizing: border-box;
     transition: color 0.2s ease;
   }
   .qv-accordion-trigger:hover {
-    color: #000000;
+    color: var(--text, #000000);
   }
   .qv-accordion-icon {
     font-size: 16px;
@@ -578,7 +581,7 @@
   .qv-accordion-panel {
     padding-bottom: 14px;
     font-size: 13px;
-    color: #444444;
+    color: color-mix(in srgb, var(--text, #444444) 88%, transparent);
     line-height: 1.65;
   }
   .qv-accordion-panel p {
@@ -588,7 +591,7 @@
     margin-bottom: 0;
   }
   .qv-accordion-panel strong {
-    color: #111111;
+    color: var(--text, #111111);
     font-weight: 600;
   }
   .qv-accordion-panel ul,
@@ -611,7 +614,7 @@
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #111111;
+    color: var(--text, #111111);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -641,8 +644,8 @@
   .qv-spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(0, 0, 0, 0.1);
-    border-top-color: #000000;
+    border: 3px solid var(--lv-border);
+    border-top-color: var(--text, #000000);
     border-radius: 50%;
     animation: qvSpin 0.8s linear infinite;
   }
@@ -656,7 +659,7 @@
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: #111111;
+    background: var(--lv-ink, #111111);
     color: #ffffff;
     padding: 12px 24px;
     border-radius: 30px;

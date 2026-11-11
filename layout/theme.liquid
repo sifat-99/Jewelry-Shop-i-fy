@@ -15,7 +15,7 @@
 
   <title>
     {{ page_title }}
-    {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+    {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' | escape }}"{% endif -%}
     {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
     {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
   </title>
@@ -53,8 +53,8 @@
     .lv-rating-stars__star { display: inline-block; color: transparent; font-size: 1em; font-weight: 700; line-height: 1; background: linear-gradient(90deg, var(--lv-rating-star-gold) 0 var(--lv-star-fill), var(--lv-rating-star-empty) var(--lv-star-fill) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 1px 0 var(--lv-rating-star-shadow)); }
     body {
       font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: #000000;
-      background-color: #ffffff;
+      color: var(--text, #000000);
+      background-color: var(--bg, #ffffff);
       -webkit-font-smoothing: antialiased;
       margin: 0;
       padding: 0;
@@ -65,22 +65,307 @@
     }
 
     /* === Dynamic Online Store 2.0 Color Schemes === */
+    {%- comment -%}
+      ===== Aurelle Theme Palette =====
+      One master palette (Theme settings > Theme Palette) drives all color schemes, the gold accent and the buttons.
+      Every text/button color is contrast-checked so no scheme ends up unreadable.
+    {%- endcomment -%}
+    {%- liquid
+      assign pal_on = settings.palette_control
+      if pal_on == nil
+        assign pal_on = true
+      endif
+      assign pal_preset = settings.palette_preset | default: 'champagne'
+
+      case pal_preset
+        when 'rose'
+          assign p_ivory = '#fffafa'
+          assign p_cream = '#fbeeec'
+          assign p_sand = '#f4dcd6'
+          assign p_ink = '#2b1a1e'
+          assign p_accent = '#b76e79'
+          assign p_dark = '#3a1f27'
+          assign p_line = '#eacfca'
+        when 'platinum'
+          assign p_ivory = '#fbfcfd'
+          assign p_cream = '#eff2f5'
+          assign p_sand = '#dfe4ea'
+          assign p_ink = '#0f1319'
+          assign p_accent = '#5d6b7c'
+          assign p_dark = '#12171f'
+          assign p_line = '#d5dbe2'
+        when 'emerald'
+          assign p_ivory = '#fafdfb'
+          assign p_cream = '#eaf2ec'
+          assign p_sand = '#d9e7dd'
+          assign p_ink = '#0e1f17'
+          assign p_accent = '#b08d4a'
+          assign p_dark = '#0a2d21'
+          assign p_line = '#cfe0d5'
+        when 'midnight'
+          assign p_ivory = '#fafbff'
+          assign p_cream = '#edf0fa'
+          assign p_sand = '#dce2f4'
+          assign p_ink = '#0e1430'
+          assign p_accent = '#b08d57'
+          assign p_dark = '#0e1430'
+          assign p_line = '#d3d9ec'
+        when 'custom'
+          assign p_ivory = settings.pal_ivory | default: '#ffffff'
+          assign p_cream = settings.pal_cream | default: '#f7f5f0'
+          assign p_sand = settings.pal_sand | default: '#f0e9dd'
+          assign p_ink = settings.pal_ink | default: '#1a1a1a'
+          assign p_accent = settings.pal_accent | default: '#9b7c53'
+          assign p_dark = settings.pal_dark | default: '#1c1a17'
+          assign p_line = settings.pal_line | default: '#e6e2d8'
+        else
+          assign p_ivory = '#ffffff'
+          assign p_cream = '#f7f5f0'
+          assign p_sand = '#f0e9dd'
+          assign p_ink = '#1a1a1a'
+          assign p_accent = '#9b7c53'
+          assign p_dark = '#1c1a17'
+          assign p_line = '#e6e2d8'
+      endcase
+
+      comment
+        Accent used as TEXT on light backgrounds: darken until it reaches 4.5:1 on ivory.
+        Accent used on DARK backgrounds: lighten until it reaches 4.5:1 on the dark color.
+      endcomment
+      assign p_accent_deep = p_accent
+      assign c_deep = p_accent_deep | color_contrast: p_ivory
+      if c_deep < 4.5
+        assign p_accent_deep = p_accent_deep | color_darken: 8
+        assign c_deep = p_accent_deep | color_contrast: p_ivory
+      endif
+      if c_deep < 4.5
+        assign p_accent_deep = p_accent_deep | color_darken: 8
+        assign c_deep = p_accent_deep | color_contrast: p_ivory
+      endif
+      if c_deep < 4.5
+        assign p_accent_deep = p_accent_deep | color_darken: 8
+      endif
+
+      assign p_accent_light = p_accent
+      assign c_light = p_accent_light | color_contrast: p_dark
+      if c_light < 4.5
+        assign p_accent_light = p_accent_light | color_lighten: 12
+        assign c_light = p_accent_light | color_contrast: p_dark
+      endif
+      if c_light < 4.5
+        assign p_accent_light = p_accent_light | color_lighten: 12
+      endif
+
+      assign p_tint = p_accent | color_lighten: 40
+      assign p_border = p_line | color_darken: 7
+      assign p_dark_line = p_dark | color_lighten: 10
+      assign p_ink_hover = p_ink | color_lighten: 14
+    -%}
     {% for scheme in settings.color_schemes -%}
+    {% liquid
+      assign s_background = scheme.settings.background
+      assign s_background_gradient = scheme.settings.background_gradient
+      assign s_text = scheme.settings.text
+      assign s_button = scheme.settings.button
+      assign s_button_label = scheme.settings.button_label
+      assign s_secondary_button_label = scheme.settings.secondary_button_label
+      assign s_shadow = scheme.settings.shadow
+      assign s_accent = settings.brand_accent | default: '#9b7c53'
+      assign s_btn_bg = settings.button_bg | default: s_button
+      assign s_btn_text = settings.button_text | default: s_button_label
+      assign s_btn_hover_bg = settings.btn_hover_bg | default: s_text
+      assign s_btn_hover_text = settings.btn_hover_text | default: s_background
+      assign s_btn_border = settings.button_border_color | default: s_btn_bg
+      assign s_btn_hover_border = settings.btn_hover_border_color | default: s_btn_hover_bg
+      assign s_sel_bg = s_btn_hover_bg
+      assign s_sel_text = s_btn_hover_text
+      assign s_sel_border = s_btn_hover_border
+      assign s_sel_hover_bg = s_btn_bg
+      assign s_sel_hover_text = s_btn_text
+      assign s_sel_hover_border = s_btn_border
+      assign s_round_bg = settings.round_button_bg | default: s_background
+      assign s_round_text = settings.round_button_text | default: s_text
+
+      if pal_on
+        assign s_background_gradient = ''
+        assign s_accent = p_accent
+        case scheme.id
+          when 'scheme-1'
+            assign s_background = p_ivory
+            assign s_text = p_ink
+            assign s_button = p_ink
+            assign s_button_label = p_ivory
+            assign s_secondary_button_label = p_ink
+            assign s_shadow = p_border
+            assign s_btn_hover_bg = p_ink_hover
+            assign s_btn_hover_text = p_ivory
+          when 'scheme-2'
+            assign s_background = p_cream
+            assign s_text = p_ink
+            assign s_button = p_ink
+            assign s_button_label = p_cream
+            assign s_secondary_button_label = p_ink
+            assign s_shadow = p_border
+            assign s_btn_hover_bg = p_ink_hover
+            assign s_btn_hover_text = p_cream
+          when 'scheme-3'
+            assign s_background = p_sand
+            assign s_text = p_ink
+            assign s_button = p_ink
+            assign s_button_label = p_sand
+            assign s_secondary_button_label = p_ink
+            assign s_shadow = p_border
+            assign s_btn_hover_bg = p_ink_hover
+            assign s_btn_hover_text = p_sand
+          when 'scheme-4'
+            assign s_background = p_tint
+            assign s_text = p_ink
+            assign s_button = p_accent_deep
+            assign l_white = p_accent_deep | color_contrast: p_ivory
+            assign l_ink = p_accent_deep | color_contrast: p_ink
+            if l_white >= l_ink
+              assign s_button_label = p_ivory
+            else
+              assign s_button_label = p_ink
+            endif
+            assign s_secondary_button_label = p_accent_deep
+            assign s_shadow = p_border
+            assign s_btn_hover_bg = p_ink
+            assign s_btn_hover_text = p_ivory
+          when 'scheme-5'
+            assign s_background = p_dark
+            assign s_text = p_ivory
+            assign s_button = p_accent_light
+            assign l_white = p_accent_light | color_contrast: p_ivory
+            assign l_dark = p_accent_light | color_contrast: p_dark
+            if l_white >= l_dark
+              assign s_button_label = p_ivory
+            else
+              assign s_button_label = p_dark
+            endif
+            assign s_secondary_button_label = p_accent_light
+            assign s_shadow = p_dark_line
+            assign s_btn_hover_bg = p_ivory
+            assign s_btn_hover_text = p_dark
+        endcase
+        comment
+          Button colors: one palette-driven style for every button. Light schemes vs the dark scheme get matching pairs.
+        endcomment
+        assign pal_dark_scheme = false
+        if scheme.id == 'scheme-5'
+          assign pal_dark_scheme = true
+        endif
+        assign btn_style = settings.palette_button_style | default: 'ivory'
+        assign l_w = p_accent_deep | color_contrast: p_ivory
+        assign l_i = p_accent_deep | color_contrast: p_ink
+        assign gold_label = p_ink
+        if l_w >= l_i
+          assign gold_label = p_ivory
+        endif
+        assign l_w2 = p_accent_light | color_contrast: p_ivory
+        assign l_d2 = p_accent_light | color_contrast: p_dark
+        assign gold_label_dark = p_dark
+        if l_w2 >= l_d2
+          assign gold_label_dark = p_ivory
+        endif
+
+        if btn_style == 'ink'
+          if pal_dark_scheme
+            assign s_btn_bg = p_accent_light
+            assign s_btn_text = gold_label_dark
+            assign s_btn_border = p_accent_light
+            assign s_btn_hover_bg = p_ivory
+            assign s_btn_hover_text = p_dark
+          else
+            assign s_btn_bg = p_ink
+            assign s_btn_text = p_ivory
+            assign s_btn_border = p_ink
+            assign s_btn_hover_bg = p_ink_hover
+            assign s_btn_hover_text = p_ivory
+          endif
+        elsif btn_style == 'gold'
+          if pal_dark_scheme
+            assign s_btn_bg = p_accent_light
+            assign s_btn_text = gold_label_dark
+            assign s_btn_border = p_accent_light
+            assign s_btn_hover_bg = p_ivory
+            assign s_btn_hover_text = p_dark
+          else
+            assign s_btn_bg = p_accent_deep
+            assign s_btn_text = gold_label
+            assign s_btn_border = p_accent_deep
+            assign s_btn_hover_bg = p_ink
+            assign s_btn_hover_text = p_ivory
+          endif
+        elsif btn_style == 'outline'
+          if pal_dark_scheme
+            assign s_btn_bg = 'transparent'
+            assign s_btn_text = p_ivory
+            assign s_btn_border = p_ivory
+            assign s_btn_hover_bg = p_ivory
+            assign s_btn_hover_text = p_dark
+          else
+            assign s_btn_bg = 'transparent'
+            assign s_btn_text = p_ink
+            assign s_btn_border = p_ink
+            assign s_btn_hover_bg = p_ink
+            assign s_btn_hover_text = p_ivory
+          endif
+        else
+          if pal_dark_scheme
+            assign s_btn_bg = p_ivory
+            assign s_btn_text = p_dark
+            assign s_btn_border = p_ivory
+            assign s_btn_hover_bg = p_accent_light
+            assign s_btn_hover_text = p_dark
+          else
+            assign s_btn_bg = p_ivory
+            assign s_btn_text = p_ink
+            assign s_btn_border = p_border
+            assign s_btn_hover_bg = p_ink
+            assign s_btn_hover_text = p_ivory
+          endif
+        endif
+        assign s_btn_hover_border = s_btn_hover_bg
+        comment
+          Selected / active state of pills, toggles, tabs, pagination: same family as the button style.
+          Solid styles keep the button colors, white and outline styles use the hover (dark) colors.
+        endcomment
+        case btn_style
+          when 'ink', 'gold'
+            assign s_sel_bg = s_btn_bg
+            assign s_sel_text = s_btn_text
+            assign s_sel_border = s_btn_border
+            assign s_sel_hover_bg = s_btn_hover_bg
+            assign s_sel_hover_text = s_btn_hover_text
+            assign s_sel_hover_border = s_btn_hover_border
+          else
+            assign s_sel_bg = s_btn_hover_bg
+            assign s_sel_text = s_btn_hover_text
+            assign s_sel_border = s_btn_hover_bg
+            assign s_sel_hover_bg = s_btn_bg
+            assign s_sel_hover_text = s_btn_text
+            assign s_sel_hover_border = s_btn_border
+        endcase
+        assign s_round_bg = s_background
+        assign s_round_text = s_text
+      endif
+    %}
       {% if forloop.index == 1 -%}
         :root,
       {%- endif %}
       .color-{{ scheme.id }} {
-        --color-background: {{ scheme.settings.background.red }},{{ scheme.settings.background.green }},{{ scheme.settings.background.blue }};
-        {% if scheme.settings.background_gradient != empty and scheme.settings.background_gradient != blank %}
-          --gradient-background: {{ scheme.settings.background_gradient }};
+        --color-background: {{ s_background | color_extract: 'red' }},{{ s_background | color_extract: 'green' }},{{ s_background | color_extract: 'blue' }};
+        {% if s_background_gradient != empty and s_background_gradient != blank %}
+          --gradient-background: {{ s_background_gradient }};
         {% else %}
-          --gradient-background: {{ scheme.settings.background }};
+          --gradient-background: {{ s_background }};
         {% endif %}
-        --color-foreground: {{ scheme.settings.text.red }},{{ scheme.settings.text.green }},{{ scheme.settings.text.blue }};
-        --color-button: {{ scheme.settings.button.red }},{{ scheme.settings.button.green }},{{ scheme.settings.button.blue }};
-        --color-button-text: {{ scheme.settings.button_label.red }},{{ scheme.settings.button_label.green }},{{ scheme.settings.button_label.blue }};
-        --color-secondary-button-text: {{ scheme.settings.secondary_button_label.red }},{{ scheme.settings.secondary_button_label.green }},{{ scheme.settings.secondary_button_label.blue }};
-        --color-shadow: {{ scheme.settings.shadow.red }},{{ scheme.settings.shadow.green }},{{ scheme.settings.shadow.blue }};
+        --color-foreground: {{ s_text | color_extract: 'red' }},{{ s_text | color_extract: 'green' }},{{ s_text | color_extract: 'blue' }};
+        --color-button: {{ s_button | color_extract: 'red' }},{{ s_button | color_extract: 'green' }},{{ s_button | color_extract: 'blue' }};
+        --color-button-text: {{ s_button_label | color_extract: 'red' }},{{ s_button_label | color_extract: 'green' }},{{ s_button_label | color_extract: 'blue' }};
+        --color-secondary-button-text: {{ s_secondary_button_label | color_extract: 'red' }},{{ s_secondary_button_label | color_extract: 'green' }},{{ s_secondary_button_label | color_extract: 'blue' }};
+        --color-shadow: {{ s_shadow | color_extract: 'red' }},{{ s_shadow | color_extract: 'green' }},{{ s_shadow | color_extract: 'blue' }};
 
         /* Theme variable overrides */
         --page-width: {{ settings.page_width | default: 1600 }}px;
@@ -100,39 +385,46 @@
         --product-thumb-radius: {{ settings.product_thumb_radius | default: settings.product_gallery_radius | default: 0 }}px;
         --media-radius: {{ settings.media_border_radius | default: settings.card_border_radius | default: 0 }}px;
         --cart-image-radius: {{ settings.media_border_radius | default: settings.card_border_radius | default: 0 }}px;
-        --bg: {{ scheme.settings.background }};
-        --bg-accent: {{ scheme.settings.background }};
-        --text: {{ scheme.settings.text }};
-        --text-dark: {{ scheme.settings.text }};
-        --text-light: rgba({{ scheme.settings.text.red }}, {{ scheme.settings.text.green }}, {{ scheme.settings.text.blue }}, 0.88);
-        --contrast: {{ scheme.settings.text }};
-        --border: {{ scheme.settings.shadow }};
-        --hairline: rgba({{ scheme.settings.shadow.red }}, {{ scheme.settings.shadow.green }}, {{ scheme.settings.shadow.blue }}, 0.22);
-        --primary: {{ scheme.settings.button }};
-        --secondary: {{ scheme.settings.secondary_button_label }};
-        --COLOR-ANNOUNCEMENT-BG: {{ scheme.settings.background }};
-        --COLOR-ANNOUNCEMENT-TEXT: {{ scheme.settings.text }};
-        --COLOR-FOOTER-BG: {{ scheme.settings.background }};
-        --COLOR-FOOTER-TEXT: {{ scheme.settings.text }};
+        --bg: {{ s_background }};
+        --bg-accent: {{ s_background }};
+        --text: {{ s_text }};
+        --text-dark: {{ s_text }};
+        --text-light: rgba({{ s_text | color_extract: 'red' }}, {{ s_text | color_extract: 'green' }}, {{ s_text | color_extract: 'blue' }}, 0.88);
+        --contrast: {{ s_text }};
+        --border: {{ s_shadow }};
+        --hairline: {{ s_shadow }};
+        --lv-border: {{ s_shadow }};
+        --primary: {{ s_button }};
+        --secondary: {{ s_secondary_button_label }};
+        --COLOR-ANNOUNCEMENT-BG: {{ s_background }};
+        --COLOR-ANNOUNCEMENT-TEXT: {{ s_text }};
+        --COLOR-FOOTER-BG: {{ s_background }};
+        --COLOR-FOOTER-TEXT: {{ s_text }};
 
-        --lv-accent: {{ settings.brand_accent | default: '#9b7c53' }};
+        --lv-accent: {{ s_accent }};
 
         /* Universal Round Button Color Variables (Online Store 2.0 Color Schemes) */
-        --round-btn-bg: {{ settings.round_button_bg | default: scheme.settings.background }};
-        --round-btn-text: {{ settings.round_button_text | default: scheme.settings.text }};
-        --round-btn-border: rgba({{ scheme.settings.text.red }}, {{ scheme.settings.text.green }}, {{ scheme.settings.text.blue }}, 0.14);
-        --round-btn-hover-bg: {{ settings.btn_hover_bg | default: scheme.settings.button }};
-        --round-btn-hover-text: {{ settings.btn_hover_text | default: scheme.settings.button_label }};
-        --round-btn-hover-border: {{ settings.btn_hover_bg | default: scheme.settings.button }};
-        --round-btn-shadow: rgba({{ scheme.settings.shadow.red }}, {{ scheme.settings.shadow.green }}, {{ scheme.settings.shadow.blue }}, 0.16);
+        --round-btn-bg: {{ s_round_bg }};
+        --round-btn-text: {{ s_round_text }};
+        --round-btn-border: rgba({{ s_text | color_extract: 'red' }}, {{ s_text | color_extract: 'green' }}, {{ s_text | color_extract: 'blue' }}, 0.14);
+        --round-btn-hover-bg: {{ s_btn_hover_bg }};
+        --round-btn-hover-text: {{ s_btn_hover_text }};
+        --round-btn-hover-border: {{ s_btn_hover_bg }};
+        --round-btn-shadow: rgba({{ s_shadow | color_extract: 'red' }}, {{ s_shadow | color_extract: 'green' }}, {{ s_shadow | color_extract: 'blue' }}, 0.16);
 
         /* Universal Regular (Square/Rectangular) Button Color Variables (Online Store 2.0 Color Schemes) */
-        --btn-regular-bg: {{ settings.button_bg | default: scheme.settings.button }};
-        --btn-regular-text: {{ settings.button_text | default: scheme.settings.button_label }};
-        --btn-regular-border: {{ settings.button_border_color | default: settings.button_bg | default: scheme.settings.button }};
-        --btn-regular-hover-bg: {{ settings.btn_hover_bg | default: scheme.settings.text }};
-        --btn-regular-hover-text: {{ settings.btn_hover_text | default: scheme.settings.background }};
-        --btn-regular-hover-border: {{ settings.btn_hover_border_color | default: settings.btn_hover_bg | default: scheme.settings.text }};
+        --btn-regular-bg: {{ s_btn_bg }};
+        --btn-regular-text: {{ s_btn_text }};
+        --btn-regular-border: {{ s_btn_border }};
+        --btn-regular-hover-bg: {{ s_btn_hover_bg }};
+        --btn-regular-hover-text: {{ s_btn_hover_text }};
+        --btn-regular-hover-border: {{ s_btn_hover_border }};
+        --btn-selected-bg: {{ s_sel_bg }};
+        --btn-selected-text: {{ s_sel_text }};
+        --btn-selected-border: {{ s_sel_border }};
+        --btn-selected-hover-bg: {{ s_sel_hover_bg }};
+        --btn-selected-hover-text: {{ s_sel_hover_text }};
+        --btn-selected-hover-border: {{ s_sel_hover_border }};
 
         /* Soft / Muted Button Variables */
         --btn-soft-bg: var(--btn-regular-bg);
@@ -151,14 +443,14 @@
         --btn-outline-hover-border: var(--btn-regular-hover-border);
 
         /* Global Universal Button Setting Overrides (theme settings) */
-        background-color: {{ scheme.settings.background }};
-        color: {{ scheme.settings.text }};
+        background-color: {{ s_background }};
+        color: {{ s_text }};
       }
       .color-{{ scheme.id }} .btn--primary,
       .color-{{ scheme.id }} .btn--soft {
-        background-color: {{ scheme.settings.button }};
-        color: {{ scheme.settings.button_label }};
-        border-color: {{ scheme.settings.button }};
+        background-color: {{ s_btn_bg }};
+        color: {{ s_btn_text }};
+        border-color: {{ s_btn_border }};
       }
       .color-{{ scheme.id }} .btn--primary:hover,
       .color-{{ scheme.id }} .btn--soft:hover,
@@ -171,17 +463,29 @@
         color: var(--btn-regular-hover-text) !important;
       }
       .color-{{ scheme.id }} .text-black {
-        color: {{ scheme.settings.text }};
+        color: {{ s_text }};
       }
       .color-{{ scheme.id }} .text-gray-500,
       .color-{{ scheme.id }} .text-gray-600 {
-        color: rgba({{ scheme.settings.text.red }}, {{ scheme.settings.text.green }}, {{ scheme.settings.text.blue }}, 0.85);
+        color: rgba({{ s_text | color_extract: 'red' }}, {{ s_text | color_extract: 'green' }}, {{ s_text | color_extract: 'blue' }}, 0.85);
       }
       .color-{{ scheme.id }} .border-gray-100,
       .color-{{ scheme.id }} .border-gray-200 {
-        border-color: rgba({{ scheme.settings.shadow.red }}, {{ scheme.settings.shadow.green }}, {{ scheme.settings.shadow.blue }}, 0.25);
+        border-color: rgba({{ s_shadow | color_extract: 'red' }}, {{ s_shadow | color_extract: 'green' }}, {{ s_shadow | color_extract: 'blue' }}, 0.25);
       }
     {% endfor %}
+
+    /* Aurelle palette, available to every section: var(--lv-ivory) ... var(--lv-line) */
+    :root {
+      --lv-ivory: {{ p_ivory }};
+      --lv-cream: {{ p_cream }};
+      --lv-sand: {{ p_sand }};
+      --lv-ink: {{ p_ink }};
+      --lv-dark: {{ p_dark }};
+      --lv-line: {{ p_line }};
+      --lv-accent-deep: {{ p_accent_deep }};
+      --lv-accent-light: {{ p_accent_light }};
+    }
 
     /* ==========================================================================
        Anti-Fade High-Contrast Typography
@@ -232,24 +536,24 @@
       font-size: {{ settings.nav_font_size | default: 13 }}px !important;
       font-weight: {{ settings.nav_font_weight | default: 600 }} !important;
       letter-spacing: 0.09em !important;
-      color: #111111 !important;
+      color: var(--text, #111111) !important;
       opacity: 1 !important;
       text-transform: {% if settings.nav_uppercase %}uppercase{% else %}none{% endif %} !important;
     }
     .header__menu__inner .menu__item .navlink--toplevel {
       opacity: 1 !important;
-      color: #111111 !important;
+      color: var(--text, #111111) !important;
     }
     .header__menu__inner:hover .menu__item:not(:hover) .navlink--toplevel {
       opacity: 0.72 !important;
     }
     .header__menu__inner .menu__item:hover .navlink--toplevel {
       opacity: 1 !important;
-      color: #000000 !important;
+      color: var(--text, #000000) !important;
     }
     .header__desktop__button svg,
     .header__mobile__button svg {
-      color: #111111 !important;
+      color: var(--text, #111111) !important;
       stroke-width: 2px !important;
       opacity: 1 !important;
     }
@@ -272,6 +576,13 @@
       border-radius: {{ settings.input_border_radius | default: 0 }}px !important;
       border-width: {{ settings.input_border_thickness | default: 1 }}px !important;
     }
+    /* One border color for every field (Theme Palette > border); focus uses the text color */
+    input[type="text"], input[type="email"], input[type="password"], input[type="search"], input[type="tel"], input[type="number"], input[type="url"], textarea, select {
+      border-color: var(--lv-border);
+    }
+    input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="number"]:focus, input[type="url"]:focus, textarea:focus, select:focus {
+      border-color: var(--text);
+    }
 
     /* Announcement Bar Ticker */
     .announcement,
@@ -283,7 +594,7 @@
       font-size: 12.5px !important;
       font-weight: 600 !important;
       letter-spacing: 0.12em !important;
-      color: #111111 !important;
+      color: var(--text, #111111) !important;
       opacity: 1 !important;
     }
 
@@ -305,7 +616,7 @@
       font-family: 'Quicksand', sans-serif !important;
       font-size: 13px !important;
       font-weight: 600 !important;
-      color: #111111 !important;
+      color: var(--text, #111111) !important;
       letter-spacing: 0.08em !important;
       opacity: 1 !important;
     }
@@ -339,18 +650,18 @@
       font-weight: 700 !important;
       letter-spacing: 0.12em !important;
       text-transform: uppercase !important;
-      color: #111111 !important;
+      color: var(--text, #111111) !important;
       opacity: 1 !important;
     }
     .footer__quicklinks a {
       font-family: 'Quicksand', sans-serif !important;
       font-size: 13px !important;
       font-weight: 500 !important;
-      color: #222222 !important;
+      color: var(--text, #222222) !important;
       opacity: 1 !important;
     }
     .footer__quicklinks a:hover {
-      color: #000000 !important;
+      color: var(--text, #000000) !important;
     }
   </style>
 
@@ -361,6 +672,16 @@
   {% render 'sale-badge-css' %}
   {% render 'card-mini-add-assets' %}
 
+  {%- liquid
+    assign smooth_scroll_on = settings.enable_smooth_scroll
+    if smooth_scroll_on == nil
+      assign smooth_scroll_on = true
+    endif
+    assign smooth_scroll_anchors_on = settings.smooth_scroll_anchors
+    if smooth_scroll_anchors_on == nil
+      assign smooth_scroll_anchors_on = true
+    endif
+  -%}
   <script>
     document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
     document.documentElement.classList.add('aos-initialized');
@@ -405,6 +726,9 @@
         badge_sale_type: {{ settings.sale_badge_type | default: "percentage" | json }},
         animate_hover: {{ settings.enable_hover_animations | default: true | json }},
         animate_scroll: {{ settings.enable_scroll_animations | default: true | json }},
+        smooth_scroll: {{ smooth_scroll_on | json }},
+        smooth_scroll_strength: {{ settings.smooth_scroll_strength | default: 3 | json }},
+        smooth_scroll_anchors: {{ smooth_scroll_anchors_on | json }},
         currency_code_enable: {{ settings.currency_code_enabled | default: false | json }}
       },
       currency: {{ shop.currency | json }},
@@ -425,6 +749,9 @@
 
   <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+  {%- if smooth_scroll_on -%}
+    <script src="{{ 'smooth-page-scroll.js' | asset_url }}" defer="defer"></script>
+  {%- endif -%}
 </head>
 <body id="{{ page_title | handle }}" class="template-{{ template.name | handle }}">
   {% sections 'header-group' %}

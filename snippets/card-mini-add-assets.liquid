@@ -1,3 +1,6 @@
+{% doc %}
+  Global CSS + JS for the compact card add button and its variant popup (bottom sheet / side drawer / above button / over product). Rendered once from layout/theme.liquid.
+{% enddoc %}
 {%- comment -%} Global CSS + JS for the compact card add button and its variant popup (bottom sheet / side drawer / above button / over product). Rendered once from layout/theme.liquid. {%- endcomment -%}
 <style>
   /* Smooth colour change on hover: the hover colour fades in (same speed as the main buttons, --btn-animation-duration). */
@@ -34,7 +37,7 @@
       width: var(--mini-size, 38px); height: var(--mini-size, 38px); padding: 0; box-sizing: border-box;
       border-radius: var(--btn-radius, 0px);
       background: var(--btn-regular-bg, #fff); color: var(--btn-regular-text, #111);
-      border: var(--btn-border-thickness, 1px) solid var(--btn-regular-border, rgba(0,0,0,.2)); box-shadow: 0 2px 8px rgba(0,0,0,.14);
+      border: var(--btn-border-thickness, 1px) solid var(--btn-regular-border, var(--lv-border)); box-shadow: 0 2px 8px rgba(0,0,0,.14);
       cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color .25s ease, color .25s ease, border-color .25s ease;
     }
     .lv-mini-add--right { right: 8px; }
@@ -48,7 +51,7 @@
 
   /* ---- Shared popup content ---- */
   .lv-mp { font-family: 'Quicksand', -apple-system, sans-serif; color: var(--text, #111); box-sizing: border-box; }
-  .lv-mp__head { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1px solid rgba(0, 0, 0, .08); }
+  .lv-mp__head { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--lv-border); }
   .lv-mp__thumb { flex: none; width: 54px; height: 54px; object-fit: cover; border-radius: var(--btn-radius, 0px); background: color-mix(in srgb, var(--text, #111) 6%, var(--bg, #fff)); }
   .lv-mp__meta { flex: 1; min-width: 0; }
   .lv-mp__title { margin: 0; font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; line-height: 1.4; }
@@ -60,12 +63,12 @@
   .lv-msheet__opt {
     display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-width: 52px; min-height: 42px; padding: 0 16px; box-sizing: border-box;
     background: transparent; color: inherit; font: inherit; font-size: 12.5px; font-weight: 600; letter-spacing: .06em;
-    border: var(--btn-border-thickness, 1px) solid rgba(0, 0, 0, .22); border-radius: var(--btn-radius, 0px); cursor: pointer;
+    border: var(--btn-border-thickness, 1px) solid var(--lv-border); border-radius: var(--btn-radius, 0px); cursor: pointer;
     transition: background-color .2s ease, color .2s ease, border-color .2s ease;
   }
   .lv-msheet__opt:hover, .lv-msheet__opt:active { background: var(--btn-regular-hover-bg, #111); color: var(--btn-regular-hover-text, #fff); border-color: var(--btn-regular-hover-border, #111); }
   .lv-msheet__opt[disabled] { opacity: .4; cursor: not-allowed; text-decoration: line-through; }
-  .lv-msheet__opt[disabled]:hover { background: transparent; color: inherit; border-color: rgba(0, 0, 0, .22); }
+  .lv-msheet__opt[disabled]:hover { background: transparent; color: inherit; border-color: color-mix(in srgb, var(--text, #000) 22%, transparent); }
   .lv-msheet__opt-note { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
   .lv-msheet__opt.is-busy { opacity: .6; pointer-events: none; }
   .lv-msheet__opt-delta { margin-left: 8px; padding: 2px 7px; font-size: 11.5px; font-weight: 700; letter-spacing: .01em; background: color-mix(in srgb, var(--text, #111) 13%, var(--bg, #fff)); color: var(--text, #111); }
@@ -97,7 +100,7 @@
   .lv-mp__eng-field { position: relative; }
   .lv-mp__eng-input {
     width: 100%; box-sizing: border-box; height: 46px; padding: 0 54px 0 14px; margin: 0; background: color-mix(in srgb, var(--text, #111) 3%, var(--bg, #fff)); color: var(--text, #111);
-    font: inherit; font-size: 16px; letter-spacing: .02em; border: 1px solid rgba(0, 0, 0, .18); border-radius: var(--input-radius, var(--btn-radius, 0px)); outline: none; box-shadow: none;
+    font: inherit; font-size: 16px; letter-spacing: .02em; border: 1px solid var(--lv-border); border-radius: var(--input-radius, var(--btn-radius, 0px)); outline: none; box-shadow: none;
     transition: border-color .2s ease, background-color .2s ease;
   }
   .lv-mp__eng-input::placeholder { color: color-mix(in srgb, var(--text, #111) 40%, transparent); font-size: 14px; }
@@ -126,15 +129,15 @@
   /* ---- Popover above the button ---- */
   .lv-mpop {
     position: fixed; z-index: 2147483000; width: min(300px, calc(100vw - 16px)); box-sizing: border-box; padding: 16px;
-    background: var(--bg, #fff); border: 1px solid rgba(0, 0, 0, .08); border-radius: calc(var(--btn-radius, 0px) + 2px);
+    background: var(--bg, #fff); border: 1px solid var(--lv-border); border-radius: calc(var(--btn-radius, 0px) + 2px);
     box-shadow: 0 18px 48px rgba(0, 0, 0, .22), 0 2px 8px rgba(0, 0, 0, .06); opacity: 0; transform: translateY(6px); transition: opacity .18s ease, transform .18s ease;
   }
   .lv-mpop.is-open { opacity: 1; transform: none; }
   .lv-mpop::after {
     content: ""; position: absolute; left: var(--arrow-x, 50%); width: 12px; height: 12px; margin-left: -6px; background: var(--bg, #fff);
-    transform: rotate(45deg); bottom: -6px; border-right: 1px solid rgba(0, 0, 0, .08); border-bottom: 1px solid rgba(0, 0, 0, .08);
+    transform: rotate(45deg); bottom: -6px; border-right: 1px solid var(--lv-border); border-bottom: 1px solid var(--lv-border);
   }
-  .lv-mpop.is-below::after { bottom: auto; top: -6px; border: 0; border-left: 1px solid rgba(0, 0, 0, .08); border-top: 1px solid rgba(0, 0, 0, .08); }
+  .lv-mpop.is-below::after { bottom: auto; top: -6px; border: 0; border-left: 1px solid color-mix(in srgb, var(--text, #000) 8%, transparent); border-top: 1px solid color-mix(in srgb, var(--text, #000) 8%, transparent); }
 
   /* ---- Overlay covering the product image ---- */
   .lv-mover {

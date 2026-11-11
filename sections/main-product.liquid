@@ -93,7 +93,7 @@
       box-sizing: border-box;
       overflow-x: clip;
       --pv-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62);
-      --pv-line: var(--hairline, rgba(0, 0, 0, 0.14));
+      --pv-line: var(--lv-border);
       --pv-soft: rgba(var(--color-foreground, 17, 17, 17), 0.035);
     }
     .pv-container {
@@ -219,7 +219,7 @@
       cursor: pointer;
       background: var(--round-btn-bg, #ffffff);
       color: var(--round-btn-text, #111111);
-      border: 1px solid var(--round-btn-border, rgba(0, 0, 0, 0.14));
+      border: 1px solid var(--round-btn-border, var(--lv-border));
       box-shadow: 0 2px 8px var(--round-btn-shadow, rgba(0, 0, 0, 0.14));
       opacity: 0;
       transition: opacity 0.25s ease, background-color 0.25s ease, color 0.25s ease;
@@ -241,7 +241,7 @@
       padding: 4px 12px;
       border-radius: 20px;
       background: rgba(255, 255, 255, 0.85);
-      color: #111;
+      color: var(--text, #111);
       pointer-events: none;
       backdrop-filter: blur(4px);
     }
@@ -273,7 +273,7 @@
       cursor: pointer;
       background: var(--round-btn-bg, #ffffff);
       color: var(--round-btn-text, #111111);
-      border: 1px solid var(--round-btn-border, rgba(0, 0, 0, 0.14));
+      border: 1px solid var(--round-btn-border, var(--lv-border));
       box-shadow: 0 2px 8px var(--round-btn-shadow, rgba(0, 0, 0, 0.14));
       transition: background-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
     }
@@ -492,19 +492,19 @@
       padding: 2px 7px;
       border-radius: 999px;
       background: rgba(0, 0, 0, 0.06);
-      color: #111;
+      color: var(--text, #111);
       line-height: 1.1;
       transition: background-color 0.2s ease, color 0.2s ease;
     }
     .pv-opt__input:checked + .pv-opt__pill .pv-opt__badge {
-      background: rgba(255, 255, 255, 0.22);
-      color: #ffffff;
+      background: color-mix(in srgb, var(--btn-selected-text, #ffffff) 22%, transparent);
+      color: var(--btn-selected-text, #ffffff);
     }
     .pv-opt__input:focus-visible + .pv-opt__pill { outline: 2px solid var(--text, #111); outline-offset: 2px; }
     .pv-opt__input:checked + .pv-opt__pill {
-      border-color: var(--text, #111);
-      background: var(--text, #111);
-      color: var(--bg, #fff);
+      border-color: var(--btn-selected-border, #111);
+      background: var(--btn-selected-bg, #111);
+      color: var(--btn-selected-text, #fff);
     }
     .pv-opt--color .pv-opt__input:checked + .pv-opt__pill {
       background: transparent; color: inherit; box-shadow: 0 0 0 1px var(--text, #111) inset;
@@ -514,7 +514,7 @@
     .pv-opt__dot {
       width: 16px; height: 16px; border-radius: 50%; flex: 0 0 auto;
       background: var(--swatch, #d9b65a);
-      border: 1px solid rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--lv-border);
     }
     .pv-opt__input.is-unavailable + .pv-opt__pill { opacity: 0.45; text-decoration: line-through; }
     .pv-opt__input.is-unavailable:checked + .pv-opt__pill { opacity: 0.7; }
@@ -530,9 +530,9 @@
       background: color-mix(in srgb, var(--text, #111) 6%, var(--bg, #fff)) !important;
     }
     html body .pv-opt__input:checked + .pv-opt__pill {
-      background: var(--text, #111) !important;
-      color: var(--bg, #fff) !important;
-      border-color: var(--text, #111) !important;
+      background: var(--btn-selected-bg, #111) !important;
+      color: var(--btn-selected-text, #fff) !important;
+      border-color: var(--btn-selected-border, #111) !important;
       box-shadow: none !important;
     }
     html body .pv-opt:not(.pv-opt--color) .pv-opt__input:checked + .pv-opt__pill::before {
@@ -540,7 +540,7 @@
       border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(45deg);
     }
     html body .pv-opt__badge { background: color-mix(in srgb, var(--text, #111) 14%, var(--bg, #fff)); color: var(--text, #111); font-size: 12px; font-weight: 700; padding: 3px 8px; letter-spacing: 0.01em; }
-    html body .pv-opt__input:checked + .pv-opt__pill .pv-opt__badge { background: var(--bg, #fff); color: var(--text, #111); }
+    html body .pv-opt__input:checked + .pv-opt__pill .pv-opt__badge { background: color-mix(in srgb, var(--btn-selected-text, #fff) 22%, transparent); color: var(--btn-selected-text, #fff); }
     html body .pv-opt__selected { color: var(--text, #111); font-weight: 500; opacity: 1; }
     html body .pv-opt--color .pv-opt__input:checked + .pv-opt__pill {
       background: var(--bg, #fff) !important; color: var(--text, #111) !important; box-shadow: 0 0 0 1px var(--text, #111) inset !important;
@@ -575,7 +575,7 @@
     /* card background = announcement bar color */
     /* card colors come from the color scheme chosen in the section settings (class color-scheme-N on the card) */
     .pv-eng-card { background: var(--bg, #fff); color: var(--text, #111); --pv-line: var(--eng-border); --eng-border: var(--btn-base-border, var(--btn-regular-border, #111)); --pv-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62); }
-    .pv-eng-card__head { border-bottom-color: color-mix(in srgb, var(--text, #111) 14%, transparent); }
+    .pv-eng-card__head { border-bottom-color: var(--lv-border); }
     .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input { border-radius: 0; border: var(--btn-border-thickness, 1px) solid var(--eng-border); }
     .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input:focus { border-color: var(--text, #111); }
     .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input, .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input:focus { background: color-mix(in srgb, var(--text, #111) 5%, var(--bg, #fff)); color: var(--text, #111); }
@@ -587,7 +587,7 @@
     .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input { background: var(--pv-soft); min-height: 50px; }
     .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input:focus { background: var(--bg, #fff); }
     /* classic look: grey box holding options + text field (original pill style) */
-    .pv-eng-card.pv-eng-card--plain { padding: 16px; background: var(--pv-soft); border: 1px solid var(--pv-line); border-radius: 0; color: inherit; --pv-line: var(--hairline, rgba(0, 0, 0, 0.14)); }
+    .pv-eng-card.pv-eng-card--plain { padding: 16px; background: var(--pv-soft); border: 1px solid var(--pv-line); border-radius: 0; color: inherit; --pv-line: var(--lv-border); }
     .pv-eng-card--plain .pv-opt { margin: 0 0 16px; }
     /* classic pills: original inline look on wide columns; on narrow columns (container <= 480px) an equal-width stacked grid */
     .pv-eng-card--plain { container-type: inline-size; }

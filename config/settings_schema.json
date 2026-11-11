@@ -91,6 +91,50 @@
     ]
   },
   {
+    "name": "Theme Palette",
+    "settings": [
+      { "type": "header", "content": "Master palette" },
+      { "type": "paragraph", "content": "Pick one jewelry palette and the whole theme follows: all color schemes (Ivory, Cream, Sand, Gold, Dark), buttons, borders and the gold accent. Text colors are checked for contrast automatically." },
+      { "type": "checkbox", "id": "palette_control", "label": "Palette controls the color schemes", "info": "Turn off to edit each scheme by hand in the Colors group below.", "default": true },
+      {
+        "type": "select",
+        "id": "palette_preset",
+        "label": "Palette",
+        "options": [
+          { "value": "champagne", "label": "Champagne Gold (warm ivory + gold)" },
+          { "value": "rose", "label": "Rose Gold (blush + rose gold)" },
+          { "value": "platinum", "label": "Platinum (cool silver + steel)" },
+          { "value": "emerald", "label": "Emerald & Gold (deep green + gold)" },
+          { "value": "midnight", "label": "Midnight (navy + soft gold)" },
+          { "value": "custom", "label": "Custom (pick the colors below)" }
+        ],
+        "default": "champagne"
+      },
+      {
+        "type": "select",
+        "id": "palette_button_style",
+        "label": "Button colors",
+        "info": "Applies to every button. Colors come from the palette, so they follow the palette you pick.",
+        "options": [
+          { "value": "ivory", "label": "Classic: white, turns black on hover" },
+          { "value": "ink", "label": "Solid dark, softer dark on hover" },
+          { "value": "gold", "label": "Palette gold, turns dark on hover" },
+          { "value": "outline", "label": "Outline, fills dark on hover" }
+        ],
+        "default": "ivory"
+      },
+      { "type": "header", "content": "Custom palette colors" },
+      { "type": "paragraph", "content": "Only used when Palette is set to Custom." },
+      { "type": "color", "id": "pal_ivory", "label": "Ivory (main page background)", "default": "#ffffff" },
+      { "type": "color", "id": "pal_cream", "label": "Cream (soft sections, announcement bar)", "default": "#f7f5f0" },
+      { "type": "color", "id": "pal_sand", "label": "Sand (deeper soft sections)", "default": "#f0e9dd" },
+      { "type": "color", "id": "pal_ink", "label": "Ink (text and solid buttons)", "default": "#1a1a1a" },
+      { "type": "color", "id": "pal_accent", "label": "Metal accent (gold, rose gold, silver)", "default": "#9b7c53" },
+      { "type": "color", "id": "pal_dark", "label": "Dark (dark sections, footer-style blocks)", "default": "#1c1a17" },
+      { "type": "color", "id": "pal_line", "label": "Hairline (borders and dividers)", "default": "#e6e2d8" }
+    ]
+  },
+  {
     "name": "Colors",
     "settings": [
       {
@@ -148,115 +192,6 @@
           "on_secondary_button": "secondary_button_label",
           "secondary_button_border": "secondary_button_label"
         }
-      }
-    ]
-  },
-  {
-    "name": "Typography",
-    "settings": [
-      {
-        "type": "header",
-        "content": "Headings & Titles"
-      },
-      {
-        "type": "font_picker",
-        "id": "type_header_font",
-        "label": "Heading font",
-        "default": "assistant_n4"
-      },
-      {
-        "type": "range",
-        "id": "heading_scale",
-        "min": 80,
-        "max": 140,
-        "step": 5,
-        "unit": "%",
-        "label": "Heading size scale",
-        "default": 100
-      },
-      {
-        "type": "select",
-        "id": "heading_text_transform",
-        "label": "Heading text transform",
-        "options": [
-          {
-            "value": "uppercase",
-            "label": "Uppercase"
-          },
-          {
-            "value": "capitalize",
-            "label": "Capitalize"
-          },
-          {
-            "value": "none",
-            "label": "None"
-          }
-        ],
-        "default": "uppercase"
-      },
-      {
-        "type": "header",
-        "content": "Body Text"
-      },
-      {
-        "type": "font_picker",
-        "id": "type_body_font",
-        "label": "Body font",
-        "default": "assistant_n4"
-      },
-      {
-        "type": "range",
-        "id": "body_scale",
-        "min": 80,
-        "max": 120,
-        "step": 5,
-        "unit": "%",
-        "label": "Body size scale",
-        "default": 100
-      },
-      {
-        "type": "header",
-        "content": "Header Navigation Menu"
-      },
-      {
-        "type": "range",
-        "id": "nav_font_size",
-        "min": 11,
-        "max": 16,
-        "step": 1,
-        "unit": "px",
-        "label": "Menu font size",
-        "default": 13
-      },
-      {
-        "type": "select",
-        "id": "nav_font_weight",
-        "label": "Menu font weight",
-        "options": [
-          {
-            "value": "400",
-            "label": "Regular (400)"
-          },
-          {
-            "value": "500",
-            "label": "Medium (500)"
-          },
-          {
-            "value": "600",
-            "label": "Semi-Bold (600)"
-          },
-          {
-            "value": "700",
-            "label": "Bold (700)"
-          }
-        ],
-        "default": "600"
-      },
-      {
-        "type": "checkbox",
-        "id": "nav_uppercase",
-        "label": "Uppercase navigation menu",
-        "default": true
       }
     ]
   },
@@ -481,15 +416,38 @@
       },
       {
         "type": "checkbox",
-        "id": "enable_image_zoom",
-        "label": "Enable subtle image zoom on hover",
-        "default": true
-      },
-      {
-        "type": "checkbox",
         "id": "enable_scroll_animations",
         "label": "Enable reveal animations on scroll",
         "default": true
+      },
+      {
+        "type": "header",
+        "content": "Page Smooth Scrolling"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_smooth_scroll",
+        "label": "Enable subtle smooth scroll",
+        "default": true,
+        "info": "Adds gentle momentum easing to page scrolling across the store."
+      },
+      {
+        "type": "range",
+        "id": "smooth_scroll_strength",
+        "min": 1,
+        "max": 10,
+        "step": 1,
+        "label": "Scroll smoothness level",
+        "default": 3,
+        "info": "1–2 = ultra-crisp, 3–4 = subtle luxury glide (recommended), 7–10 = deeper deceleration.",
+        "visible_if": "{{ settings.enable_smooth_scroll }}"
+      },
+      {
+        "type": "checkbox",
+        "id": "smooth_scroll_anchors",
+        "label": "Smooth scroll for in-page anchor links",
+        "default": true,
+        "visible_if": "{{ settings.enable_smooth_scroll }}"
       }
     ]
   },
@@ -540,7 +498,7 @@
         "id": "brand_accent",
         "label": "Brand accent color (gold)",
         "default": "#9b7c53",
-        "info": "Used for highlights such as the engraving card."
+        "info": "Used for highlights such as the engraving card. While Theme Palette is on, the palette accent is used instead."
       },
       {
         "type": "color",
@@ -687,26 +645,6 @@
       },
       {
         "type": "select",
-        "id": "product_card_aspect_ratio",
-        "label": "Image aspect ratio",
-        "options": [
-          {
-            "value": "square",
-            "label": "Square (1:1)"
-          },
-          {
-            "value": "portrait",
-            "label": "Portrait (3:4)"
-          },
-          {
-            "value": "adapt",
-            "label": "Adapt to image"
-          }
-        ],
-        "default": "square"
-      },
-      {
-        "type": "select",
         "id": "product_card_text_alignment",
         "label": "Text alignment",
         "options": [
@@ -758,20 +696,8 @@
       },
       {
         "type": "checkbox",
-        "id": "show_secondary_image",
-        "label": "Show second image on hover",
-        "default": true
-      },
-      {
-        "type": "checkbox",
         "id": "show_vendor",
         "label": "Show product vendor / brand",
-        "default": false
-      },
-      {
-        "type": "checkbox",
-        "id": "show_rating",
-        "label": "Show product star rating",
         "default": false
       },
       {
@@ -1303,18 +1229,6 @@
         "content": "Sold Out Badge"
       },
       {
-        "type": "color",
-        "id": "sold_out_badge_bg",
-        "label": "Sold out badge background",
-        "default": "#666666"
-      },
-      {
-        "type": "color",
-        "id": "sold_out_badge_text",
-        "label": "Sold out badge text color",
-        "default": "#ffffff"
-      },
-      {
         "type": "range",
         "id": "badge_corner_radius",
         "min": 0,
@@ -1327,75 +1241,8 @@
     ]
   },
   {
-    "name": "Collection Card",
-    "settings": [
-      {
-        "type": "select",
-        "id": "collection_card_image_ratio",
-        "label": "Collection image ratio",
-        "options": [
-          {
-            "value": "square",
-            "label": "Square (1:1)"
-          },
-          {
-            "value": "portrait",
-            "label": "Portrait (3:4)"
-          },
-          {
-            "value": "landscape",
-            "label": "Landscape (4:3)"
-          }
-        ],
-        "default": "square"
-      },
-      {
-        "type": "select",
-        "id": "collection_card_text_alignment",
-        "label": "Text alignment",
-        "options": [
-          {
-            "value": "left",
-            "label": "Left"
-          },
-          {
-            "value": "center",
-            "label": "Center"
-          }
-        ],
-        "default": "center"
-      },
-      {
-        "type": "range",
-        "id": "collection_card_radius",
-        "min": 0,
-        "max": 20,
-        "step": 1,
-        "unit": "px",
-        "label": "Corner radius",
-        "default": 0
-      }
-    ]
-  },
-  {
     "name": "Cart & Drawer",
     "settings": [
-      {
-        "type": "select",
-        "id": "cart_type",
-        "label": "Cart type",
-        "options": [
-          {
-            "value": "drawer",
-            "label": "Slide-out drawer"
-          },
-          {
-            "value": "page",
-            "label": "Dedicated cart page"
-          }
-        ],
-        "default": "drawer"
-      },
       {
         "type": "select",
         "id": "cart_checkout_position",
@@ -1441,37 +1288,37 @@
         "type": "color",
         "id": "cart_checkout_button_bg",
         "label": "Button background",
-        "default": "#1d1a17"
+        "info": "Leave empty to use the global button colors (Theme Palette > Button colors)."
       },
       {
         "type": "color",
         "id": "cart_checkout_button_text",
         "label": "Button text color",
-        "default": "#ffffff"
+        "info": "Leave empty to use the global button colors (Theme Palette > Button colors)."
       },
       {
         "type": "color",
         "id": "cart_checkout_button_border",
         "label": "Button border color",
-        "default": "#1d1a17"
+        "info": "Leave empty to use the global button colors (Theme Palette > Button colors)."
       },
       {
         "type": "color",
         "id": "cart_checkout_button_hover_bg",
         "label": "Hover background",
-        "default": "#42382d"
+        "info": "Leave empty to use the global button colors (Theme Palette > Button colors)."
       },
       {
         "type": "color",
         "id": "cart_checkout_button_hover_text",
         "label": "Hover text color",
-        "default": "#ffffff"
+        "info": "Leave empty to use the global button colors (Theme Palette > Button colors)."
       },
       {
         "type": "color",
         "id": "cart_checkout_button_hover_border",
         "label": "Hover border color",
-        "default": "#42382d"
+        "info": "Leave empty to use the global button colors (Theme Palette > Button colors)."
       },
       {
         "type": "range",
@@ -1492,67 +1339,6 @@
         "unit": "px",
         "label": "Button text size",
         "default": 14
-      },
-      {
-        "type": "checkbox",
-        "id": "show_cart_note",
-        "label": "Enable cart notes / special instructions",
-        "default": true
-      },
-      {
-        "type": "header",
-        "content": "Free Shipping Bar"
-      },
-      {
-        "type": "checkbox",
-        "id": "enable_free_shipping_bar",
-        "label": "Enable free shipping progress bar",
-        "default": true
-      },
-      {
-        "type": "number",
-        "id": "free_shipping_threshold",
-        "label": "Free shipping threshold amount (€)",
-        "default": 39
-      },
-      {
-        "type": "header",
-        "content": "Checkout Verification"
-      },
-      {
-        "type": "checkbox",
-        "id": "show_terms_checkbox",
-        "label": "Require Terms & Conditions checkbox before checkout",
-        "default": false
-      }
-    ]
-  },
-  {
-    "name": "Search & Predictive Search",
-    "settings": [
-      {
-        "type": "checkbox",
-        "id": "predictive_search_enabled",
-        "label": "Enable predictive live search",
-        "default": true
-      },
-      {
-        "type": "checkbox",
-        "id": "search_show_vendor",
-        "label": "Show vendor in search results",
-        "default": false
-      },
-      {
-        "type": "checkbox",
-        "id": "search_show_price",
-        "label": "Show price in search results",
-        "default": true
-      },
-      {
-        "type": "checkbox",
-        "id": "search_show_articles",
-        "label": "Include blog posts & articles",
-        "default": true
       }
     ]
   },
@@ -1570,58 +1356,6 @@
         "id": "social_tiktok_link",
         "label": "TikTok",
         "info": "https://tiktok.com/@your-brand"
-      },
-      {
-        "type": "text",
-        "id": "social_facebook_link",
-        "label": "Facebook"
-      },
-      {
-        "type": "text",
-        "id": "social_pinterest_link",
-        "label": "Pinterest"
-      },
-      {
-        "type": "text",
-        "id": "social_youtube_link",
-        "label": "YouTube"
-      },
-      {
-        "type": "text",
-        "id": "social_twitter_link",
-        "label": "X (formerly Twitter)"
-      },
-      {
-        "type": "text",
-        "id": "social_whatsapp_link",
-        "label": "WhatsApp"
-      },
-      {
-        "type": "text",
-        "id": "social_linkedin_link",
-        "label": "LinkedIn"
-      }
-    ]
-  },
-  {
-    "name": "Brand Information",
-    "settings": [
-      {
-        "type": "text",
-        "id": "brand_headline",
-        "label": "Brand headline",
-        "default": "Jewelry Shop"
-      },
-      {
-        "type": "richtext",
-        "id": "brand_description",
-        "label": "Brand description",
-        "default": "<p>Timeless fine jewelry crafted with elegance and personal meaning.</p>"
-      },
-      {
-        "type": "image_picker",
-        "id": "brand_image",
-        "label": "Brand image"
       }
     ]
   },

@@ -5,8 +5,8 @@
     padding-bottom: var(--PB, 40px);
     background-color: var(--bg);
     color: var(--text);
-    border-top: 1px solid var(--border, rgba(0,0,0,0.06));
-    border-bottom: 1px solid var(--border, rgba(0,0,0,0.06));
+    border-top: 1px solid var(--border, var(--lv-border));
+    border-bottom: 1px solid var(--border, var(--lv-border));
     box-sizing: border-box;
   }
   .icons-grid {
@@ -51,13 +51,13 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin: 0 0 6px 0;
-    color: #111111;
+    color: var(--text, #111111);
   }
   .icon-box p {
     font-family: 'Quicksand', sans-serif;
     font-size: 12px;
     font-weight: 500;
-    color: #2b2622;
+    color: var(--text, #2b2622);
     margin: 0;
     line-height: 1.5;
   }

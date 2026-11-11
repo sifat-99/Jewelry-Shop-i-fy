@@ -1,3 +1,10 @@
+{% doc %}
+  Permanent Jewelry On-Site Landing Layout with Auto-Rotating Atelier Showcase. Accepts: blocks, cfg (section.settings), page_title, page_content
+
+  @param [cfg] - Optional cfg passed by the parent file
+  @param [page_title] - Optional page title passed by the parent file
+  @param [page_content] - Optional page content passed by the parent file
+{% enddoc %}
 {%- comment -%}
   Permanent Jewelry On-Site Landing Layout with Auto-Rotating Atelier Showcase.
   Accepts: blocks, cfg (section.settings), page_title, page_content
@@ -19,7 +26,7 @@
   /* === Theme Design System Synchronization for Permanent Jewelry === */
   :root, .pg-page {
     --ct-radius: var(--card-radius, 0px);
-    --pp-line: rgba(var(--color-foreground, 0, 0, 0), 0.12);
+    --pp-line: var(--lv-border);
     --pp-muted: rgba(var(--color-foreground, 0, 0, 0), 0.62);
     --pp-soft: color-mix(in srgb, var(--text, #000) 4%, var(--bg, #fff));
   }
@@ -121,10 +128,10 @@
     text-transform: uppercase !important;
     line-height: 1 !important;
     white-space: nowrap !important;
-    color: #ffffff !important;
-    background: #000000 !important;
-    border: 1px solid #000000 !important;
-    border-radius: 0px !important;
+    color: var(--btn-regular-text, #ffffff) !important;
+    background: var(--btn-regular-bg, #000000) !important;
+    border: 1px solid var(--btn-regular-border, #000000) !important;
+    border-radius: var(--btn-radius, 0px) !important;
     padding: 10px 18px !important;
     text-decoration: none !important;
     cursor: pointer !important;
@@ -132,20 +139,20 @@
   }
   .perm-slide__btn span,
   .perm-slide__btn .perm-slide__btn-text {
-    color: #ffffff !important;
+    color: var(--btn-regular-text, #ffffff) !important;
     display: inline-block !important;
     line-height: 1 !important;
     position: relative !important;
     z-index: 2 !important;
   }
   .perm-slide__btn:hover {
-    background: #ffffff !important;
-    color: #000000 !important;
-    border-color: #000000 !important;
+    background: var(--btn-regular-hover-bg, #ffffff) !important;
+    color: var(--btn-regular-hover-text, #000000) !important;
+    border-color: var(--btn-regular-hover-border, #000000) !important;
   }
   .perm-slide__btn:hover span,
   .perm-slide__btn:hover .perm-slide__btn-text {
-    color: #000000 !important;
+    color: var(--btn-regular-hover-text, #000000) !important;
   }
   .perm-slide-nav {
     position: absolute;
@@ -428,7 +435,7 @@
     border-left: none !important;
     border-right: none !important;
     border-radius: 0px !important;
-    color: #000000 !important;
+    color: var(--text, #000000) !important;
     box-shadow: none !important;
   }
   @media (max-width: 640px) {
@@ -466,7 +473,7 @@
     letter-spacing: 0.12em !important;
     text-transform: uppercase !important;
     line-height: 1.25 !important;
-    color: #000000 !important;
+    color: var(--text, #000000) !important;
     opacity: 1 !important;
   }
   .sl-cta__text,
@@ -476,7 +483,7 @@
     max-width: 540px !important;
     font-size: 15px !important;
     line-height: 1.8 !important;
-    color: #444444 !important;
+    color: color-mix(in srgb, var(--text, #444444) 88%, transparent) !important;
     opacity: 1 !important;
   }
   .sl-cta__actions,
@@ -519,14 +526,14 @@
   .sl-cta__btn-primary,
   .sl-cta .sl-cta__btn-primary,
   html body .pg-page .sl-cta .sl-cta__btn-primary {
-    background-color: #000000 !important;
-    border: 1px solid #000000 !important;
-    color: #ffffff !important;
+    background-color: var(--btn-regular-bg, #000000) !important;
+    border: 1px solid var(--btn-regular-border, #000000) !important;
+    color: var(--btn-regular-text, #ffffff) !important;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
   }
   .sl-cta__btn-primary .btn__text-content,
   .sl-cta__btn-primary span {
-    color: #ffffff !important;
+    color: var(--btn-regular-text, #ffffff) !important;
     transition: color 0.3s ease !important;
   }
   .sl-cta__btn-primary::before {
@@ -534,29 +541,29 @@
   }
   .sl-cta__btn-primary:hover,
   html body .pg-page .sl-cta .sl-cta__btn-primary:hover {
-    border-color: #000000 !important;
-    background-color: #ffffff !important;
+    border-color: var(--btn-regular-hover-border, #000000) !important;
+    background-color: var(--btn-regular-hover-bg, #ffffff) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
   }
   .sl-cta__btn-primary:hover .btn__text-content,
   html body .pg-page .sl-cta .sl-cta__btn-primary:hover .btn__text-content,
   .sl-cta__btn-primary:hover span,
   html body .pg-page .sl-cta .sl-cta__btn-primary:hover span {
-    color: #000000 !important;
+    color: var(--btn-regular-hover-text, #000000) !important;
   }
 
   /* Secondary Button: Inquire Private Event (Matches Global Border #D1D1D1) */
   .sl-cta__btn-secondary,
   .sl-cta .sl-cta__btn-secondary,
   html body .pg-page .sl-cta .sl-cta__btn-secondary {
-    background-color: #ffffff !important;
-    border: 1px solid #D1D1D1 !important;
-    color: #000000 !important;
+    background-color: var(--bg, #ffffff) !important;
+    border: 1px solid var(--border, var(--lv-border)) !important;
+    color: var(--text, #000000) !important;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
   }
   .sl-cta__btn-secondary .btn__text-content,
   .sl-cta__btn-secondary span {
-    color: #000000 !important;
+    color: var(--text, #000000) !important;
     transition: color 0.3s ease !important;
   }
   .sl-cta__btn-secondary::before {
@@ -564,15 +571,15 @@
   }
   .sl-cta__btn-secondary:hover,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover {
-    border-color: #000000 !important;
-    background-color: #000000 !important;
+    border-color: var(--btn-regular-hover-border, #000000) !important;
+    background-color: var(--btn-regular-hover-bg, #000000) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
   }
   .sl-cta__btn-secondary:hover .btn__text-content,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover .btn__text-content,
   .sl-cta__btn-secondary:hover span,
   html body .pg-page .sl-cta .sl-cta__btn-secondary:hover span {
-    color: #ffffff !important;
+    color: var(--btn-regular-hover-text, #ffffff) !important;
   }
 
   .sl-btn, .btn {
@@ -877,14 +884,14 @@
 <section class="sl-cta">
   <div class="sl-cta__inner">
     <p class="sl-cta__eyebrow" style="color: var(--pp-muted, #777777) !important;">Atelier Bookings & Concierge</p>
-    <h2 class="sl-cta__title" style="color: #000000 !important; opacity: 1 !important;">
+    <h2 class="sl-cta__title" style="color: var(--text, #000000) !important; opacity: 1 !important;">
       {%- if cfg.perm_cta_title != blank and cfg.perm_cta_title != 'Ready for yours?' -%}
         {{ cfg.perm_cta_title }}
       {%- else -%}
         Ready For Your Permanent Piece?
       {%- endif -%}
     </h2>
-    <p class="sl-cta__text" style="color: #444444 !important; opacity: 1 !important;">
+    <p class="sl-cta__text" style="color: color-mix(in srgb, var(--text, #444444) 88%, transparent) !important; opacity: 1 !important;">
       {%- if cfg.perm_cta_text != blank and cfg.perm_cta_text != 'Tell us about your event, studio visit or group booking and we will find a date that works.' -%}
         {{ cfg.perm_cta_text }}
       {%- else -%}

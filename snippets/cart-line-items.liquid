@@ -1,3 +1,6 @@
+{% doc %}
+  Snippet "cart-line-items" used by the theme sections.
+{% enddoc %}
 <!-- /snippets/cart-line-items.liquid -->
 <div class="cart__items">
   {%- for item in cart.items -%}
@@ -48,7 +51,7 @@
             {%- endunless -%}
             {%- for property in item.properties -%}
               {%- if property.last != blank -%}
-                <p class="body-size-3 text-subdued">{{ property.first }}: {{ property.last }}</p>
+                <p class="body-size-3 text-subdued">{{ property.first | escape }}: {{ property.last | escape }}</p>
               {%- endif -%}
             {%- endfor -%}
           </div>
@@ -57,9 +60,9 @@
         <div class="cart__items__price">
           <p class="line__price">
             {%- if item.original_price > item.final_price -%}
-              <del style="color: #888888; margin-right: 6px;">{{ item.original_price | money }}</del>
+              <del style="color: color-mix(in srgb, var(--text, #888888) 62%, transparent); margin-right: 6px;">{{ item.original_price | money }}</del>
               {%- if item.quantity > 1 -%}
-                <span class="line__price-multi" style="font-size: 13px; font-weight: 500; color: #111111;">
+                <span class="line__price-multi" style="font-size: 13px; font-weight: 500; color: var(--text, #111111);">
                   {{ item.final_price | money }} × {{ item.quantity }} = <strong style="font-weight: 700;">{{ item.final_line_price | money }}</strong>
                 </span>
               {%- else -%}
@@ -67,7 +70,7 @@
               {%- endif -%}
             {%- else -%}
               {%- if item.quantity > 1 -%}
-                <span class="line__price-multi" style="font-size: 13px; font-weight: 500; color: #111111;">
+                <span class="line__price-multi" style="font-size: 13px; font-weight: 500; color: var(--text, #111111);">
                   {{ item.final_price | money }} × {{ item.quantity }} = <strong style="font-weight: 700;">{{ item.final_line_price | money }}</strong>
                 </span>
               {%- else -%}

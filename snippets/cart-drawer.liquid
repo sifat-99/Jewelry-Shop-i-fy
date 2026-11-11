@@ -1,3 +1,6 @@
+{% doc %}
+  Snippet "cart-drawer" used by the theme sections.
+{% enddoc %}
 <!-- /snippets/cart-drawer.liquid -->
 {%- assign checkout_after_items = false -%}
 {%- if settings.cart_checkout_position == 'after_items' -%}
@@ -9,12 +12,12 @@
 >
   <style>
     :root {
-      --cart-checkout-btn-bg: {{ settings.cart_checkout_button_bg | default: '#1d1a17' }};
-      --cart-checkout-btn-text: {{ settings.cart_checkout_button_text | default: '#ffffff' }};
-      --cart-checkout-btn-border: {{ settings.cart_checkout_button_border | default: '#1d1a17' }};
-      --cart-checkout-btn-hover-bg: {{ settings.cart_checkout_button_hover_bg | default: '#42382d' }};
-      --cart-checkout-btn-hover-text: {{ settings.cart_checkout_button_hover_text | default: '#ffffff' }};
-      --cart-checkout-btn-hover-border: {{ settings.cart_checkout_button_hover_border | default: '#42382d' }};
+      --cart-checkout-btn-bg: {{ settings.cart_checkout_button_bg | default: 'var(--btn-regular-bg)' }};
+      --cart-checkout-btn-text: {{ settings.cart_checkout_button_text | default: 'var(--btn-regular-text)' }};
+      --cart-checkout-btn-border: {{ settings.cart_checkout_button_border | default: 'var(--btn-regular-border)' }};
+      --cart-checkout-btn-hover-bg: {{ settings.cart_checkout_button_hover_bg | default: 'var(--btn-regular-hover-bg)' }};
+      --cart-checkout-btn-hover-text: {{ settings.cart_checkout_button_hover_text | default: 'var(--btn-regular-hover-text)' }};
+      --cart-checkout-btn-hover-border: {{ settings.cart_checkout_button_hover_border | default: 'var(--btn-regular-hover-border)' }};
     }
 
     #drawer-cart .checkout__button {
@@ -36,7 +39,7 @@
       background-color: var(--cart-checkout-btn-hover-bg) !important;
     }
     #drawer-cart .checkout__button[data-button-style="outline"] {
-      background-color: #ffffff !important;
+      background-color: var(--bg, #ffffff) !important;
       color: var(--cart-checkout-btn-border) !important;
     }
     #drawer-cart .checkout__button[data-button-style="champagne"] {
@@ -145,7 +148,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: #888888;
+      color: color-mix(in srgb, var(--text, #888888) 62%, transparent);
       transition: color 0.2s ease, transform 0.15s ease;
       padding: 4px;
     }
@@ -299,7 +302,7 @@
   (function() {
     // Money Formatter Helper
     function fmtMoney(cents) {
-      var moneyFormat = (typeof theme !== 'undefined' && theme.moneyFormat) ? theme.moneyFormat : "৳{{amount}}";
+      var moneyFormat = (typeof theme !== 'undefined' && theme.moneyFormat) ? theme.moneyFormat : {{ shop.money_format | json }};
       var num = (cents / 100.0).toFixed(2);
       var parts = num.split('.');
       var dollars = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');

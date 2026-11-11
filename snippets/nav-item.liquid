@@ -1,6 +1,13 @@
+{% doc %}
+  Snippet "nav-item" used by the theme sections.
+
+  @param [link] - Optional link passed by the parent file
+  @param [link_index] - Optional link index passed by the parent file
+  @param [section] - Optional section passed by the parent file
+{% enddoc %}
 <!-- /snippets/nav-item.liquid -->
 {%- liquid
-  assign item_index = link_index | default: forloop.index | default: 1
+  assign item_index = link_index | default: 1
   assign item_id = 'dropdown-' | append: link.handle | append: '-' | append: item_index
   assign downcase_title = link.title | downcase | strip
   assign matched_block = nil

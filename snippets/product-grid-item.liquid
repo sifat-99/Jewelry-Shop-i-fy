@@ -1,3 +1,11 @@
+{% doc %}
+  Snippet "product-grid-item" used by the theme sections.
+
+  @param {product} [product] - Optional product passed by the parent file
+  @param [fallback_index] - Optional fallback index passed by the parent file
+  @param [card_border_radius] - Optional card border radius passed by the parent file
+  @param [extra_class] - Optional extra class passed by the parent file
+{% enddoc %}
 <!-- /snippets/product-grid-item.liquid -->
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
@@ -491,7 +499,7 @@
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #111111;
+      color: var(--btn-regular-text, #111111);
       transition: opacity 220ms ease, transform 220ms ease, color 350ms ease-in-out;
       pointer-events: none;
       z-index: 2;
@@ -508,7 +516,7 @@
       transition: opacity 220ms ease, transform 220ms ease !important;
       pointer-events: none !important;
       z-index: 3 !important;
-      background: #ffffff !important;
+      background: var(--bg, #ffffff) !important;
       overflow: hidden !important;
       border-radius: inherit !important;
     }
@@ -523,6 +531,17 @@
         opacity: 1 !important;
         transform: translateY(0) !important;
         pointer-events: auto !important;
+      }
+    }
+
+    /* While the size list is showing, the bar frame uses the global border color (same as the size pills inside it) */
+    .lv-card-sizes-bar.is-open,
+    .lv-card-media-wrap.lv-mp-open .lv-card-sizes-bar {
+      border-color: var(--lv-border) !important;
+    }
+    @media (hover: hover) {
+      .lv-card-sizes-bar:hover {
+        border-color: var(--lv-border) !important;
       }
     }
 
@@ -583,23 +602,23 @@
       padding: 0 !important;
       margin: 0 !important;
       cursor: pointer !important;
-      color: #111111 !important;
+      color: var(--text, #111111) !important;
       background: transparent !important;
       transition: opacity 180ms ease, color 180ms ease !important;
       pointer-events: auto !important;
     }
     .lv-card-size-nav-prev {
       left: 0 !important;
-      background: linear-gradient(90deg, #ffffff 80%, rgba(255, 255, 255, 0)) !important;
+      background: linear-gradient(90deg, var(--bg, #ffffff) 80%, transparent) !important;
       padding-right: 6px !important;
     }
     .lv-card-size-nav-next {
       right: 0 !important;
-      background: linear-gradient(-90deg, #ffffff 80%, rgba(255, 255, 255, 0)) !important;
+      background: linear-gradient(-90deg, var(--bg, #ffffff) 80%, transparent) !important;
       padding-left: 6px !important;
     }
     .lv-card-size-nav:hover {
-      color: #000000 !important;
+      color: var(--text, #000000) !important;
     }
     .lv-card-size-nav svg {
       transition: transform 150ms ease !important;
@@ -622,10 +641,10 @@
       height: 30px !important;
       padding: 0 8px !important;
       margin: 0 !important;
-      background: #ffffff !important;
-      border: 1px solid rgba(0, 0, 0, 0.16) !important;
+      background: var(--bg, #ffffff) !important;
+      border: 1px solid var(--lv-border) !important;
       border-radius: var(--btn-radius, 0px) !important;
-      color: #111111 !important;
+      color: var(--text, #111111) !important;
       font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
       font-size: 11px !important;
       font-weight: 600 !important;
@@ -637,9 +656,9 @@
     /* High contrast black hover on size pills */
     .lv-card-size-pill:hover,
     .lv-card-size-pill.is-active {
-      background-color: #000000 !important;
-      color: #ffffff !important;
-      border-color: #000000 !important;
+      background-color: var(--btn-selected-bg, #000000) !important;
+      color: var(--btn-selected-text, #ffffff) !important;
+      border-color: var(--btn-selected-border, #000000) !important;
     }
 
     .lv-card-size-pill:active {
@@ -757,14 +776,14 @@
     .product__grid__price[data-price-design="modern_bold"] .price-item--regular { font-weight: 700; }
     .product__grid__price[data-price-design="gold_accent"] .price-item--regular {
       padding-bottom: 2px;
-      border-bottom: 1px solid #c5a76a;
+      border-bottom: 1px solid var(--lv-accent, #c5a76a);
     }
     .product__grid__price[data-on-sale="true"] .price-item--regular { color: #8c2b3f; }
     .product__grid__price .price-item--compare {
       font-family: 'Quicksand', sans-serif;
       font-size: 12px;
       line-height: 1.35;
-      color: #999999;
+      color: color-mix(in srgb, var(--text, #999999) 62%, transparent);
     }
   </style>
 

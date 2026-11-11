@@ -1,3 +1,12 @@
+{% doc %}
+  Renders a star rating (supports half stars) as a single accessible element.
+
+  @param {number} rating - Rating from 0 to 5
+  @param {string} [class_name] - Extra CSS classes for the wrapper
+
+  @example
+  {% render 'rating-stars', rating: 4.5, class_name: 'lv-stars' %}
+{% enddoc %}
 {%- liquid
   assign star_rating = rating | default: 0 | plus: 0 | round: 1
   if star_rating > 5

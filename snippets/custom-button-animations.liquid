@@ -1,3 +1,6 @@
+{% doc %}
+  Snippet "custom-button-animations" used by the theme sections.
+{% enddoc %}
 <!-- /snippets/custom-button-animations.liquid -->
 <style>
   /* ==========================================================================
@@ -10,12 +13,14 @@
     --btn-radius: {{ settings.button_border_radius | default: 0 }}px;
     --BUTTON-RADIUS: {{ settings.button_border_radius | default: 0 }}px;
     /* Dynamic Theme Colors for Regular (Square/Rectangular) Buttons */
+    {%- if settings.palette_control == false -%}
     --btn-regular-bg: {{ settings.button_bg | default: settings.color_schemes[0].settings.button | default: '#000000' }};
     --btn-regular-text: {{ settings.button_text | default: settings.color_schemes[0].settings.button_label | default: '#ffffff' }};
     --btn-regular-border: {{ settings.button_border_color | default: 'var(--btn-regular-bg)' }};
     --btn-regular-hover-bg: {{ settings.btn_hover_bg | default: settings.color_schemes[0].settings.text | default: '#2b2622' }};
     --btn-regular-hover-text: {{ settings.btn_hover_text | default: settings.color_schemes[0].settings.background | default: '#ffffff' }};
     --btn-regular-hover-border: {{ settings.btn_hover_border_color | default: 'var(--btn-regular-hover-bg)' }};
+    {%- endif -%}
     --btn-animation-duration: {% if settings.enable_hover_animations == false %}0ms{% else %}{{ settings.button_hover_speed | default: 450 }}ms{% endif %};
     --btn-ease: cubic-bezier(0.65, 0, 0.35, 1);
     --btn-base-bg: {% if settings.global_button_style == 'outline' or settings.global_button_style == 'minimal' %}transparent{% elsif settings.global_button_style == 'soft' %}color-mix(in srgb, var(--btn-regular-bg) 92%, var(--btn-regular-text) 8%){% else %}var(--btn-regular-bg){% endif %};
@@ -37,11 +42,15 @@
     --btn-outline-hover-border: var(--btn-regular-hover-bg);
 
     /* Dynamic Theme Colors for Round Action Buttons */
+    {%- if settings.palette_control == false -%}
     --round-btn-bg: {{ settings.round_button_bg | default: settings.color_schemes[0].settings.background | default: '#ffffff' }};
     --round-btn-text: {{ settings.round_button_text | default: settings.color_schemes[0].settings.text | default: '#000000' }};
+    {%- endif -%}
     --round-btn-border: rgba(0, 0, 0, 0.12);
+    {%- if settings.palette_control == false -%}
     --round-btn-hover-bg: {{ settings.btn_hover_bg | default: settings.color_schemes[0].settings.button | default: '#000000' }};
     --round-btn-hover-text: {{ settings.btn_hover_text | default: settings.color_schemes[0].settings.button_label | default: '#ffffff' }};
+    {%- endif -%}
     --round-btn-hover-border: var(--round-btn-hover-bg);
     --round-btn-shadow: rgba(0, 0, 0, 0.14);
   }
@@ -430,9 +439,9 @@
     height: 34px !important;
     min-height: 34px !important;
     max-height: 34px !important;
-    border: 1px solid rgba(0, 0, 0, 0.18) !important;
+    border: 1px solid var(--lv-border) !important;
     border-radius: 3px !important;
-    background: #ffffff !important;
+    background: var(--bg, #ffffff) !important;
     padding: 0 !important;
     margin: 4px 0 0 0 !important;
     overflow: hidden !important;
@@ -443,7 +452,7 @@
   .quantity__wrapper:not(.product-quantity-selector):hover,
   [data-quantity-selector]:not(.product-quantity-selector):hover,
   .cart__items__quantity .quantity__wrapper:hover {
-    border-color: rgba(0, 0, 0, 0.45) !important;
+    border-color: color-mix(in srgb, var(--text, #000) 45%, transparent) !important;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
   }
 
@@ -469,7 +478,7 @@
     justify-content: center !important;
     border: none !important;
     background: transparent !important;
-    color: #111111 !important;
+    color: var(--text, #111111) !important;
     padding: 0 !important;
     margin: 0 !important;
     cursor: pointer !important;
@@ -535,7 +544,7 @@
     outline: none !important;
     box-shadow: none !important;
     background: transparent !important;
-    color: #111111 !important;
+    color: var(--text, #111111) !important;
     font-family: inherit !important;
     font-size: 13px !important;
     font-weight: 600 !important;
@@ -558,7 +567,7 @@
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    color: #888888 !important;
+    color: color-mix(in srgb, var(--text, #888888) 62%, transparent) !important;
     transition: color 0.2s ease, transform 0.2s ease !important;
     padding: 4px !important;
   }

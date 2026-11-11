@@ -1,0 +1,1 @@
+/Users/sifat/Project/Shopify_Practice/Shopify_Liquid_Practice/AGENTS.md

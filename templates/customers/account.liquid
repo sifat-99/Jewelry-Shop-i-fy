@@ -68,8 +68,8 @@
     <div class="account-details">
       <h2 class="account-section-title">{{ 'customer.account.details' | default: 'Account Details' }}</h2>
       <div class="account-card">
-        <p class="account-name"><strong>{{ customer.name }}</strong></p>
-        <p class="account-email">{{ customer.email }}</p>
+        <p class="account-name"><strong>{{ customer.name | escape }}</strong></p>
+        <p class="account-email">{{ customer.email | escape }}</p>
 
         {%- if customer.default_address -%}
           <div class="account-address-default">

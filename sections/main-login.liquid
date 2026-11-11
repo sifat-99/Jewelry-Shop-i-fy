@@ -16,7 +16,7 @@
     .lg {
       padding: var(--lg-pt, 60px) clamp(16px, 4vw, 48px) var(--lg-pb, 80px);
       --lg-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62);
-      --lg-line: var(--btn-regular-border, var(--hairline, rgba(0, 0, 0, 0.18)));
+      --lg-line: var(--lv-border);
       --lg-soft: rgba(var(--color-foreground, 17, 17, 17), 0.035);
     }
     .lg__shell {
@@ -25,7 +25,7 @@
       margin: 0 auto;
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      border: 1px solid var(--hairline, rgba(0, 0, 0, 0.12));
+      border: 1px solid var(--hairline, var(--lv-border));
       border-radius: var(--card-radius, 0px);
       overflow: hidden;
       background: var(--bg, #fff);
@@ -116,7 +116,7 @@
     .lg__msg--error { background: #fdf2f2; border-color: #f1b8b4; color: #8c1d18; }
     .lg__msg--ok { background: #f0fdf4; border-color: #bbf0cc; color: #166534; text-align: center; }
 
-    .lg__foot { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--hairline, rgba(0, 0, 0, 0.12)); text-align: center; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--lg-muted); }
+    .lg__foot { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--hairline, var(--lv-border)); text-align: center; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--lg-muted); }
     .lg__foot p { margin: 0; }
     .lg__foot a { color: var(--text, #111); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
     .lg__foot .lg__back { font-weight: 500; font-size: 12px; letter-spacing: 0.04em; text-decoration: none; color: var(--lg-muted); }

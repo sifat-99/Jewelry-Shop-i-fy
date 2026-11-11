@@ -22,7 +22,7 @@
             type="text"
             name="customer[first_name]"
             id="RegisterFirstName"
-            {% if form.first_name %}value="{{ form.first_name }}"{% endif %}
+            {% if form.first_name %}value="{{ form.first_name | escape }}"{% endif %}
             autocomplete="given-name"
             class="form-input"
             placeholder="First name"
@@ -35,7 +35,7 @@
             type="text"
             name="customer[last_name]"
             id="RegisterLastName"
-            {% if form.last_name %}value="{{ form.last_name }}"{% endif %}
+            {% if form.last_name %}value="{{ form.last_name | escape }}"{% endif %}
             autocomplete="family-name"
             class="form-input"
             placeholder="Last name"
@@ -48,7 +48,7 @@
             type="email"
             name="customer[email]"
             id="RegisterEmail"
-            {% if form.email %}value="{{ form.email }}"{% endif %}
+            {% if form.email %}value="{{ form.email | escape }}"{% endif %}
             spellcheck="false"
             autocapitalize="off"
             autocomplete="email"

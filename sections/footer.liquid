@@ -94,7 +94,7 @@
                     {%- when 'text' -%}
                       <div class="grid__item medium-up--one-quarter footer__block" {{ block.shopify_attributes }}>
                         <p class="footer__title">{{ block.settings.title }}</p>
-                        <div class="rte text-xs" style="color: #2b2622; font-weight: 500; line-height: 1.6;">
+                        <div class="rte text-xs" style="color: var(--text, #2b2622); font-weight: 500; line-height: 1.6;">
                           {{ block.settings.text }}
                         </div>
                       </div>
@@ -103,12 +103,12 @@
                       <div class="grid__item medium-up--one-quarter footer__block" {{ block.shopify_attributes }}>
                         <p class="footer__title">{{ block.settings.title }}</p>
                         {%- if block.settings.text != blank -%}
-                          <p class="text-xs" style="color: #2b2622; font-weight: 500; margin-bottom: 16px;">{{ block.settings.text }}</p>
+                          <p class="text-xs" style="color: var(--text, #2b2622); font-weight: 500; margin-bottom: 16px;">{{ block.settings.text }}</p>
                         {%- endif -%}
                         {% form 'customer', class: 'footer-newsletter-form' %}
                           <input type="hidden" name="contact[tags]" value="newsletter">
                           <div style="display: flex; gap: 8px;">
-                            <input type="email" name="contact[email]" placeholder="Your email" required style="flex: 1; padding: 10px 14px; border: 1px solid var(--border, #ddd); font-size: 12px; background: var(--bg, #fff); color: var(--text, #000);">
+                            <input type="email" name="contact[email]" placeholder="Your email" required style="flex: 1; padding: 10px 14px; border: 1px solid var(--border, var(--lv-border)); font-size: 12px; background: var(--bg, #fff); color: var(--text, #000);">
                             <button type="submit" class="btn btn--primary" style="padding: 10px 18px; font-size: 11px; font-weight: 600; text-transform: uppercase;"><span>Join</span></button>
                           </div>
                         {% endform %}

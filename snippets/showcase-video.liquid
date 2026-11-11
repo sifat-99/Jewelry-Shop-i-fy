@@ -1,0 +1,152 @@
+{% doc %}
+  Renders an autoplaying muted looping video inside a custom `<showcase-video>`
+  controller with an accessible pause/play toggle button and optional link wrapper.
+
+  @param {video} video - Shopify video object from a `video` schema setting.
+  @param {string} [link] - Optional URL when clicking the video area.
+  @param {string} [alt_label] - Accessible label used for the video link or video region.
+  @param {string} [extra_class] - Optional extra class name(s) applied to `<showcase-video>`.
+
+  @example
+  {% render 'showcase-video',
+    video: section.settings.video,
+    link: section.settings.image_link,
+    alt_label: section.settings.image_heading
+  %}
+{% enddoc %}
+
+{%- liquid
+  assign toggle_pause_label = 'Pause video'
+  assign toggle_play_label = 'Play video'
+  assign accessible_label = alt_label | default: 'Showcase video' | strip
+-%}
+
+{%- if video != blank -%}
+  <showcase-video class="showcase__video{% if extra_class != blank %} {{ extra_class }}{% endif %}">
+    {%- if link != blank -%}
+      <a
+        href="{{ link }}"
+        class="showcase__media-link"
+        aria-label="{{ accessible_label | escape }}"
+      >
+    {%- endif -%}
+
+    {{
+      video
+      | video_tag:
+        image_size: '1600x',
+        autoplay: true,
+        loop: true,
+        muted: true,
+        controls: false,
+        playsinline: true,
+        preload: 'metadata',
+        class: 'showcase__video-media',
+        aria-label: accessible_label
+    }}
+
+    {%- if link != blank -%}
+      </a>
+    {%- endif -%}
+
+    <button
+      type="button"
+      class="showcase__video-toggle"
+      data-showcase-video-toggle
+      data-label-pause="{{ toggle_pause_label }}"
+      data-label-play="{{ toggle_play_label }}"
+      aria-label="{{ toggle_pause_label }}"
+      aria-pressed="false"
+    >
+      <span class="showcase__icon-pause" aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="2" width="3.5" height="12" rx="0.75" fill="currentColor" />
+          <rect x="9.5" y="2" width="3.5" height="12" rx="0.75" fill="currentColor" />
+        </svg>
+      </span>
+      <span class="showcase__icon-play" aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 2.5L13.5 8L4 13.5V2.5Z" fill="currentColor" />
+        </svg>
+      </span>
+    </button>
+  </showcase-video>
+{%- endif -%}
+
+{% stylesheet %}
+  showcase-video.showcase__video {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .showcase__media-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .showcase__image,
+  .showcase__video-media,
+  .showcase__video video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .showcase__video-toggle {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    z-index: 6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 50%;
+    background: rgba(26, 20, 26, 0.68);
+    color: var(--lv-ivory, #ffffff);
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .showcase__video-toggle:hover {
+    background: rgba(26, 20, 26, 0.88);
+    transform: scale(1.04);
+  }
+
+  .showcase__video-toggle:focus-visible {
+    outline: 2px solid var(--lv-ivory, #ffffff);
+    outline-offset: 2px;
+  }
+
+  .showcase__video-toggle .showcase__icon-pause {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .showcase__video-toggle .showcase__icon-play {
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  showcase-video[paused] .showcase__video-toggle .showcase__icon-pause {
+    display: none;
+  }
+
+  showcase-video[paused] .showcase__video-toggle .showcase__icon-play {
+    display: inline-flex;
+  }
+{% endstylesheet %}
