@@ -4,6 +4,7 @@
   @param [opacity] - Optional opacity passed by the parent file
   @param [style] - Optional style passed by the parent file
   @param [position] - Optional position passed by the parent file
+  @param [color] - Optional overlay color (default black)
 {% enddoc %}
 {%- comment -%}
   Banner dark overlay.
@@ -15,6 +16,8 @@
 {%- liquid
   assign overlay_bg = ''
   assign strength = opacity | default: 0 | times: 1
+  assign ov_color = color | default: '#000000'
+  assign ov_rgb = ov_color | color_extract: 'red' | append: ',' | append: ov_color | color_extract: 'green' | append: ',' | append: ov_color | color_extract: 'blue'
   if strength > 0
     assign a = strength | divided_by: 100.0
     if style == 'gradient'
@@ -39,7 +42,7 @@
         assign dir = 'radial'
       endif
       capture stops
-        echo 'rgba(0,0,0,' | append: s0 | append: ') 0%, rgba(0,0,0,' | append: s1 | append: ') 10%, rgba(0,0,0,' | append: s2 | append: ') 21%, rgba(0,0,0,' | append: s3 | append: ') 32%, rgba(0,0,0,' | append: s4 | append: ') 43%, rgba(0,0,0,' | append: s5 | append: ') 54%, rgba(0,0,0,' | append: s6 | append: ') 65%, rgba(0,0,0,0) 75%'
+        echo 'rgba(' | append: ov_rgb | append: ',' | append: s0 | append: ') 0%, rgba(' | append: ov_rgb | append: ',' | append: s1 | append: ') 10%, rgba(' | append: ov_rgb | append: ',' | append: s2 | append: ') 21%, rgba(' | append: ov_rgb | append: ',' | append: s3 | append: ') 32%, rgba(' | append: ov_rgb | append: ',' | append: s4 | append: ') 43%, rgba(' | append: ov_rgb | append: ',' | append: s5 | append: ') 54%, rgba(' | append: ov_rgb | append: ',' | append: s6 | append: ') 65%, rgba(' | append: ov_rgb | append: ',0) 75%'
       endcapture
       if dir == 'radial'
         assign overlay_bg = 'radial-gradient(ellipse 75% 85% at 50% 50%, ' | append: stops | append: ')'
@@ -47,7 +50,7 @@
         assign overlay_bg = 'linear-gradient(' | append: dir | append: ', ' | append: stops | append: ')'
       endif
     else
-      assign overlay_bg = 'rgba(0,0,0,' | append: a | append: ')'
+      assign overlay_bg = 'rgba(' | append: ov_rgb | append: ',' | append: a | append: ')'
     endif
   endif
 -%}

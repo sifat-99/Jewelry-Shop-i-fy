@@ -1,7 +1,14 @@
 <!-- /sections/main-account-dashboard.liquid -->
 {%- liquid
   assign concierge_email = section.settings.concierge_email | default: 'info@bssoln.com'
-  assign wishlist_url = section.settings.wishlist_url | default: '/pages/wishlist'
+  assign root_prefix = routes.root_url
+  unless root_prefix == '/'
+    assign root_prefix = root_prefix | append: '/'
+  endunless
+  assign default_wishlist_url = root_prefix | append: 'pages/wishlist'
+  assign wishlist_url = section.settings.wishlist_url | default: default_wishlist_url
+  assign size_guide_url = root_prefix | append: 'pages/size-guide'
+  assign permanent_jewelry_url = root_prefix | append: 'pages/permanent-jewelry-on-site'
 
   comment
     With New customer accounts customer.orders_count / total_spent can read 0 even though customer.orders lists the orders,
@@ -35,243 +42,451 @@
 -%}
 
 <style>
-  .ad-wrap {
-    --ad-line: var(--lv-border);
-    --ad-surface: color-mix(in srgb, var(--text) 3%, var(--bg));
-    --ad-surface-2: color-mix(in srgb, var(--text) 6%, var(--bg));
-    --ad-muted: color-mix(in srgb, var(--text) 62%, transparent);
-    --ad-accent: var(--lv-accent, #9b7c53);
-    --ad-radius: var(--card-radius, 0px);
-    --ad-btn-r: var(--btn-radius, 0px);
-    --ad-btn-bw: var(--btn-border-thickness, 1px);
-    --ad-badge-r: var(--badge-radius, 2px);
-    --ad-media-r: var(--media-radius, 0px);
-    --ad-input-r: {{ settings.input_border_radius | default: 0 }}px;
-    --ad-input-bw: {{ settings.input_border_thickness | default: 1 }}px;
-    --ad-input-line: var(--lv-border);
-    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+  .lv-acct-wrap {
+    --lv-acct-line: var(--lv-border);
+    --lv-acct-surface: color-mix(in srgb, var(--text) 3%, var(--bg));
+    --lv-acct-surface-2: color-mix(in srgb, var(--text) 6%, var(--bg));
+    --lv-acct-muted: color-mix(in srgb, var(--text) 62%, transparent);
+    --lv-acct-accent: var(--lv-accent, #9b7c53);
+    --lv-acct-radius: var(--card-radius, 0px);
+    --lv-acct-btn-r: var(--btn-radius, 0px);
+    --lv-acct-btn-bw: var(--btn-border-thickness, 1px);
+    --lv-acct-badge-r: var(--badge-radius, 2px);
+    --lv-acct-media-r: var(--media-radius, 0px);
+    --lv-acct-input-r: {{ settings.input_border_radius | default: 0 }}px;
+    --lv-acct-input-bw: {{ settings.input_border_thickness | default: 1 }}px;
+    --lv-acct-input-line: var(--lv-border);
+    --lv-acct-edge-x: clamp(16px, 2.2vw, 24px);
+    --lv-acct-cta-w: 160px;
+    --lv-acct-cta-h: 40px;
+    --lv-acct-sticky-top: 0px;
+    --lv-acct-hero-top: 0px;
+    --lv-acct-hero-h: 98px;
+    font-family: var(--FONT-STACK-BODY, sans-serif);
     color: var(--text);
     background: var(--bg);
     width: 100%;
     box-sizing: border-box;
   }
-  .ad-wrap *, .ad-wrap *::before, .ad-wrap *::after { box-sizing: border-box; }
-  .ad-inner {
+  .lv-acct-wrap *, .lv-acct-wrap *::before, .lv-acct-wrap *::after { box-sizing: border-box; }
+  .lv-acct-inner {
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: var(--ad-pt, 40px) var(--outer, 24px) var(--ad-pb, 70px);
+    padding: var(--lv-acct-pt, 40px) var(--outer, 24px) var(--lv-acct-pb, 70px);
   }
-  .ad-wrap .lv-crumbs { margin-bottom: 22px; }
-  .ad-wrap svg.ad-i { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-  .ad-eyebrow { display: block; font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--ad-accent); }
+  .lv-acct-wrap .lv-crumbs { margin-bottom: 22px; }
+  .lv-acct-wrap svg.lv-acct-i { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .lv-acct-eyebrow { display: block; font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--lv-acct-accent); }
 
   /* ---------- Hero / welcome ---------- */
-  .ad-hero {
+  .lv-acct-hero {
     position: relative;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
-    gap: clamp(16px, 3vw, 32px);
-    padding: clamp(22px, 3.4vw, 36px) clamp(18px, 3.4vw, 40px);
-    background: var(--ad-surface);
-    border: 1px solid var(--ad-line);
-    border-radius: var(--ad-radius);
-    margin-bottom: clamp(20px, 3vw, 32px);
+    gap: clamp(14px, 2.5vw, 26px);
+    padding: clamp(14px, 2vw, 20px) var(--lv-acct-edge-x);
+    background: var(--lv-acct-surface);
+    border: 1px solid var(--lv-acct-line);
+    border-radius: var(--lv-acct-radius);
+    margin-bottom: clamp(18px, 2.6vw, 26px);
+    transition: box-shadow .25s ease;
   }
-  .ad-hero::before { content: ""; position: absolute; left: -1px; right: -1px; top: -1px; height: 3px; background: var(--ad-accent); border-radius: var(--ad-radius) var(--ad-radius) 0 0; }
-  .ad-avatar {
-    width: clamp(60px, 7vw, 84px); height: clamp(60px, 7vw, 84px);
+  .lv-acct-hero::before { content: ""; position: absolute; left: -1px; right: -1px; top: -1px; height: 3px; background: var(--lv-acct-accent); border-radius: var(--lv-acct-radius) var(--lv-acct-radius) 0 0; }
+  @media (min-width: 861px) {
+    .lv-acct-hero {
+      position: sticky;
+      top: var(--lv-acct-hero-top, var(--lv-acct-sticky-top, 0px));
+      z-index: 40;
+    }
+    .lv-acct-hero.is-stuck {
+      box-shadow: 0 12px 28px -16px rgba(0, 0, 0, .18);
+    }
+  }
+  .lv-acct-avatar {
+    position: relative;
+    overflow: hidden;
+    width: clamp(54px, 5.4vw, 70px); height: clamp(54px, 5.4vw, 70px);
     border-radius: 50%;
     display: grid; place-items: center;
     background: var(--bg);
-    border: 1px solid var(--ad-accent);
-    outline: 1px solid color-mix(in srgb, var(--ad-accent) 35%, transparent);
+    border: 1px solid var(--lv-acct-accent);
+    outline: 1px solid color-mix(in srgb, var(--lv-acct-accent) 35%, transparent);
     outline-offset: 4px;
-    font-size: clamp(18px, 2.2vw, 26px); font-weight: 700; letter-spacing: .08em; color: var(--text);
+    font-size: clamp(17px, 2vw, 22px); font-weight: 700; letter-spacing: .08em; color: var(--text);
   }
-  .ad-hero__text { min-width: 0; }
-  .ad-hero__title { margin: 6px 0 6px; font-size: clamp(20px, 2.6vw, 30px); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; line-height: 1.2; overflow-wrap: anywhere; }
-  .ad-hero__meta { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13px; color: var(--ad-muted); }
-  .ad-hero__meta span { overflow-wrap: anywhere; }
-  .ad-badge { display: inline-block; padding: 3px 10px; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ad-accent); border: 1px solid color-mix(in srgb, var(--ad-accent) 45%, transparent); border-radius: var(--ad-badge-r); background: color-mix(in srgb, var(--ad-accent) 8%, transparent); white-space: nowrap; }
-  .ad-signout { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--btn-regular-text); text-decoration: none; border: var(--ad-btn-bw) solid var(--btn-regular-border); border-radius: var(--ad-btn-r); background: var(--btn-regular-bg); transition: border-color .25s, background .25s; white-space: nowrap; }
-  .ad-signout:hover { color: var(--btn-regular-hover-text); border-color: var(--btn-regular-hover-border); background: var(--btn-regular-hover-bg); }
-  .ad-signout svg.ad-i { width: 16px; height: 16px; }
+  .lv-acct-avatar__inner {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+  .lv-acct-avatar__inner__letter {
+    position: relative;
+    z-index: 1;
+    line-height: 1;
+  }
+  .lv-acct-avatar__inner__media,
+  .lv-acct-avatar__inner__media > *,
+  .lv-acct-avatar__inner__media img,
+  .lv-acct-avatar__inner__media svg {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+  }
+  .lv-acct-avatar__inner__media { z-index: 2; }
+  .lv-acct-avatar__inner.is-avatar-error .lv-acct-avatar__inner__media { display: none !important; }
+  .lv-acct-hero__text { min-width: 0; }
+  .lv-acct-hero__title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 4px 0 4px; }
+  .lv-acct-hero__title { margin: 0; font-family: var(--FONT-STACK-HEADING, sans-serif); font-size: calc(clamp(18px, 2.3vw, 26px) * var(--FONT-ADJUST-HEADING, 1)); font-weight: var(--FONT-WEIGHT-HEADING, 600); letter-spacing: var(--FONT-HEADING-LETTER-SPACING, .1em); text-transform: var(--FONT-HEADING-TRANSFORM, uppercase); line-height: 1.2; overflow-wrap: anywhere; }
+  .lv-acct-hero__meta { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13px; color: var(--lv-acct-muted); }
+  .lv-acct-hero__meta span { overflow-wrap: anywhere; }
 
-  /* ---------- Layout + nav ---------- */
-  .ad-layout { display: grid; grid-template-columns: clamp(220px, 22vw, 260px) minmax(0, 1fr); gap: clamp(20px, 3vw, 36px); align-items: start; }
-  .ad-content { min-width: 0; }
-  .ad-nav { position: sticky; top: 96px; display: flex; flex-direction: column; border: 1px solid var(--ad-line); background: var(--bg); border-radius: var(--ad-radius); padding: 8px; }
-  .ad-nav__btn {
+  /* Luxury VIP Crest Badge */
+  .lv-acct-vip-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px 4px 8px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: var(--lv-acct-accent);
+    border: 1px solid color-mix(in srgb, var(--lv-acct-accent) 55%, transparent);
+    border-radius: var(--lv-acct-badge-r);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--lv-acct-accent) 16%, var(--bg)), color-mix(in srgb, var(--lv-acct-accent) 5%, var(--bg)));
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 55%, transparent), 0 1px 4px color-mix(in srgb, var(--lv-acct-accent) 14%, transparent);
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .lv-acct-vip-badge svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    flex: none;
+  }
+  .lv-acct-vip-badge--sm {
+    padding: 3px 8px 3px 6px;
+    font-size: 9.5px;
+    gap: 4px;
+    letter-spacing: .16em;
+  }
+  .lv-acct-vip-badge--sm svg { width: 12px; height: 12px; }
+
+  .lv-acct-badge { display: inline-block; padding: 3px 10px; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--lv-acct-accent); border: 1px solid color-mix(in srgb, var(--lv-acct-accent) 45%, transparent); border-radius: var(--lv-acct-badge-r); background: color-mix(in srgb, var(--lv-acct-accent) 8%, transparent); white-space: nowrap; }
+  .lv-acct-signout { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 18px; min-height: var(--lv-acct-cta-h); font-family: var(--TYPE-STACK-BUTTON, inherit); font-size: 11.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; line-height: 1.2; color: var(--btn-regular-text); text-decoration: none; border: var(--lv-acct-btn-bw) solid var(--btn-regular-border); border-radius: var(--lv-acct-btn-r); background: var(--btn-regular-bg); transition: border-color .25s, background .25s, color .25s; white-space: nowrap; }
+  .lv-acct-signout:hover { color: var(--btn-regular-hover-text); border-color: var(--btn-regular-hover-border); background: var(--btn-regular-hover-bg); }
+  .lv-acct-signout svg.lv-acct-i { width: 15px; height: 15px; }
+  .lv-acct-signout--sidebar { width: 100%; }
+
+  /* ---------- Layout + sidebar nav ---------- */
+  .lv-acct-layout { display: grid; grid-template-columns: clamp(220px, 22vw, 260px) minmax(0, 1fr); gap: clamp(20px, 3vw, 36px); align-items: stretch; }
+  .lv-acct-sidebar { min-width: 0; }
+  .lv-acct-content { min-width: 0; }
+  .lv-acct-nav {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--lv-acct-line);
+    background: var(--bg);
+    border-radius: var(--lv-acct-radius);
+    padding: 8px;
+  }
+  @media (min-width: 861px) {
+    .lv-acct-sidebar { height: 100%; }
+    .lv-acct-nav {
+      position: sticky;
+      top: calc(var(--lv-acct-sticky-top, 0px) + var(--lv-acct-hero-h, 98px) + 20px);
+      height: 100%;
+      min-height: min(440px, var(--lv-acct-nav-max-h, calc(100vh - var(--lv-acct-sticky-top, 0px) - var(--lv-acct-hero-h, 98px) - 56px)));
+      max-height: var(--lv-acct-nav-max-h, calc(100vh - var(--lv-acct-sticky-top, 0px) - var(--lv-acct-hero-h, 98px) - 56px));
+    }
+  }
+  .lv-acct-nav__drawer-head { display: none; }
+  .lv-acct-nav__list { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; overflow-y: auto; gap: 2px; }
+  .lv-acct-nav__foot { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--lv-acct-line); }
+
+  /* Mobile navigation bar (hidden on desktop) */
+  .lv-acct-mobile-bar { display: none; }
+  .lv-acct-drawer-backdrop { display: none; }
+
+  .lv-acct-nav__btn {
     position: relative; display: flex; align-items: center; gap: 12px; width: 100%;
-    padding: 14px 14px 14px 16px; background: transparent; border: 0; border-radius: var(--ad-radius);
-    color: var(--ad-muted); font: inherit; font-size: 12.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; text-align: left; cursor: pointer;
+    padding: 14px 14px 14px 16px; background: transparent; border: 0; border-radius: var(--lv-acct-radius);
+    color: var(--lv-acct-muted); font: inherit; font-size: 12.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; text-align: left; cursor: pointer;
     transition: background .2s, color .2s;
   }
-  .ad-nav__btn::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 2px; background: var(--ad-accent); transform: scaleY(0); transition: transform .25s; }
-  .ad-nav__btn:hover { color: var(--text); background: var(--ad-surface); }
-  .ad-nav__btn.is-active { color: var(--text); background: var(--ad-surface-2); }
-  .ad-nav__btn.is-active::before { transform: scaleY(1); }
-  .ad-nav__btn.is-active svg.ad-i { stroke: var(--ad-accent); }
-  .ad-nav__label { flex: 1 1 auto; min-width: 0; }
-  .ad-nav__pill { min-width: 22px; padding: 2px 7px; text-align: center; font-size: 10.5px; font-weight: 700; border-radius: var(--ad-badge-r); background: color-mix(in srgb, var(--text) 9%, transparent); color: var(--text); }
+  .lv-acct-nav__btn::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 2px; background: var(--lv-acct-accent); transform: scaleY(0); transition: transform .25s; }
+  .lv-acct-nav__btn:hover { color: var(--text); background: var(--lv-acct-surface); }
+  .lv-acct-nav__btn.is-active { color: var(--text); background: var(--lv-acct-surface-2); }
+  .lv-acct-nav__btn.is-active::before { transform: scaleY(1); }
+  .lv-acct-nav__btn.is-active svg.lv-acct-i { stroke: var(--lv-acct-accent); }
+  .lv-acct-nav__label { flex: 1 1 auto; min-width: 0; }
+  .lv-acct-nav__pill { min-width: 22px; padding: 2px 7px; text-align: center; font-size: 10.5px; font-weight: 700; border-radius: var(--lv-acct-badge-r); background: color-mix(in srgb, var(--text) 9%, transparent); color: var(--text); }
 
   /* ---------- Panels ---------- */
-  .ad-panel { display: none; }
-  .ad-panel.is-active { display: block; animation: adFade .35s ease; }
-  @keyframes adFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .ad-ptitle { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; padding-bottom: 16px; margin-bottom: 22px; border-bottom: 1px solid var(--ad-line); }
-  .ad-ptitle h2 { margin: 4px 0 0; font-size: clamp(17px, 2vw, 22px); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
-  .ad-link { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--text); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: color-mix(in srgb, var(--text) 35%, transparent); transition: color .2s; }
-  .ad-link:hover { color: var(--ad-accent); }
+  .lv-acct-panel { display: none; }
+  .lv-acct-panel.is-active { display: block; animation: lvAcctFade .35s ease; }
+  @keyframes lvAcctFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .lv-acct-ptitle {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap;
+    padding: 18px var(--lv-acct-edge-x); margin-bottom: 20px;
+    background: var(--bg); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius);
+  }
+  .lv-acct-ptitle h2 { margin: 4px 0 0; font-family: var(--FONT-STACK-HEADING, sans-serif); font-size: calc(clamp(17px, 2vw, 22px) * var(--FONT-ADJUST-HEADING, 1)); font-weight: var(--FONT-WEIGHT-HEADING, 600); letter-spacing: var(--FONT-HEADING-LETTER-SPACING, .12em); text-transform: var(--FONT-HEADING-TRANSFORM, uppercase); }
+  .lv-acct-ptitle__actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+  .lv-acct-view-toggle { display: inline-flex; align-items: stretch; height: var(--lv-acct-cta-h); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-btn-r); background: var(--bg); overflow: hidden; }
+  .lv-acct-view-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 0 13px; border: 0; background: transparent; color: var(--lv-acct-muted);
+    font: inherit; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
+    transition: background .2s, color .2s;
+  }
+  .lv-acct-view-btn + .lv-acct-view-btn { border-left: 1px solid var(--lv-acct-line); }
+  .lv-acct-view-btn:hover { color: var(--text); background: var(--lv-acct-surface); }
+  .lv-acct-view-btn.is-active { color: var(--text); background: var(--lv-acct-surface-2); box-shadow: inset 0 -2px 0 var(--lv-acct-accent); }
+  .lv-acct-view-btn.is-active svg { stroke: var(--lv-acct-accent); }
+  .lv-acct-view-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .lv-acct-link { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--text); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: color-mix(in srgb, var(--text) 35%, transparent); transition: color .2s; }
+  .lv-acct-link:hover { color: var(--lv-acct-accent); }
 
-  .ad-card { background: var(--bg); border: 1px solid var(--ad-line); border-radius: var(--ad-radius); padding: clamp(16px, 2.4vw, 28px); margin-bottom: clamp(16px, 2.4vw, 24px); }
-  .ad-card__head { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; margin-bottom: 18px; }
-  .ad-card__title { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-  .ad-card__title svg.ad-i { stroke: var(--ad-accent); }
+  .lv-acct-card { background: var(--bg); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); padding: clamp(16px, 2.2vw, 24px) var(--lv-acct-edge-x); margin-bottom: clamp(16px, 2.4vw, 24px); }
+  .lv-acct-card__head { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; margin-bottom: 18px; }
+  .lv-acct-card__title { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .lv-acct-card__title svg.lv-acct-i { stroke: var(--lv-acct-accent); }
 
   /* ---------- Stats ---------- */
-  .ad-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 18px); margin-bottom: clamp(16px, 2.4vw, 24px); }
-  .ad-stat { display: flex; align-items: center; gap: 16px; padding: clamp(16px, 2vw, 24px); background: var(--ad-surface); border: 1px solid var(--ad-line); border-radius: var(--ad-radius); min-width: 0; }
-  .ad-stat__icon { width: 46px; height: 46px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--ad-accent) 45%, transparent); border-radius: 50%; color: var(--ad-accent); flex: none; }
-  .ad-stat__body { min-width: 0; }
-  .ad-stat__label { margin: 0 0 4px; font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ad-muted); }
-  .ad-stat__val { margin: 0; font-size: clamp(18px, 2vw, 24px); font-weight: 700; letter-spacing: .04em; line-height: 1.1; overflow-wrap: anywhere; }
+  .lv-acct-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 18px); margin-bottom: clamp(16px, 2.4vw, 24px); }
+  .lv-acct-stat { display: flex; align-items: center; gap: 16px; padding: clamp(16px, 2vw, 24px); background: var(--lv-acct-surface); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); min-width: 0; }
+  .lv-acct-stat__icon { width: 46px; height: 46px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--lv-acct-accent) 45%, transparent); border-radius: 50%; color: var(--lv-acct-accent); flex: none; }
+  .lv-acct-stat__body { min-width: 0; }
+  .lv-acct-stat__label { margin: 0 0 4px; font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--lv-acct-muted); }
+  .lv-acct-stat__val { margin: 0; font-size: clamp(18px, 2vw, 24px); font-weight: 700; letter-spacing: .04em; line-height: 1.1; overflow-wrap: anywhere; }
 
   /* ---------- Quick actions ---------- */
-  .ad-quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 16px); margin-bottom: clamp(16px, 2.4vw, 24px); }
-  .ad-quick__item { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 18px; background: var(--bg); border: 1px solid var(--ad-line); border-radius: var(--ad-radius); color: var(--text); text-decoration: none; font: inherit; text-align: left; cursor: pointer; transition: border-color .25s, transform .25s; }
-  .ad-quick__item:hover { border-color: var(--ad-accent); transform: translateY(-2px); }
-  .ad-quick__item svg.ad-i { stroke: var(--ad-accent); width: 22px; height: 22px; }
-  .ad-quick__name { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-  .ad-quick__sub { font-size: 12.5px; color: var(--ad-muted); line-height: 1.5; margin-top: -4px; }
+  .lv-acct-quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 16px); margin-bottom: clamp(16px, 2.4vw, 24px); }
+  .lv-acct-quick__item { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 18px; background: var(--bg); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); color: var(--text); text-decoration: none; font: inherit; text-align: left; cursor: pointer; transition: border-color .25s, transform .25s; }
+  .lv-acct-quick__item:hover { border-color: var(--lv-acct-accent); transform: translateY(-2px); }
+  .lv-acct-quick__item svg.lv-acct-i { stroke: var(--lv-acct-accent); width: 22px; height: 22px; }
+  .lv-acct-quick__name { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .lv-acct-quick__sub { font-size: 12.5px; color: var(--lv-acct-muted); line-height: 1.5; margin-top: -4px; }
 
   /* ---------- Orders ---------- */
-  .ad-order { display: grid; grid-template-columns: minmax(0, 1.4fr) auto auto; gap: 14px clamp(16px, 3vw, 36px); align-items: center; padding: clamp(14px, 2vw, 22px); border: 1px solid var(--ad-line); border-radius: var(--ad-radius); background: var(--bg); margin-bottom: 14px; transition: border-color .25s; }
-  .ad-order:last-child { margin-bottom: 0; }
-  .ad-order:hover { border-color: color-mix(in srgb, var(--text) 40%, transparent); }
-  .ad-order__id { min-width: 0; }
-  .ad-order__num { display: inline-block; font-size: 15px; font-weight: 700; letter-spacing: .08em; color: var(--text); text-decoration: none; }
-  .ad-order__num:hover { color: var(--ad-accent); }
-  .ad-order__date { margin: 3px 0 10px; font-size: 12.5px; color: var(--ad-muted); }
-  .ad-order__thumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .ad-order__thumb { width: 52px; height: 52px; object-fit: cover; border: 1px solid var(--ad-line); border-radius: var(--ad-media-r); background: var(--ad-surface); }
-  .ad-order__more { font-size: 12px; font-weight: 600; color: var(--ad-muted); }
-  .ad-order__status { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
-  .ad-order__buy { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; text-align: right; }
-  .ad-order__total { font-size: 16px; font-weight: 700; letter-spacing: .04em; }
-  .ad-pill { display: inline-block; padding: 3px 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; border: 1px solid var(--ad-line); border-radius: var(--ad-badge-r); background: var(--ad-surface); color: var(--text); white-space: nowrap; }
-  .ad-pill--paid, .ad-pill--fulfilled { color: var(--ad-accent); border-color: color-mix(in srgb, var(--ad-accent) 30%, transparent); background: color-mix(in srgb, var(--ad-accent) 9%, transparent); }
-  .ad-pill--pending, .ad-pill--partially_paid, .ad-pill--unfulfilled, .ad-pill--partial, .ad-pill--authorized { color: var(--ad-accent); border-color: color-mix(in srgb, var(--ad-accent) 40%, transparent); background: color-mix(in srgb, var(--ad-accent) 9%, transparent); }
+  .lv-acct-order { display: grid; grid-template-columns: minmax(0, 1.4fr) auto auto; gap: 14px clamp(16px, 3vw, 36px); align-items: center; padding: clamp(14px, 2vw, 22px) var(--lv-acct-edge-x); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--bg); margin-bottom: 14px; transition: border-color .25s; }
+  .lv-acct-order:last-child { margin-bottom: 0; }
+  .lv-acct-order:hover { border-color: color-mix(in srgb, var(--text) 40%, transparent); }
+  .lv-acct-order__id { min-width: 0; }
+  .lv-acct-order__num { display: inline-block; padding: 0; border: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 700; letter-spacing: .08em; color: var(--text); text-decoration: none; cursor: pointer; text-align: left; transition: color .2s; }
+  .lv-acct-order__num:hover { color: var(--lv-acct-accent); }
+  .lv-acct-order__num:focus-visible { outline: 2px solid var(--lv-acct-accent); outline-offset: 2px; }
+  .lv-acct-order__date { margin: 3px 0 10px; font-size: 12.5px; color: var(--lv-acct-muted); }
+  .lv-acct-order__thumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .lv-acct-order__thumb { width: 52px; height: 52px; object-fit: cover; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-media-r); background: var(--lv-acct-surface); }
+  .lv-acct-order__more { font-size: 12px; font-weight: 600; color: var(--lv-acct-muted); }
+  .lv-acct-order__status { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .lv-acct-order__buy { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; text-align: right; }
+  .lv-acct-order__total { font-size: 16px; font-weight: 700; letter-spacing: .04em; }
+  .lv-acct-pill { display: inline-block; padding: 3px 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-badge-r); background: var(--lv-acct-surface); color: var(--text); white-space: nowrap; }
+  .lv-acct-pill--paid, .lv-acct-pill--fulfilled { color: #2d6a4f; border-color: color-mix(in srgb, #2d6a4f 35%, transparent); background: color-mix(in srgb, #2d6a4f 9%, transparent); }
+  .lv-acct-pill--pending, .lv-acct-pill--partially_paid, .lv-acct-pill--partial, .lv-acct-pill--partially_fulfilled, .lv-acct-pill--authorized, .lv-acct-pill--in_progress, .lv-acct-pill--scheduled, .lv-acct-pill--on_hold { color: #a16207; border-color: color-mix(in srgb, #b45309 38%, transparent); background: color-mix(in srgb, #d97706 11%, transparent); }
+  .lv-acct-pill--unfulfilled { color: var(--lv-acct-muted); border-color: var(--lv-acct-line); background: var(--lv-acct-surface); }
+  .lv-acct-pill--cancelled, .lv-acct-pill--refunded, .lv-acct-pill--partially_refunded, .lv-acct-pill--voided, .lv-acct-pill--restocked { color: #9f2d2d; border-color: color-mix(in srgb, #9f2d2d 35%, transparent); background: color-mix(in srgb, #9f2d2d 9%, transparent); }
+  .lv-acct-pill--tracking { color: var(--lv-acct-accent); border-color: color-mix(in srgb, var(--lv-acct-accent) 35%, transparent); background: color-mix(in srgb, var(--lv-acct-accent) 8%, transparent); }
+  .lv-acct-refresh-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 14px; min-height: var(--lv-acct-cta-h); font-family: var(--TYPE-STACK-BUTTON, inherit); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; line-height: 1.2; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-btn-r); background: var(--bg); color: var(--text); cursor: pointer; transition: border-color .2s, color .2s; white-space: nowrap; }
+  .lv-acct-refresh-btn:hover { border-color: var(--lv-acct-accent); color: var(--lv-acct-accent); }
+  .lv-acct-refresh-btn:disabled { opacity: .65; cursor: wait; }
+  .lv-acct-refresh-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .lv-acct-refresh-btn.is-loading svg { animation: lvAcctSpin .85s linear infinite; }
+  @keyframes lvAcctSpin { to { transform: rotate(360deg); } }
 
   /* ---------- Addresses / concierge ---------- */
-  .ad-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: clamp(12px, 1.8vw, 18px); }
-  .ad-tile { position: relative; padding: 20px; background: var(--ad-surface); border: 1px solid var(--ad-line); border-radius: var(--ad-radius); font-size: 13.5px; line-height: 1.65; }
-  .ad-tile--default { border-color: var(--ad-accent); background: color-mix(in srgb, var(--ad-accent) 5%, var(--bg)); }
-  .ad-tile__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-  .ad-tile address { font-style: normal; color: var(--ad-muted); }
-  .ad-tile__phone { margin: 8px 0 0; font-size: 12.5px; color: var(--ad-muted); }
-  .ad-tile__icon { color: var(--ad-accent); margin-bottom: 12px; }
-  .ad-tile__title { margin: 0 0 6px; font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-  .ad-tile__text { margin: 0 0 14px; font-size: 13px; color: var(--ad-muted); }
+  .lv-acct-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: clamp(12px, 1.8vw, 18px); }
+  .lv-acct-grid--addresses { grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr)); }
+  .lv-acct-tile { position: relative; padding: 20px; background: var(--lv-acct-surface); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); font-size: 13.5px; line-height: 1.65; }
+  .lv-acct-grid--addresses .lv-acct-tile { display: flex; flex-direction: column; }
+  .lv-acct-tile__main { flex: 1 1 auto; min-width: 0; }
+  .lv-acct-tile--default { border-color: var(--lv-acct-accent); background: color-mix(in srgb, var(--lv-acct-accent) 5%, var(--bg)); }
+  .lv-acct-tile__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .lv-acct-tile address { font-style: normal; color: var(--lv-acct-muted); }
+  .lv-acct-tile__phone { margin: 8px 0 0; font-size: 12.5px; color: var(--lv-acct-muted); }
+  .lv-acct-tile__icon { color: var(--lv-acct-accent); margin-bottom: 12px; }
+  .lv-acct-tile__title { margin: 0 0 6px; font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .lv-acct-tile__text { margin: 0 0 14px; font-size: 13px; color: var(--lv-acct-muted); }
+  .lv-acct-grid--addresses[data-view="list"] { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .lv-acct-grid--addresses[data-view="list"] .lv-acct-tile { flex-direction: row; align-items: center; justify-content: space-between; gap: 16px clamp(16px, 3vw, 36px); padding: 20px var(--lv-acct-edge-x); }
+  .lv-acct-grid--addresses[data-view="list"] .lv-acct-tile__top { justify-content: flex-start; gap: 10px; margin-bottom: 6px; }
+  .lv-acct-grid--addresses[data-view="list"] .lv-acct-tile address p { margin: 0; }
+  .lv-acct-grid--addresses[data-view="list"] .lv-acct-tile__actions { margin-top: 0; padding-top: 0; border-top: 0; flex-shrink: 0; }
 
   /* ---------- Empty ---------- */
-  .ad-empty { text-align: center; padding: clamp(32px, 5vw, 56px) 20px; border: 1px dashed var(--ad-line); border-radius: var(--ad-radius); background: var(--ad-surface); }
-  .ad-empty svg.ad-i { display: block; width: 34px; height: 34px; stroke: var(--ad-accent); margin: 0 auto 14px; }
-  .ad-empty__title { margin: 0 0 8px; font-size: 15px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-  .ad-empty__text { margin: 0 auto 22px; max-width: 440px; font-size: 13.5px; line-height: 1.65; color: var(--ad-muted); }
-  .ad-muted-text { margin: 0 0 14px; font-size: 13.5px; color: var(--ad-muted); }
+  .lv-acct-empty { text-align: center; padding: clamp(32px, 5vw, 56px) 20px; border: 1px dashed var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--lv-acct-surface); }
+  .lv-acct-empty svg.lv-acct-i { display: block; width: 34px; height: 34px; stroke: var(--lv-acct-accent); margin: 0 auto 14px; }
+  .lv-acct-empty__title { margin: 0 0 8px; font-size: 15px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .lv-acct-empty__text { margin: 0 auto 22px; max-width: 440px; font-size: 13.5px; line-height: 1.65; color: var(--lv-acct-muted); }
+  .lv-acct-muted-text { margin: 0 0 14px; font-size: 13.5px; color: var(--lv-acct-muted); }
 
   /* ---------- Buttons / perks ---------- */
-  .ad-btn { padding: 12px 26px; font-size: 12.5px; max-width: 100%; text-align: center; }
-  .ad-btn--sm { padding: 9px 18px; font-size: 11.5px; }
-  .ad-btn--ghost { background: transparent; color: var(--text); border: var(--ad-btn-bw) solid var(--ad-input-line); }
-  .ad-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-  .ad-pagination { margin-top: 24px; text-align: center; }
-  .ad-perks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--ad-line); border-radius: var(--ad-radius); background: var(--ad-surface); }
-  .ad-perk { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 18px 14px; font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; text-align: left; }
-  .ad-perk + .ad-perk { border-left: 1px solid var(--ad-line); }
-  .ad-perk svg.ad-i { stroke: var(--ad-accent); }
+  .lv-acct-btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 26px; font-family: var(--TYPE-STACK-BUTTON, inherit); font-size: 12.5px; line-height: 1.2; max-width: 100%; text-align: center; }
+  .lv-acct-btn--sm { padding: 9px 18px; min-height: 36px; font-size: 11.5px; letter-spacing: .12em; }
+  @media (min-width: 641px) {
+    .lv-acct-ptitle .lv-acct-btn,
+    .lv-acct-ptitle .lv-acct-refresh-btn,
+    .lv-acct-order__buy .lv-acct-btn {
+      min-width: var(--lv-acct-cta-w);
+      min-height: var(--lv-acct-cta-h);
+      justify-content: center;
+    }
+  }
+  .lv-acct-btn--ghost { background: transparent; color: var(--text); border: var(--lv-acct-btn-bw) solid var(--lv-acct-input-line); }
+  .lv-acct-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .lv-acct-pagination { margin-top: 24px; text-align: center; }
+  .lv-acct-perks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--lv-acct-surface); }
+  .lv-acct-perk { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 18px 14px; font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; text-align: left; }
+  .lv-acct-perk + .lv-acct-perk { border-left: 1px solid var(--lv-acct-line); }
+  .lv-acct-perk svg.lv-acct-i { stroke: var(--lv-acct-accent); }
 
   /* ---------- Modals ---------- */
-  dialog.ad-modal:not([open]) {
+  dialog.lv-acct-modal:not([open]) {
     display: none;
   }
-  .ad-modal {
+  .lv-acct-modal {
     width: min(540px, calc(100vw - 32px));
     max-height: calc(100vh - 48px);
     margin: auto;
     padding: 0;
-    border: 1px solid var(--ad-line);
-    border-radius: var(--ad-radius);
+    border: 1px solid var(--lv-acct-line);
+    border-radius: var(--lv-acct-radius);
     background: var(--bg);
     color: var(--text);
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22);
     overflow: hidden;
   }
-  .ad-modal::backdrop {
+  .lv-acct-modal::backdrop {
     background: rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
-  .ad-modal__inner {
+  .lv-acct-modal__inner {
     padding: clamp(20px, 3.5vw, 32px);
     max-height: calc(100vh - 60px);
     overflow-y: auto;
   }
-  .ad-modal__head {
+  .lv-acct-modal__head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 20px;
     padding-bottom: 14px;
-    border-bottom: 1px solid var(--ad-line);
+    border-bottom: 1px solid var(--lv-acct-line);
   }
-  .ad-modal__title {
+  .lv-acct-modal__title {
     margin: 0;
     font-size: 17px;
     font-weight: 700;
     letter-spacing: .08em;
     text-transform: uppercase;
   }
-  .ad-modal__close {
+  .lv-acct-modal__close {
     background: transparent;
     border: 0;
-    color: var(--ad-muted);
+    color: var(--lv-acct-muted);
     font-size: 26px;
     cursor: pointer;
     line-height: 1;
     padding: 2px 8px;
     transition: color .2s;
   }
-  .ad-modal__close:hover {
+  .lv-acct-modal__close:hover {
     color: var(--text);
   }
-  .ad-modal__form {
+  .lv-acct-modal__form {
     display: flex;
     flex-direction: column;
     gap: 14px;
   }
-  .ad-modal__foot {
+  .lv-acct-modal__foot {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
     margin-top: 14px;
     padding-top: 16px;
-    border-top: 1px solid var(--ad-line);
+    border-top: 1px solid var(--lv-acct-line);
   }
-  .ad-field-row {
+
+  /* ---------- Order Details Modal ---------- */
+  .lv-acct-modal--order { width: min(780px, calc(100vw - 32px)); }
+  .lv-acct-om__head { align-items: flex-start; }
+  .lv-acct-om__head-info { min-width: 0; }
+  .lv-acct-om__placed { margin: 6px 0 0; font-size: 12.5px; color: var(--lv-acct-muted); }
+  .lv-acct-om__statuses { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px; }
+  .lv-acct-om__notice { padding: 12px 16px; margin-bottom: 18px; border-radius: var(--lv-acct-radius); border: 1px solid color-mix(in srgb, #9f2d2d 30%, transparent); background: color-mix(in srgb, #9f2d2d 7%, transparent); color: #7f1d1d; font-size: 13px; line-height: 1.5; }
+  .lv-acct-om__notice-reason { margin: 4px 0 0; }
+  .lv-acct-om__section { margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--lv-acct-line); }
+  .lv-acct-om__subhead { margin: 0 0 12px; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--lv-acct-muted); }
+  .lv-acct-om__ships { display: flex; flex-direction: column; gap: 10px; }
+  .lv-acct-om__ship-card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--lv-acct-surface); }
+  .lv-acct-om__ship-title { margin: 0; font-size: 13.5px; font-weight: 700; }
+  .lv-acct-om__carrier { font-weight: 500; color: var(--lv-acct-muted); }
+  .lv-acct-om__ship-date, .lv-acct-om__ship-track { margin: 4px 0 0; font-size: 12.5px; color: var(--lv-acct-muted); }
+  .lv-acct-om__ship-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .lv-acct-om__mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; color: var(--text); }
+  .lv-acct-om__muted-note { margin: 0; font-size: 13px; color: var(--lv-acct-muted); }
+  .lv-acct-om__items { display: flex; flex-direction: column; gap: 12px; }
+  .lv-acct-om__item { display: grid; grid-template-columns: 68px minmax(0, 1fr) auto; gap: 14px; align-items: start; padding: 12px; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--bg); }
+  .lv-acct-om__thumb-link { display: block; }
+  .lv-acct-om__thumb { display: block; width: 68px; height: 68px; object-fit: cover; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-media-r); background: var(--lv-acct-surface); }
+  .lv-acct-om__thumb--empty { display: grid; place-items: center; font-size: 12px; font-weight: 700; letter-spacing: .12em; color: var(--lv-acct-muted); }
+  .lv-acct-om__item-body { min-width: 0; }
+  .lv-acct-om__item-title { display: inline-block; font-size: 14px; font-weight: 600; color: var(--text); text-decoration: none; margin-bottom: 4px; overflow-wrap: anywhere; }
+  .lv-acct-om__item-title:hover { color: var(--lv-acct-accent); }
+  .lv-acct-om__item-meta, .lv-acct-om__item-ful { margin: 2px 0 0; font-size: 12.5px; color: var(--lv-acct-muted); }
+  .lv-acct-om__props { margin-top: 6px; display: flex; flex-direction: column; gap: 3px; font-size: 12.5px; color: var(--lv-acct-muted); }
+  .lv-acct-om__prop-key { font-weight: 600; color: var(--text); }
+  .lv-acct-om__item-discounts { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .lv-acct-om__disc-tag { display: inline-block; padding: 2px 8px; font-size: 11px; border-radius: var(--lv-acct-badge-r); background: color-mix(in srgb, #2d6a4f 10%, transparent); color: #2d6a4f; font-weight: 600; }
+  .lv-acct-om__item-price { text-align: right; font-size: 13px; white-space: nowrap; }
+  .lv-acct-om__unit-price { color: var(--lv-acct-muted); font-size: 12px; display: flex; justify-content: flex-end; gap: 6px; align-items: baseline; }
+  .lv-acct-om__line-total { margin-top: 4px; font-size: 14px; display: flex; justify-content: flex-end; gap: 6px; align-items: baseline; }
+  .lv-acct-om__unit-price s, .lv-acct-om__line-total s { opacity: .65; }
+  .lv-acct-om__totals { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; background: var(--lv-acct-surface); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); font-size: 13.5px; }
+  .lv-acct-om__tot-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; color: var(--lv-acct-muted); }
+  .lv-acct-om__tot-row--discount span:last-child { color: #2d6a4f; font-weight: 600; }
+  .lv-acct-om__tot-row--refund span:last-child { color: #9f2d2d; font-weight: 600; }
+  .lv-acct-om__tot-row--grand, .lv-acct-om__tot-row--net { padding-top: 10px; margin-top: 2px; border-top: 1px solid var(--lv-acct-line); color: var(--text); font-weight: 700; font-size: 15px; }
+  .lv-acct-om__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+  .lv-acct-om__box { padding: 14px 16px; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--lv-acct-surface); font-size: 13px; line-height: 1.6; }
+  .lv-acct-om__box--full { margin-bottom: 16px; }
+  .lv-acct-om__addr p { margin: 0; color: var(--lv-acct-muted); }
+  .lv-acct-om__addr-phone { margin-top: 6px !important; }
+  .lv-acct-om__txs { display: flex; flex-direction: column; gap: 10px; }
+  .lv-acct-om__tx-top { display: flex; justify-content: space-between; gap: 10px; font-weight: 600; }
+  .lv-acct-om__tx-meta { margin: 2px 0 0; font-size: 12px; color: var(--lv-acct-muted); }
+  .lv-acct-om__contact p { margin: 0 0 4px; color: var(--lv-acct-muted); overflow-wrap: anywhere; }
+  .lv-acct-om__contact p:last-child { margin-bottom: 0; }
+  .lv-acct-om__contact-label { font-weight: 600; color: var(--text); }
+  .lv-acct-om__note { margin: 0; color: var(--lv-acct-muted); overflow-wrap: anywhere; }
+  .lv-acct-field-row {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
   @media (max-width: 580px) {
-    .ad-field-row {
+    .lv-acct-field-row {
       grid-template-columns: minmax(0, 1fr);
     }
   }
-  .ad-field {
+  .lv-acct-field {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -279,10 +494,10 @@
     font-weight: 700;
     letter-spacing: .12em;
     text-transform: uppercase;
-    color: var(--ad-muted);
+    color: var(--lv-acct-muted);
     text-align: left;
   }
-  .ad-field input, .ad-field select {
+  .lv-acct-field input, .lv-acct-field select {
     width: 100%;
     height: 44px;
     padding: 0 12px;
@@ -292,17 +507,17 @@
     text-transform: none;
     letter-spacing: normal;
     color: var(--text);
-    background: var(--ad-surface);
-    border: 1px solid var(--ad-line);
-    border-radius: var(--ad-radius);
+    background: var(--lv-acct-surface);
+    border: 1px solid var(--lv-acct-line);
+    border-radius: var(--lv-acct-radius);
     outline: none;
     transition: border-color .2s;
     box-sizing: border-box;
   }
-  .ad-field input:focus, .ad-field select:focus {
+  .lv-acct-field input:focus, .lv-acct-field select:focus {
     border-color: var(--text);
   }
-  .ad-check {
+  .lv-acct-check {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -313,15 +528,15 @@
     color: var(--text);
     margin-top: 4px;
   }
-  .ad-tile__actions {
+  .lv-acct-tile__actions {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-top: 14px;
     padding-top: 12px;
-    border-top: 1px solid var(--ad-line);
+    border-top: 1px solid var(--lv-acct-line);
   }
-  .ad-toast {
+  .lv-acct-toast {
     position: fixed;
     bottom: 24px;
     right: 24px;
@@ -331,7 +546,7 @@
     font-size: 13px;
     font-weight: 600;
     letter-spacing: .04em;
-    border-radius: var(--ad-radius);
+    border-radius: var(--lv-acct-radius);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     z-index: 999999;
     opacity: 0;
@@ -339,290 +554,500 @@
     transition: opacity .3s, transform .3s;
     pointer-events: none;
   }
-  .ad-toast.is-visible {
+  .lv-acct-toast.is-visible {
     opacity: 1;
     transform: translateY(0);
   }
 
   /* ---------- Guest ---------- */
-  .ad-guest { max-width: 680px; margin: 0 auto; text-align: center; background: var(--ad-surface); border: 1px solid var(--ad-line); border-radius: var(--ad-radius); padding: clamp(32px, 6vw, 56px) clamp(18px, 4vw, 40px); position: relative; }
-  .ad-guest::before { content: ""; position: absolute; left: -1px; right: -1px; top: -1px; height: 3px; background: var(--ad-accent); }
-  .ad-guest__title { margin: 8px 0 12px; font-size: clamp(20px, 3vw, 28px); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
-  .ad-guest__desc { margin: 0 auto 28px; max-width: 480px; font-size: 14px; line-height: 1.7; color: var(--ad-muted); }
-  .ad-guest__actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 34px; }
-  .ad-guest__perks { border-top: 1px solid var(--ad-line); padding-top: 26px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-  .ad-guest-perk { font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-  .ad-guest-perk span { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ad-muted); }
+  .lv-acct-guest { max-width: 680px; margin: 0 auto; text-align: center; background: var(--lv-acct-surface); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); padding: clamp(32px, 6vw, 56px) clamp(18px, 4vw, 40px); position: relative; }
+  .lv-acct-guest::before { content: ""; position: absolute; left: -1px; right: -1px; top: -1px; height: 3px; background: var(--lv-acct-accent); }
+  .lv-acct-guest__title { margin: 8px 0 12px; font-size: clamp(20px, 3vw, 28px); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+  .lv-acct-guest__desc { margin: 0 auto 28px; max-width: 480px; font-size: 14px; line-height: 1.7; color: var(--lv-acct-muted); }
+  .lv-acct-guest__actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 34px; }
+  .lv-acct-guest__perks { border-top: 1px solid var(--lv-acct-line); padding-top: 26px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .lv-acct-guest-perk { font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .lv-acct-guest-perk span { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--lv-acct-muted); }
 
   /* ================= Tablet ================= */
   @media (max-width: 1024px) {
-    .ad-quick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .ad-order { grid-template-columns: minmax(0, 1fr) auto; }
-    .ad-order__status { grid-column: 2; grid-row: 1; align-items: flex-end; }
-    .ad-order__buy { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; border-top: 1px solid var(--ad-line); padding-top: 14px; text-align: left; }
+    .lv-acct-quick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .lv-acct-order { grid-template-columns: minmax(0, 1fr) auto; }
+    .lv-acct-order__status { grid-column: 2; grid-row: 1; align-items: flex-end; }
+    .lv-acct-order__buy { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; border-top: 1px solid var(--lv-acct-line); padding-top: 14px; text-align: left; }
   }
 
-  /* ================= Tablet portrait + mobile: tab bar ================= */
+  /* ================= Tablet portrait + mobile: slide-out sidebar drawer ================= */
   @media (max-width: 860px) {
-    .ad-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; }
-    .ad-nav { position: static; flex-direction: row; gap: 4px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; padding: 6px; -webkit-overflow-scrolling: touch; }
-    .ad-nav::-webkit-scrollbar { display: none; }
-    .ad-nav__btn { flex: 0 0 auto; width: auto; white-space: nowrap; padding: 12px 14px; scroll-snap-align: start; }
-    .ad-nav__btn::before { left: 12px; right: 12px; top: auto; bottom: 2px; width: auto; height: 2px; transform: scaleX(0); }
-    .ad-nav__btn.is-active::before { transform: scaleX(1); }
+    body.lv-acct-drawer-lock { overflow: hidden; }
+    .lv-acct-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .lv-acct-sidebar { display: contents; }
+
+    .lv-acct-mobile-bar {
+      position: sticky;
+      top: var(--lv-acct-sticky-top, 0px);
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--lv-acct-line);
+      border-radius: var(--lv-acct-radius);
+      box-shadow: 0 8px 20px -16px rgba(0, 0, 0, .14);
+    }
+    .lv-acct-mobile-bar__info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .lv-acct-mobile-bar__label { font-size: 9.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--lv-acct-accent); }
+    .lv-acct-mobile-bar__current { font-size: 13.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lv-acct-mobile-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      min-height: 36px;
+      border: var(--lv-acct-btn-bw) solid var(--lv-acct-line);
+      border-radius: var(--lv-acct-btn-r);
+      background: var(--lv-acct-surface);
+      color: var(--text);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      flex: none;
+      transition: border-color .2s, background .2s;
+    }
+    .lv-acct-mobile-toggle:hover { border-color: var(--lv-acct-accent); background: var(--lv-acct-surface-2); }
+    .lv-acct-mobile-toggle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+    .lv-acct-drawer-backdrop {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 6999;
+      background: rgba(0, 0, 0, .48);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .26s ease;
+    }
+    .lv-acct-drawer-backdrop[hidden] { display: none; }
+    .lv-acct-drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+    .lv-acct-nav {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: min(310px, 85vw);
+      height: 100vh;
+      height: 100dvh;
+      max-height: 100dvh;
+      z-index: 7000;
+      padding: 0;
+      border: 0;
+      border-right: 1px solid var(--lv-acct-line);
+      border-radius: 0;
+      background: var(--bg);
+      transform: translateX(-105%);
+      visibility: hidden;
+      pointer-events: none;
+      transition: transform .28s cubic-bezier(.16, 1, .3, 1), visibility .28s;
+      box-shadow: 12px 0 36px rgba(0, 0, 0, .2);
+    }
+    .lv-acct-nav.is-open {
+      transform: translateX(0);
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .lv-acct-nav__drawer-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 16px;
+      background: var(--lv-acct-surface);
+      border-bottom: 1px solid var(--lv-acct-line);
+      position: relative;
+      flex: none;
+    }
+    .lv-acct-nav__drawer-head::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--lv-acct-accent); }
+    .lv-acct-nav__drawer-avatar {
+      position: relative;
+      overflow: hidden;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--bg);
+      border: 1px solid var(--lv-acct-accent);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: var(--text);
+      flex: none;
+    }
+    .lv-acct-nav__drawer-meta { flex: 1 1 auto; min-width: 0; }
+    .lv-acct-nav__drawer-name { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; line-height: 1.3; text-transform: uppercase; color: var(--text); overflow-wrap: anywhere; }
+    .lv-acct-nav__drawer-close {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--lv-acct-line);
+      border-radius: var(--lv-acct-btn-r);
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      flex: none;
+      padding: 0;
+      transition: border-color .2s, background .2s;
+    }
+    .lv-acct-nav__drawer-close:hover { border-color: var(--lv-acct-accent); background: var(--lv-acct-surface-2); }
+    .lv-acct-nav__drawer-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .lv-acct-nav__list { padding: 12px 10px; }
+    .lv-acct-nav__foot { padding: 12px 14px calc(16px + env(safe-area-inset-bottom, 0px)); }
+    .lv-acct-nav__btn { padding: 13px 14px 13px 16px; }
   }
 
   /* ================= Mobile ================= */
   @media (max-width: 640px) {
-    .ad-hero { grid-template-columns: auto minmax(0, 1fr); align-items: center; }
-    .ad-signout { grid-column: 1 / -1; justify-content: center; width: 100%; }
-    .ad-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-    .ad-stat { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 12px; }
-    .ad-stat__icon { width: 34px; height: 34px; }
-    .ad-stat__icon svg.ad-i { width: 16px; height: 16px; }
-    .ad-stat__label { font-size: 9.5px; letter-spacing: .1em; }
-    .ad-stat__val { font-size: 16px; }
-    .ad-quick__item { padding: 14px; }
-    .ad-quick__sub { display: none; }
-    .ad-order { grid-template-columns: minmax(0, 1fr); }
-    .ad-order__status { grid-column: auto; grid-row: auto; flex-direction: row; flex-wrap: wrap; align-items: center; }
-    .ad-order__buy { flex-direction: column; align-items: stretch; gap: 12px; text-align: center; }
-    .ad-order__buy .btn { width: 100%; }
-    .ad-order__thumb { width: 46px; height: 46px; }
-    .ad-perks { grid-template-columns: minmax(0, 1fr); }
-    .ad-perk { justify-content: flex-start; padding: 14px 16px; }
-    .ad-perk + .ad-perk { border-left: 0; border-top: 1px solid var(--ad-line); }
-    .ad-actions .btn, .ad-guest__actions .btn { width: 100%; }
-    .ad-guest__perks { grid-template-columns: minmax(0, 1fr); }
+    .lv-acct-hero { grid-template-columns: auto minmax(0, 1fr); align-items: center; padding: 14px 16px; gap: 14px; }
+    .lv-acct-avatar { outline-offset: 3px; }
+    .lv-acct-ptitle { align-items: flex-start; }
+    .lv-acct-ptitle__actions { width: 100%; justify-content: space-between; gap: 8px; }
+    .lv-acct-view-toggle { height: 36px; }
+    .lv-acct-view-btn { padding: 0 10px; font-size: 10.5px; gap: 5px; }
+    .lv-acct-ptitle .lv-acct-btn,
+    .lv-acct-ptitle .lv-acct-refresh-btn { min-height: 36px; padding: 8px 14px; font-size: 11px; }
+    .lv-acct-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .lv-acct-stat { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 12px; }
+    .lv-acct-stat__icon { width: 34px; height: 34px; }
+    .lv-acct-stat__icon svg.lv-acct-i { width: 16px; height: 16px; }
+    .lv-acct-stat__label { font-size: 9.5px; letter-spacing: .1em; }
+    .lv-acct-stat__val { font-size: 16px; }
+    .lv-acct-quick__item { padding: 14px; }
+    .lv-acct-quick__sub { display: none; }
+    .lv-acct-order { grid-template-columns: minmax(0, 1fr); }
+    .lv-acct-order__status { grid-column: auto; grid-row: auto; flex-direction: row; flex-wrap: wrap; align-items: center; }
+    .lv-acct-order__buy { flex-direction: column; align-items: stretch; gap: 12px; text-align: center; }
+    .lv-acct-order__buy .btn { width: 100%; }
+    .lv-acct-order__thumb { width: 46px; height: 46px; }
+    .lv-acct-grid--addresses[data-view="list"] .lv-acct-tile { flex-direction: column; align-items: stretch; gap: 14px; }
+    .lv-acct-grid--addresses[data-view="list"] .lv-acct-tile__actions { margin-top: 2px; padding-top: 12px; border-top: 1px solid var(--lv-acct-line); justify-content: flex-start; }
+    .lv-acct-perks { grid-template-columns: minmax(0, 1fr); }
+    .lv-acct-perk { justify-content: flex-start; padding: 14px 16px; }
+    .lv-acct-perk + .lv-acct-perk { border-left: 0; border-top: 1px solid var(--lv-acct-line); }
+    .lv-acct-actions .btn, .lv-acct-guest__actions .btn { width: 100%; }
+    .lv-acct-guest__perks { grid-template-columns: minmax(0, 1fr); }
+    .lv-acct-om__grid { grid-template-columns: minmax(0, 1fr); }
+    .lv-acct-om__item { grid-template-columns: 56px minmax(0, 1fr); }
+    .lv-acct-om__thumb { width: 56px; height: 56px; }
+    .lv-acct-om__item-price { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; text-align: left; padding-top: 8px; border-top: 1px solid var(--lv-acct-line); }
+    .lv-acct-om__unit-price, .lv-acct-om__line-total { justify-content: flex-start; margin-top: 0; }
   }
   @media (max-width: 380px) {
-    .ad-stat__val { font-size: 14px; }
-    .ad-nav__btn { padding: 11px 11px; font-size: 11.5px; }
+    .lv-acct-stat__val { font-size: 14px; }
+    .lv-acct-nav__btn { padding: 11px 11px; font-size: 11.5px; }
   }
 </style>
 
 <div
-  class="ad-wrap color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
-  style="--ad-pt: {{ section.settings.padding_top | default: 40 }}px; --ad-pb: {{ section.settings.padding_bottom | default: 70 }}px;"
+  class="lv-acct-wrap color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
+  data-section-id="{{ section.id }}"
+  style="--lv-acct-pt: {{ section.settings.padding_top | default: 40 }}px; --lv-acct-pb: {{ section.settings.padding_bottom | default: 70 }}px;"
 >
-  <div class="ad-inner">
-    {% render 'breadcrumb', current: 'My Account' %}
+  <div class="lv-acct-inner">
+    {%- assign acct_breadcrumb_label = 'customer.account.title' | t -%}
+    {% render 'breadcrumb', current: acct_breadcrumb_label %}
 
     {% if customer %}
+      {%- assign member_fallback = 'customer.account.member_fallback' | t -%}
+      {%- assign vip_badge_label = 'customer.account.vip_short' | t -%}
+      {%- capture vip_crown_svg -%}
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="3.8" r="1.15"/><circle cx="2.5" cy="7.4" r="0.95"/><circle cx="21.5" cy="7.4" r="0.95"/><path d="M4 17.2L2.4 8.5l5.4 3.7L12 5.2l4.2 7L21.6 8.5 20 17.2H4z"/><rect x="4" y="18.6" width="16" height="1.8"/></svg>
+      {%- endcapture -%}
       <!-- ================= LOGGED IN ================= -->
-      <header class="ad-hero">
-        <div class="ad-avatar" aria-hidden="true">{{ initials }}</div>
-        <div class="ad-hero__text">
-          <span class="ad-eyebrow">Welcome back</span>
-          <h1 class="ad-hero__title">{{ customer.name | default: 'Atelier Member' }}</h1>
-          <p class="ad-hero__meta"><span>{{ customer.email | escape }}</span><span class="ad-badge">VIP Member</span></p>
+      <header class="lv-acct-hero">
+        <div class="lv-acct-avatar" aria-hidden="true">{%- render 'header-account-avatar', customer_obj: customer, fallback_text: initials, wrapper_class: 'lv-acct-avatar__inner' -%}</div>
+        <div class="lv-acct-hero__text">
+          <span class="lv-acct-eyebrow">{{ 'customer.account.welcome_back' | t }}</span>
+          <div class="lv-acct-hero__title-row">
+            <h1 class="lv-acct-hero__title">{{ customer.name | default: member_fallback }}</h1>
+            <span class="lv-acct-vip-badge" title="{{ vip_badge_label }}" aria-label="{{ vip_badge_label }}">{{ vip_crown_svg }}<span>{{ vip_badge_label }}</span></span>
+          </div>
+          <p class="lv-acct-hero__meta"><span>{{ customer.email | escape }}</span></p>
         </div>
-        <a href="{{ routes.account_logout_url }}" class="ad-signout">
-          <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Sign Out
-        </a>
       </header>
 
-      <div class="ad-layout" data-ad-dashboard>
-        <nav class="ad-nav" role="tablist" aria-label="Account sections">
-          <button type="button" class="ad-nav__btn is-active" data-tab-target="overview" role="tab" aria-selected="true">
-            <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            <span class="ad-nav__label">Overview</span>
+      <div class="lv-acct-layout" data-lv-acct-dashboard>
+        <div class="lv-acct-mobile-bar">
+          <div class="lv-acct-mobile-bar__info">
+            <span class="lv-acct-mobile-bar__label">{{ 'customer.account.mobile_dashboard' | t }}</span>
+            <span class="lv-acct-mobile-bar__current" data-lv-acct-mobile-current>{{ 'customer.account.nav_overview' | t }}</span>
+          </div>
+          <button
+            type="button"
+            class="lv-acct-mobile-toggle"
+            data-lv-acct-drawer-open
+            aria-expanded="false"
+            aria-controls="LvAcctSidebarNav"
+            aria-label="{{ 'customer.account.open_nav' | t }}"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="16" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <span>{{ 'customer.account.menu' | t }}</span>
           </button>
-          <button type="button" class="ad-nav__btn" data-tab-target="orders" role="tab" aria-selected="false">
-            <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            <span class="ad-nav__label">Orders</span>
-            <span class="ad-nav__pill">{{ orders_total }}</span>
-          </button>
-          <button type="button" class="ad-nav__btn" data-tab-target="addresses" role="tab" aria-selected="false">
-            <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span class="ad-nav__label">Addresses</span>
-            <span class="ad-nav__pill">{{ customer.addresses_count }}</span>
-          </button>
-          {% if section.settings.show_wishlist %}
-            <button type="button" class="ad-nav__btn" data-tab-target="wishlist" role="tab" aria-selected="false">
-              <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              <span class="ad-nav__label">Saved</span>
-            </button>
-          {% endif %}
-          <button type="button" class="ad-nav__btn" data-tab-target="concierge" role="tab" aria-selected="false">
-            <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span class="ad-nav__label">Concierge</span>
-          </button>
-        </nav>
+        </div>
 
-        <main class="ad-content">
+        <div class="lv-acct-drawer-backdrop" data-lv-acct-drawer-close hidden></div>
+
+        <aside class="lv-acct-sidebar">
+          <nav class="lv-acct-nav" id="LvAcctSidebarNav" aria-label="{{ 'customer.account.nav_aria' | t }}">
+            <div class="lv-acct-nav__drawer-head">
+              <div class="lv-acct-nav__drawer-avatar" aria-hidden="true">{%- render 'header-account-avatar', customer_obj: customer, fallback_text: initials, wrapper_class: 'lv-acct-avatar__inner' -%}</div>
+              <div class="lv-acct-nav__drawer-meta">
+                <p class="lv-acct-nav__drawer-name">{{ customer.name | default: member_fallback }}</p>
+                <span class="lv-acct-vip-badge lv-acct-vip-badge--sm" title="{{ vip_badge_label }}" aria-label="{{ vip_badge_label }}">{{ vip_crown_svg }}<span>{{ vip_badge_label }}</span></span>
+              </div>
+              <button type="button" class="lv-acct-nav__drawer-close" data-lv-acct-drawer-close aria-label="{{ 'customer.account.close_nav' | t }}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+
+            <div class="lv-acct-nav__list" role="tablist" aria-label="{{ 'customer.account.sections_aria' | t }}">
+              <button type="button" class="lv-acct-nav__btn is-active" data-tab-target="overview" role="tab" aria-selected="true">
+                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span class="lv-acct-nav__label">{{ 'customer.account.nav_overview' | t }}</span>
+              </button>
+              <button type="button" class="lv-acct-nav__btn" data-tab-target="orders" role="tab" aria-selected="false">
+                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                <span class="lv-acct-nav__label">{{ 'customer.account.nav_orders' | t }}</span>
+                <span class="lv-acct-nav__pill" data-lv-acct-orders-pill>{{ orders_total }}</span>
+              </button>
+              <button type="button" class="lv-acct-nav__btn" data-tab-target="addresses" role="tab" aria-selected="false">
+                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span class="lv-acct-nav__label">{{ 'customer.account.nav_addresses' | t }}</span>
+                <span class="lv-acct-nav__pill">{{ customer.addresses_count }}</span>
+              </button>
+              {% if section.settings.show_wishlist %}
+                <button type="button" class="lv-acct-nav__btn" data-tab-target="wishlist" role="tab" aria-selected="false">
+                  <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  <span class="lv-acct-nav__label">{{ 'customer.account.nav_saved' | t }}</span>
+                </button>
+              {% endif %}
+              <button type="button" class="lv-acct-nav__btn" data-tab-target="concierge" role="tab" aria-selected="false">
+                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span class="lv-acct-nav__label">{{ 'customer.account.nav_concierge' | t }}</span>
+              </button>
+            </div>
+
+            <div class="lv-acct-nav__foot">
+              <a href="{{ routes.account_logout_url }}" class="lv-acct-signout lv-acct-signout--sidebar">
+                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>{{ 'customer.log_out' | t }}</span>
+              </a>
+            </div>
+          </nav>
+        </aside>
+
+        <main class="lv-acct-content">
 
           <!-- OVERVIEW -->
-          <div class="ad-panel is-active" data-tab-panel="overview" role="tabpanel">
-            <div class="ad-stats">
-              <div class="ad-stat">
-                <span class="ad-stat__icon"><svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg></span>
-                <div class="ad-stat__body"><p class="ad-stat__label">Orders</p><p class="ad-stat__val">{{ orders_total }}</p></div>
+          <div class="lv-acct-panel is-active" data-tab-panel="overview" role="tabpanel">
+            <div class="lv-acct-stats">
+              <div class="lv-acct-stat">
+                <span class="lv-acct-stat__icon"><svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg></span>
+                <div class="lv-acct-stat__body"><p class="lv-acct-stat__label">{{ 'customer.account.stat_orders' | t }}</p><p class="lv-acct-stat__val" data-lv-acct-stat-orders>{{ orders_total }}</p></div>
               </div>
-              <div class="ad-stat">
-                <span class="ad-stat__icon"><svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.2c-.5-.8-1.4-1.2-2.5-1.2-1.4 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2c-1.1 0-2-.4-2.5-1.2M12 6.5V8m0 8v1.5"/></svg></span>
-                <div class="ad-stat__body"><p class="ad-stat__label">Total spent</p><p class="ad-stat__val">{{ spent_total | money }}</p></div>
+              <div class="lv-acct-stat">
+                <span class="lv-acct-stat__icon"><svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.2c-.5-.8-1.4-1.2-2.5-1.2-1.4 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2c-1.1 0-2-.4-2.5-1.2M12 6.5V8m0 8v1.5"/></svg></span>
+                <div class="lv-acct-stat__body"><p class="lv-acct-stat__label">{{ 'customer.account.stat_total_spent' | t }}</p><p class="lv-acct-stat__val" data-lv-acct-stat-spent>{{ spent_total | money }}</p></div>
               </div>
-              <div class="ad-stat">
-                <span class="ad-stat__icon"><svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-                <div class="ad-stat__body"><p class="ad-stat__label">Status</p><p class="ad-stat__val">VIP</p></div>
+              <div class="lv-acct-stat">
+                <span class="lv-acct-stat__icon"><svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l3 6-9 12L3 9z"/><path d="M3 9h18M9 3l3 18M15 3l-3 18"/></svg></span>
+                <div class="lv-acct-stat__body"><p class="lv-acct-stat__label">{{ 'customer.account.stat_status' | t }}</p><p class="lv-acct-stat__val"><span class="lv-acct-vip-badge lv-acct-vip-badge--sm" title="{{ vip_badge_label }}" aria-label="{{ vip_badge_label }}">{{ vip_crown_svg }}<span>{{ vip_badge_label }}</span></span></p></div>
               </div>
             </div>
 
-            <div class="ad-quick">
-              <a class="ad-quick__item" href="{{ routes.all_products_collection_url }}">
-                <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l3 6-9 12L3 9z"/><path d="M3 9h18M9 3l3 18M15 3l-3 18"/></svg>
-                <span class="ad-quick__name">Shop</span><span class="ad-quick__sub">Explore the collection</span>
+            <div class="lv-acct-quick">
+              <a class="lv-acct-quick__item" href="{{ routes.all_products_collection_url }}">
+                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l3 6-9 12L3 9z"/><path d="M3 9h18M9 3l3 18M15 3l-3 18"/></svg>
+                <span class="lv-acct-quick__name">{{ 'customer.account.quick_shop' | t }}</span><span class="lv-acct-quick__sub">{{ 'customer.account.quick_shop_sub' | t }}</span>
               </a>
-              <button type="button" class="ad-quick__item" data-switch-to="orders">
-                <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="6" width="14" height="10"/><path d="M15 9h4l3 3v4h-7z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
-                <span class="ad-quick__name">Track order</span><span class="ad-quick__sub">See delivery status</span>
+              <button type="button" class="lv-acct-quick__item" data-switch-to="orders">
+                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="6" width="14" height="10"/><path d="M15 9h4l3 3v4h-7z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+                <span class="lv-acct-quick__name">{{ 'customer.account.quick_track' | t }}</span><span class="lv-acct-quick__sub">{{ 'customer.account.quick_track_sub' | t }}</span>
               </button>
-              <a class="ad-quick__item" href="/pages/size-guide">
-                <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></svg>
-                <span class="ad-quick__name">Size guide</span><span class="ad-quick__sub">Find your fit</span>
+              <a class="lv-acct-quick__item" href="{{ size_guide_url }}">
+                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></svg>
+                <span class="lv-acct-quick__name">{{ 'customer.account.quick_size' | t }}</span><span class="lv-acct-quick__sub">{{ 'customer.account.quick_size_sub' | t }}</span>
               </a>
-              <a class="ad-quick__item" href="mailto:{{ concierge_email }}">
-                <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><polyline points="3 7 12 13 21 7"/></svg>
-                <span class="ad-quick__name">Contact</span><span class="ad-quick__sub">Talk to our concierge</span>
+              <a class="lv-acct-quick__item" href="mailto:{{ concierge_email }}">
+                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><polyline points="3 7 12 13 21 7"/></svg>
+                <span class="lv-acct-quick__name">{{ 'customer.account.quick_contact' | t }}</span><span class="lv-acct-quick__sub">{{ 'customer.account.quick_contact_sub' | t }}</span>
               </a>
             </div>
 
-            <div class="ad-card">
-              <div class="ad-card__head">
-                <h3 class="ad-card__title"><svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>Latest order</h3>
-                {% if customer.orders.size > 0 %}<a href="#orders" class="ad-link" data-switch-to="orders">View all</a>{% endif %}
+            <div class="lv-acct-card">
+              <div class="lv-acct-card__head">
+                <h3 class="lv-acct-card__title"><svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>{{ 'customer.account.latest_order' | t }}</h3>
+                {% if customer.orders.size > 0 %}<a href="#orders" class="lv-acct-link" data-switch-to="orders">{{ 'customer.account.view_all' | t }}</a>{% endif %}
               </div>
-              {% if customer.orders.size > 0 %}
-                {% assign order = customer.orders.first %}
-                {% render 'account-order-row', order: order %}
-              {% else %}
-                <div class="ad-empty">
-                  <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
-                  <p class="ad-empty__title">No orders yet</p>
-                  <p class="ad-empty__text">Explore our fine waterproof jewelry, personal engravings and heirloom rings.</p>
-                  <a href="{{ routes.all_products_collection_url }}" class="btn btn-sliding-hover ad-btn">Explore Collection</a>
-                </div>
-              {% endif %}
+              <div data-lv-acct-latest-order>
+                {% if customer.orders.size > 0 %}
+                  {% assign order = customer.orders.first %}
+                  {% render 'account-order-row', order: order %}
+                {% else %}
+                  <div class="lv-acct-empty">
+                    <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+                    <p class="lv-acct-empty__title">{{ 'customer.orders.none_title' | t }}</p>
+                    <p class="lv-acct-empty__text">{{ 'customer.orders.none_overview_text' | t }}</p>
+                    <a href="{{ routes.all_products_collection_url }}" class="btn btn-sliding-hover lv-acct-btn">{{ 'customer.account.explore_collection' | t }}</a>
+                  </div>
+                {% endif %}
+              </div>
             </div>
 
-            <div class="ad-card">
-              <div class="ad-card__head">
-                <h3 class="ad-card__title"><svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Delivery address</h3>
-                <a href="#addresses" class="ad-link" data-switch-to="addresses">Manage</a>
+            <div class="lv-acct-card">
+              <div class="lv-acct-card__head">
+                <h3 class="lv-acct-card__title"><svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ 'customer.account.delivery_address' | t }}</h3>
+                <a href="#addresses" class="lv-acct-link" data-switch-to="addresses">{{ 'customer.account.manage' | t }}</a>
               </div>
               {% if customer.default_address %}
-                <div class="ad-tile ad-tile--default">
-                  <div class="ad-tile__top"><strong>{{ customer.default_address.name }}</strong><span class="ad-badge">Default</span></div>
+                <div class="lv-acct-tile lv-acct-tile--default">
+                  <div class="lv-acct-tile__top"><strong>{{ customer.default_address.name }}</strong><span class="lv-acct-badge">{{ 'customer.addresses.default_pill' | t }}</span></div>
                   <address>{{ customer.default_address | format_address }}</address>
                 </div>
               {% else %}
-                <p class="ad-muted-text">No default delivery address saved yet.</p>
-                <button type="button" class="btn btn-sliding-hover ad-btn ad-btn--sm" data-ad-open-modal="AdAddAddressModal">Add Address</button>
+                <p class="lv-acct-muted-text">{{ 'customer.addresses.none_default' | t }}</p>
+                <button type="button" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm" data-lv-acct-open-modal="LvAcctAddAddressModal">{{ 'customer.addresses.add_new' | t }}</button>
               {% endif %}
             </div>
 
-            <div class="ad-perks">
-              <div class="ad-perk"><svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Waterproof &amp; sweat-proof</span></div>
-              <div class="ad-perk"><svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg><span>14 days easy returns</span></div>
-              <div class="ad-perk"><svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><span>Free shipping from €39</span></div>
+            <div class="lv-acct-perks">
+              <div class="lv-acct-perk"><svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>{{ 'customer.account.perk_waterproof' | t }}</span></div>
+              <div class="lv-acct-perk"><svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg><span>{{ 'customer.account.perk_returns' | t }}</span></div>
+              <div class="lv-acct-perk"><svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><span>{{ 'customer.account.perk_shipping' | t }}</span></div>
             </div>
           </div>
 
           <!-- ORDERS -->
-          <div class="ad-panel" data-tab-panel="orders" role="tabpanel">
-            <div class="ad-ptitle"><div><span class="ad-eyebrow">History</span><h2>My orders ({{ orders_total }})</h2></div></div>
-            {% if customer.orders.size > 0 %}
-              {% paginate customer.orders by 15 %}
-                {% for order in customer.orders %}
-                  {% render 'account-order-row', order: order %}
-                {% endfor %}
-                {% if paginate.pages > 1 %}<div class="ad-pagination">{{ paginate | default_pagination }}</div>{% endif %}
-              {% endpaginate %}
-            {% else %}
-              <div class="ad-empty">
-                <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
-                <p class="ad-empty__title">No orders yet</p>
-                <p class="ad-empty__text">Every Aurelle piece is crafted with hypoallergenic materials and made to be worn daily.</p>
-                <a href="{{ routes.all_products_collection_url }}" class="btn btn-sliding-hover ad-btn">Explore Collections</a>
-              </div>
-            {% endif %}
+          <div class="lv-acct-panel" data-tab-panel="orders" role="tabpanel">
+            <div class="lv-acct-ptitle">
+              <div><span class="lv-acct-eyebrow">{{ 'customer.orders.history_eyebrow' | t }}</span><h2 data-lv-acct-orders-heading>{{ 'customer.orders.my_orders_count' | t: count: orders_total }}</h2></div>
+              <button type="button" class="lv-acct-refresh-btn" data-lv-acct-refresh-orders>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                <span>{{ 'customer.orders.refresh_status' | t }}</span>
+              </button>
+            </div>
+            <div data-lv-acct-orders-list>
+              {% if customer.orders.size > 0 %}
+                {% paginate customer.orders by 15 %}
+                  {% for order in customer.orders %}
+                    {% render 'account-order-row', order: order %}
+                  {% endfor %}
+                  {% if paginate.pages > 1 %}<div class="lv-acct-pagination">{{ paginate | default_pagination }}</div>{% endif %}
+                {% endpaginate %}
+              {% else %}
+                <div class="lv-acct-empty">
+                  <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+                  <p class="lv-acct-empty__title">{{ 'customer.orders.none_title' | t }}</p>
+                  <p class="lv-acct-empty__text">{{ 'customer.orders.none_list_text' | t }}</p>
+                  <a href="{{ routes.all_products_collection_url }}" class="btn btn-sliding-hover lv-acct-btn">{{ 'customer.account.explore_collections' | t }}</a>
+                </div>
+              {% endif %}
+            </div>
           </div>
 
           <!-- ADDRESSES -->
-          <div class="ad-panel" data-tab-panel="addresses" role="tabpanel">
-            <div class="ad-ptitle">
-              <div><span class="ad-eyebrow">Delivery</span><h2>Saved addresses ({{ customer.addresses_count }})</h2></div>
-              <button type="button" class="btn btn-sliding-hover ad-btn ad-btn--sm" data-ad-open-modal="AdAddAddressModal">Add address</button>
+          <div class="lv-acct-panel" data-tab-panel="addresses" role="tabpanel">
+            <div class="lv-acct-ptitle">
+              <div><span class="lv-acct-eyebrow">{{ 'customer.addresses.delivery_eyebrow' | t }}</span><h2>{{ 'customer.addresses.saved_count' | t: count: customer.addresses_count }}</h2></div>
+              <div class="lv-acct-ptitle__actions">
+                {% if customer.addresses.size > 0 %}
+                  <div class="lv-acct-view-toggle" role="group" aria-label="{{ 'customer.addresses.layout_view_aria' | t }}">
+                    <button type="button" class="lv-acct-view-btn is-active" data-lv-acct-addr-view="grid" aria-pressed="true" title="{{ 'customer.addresses.grid_view' | t }}">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                      <span>{{ 'customer.addresses.grid' | t }}</span>
+                    </button>
+                    <button type="button" class="lv-acct-view-btn" data-lv-acct-addr-view="list" aria-pressed="false" title="{{ 'customer.addresses.list_view' | t }}">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                      <span>{{ 'customer.addresses.list' | t }}</span>
+                    </button>
+                  </div>
+                {% endif %}
+                <button type="button" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm" data-lv-acct-open-modal="LvAcctAddAddressModal">{{ 'customer.addresses.add_new' | t }}</button>
+              </div>
             </div>
             {% if customer.addresses.size > 0 %}
-              <div class="ad-grid">
+              <div class="lv-acct-grid lv-acct-grid--addresses" data-lv-acct-addresses-grid data-view="grid">
                 {% for addr in customer.addresses %}
-                  <div class="ad-tile{% if addr == customer.default_address %} ad-tile--default{% endif %}">
-                    <div class="ad-tile__top">
-                      <strong>{{ addr.name }}</strong>
-                      {% if addr == customer.default_address %}<span class="ad-badge">Default</span>{% endif %}
+                  <div class="lv-acct-tile{% if addr == customer.default_address %} lv-acct-tile--default{% endif %}">
+                    <div class="lv-acct-tile__main">
+                      <div class="lv-acct-tile__top">
+                        <strong>{{ addr.name }}</strong>
+                        {% if addr == customer.default_address %}<span class="lv-acct-badge">{{ 'customer.addresses.default_pill' | t }}</span>{% endif %}
+                      </div>
+                      <address>{{ addr | format_address }}</address>
+                      {% if addr.phone != blank %}<p class="lv-acct-tile__phone">{{ addr.phone }}</p>{% endif %}
                     </div>
-                    <address>{{ addr | format_address }}</address>
-                    {% if addr.phone != blank %}<p class="ad-tile__phone">{{ addr.phone }}</p>{% endif %}
-                    <div class="ad-tile__actions">
-                      <button type="button" class="btn btn-sliding-hover ad-btn ad-btn--sm" data-ad-open-modal="AdEditAddressModal-{{ addr.id }}">Edit</button>
-                      <form method="post" action="{{ routes.account_addresses_url }}/{{ addr.id }}" data-ad-delete-form style="margin: 0; display: inline;">
+                    <div class="lv-acct-tile__actions">
+                      <button type="button" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm" data-lv-acct-open-modal="LvAcctEditAddressModal-{{ addr.id }}">{{ 'customer.addresses.edit' | t }}</button>
+                      <form method="post" action="{{ routes.account_addresses_url }}/{{ addr.id }}" data-lv-acct-delete-form style="margin: 0; display: inline;">
                         <input type="hidden" name="_method" value="delete">
-                        <button type="submit" class="btn btn-sliding-hover ad-btn ad-btn--sm ad-btn--ghost">Delete</button>
+                        <button type="submit" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm lv-acct-btn--ghost">{{ 'customer.addresses.delete' | t }}</button>
                       </form>
                     </div>
                   </div>
                 {% endfor %}
               </div>
             {% else %}
-              <div class="ad-empty">
-                <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                <p class="ad-empty__title">No addresses saved</p>
-                <p class="ad-empty__text">Save your delivery addresses for a faster checkout on your next order.</p>
-                <button type="button" class="btn btn-sliding-hover ad-btn" data-ad-open-modal="AdAddAddressModal">Add New Address</button>
+              <div class="lv-acct-empty">
+                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <p class="lv-acct-empty__title">{{ 'customer.addresses.none_title' | t }}</p>
+                <p class="lv-acct-empty__text">{{ 'customer.addresses.none_text' | t }}</p>
+                <button type="button" class="btn btn-sliding-hover lv-acct-btn" data-lv-acct-open-modal="LvAcctAddAddressModal">{{ 'customer.addresses.add_new' | t }}</button>
               </div>
             {% endif %}
           </div>
 
           <!-- SAVED -->
           {% if section.settings.show_wishlist %}
-            <div class="ad-panel" data-tab-panel="wishlist" role="tabpanel">
-              <div class="ad-ptitle"><div><span class="ad-eyebrow">Favourites</span><h2>Saved pieces</h2></div></div>
-              <div class="ad-empty">
-                <svg class="ad-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                <p class="ad-empty__title">Curate your collection</p>
-                <p class="ad-empty__text">Save your favourite rings, chains and earrings as you browse the atelier.</p>
-                <div class="ad-actions">
-                  <a href="{{ wishlist_url }}" class="btn btn-sliding-hover ad-btn">View Wishlist</a>
-                  <a href="{{ routes.collections_url }}/bestsellers" class="btn btn-sliding-hover ad-btn ad-btn--ghost">Bestsellers</a>
+            <div class="lv-acct-panel" data-tab-panel="wishlist" role="tabpanel">
+              <div class="lv-acct-ptitle"><div><span class="lv-acct-eyebrow">{{ 'customer.account.saved_eyebrow' | t }}</span><h2>{{ 'customer.account.saved_title' | t }}</h2></div></div>
+              <div class="lv-acct-empty">
+                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <p class="lv-acct-empty__title">{{ 'customer.account.saved_empty_title' | t }}</p>
+                <p class="lv-acct-empty__text">{{ 'customer.account.saved_empty_text' | t }}</p>
+                <div class="lv-acct-actions">
+                  <a href="{{ wishlist_url }}" class="btn btn-sliding-hover lv-acct-btn">{{ 'customer.account.view_wishlist' | t }}</a>
+                  <a href="{{ routes.collections_url }}/bestsellers" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--ghost">{{ 'customer.account.bestsellers' | t }}</a>
                 </div>
               </div>
             </div>
           {% endif %}
 
           <!-- CONCIERGE -->
-          <div class="ad-panel" data-tab-panel="concierge" role="tabpanel">
-            <div class="ad-ptitle"><div><span class="ad-eyebrow">Atelier</span><h2>Concierge &amp; care</h2></div></div>
-            <div class="ad-grid">
-              <div class="ad-tile">
-                <svg class="ad-i ad-tile__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></svg>
-                <h4 class="ad-tile__title">Sizing &amp; fit</h4>
-                <p class="ad-tile__text">Find your ring diameter, bracelet drape or necklace layering length.</p>
-                <a href="/pages/size-guide" class="ad-link">Open sizing guide</a>
+          <div class="lv-acct-panel" data-tab-panel="concierge" role="tabpanel">
+            <div class="lv-acct-ptitle"><div><span class="lv-acct-eyebrow">{{ 'customer.account.atelier_eyebrow' | t }}</span><h2>{{ 'customer.account.concierge_title' | t }}</h2></div></div>
+            <div class="lv-acct-grid">
+              <div class="lv-acct-tile">
+                <svg class="lv-acct-i lv-acct-tile__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></svg>
+                <h4 class="lv-acct-tile__title">{{ 'customer.account.concierge_sizing_title' | t }}</h4>
+                <p class="lv-acct-tile__text">{{ 'customer.account.concierge_sizing_text' | t }}</p>
+                <a href="{{ size_guide_url }}" class="lv-acct-link">{{ 'customer.account.concierge_sizing_link' | t }}</a>
               </div>
-              <div class="ad-tile">
-                <svg class="ad-i ad-tile__icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-                <h4 class="ad-tile__title">Permanent jewelry</h4>
-                <p class="ad-tile__text">Book an in-person micro-weld session for a bespoke claspless chain.</p>
-                <a href="/pages/permanent-jewelry-on-site" class="ad-link">Book appointment</a>
+              <div class="lv-acct-tile">
+                <svg class="lv-acct-i lv-acct-tile__icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                <h4 class="lv-acct-tile__title">{{ 'customer.account.concierge_permanent_title' | t }}</h4>
+                <p class="lv-acct-tile__text">{{ 'customer.account.concierge_permanent_text' | t }}</p>
+                <a href="{{ permanent_jewelry_url }}" class="lv-acct-link">{{ 'customer.account.concierge_permanent_link' | t }}</a>
               </div>
-              <div class="ad-tile">
-                <svg class="ad-i ad-tile__icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><polyline points="3 7 12 13 21 7"/></svg>
-                <h4 class="ad-tile__title">Questions &amp; engravings</h4>
-                <p class="ad-tile__text">Need help with an engraving or an order change? We are here.</p>
-                <a href="mailto:{{ concierge_email }}" class="ad-link">Email concierge</a>
+              <div class="lv-acct-tile">
+                <svg class="lv-acct-i lv-acct-tile__icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><polyline points="3 7 12 13 21 7"/></svg>
+                <h4 class="lv-acct-tile__title">{{ 'customer.account.concierge_questions_title' | t }}</h4>
+                <p class="lv-acct-tile__text">{{ 'customer.account.concierge_questions_text' | t }}</p>
+                <a href="mailto:{{ concierge_email }}" class="lv-acct-link">{{ 'customer.account.concierge_email_link' | t }}</a>
               </div>
             </div>
           </div>
@@ -631,161 +1056,180 @@
       </div>
 
       <!-- ================= ADDRESS MODALS ================= -->
-      <dialog id="AdAddAddressModal" class="ad-modal">
-        <div class="ad-modal__inner">
-          <div class="ad-modal__head">
-            <h3 class="ad-modal__title">Add New Address</h3>
-            <button type="button" class="ad-modal__close" data-ad-close-modal aria-label="Close modal">&times;</button>
+      <dialog id="LvAcctAddAddressModal" class="lv-acct-modal">
+        <div class="lv-acct-modal__inner">
+          <div class="lv-acct-modal__head">
+            <h3 class="lv-acct-modal__title">{{ 'customer.addresses.add_new' | t }}</h3>
+            <button type="button" class="lv-acct-modal__close" data-lv-acct-close-modal aria-label="{{ 'accessibility.close_modal' | t }}">&times;</button>
           </div>
-          {% form 'customer_address', customer.new_address, class: 'ad-modal__form', data-ad-address-form: '' %}
-            <div class="ad-field-row">
-              <div class="ad-field">
-                <label for="AddressFirstNameNew">First Name</label>
+          {% form 'customer_address', customer.new_address, class: 'lv-acct-modal__form', data-lv-acct-address-form: '' %}
+            <div class="lv-acct-field-row">
+              <div class="lv-acct-field">
+                <label for="AddressFirstNameNew">{{ 'customer.addresses.first_name' | t }}</label>
                 <input type="text" id="AddressFirstNameNew" name="address[first_name]" value="{{ form.first_name | escape }}" autocomplete="given-name" required>
               </div>
-              <div class="ad-field">
-                <label for="AddressLastNameNew">Last Name</label>
+              <div class="lv-acct-field">
+                <label for="AddressLastNameNew">{{ 'customer.addresses.last_name' | t }}</label>
                 <input type="text" id="AddressLastNameNew" name="address[last_name]" value="{{ form.last_name | escape }}" autocomplete="family-name" required>
               </div>
             </div>
-            <div class="ad-field">
-              <label for="AddressCompanyNew">Company (optional)</label>
+            <div class="lv-acct-field">
+              <label for="AddressCompanyNew">{{ 'customer.addresses.company_optional' | t }}</label>
               <input type="text" id="AddressCompanyNew" name="address[company]" value="{{ form.company | escape }}" autocomplete="organization">
             </div>
-            <div class="ad-field">
-              <label for="AddressAddress1New">Address line 1</label>
+            <div class="lv-acct-field">
+              <label for="AddressAddress1New">{{ 'customer.addresses.address1' | t }}</label>
               <input type="text" id="AddressAddress1New" name="address[address1]" value="{{ form.address1 | escape }}" autocomplete="address-line1" required>
             </div>
-            <div class="ad-field">
-              <label for="AddressAddress2New">Apartment, suite, etc. (optional)</label>
+            <div class="lv-acct-field">
+              <label for="AddressAddress2New">{{ 'customer.addresses.address2_optional' | t }}</label>
               <input type="text" id="AddressAddress2New" name="address[address2]" value="{{ form.address2 | escape }}" autocomplete="address-line2">
             </div>
-            <div class="ad-field-row">
-              <div class="ad-field">
-                <label for="AddressCityNew">City</label>
+            <div class="lv-acct-field-row">
+              <div class="lv-acct-field">
+                <label for="AddressCityNew">{{ 'customer.addresses.city' | t }}</label>
                 <input type="text" id="AddressCityNew" name="address[city]" value="{{ form.city | escape }}" autocomplete="address-level2" required>
               </div>
-              <div class="ad-field">
-                <label for="AddressZipNew">Postal / ZIP Code</label>
+              <div class="lv-acct-field">
+                <label for="AddressZipNew">{{ 'customer.addresses.zip' | t }}</label>
                 <input type="text" id="AddressZipNew" name="address[zip]" value="{{ form.zip | escape }}" autocomplete="postal-code" required>
               </div>
             </div>
-            <div class="ad-field-row">
-              <div class="ad-field">
-                <label for="AddressCountryNew">Country</label>
-                <select id="AddressCountryNew" name="address[country]" data-default="{{ form.country | escape }}" data-ad-country autocomplete="country">
+            <div class="lv-acct-field-row">
+              <div class="lv-acct-field">
+                <label for="AddressCountryNew">{{ 'customer.addresses.country' | t }}</label>
+                <select id="AddressCountryNew" name="address[country]" data-default="{{ form.country | escape }}" data-lv-acct-country autocomplete="country">
                   {{ all_country_option_tags }}
                 </select>
               </div>
-              <div class="ad-field" id="AddressProvinceContainerNew" style="display: none;">
-                <label for="AddressProvinceNew">Region / State</label>
-                <select id="AddressProvinceNew" name="address[province]" data-default="{{ form.province | escape }}" data-ad-province autocomplete="address-level1">
+              <div class="lv-acct-field" id="AddressProvinceContainerNew" style="display: none;">
+                <label for="AddressProvinceNew">{{ 'customer.addresses.province' | t }}</label>
+                <select id="AddressProvinceNew" name="address[province]" data-default="{{ form.province | escape }}" data-lv-acct-province autocomplete="address-level1">
                 </select>
               </div>
             </div>
-            <div class="ad-field">
-              <label for="AddressPhoneNew">Phone (optional)</label>
+            <div class="lv-acct-field">
+              <label for="AddressPhoneNew">{{ 'customer.addresses.phone_optional' | t }}</label>
               <input type="tel" id="AddressPhoneNew" name="address[phone]" value="{{ form.phone | escape }}" autocomplete="tel">
             </div>
-            <label class="ad-check" for="address_default_address_new">
+            <label class="lv-acct-check" for="address_default_address_new">
               <input type="checkbox" id="address_default_address_new" name="address[default]" value="1">
-              <span>Set as default delivery address</span>
+              <span>{{ 'customer.addresses.set_default' | t }}</span>
             </label>
-            <div class="ad-modal__foot">
-              <button type="button" class="btn btn-sliding-hover ad-btn ad-btn--sm ad-btn--ghost" data-ad-close-modal>Cancel</button>
-              <button type="submit" class="btn btn-sliding-hover ad-btn ad-btn--sm">Save Address</button>
+            <div class="lv-acct-modal__foot">
+              <button type="button" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm lv-acct-btn--ghost" data-lv-acct-close-modal>{{ 'customer.addresses.cancel' | t }}</button>
+              <button type="submit" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm">{{ 'customer.addresses.add' | t }}</button>
             </div>
           {% endform %}
         </div>
       </dialog>
 
       {% for addr in customer.addresses %}
-        <dialog id="AdEditAddressModal-{{ addr.id }}" class="ad-modal">
-          <div class="ad-modal__inner">
-            <div class="ad-modal__head">
-              <h3 class="ad-modal__title">Edit Address</h3>
-              <button type="button" class="ad-modal__close" data-ad-close-modal aria-label="Close modal">&times;</button>
+        <dialog id="LvAcctEditAddressModal-{{ addr.id }}" class="lv-acct-modal">
+          <div class="lv-acct-modal__inner">
+            <div class="lv-acct-modal__head">
+              <h3 class="lv-acct-modal__title">{{ 'customer.addresses.edit_address' | t }}</h3>
+              <button type="button" class="lv-acct-modal__close" data-lv-acct-close-modal aria-label="{{ 'accessibility.close_modal' | t }}">&times;</button>
             </div>
-            {% form 'customer_address', addr, class: 'ad-modal__form', data-ad-address-form: '' %}
-              <div class="ad-field-row">
-                <div class="ad-field">
-                  <label for="AddressFirstName_{{ addr.id }}">First Name</label>
+            {% form 'customer_address', addr, class: 'lv-acct-modal__form', data-lv-acct-address-form: '' %}
+              <div class="lv-acct-field-row">
+                <div class="lv-acct-field">
+                  <label for="AddressFirstName_{{ addr.id }}">{{ 'customer.addresses.first_name' | t }}</label>
                   <input type="text" id="AddressFirstName_{{ addr.id }}" name="address[first_name]" value="{{ form.first_name | escape }}" autocomplete="given-name" required>
                 </div>
-                <div class="ad-field">
-                  <label for="AddressLastName_{{ addr.id }}">Last Name</label>
+                <div class="lv-acct-field">
+                  <label for="AddressLastName_{{ addr.id }}">{{ 'customer.addresses.last_name' | t }}</label>
                   <input type="text" id="AddressLastName_{{ addr.id }}" name="address[last_name]" value="{{ form.last_name | escape }}" autocomplete="family-name" required>
                 </div>
               </div>
-              <div class="ad-field">
-                <label for="AddressCompany_{{ addr.id }}">Company (optional)</label>
+              <div class="lv-acct-field">
+                <label for="AddressCompany_{{ addr.id }}">{{ 'customer.addresses.company_optional' | t }}</label>
                 <input type="text" id="AddressCompany_{{ addr.id }}" name="address[company]" value="{{ form.company | escape }}" autocomplete="organization">
               </div>
-              <div class="ad-field">
-                <label for="AddressAddress1_{{ addr.id }}">Address line 1</label>
+              <div class="lv-acct-field">
+                <label for="AddressAddress1_{{ addr.id }}">{{ 'customer.addresses.address1' | t }}</label>
                 <input type="text" id="AddressAddress1_{{ addr.id }}" name="address[address1]" value="{{ form.address1 | escape }}" autocomplete="address-line1" required>
               </div>
-              <div class="ad-field">
-                <label for="AddressAddress2_{{ addr.id }}">Apartment, suite, etc. (optional)</label>
+              <div class="lv-acct-field">
+                <label for="AddressAddress2_{{ addr.id }}">{{ 'customer.addresses.address2_optional' | t }}</label>
                 <input type="text" id="AddressAddress2_{{ addr.id }}" name="address[address2]" value="{{ form.address2 | escape }}" autocomplete="address-line2">
               </div>
-              <div class="ad-field-row">
-                <div class="ad-field">
-                  <label for="AddressCity_{{ addr.id }}">City</label>
+              <div class="lv-acct-field-row">
+                <div class="lv-acct-field">
+                  <label for="AddressCity_{{ addr.id }}">{{ 'customer.addresses.city' | t }}</label>
                   <input type="text" id="AddressCity_{{ addr.id }}" name="address[city]" value="{{ form.city | escape }}" autocomplete="address-level2" required>
                 </div>
-                <div class="ad-field">
-                  <label for="AddressZip_{{ addr.id }}">Postal / ZIP Code</label>
+                <div class="lv-acct-field">
+                  <label for="AddressZip_{{ addr.id }}">{{ 'customer.addresses.zip' | t }}</label>
                   <input type="text" id="AddressZip_{{ addr.id }}" name="address[zip]" value="{{ form.zip | escape }}" autocomplete="postal-code" required>
                 </div>
               </div>
-              <div class="ad-field-row">
-                <div class="ad-field">
-                  <label for="AddressCountry_{{ addr.id }}">Country</label>
-                  <select id="AddressCountry_{{ addr.id }}" name="address[country]" data-default="{{ addr.country }}" data-ad-country autocomplete="country">
+              <div class="lv-acct-field-row">
+                <div class="lv-acct-field">
+                  <label for="AddressCountry_{{ addr.id }}">{{ 'customer.addresses.country' | t }}</label>
+                  <select id="AddressCountry_{{ addr.id }}" name="address[country]" data-default="{{ addr.country }}" data-lv-acct-country autocomplete="country">
                     {{ all_country_option_tags }}
                   </select>
                 </div>
-                <div class="ad-field" id="AddressProvinceContainer_{{ addr.id }}" style="display: none;">
-                  <label for="AddressProvince_{{ addr.id }}">Region / State</label>
-                  <select id="AddressProvince_{{ addr.id }}" name="address[province]" data-default="{{ addr.province }}" data-ad-province autocomplete="address-level1">
+                <div class="lv-acct-field" id="AddressProvinceContainer_{{ addr.id }}" style="display: none;">
+                  <label for="AddressProvince_{{ addr.id }}">{{ 'customer.addresses.province' | t }}</label>
+                  <select id="AddressProvince_{{ addr.id }}" name="address[province]" data-default="{{ addr.province }}" data-lv-acct-province autocomplete="address-level1">
                   </select>
                 </div>
               </div>
-              <div class="ad-field">
-                <label for="AddressPhone_{{ addr.id }}">Phone (optional)</label>
+              <div class="lv-acct-field">
+                <label for="AddressPhone_{{ addr.id }}">{{ 'customer.addresses.phone_optional' | t }}</label>
                 <input type="tel" id="AddressPhone_{{ addr.id }}" name="address[phone]" value="{{ form.phone | escape }}" autocomplete="tel">
               </div>
-              <label class="ad-check" for="address_default_address_{{ addr.id }}">
+              <label class="lv-acct-check" for="address_default_address_{{ addr.id }}">
                 <input type="checkbox" id="address_default_address_{{ addr.id }}" name="address[default]" value="1"{% if addr == customer.default_address %} checked{% endif %}>
-                <span>Set as default delivery address</span>
+                <span>{{ 'customer.addresses.set_default' | t }}</span>
               </label>
-              <div class="ad-modal__foot">
-                <button type="button" class="btn btn-sliding-hover ad-btn ad-btn--sm ad-btn--ghost" data-ad-close-modal>Cancel</button>
-                <button type="submit" class="btn btn-sliding-hover ad-btn ad-btn--sm">Update Address</button>
+              <div class="lv-acct-modal__foot">
+                <button type="button" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm lv-acct-btn--ghost" data-lv-acct-close-modal>{{ 'customer.addresses.cancel' | t }}</button>
+                <button type="submit" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm">{{ 'customer.addresses.update' | t }}</button>
               </div>
             {% endform %}
           </div>
         </dialog>
       {% endfor %}
 
-      <div id="AdToast" class="ad-toast" role="status" aria-live="polite"></div>
+      <div data-lv-acct-order-modals>
+        {% if customer.orders.size > 0 %}
+          {% assign rendered_order_modal_ids = '' %}
+          {% assign latest_order = customer.orders.first %}
+          {% assign latest_modal_key = '|' | append: latest_order.id | append: '|' %}
+          {% assign rendered_order_modal_ids = rendered_order_modal_ids | append: latest_modal_key %}
+          {% render 'account-order-modal', order: latest_order %}
+          {% paginate customer.orders by 15 %}
+            {% for order in customer.orders %}
+              {% assign ord_modal_key = '|' | append: order.id | append: '|' %}
+              {% unless rendered_order_modal_ids contains ord_modal_key %}
+                {% assign rendered_order_modal_ids = rendered_order_modal_ids | append: ord_modal_key %}
+                {% render 'account-order-modal', order: order %}
+              {% endunless %}
+            {% endfor %}
+          {% endpaginate %}
+        {% endif %}
+      </div>
+
+      <div id="LvAcctToast" class="lv-acct-toast" role="status" aria-live="polite"></div>
     {% else %}
       <!-- ================= GUEST ================= -->
-      {%- assign guest_return_to = '/pages/account' | url_encode -%}
+      {%- assign guest_return_to = root_prefix | append: 'pages/account' | url_encode -%}
       {%- assign guest_login_url = '/customer_authentication/login?return_to=' | append: guest_return_to -%}
-      <div class="ad-guest">
-        <span class="ad-eyebrow">Aurelle Atelier Privileges</span>
-        <h1 class="ad-guest__title">Sign in to your account</h1>
-        <p class="ad-guest__desc">Track orders, manage delivery addresses, review engravings and enjoy concierge privileges.</p>
-        <div class="ad-guest__actions">
-          <a href="{{ guest_login_url }}" class="btn btn-sliding-hover ad-btn">Sign In</a>
-          <a href="{{ guest_login_url }}" class="btn btn-sliding-hover ad-btn ad-btn--ghost">Create Account</a>
+      <div class="lv-acct-guest">
+        <span class="lv-acct-eyebrow">{{ 'customer.account.guest_eyebrow' | t }}</span>
+        <h1 class="lv-acct-guest__title">{{ 'customer.account.guest_title' | t }}</h1>
+        <p class="lv-acct-guest__desc">{{ 'customer.account.guest_desc' | t }}</p>
+        <div class="lv-acct-guest__actions">
+          <a href="{{ guest_login_url }}" class="btn btn-sliding-hover lv-acct-btn">{{ 'customer.login_page.sign_in' | t }}</a>
+          <a href="{{ guest_login_url }}" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--ghost">{{ 'customer.register.title' | t }}</a>
         </div>
-        <div class="ad-guest__perks">
-          <div class="ad-guest-perk">Order tracking<span>Real-time delivery updates</span></div>
-          <div class="ad-guest-perk">Saved details<span>Addresses &amp; engraving records</span></div>
-          <div class="ad-guest-perk">Member privileges<span>Complimentary care &amp; offers</span></div>
+        <div class="lv-acct-guest__perks">
+          <div class="lv-acct-guest-perk">{{ 'customer.account.guest_perk1_title' | t }}<span>{{ 'customer.account.guest_perk1_sub' | t }}</span></div>
+          <div class="lv-acct-guest-perk">{{ 'customer.account.guest_perk2_title' | t }}<span>{{ 'customer.account.guest_perk2_sub' | t }}</span></div>
+          <div class="lv-acct-guest-perk">{{ 'customer.account.guest_perk3_title' | t }}<span>{{ 'customer.account.guest_perk3_sub' | t }}</span></div>
         </div>
       </div>
     {% endif %}
@@ -794,21 +1238,38 @@
 
 <script>
   (function() {
+    var closeMobileDrawerFn = null;
+    var scheduleStickySyncFn = null;
+
     function initDashboardTabs() {
-      var root = document.querySelector('[data-ad-dashboard]');
+      var root = document.querySelector('[data-lv-acct-dashboard]');
       if (!root) return;
 
       var navBtns = root.querySelectorAll('[data-tab-target]');
       var panels = root.querySelectorAll('[data-tab-panel]');
       var quickSwitchers = root.querySelectorAll('[data-switch-to]');
+      var mobileCurrentEl = root.querySelector('[data-lv-acct-mobile-current]');
+
+      function syncMobileCurrentLabel(activeBtn) {
+        if (!mobileCurrentEl || !activeBtn) return;
+        var labelEl = activeBtn.querySelector('.lv-acct-nav__label');
+        var pillEl = activeBtn.querySelector('.lv-acct-nav__pill');
+        var text = labelEl ? labelEl.textContent.trim() : '';
+        if (pillEl && pillEl.textContent.trim()) {
+          text += ' (' + pillEl.textContent.trim() + ')';
+        }
+        mobileCurrentEl.textContent = text;
+      }
 
       function switchTab(tabId) {
         if (!tabId) return;
+        var activeBtn = null;
         navBtns.forEach(function(btn) {
           var target = btn.getAttribute('data-tab-target');
           var isActive = target === tabId;
           btn.classList.toggle('is-active', isActive);
           btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          if (isActive) activeBtn = btn;
         });
 
         panels.forEach(function(panel) {
@@ -816,13 +1277,28 @@
           panel.classList.toggle('is-active', id === tabId);
         });
 
+        syncMobileCurrentLabel(activeBtn);
+
+        if (typeof closeMobileDrawerFn === 'function') {
+          closeMobileDrawerFn(false);
+        }
+        if (typeof scheduleStickySyncFn === 'function') {
+          scheduleStickySyncFn(0);
+        }
+
         // Update URL hash without jump
         if (history.replaceState) {
           history.replaceState(null, null, '#' + tabId);
         }
+
+        if (tabId === 'orders') {
+          refreshOrderStatuses(false);
+        }
       }
 
       navBtns.forEach(function(btn) {
+        if (btn.dataset.lvTabBound) return;
+        btn.dataset.lvTabBound = '1';
         btn.addEventListener('click', function(e) {
           e.preventDefault();
           var target = this.getAttribute('data-tab-target');
@@ -831,6 +1307,8 @@
       });
 
       quickSwitchers.forEach(function(switcher) {
+        if (switcher.dataset.lvSwitchBound) return;
+        switcher.dataset.lvSwitchBound = '1';
         switcher.addEventListener('click', function(e) {
           e.preventDefault();
           var target = this.getAttribute('data-switch-to');
@@ -842,11 +1320,13 @@
       var hash = window.location.hash ? window.location.hash.substring(1) : '';
       if (hash && root.querySelector('[data-tab-panel="' + hash + '"]')) {
         switchTab(hash);
+      } else {
+        syncMobileCurrentLabel(root.querySelector('.lv-acct-nav__btn.is-active'));
       }
     }
 
     function showToast(message) {
-      var toast = document.getElementById('AdToast');
+      var toast = document.getElementById('LvAcctToast');
       if (!toast) return;
       toast.textContent = message;
       toast.classList.add('is-visible');
@@ -855,53 +1335,161 @@
       }, 3500);
     }
 
+    var lastOrdersRefreshAt = Date.now();
+    var ordersRefreshInFlight = null;
+
+    function syncElementHtml(doc, selector) {
+      var nextEl = doc.querySelector(selector);
+      var currEl = document.querySelector(selector);
+      if (nextEl && currEl) {
+        currEl.innerHTML = nextEl.innerHTML;
+      }
+    }
+
+    function refreshOrderStatuses(isManual) {
+      var wrap = document.querySelector('.lv-acct-wrap[data-section-id]');
+      if (!wrap) return Promise.resolve(false);
+      var sectionId = wrap.getAttribute('data-section-id');
+      if (!sectionId) return Promise.resolve(false);
+
+      if (ordersRefreshInFlight) {
+        return ordersRefreshInFlight;
+      }
+
+      var now = Date.now();
+      if (!isManual && now - lastOrdersRefreshAt < 15000) {
+        return Promise.resolve(false);
+      }
+
+      var refreshBtn = document.querySelector('[data-lv-acct-refresh-orders]');
+      if (isManual && refreshBtn) {
+        refreshBtn.disabled = true;
+        refreshBtn.classList.add('is-loading');
+      }
+
+      var fetchUrl = new URL(window.location.href);
+      fetchUrl.searchParams.set('section_id', sectionId);
+      fetchUrl.searchParams.set('_ts', String(now));
+
+      ordersRefreshInFlight = fetch(fetchUrl.toString(), {
+        cache: 'no-store',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'text/html'
+        }
+      })
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function(html) {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, 'text/html');
+        if (!doc.querySelector('[data-lv-acct-orders-list]')) {
+          return false;
+        }
+        syncElementHtml(doc, '[data-lv-acct-latest-order]');
+        syncElementHtml(doc, '[data-lv-acct-orders-list]');
+        syncElementHtml(doc, '[data-lv-acct-orders-pill]');
+        syncElementHtml(doc, '[data-lv-acct-stat-orders]');
+        syncElementHtml(doc, '[data-lv-acct-stat-spent]');
+        syncElementHtml(doc, '[data-lv-acct-orders-heading]');
+        if (!document.querySelector('dialog.lv-acct-modal--order[open]')) {
+          syncElementHtml(doc, '[data-lv-acct-order-modals]');
+        }
+        lastOrdersRefreshAt = Date.now();
+        if (isManual) {
+          var acctI18n = (window.theme && window.theme.i18n) || {};
+          showToast(acctI18n.ordersRefreshed || {{ 'customer.orders.refreshed' | t | json }});
+        }
+        return true;
+      })
+      .catch(function(err) {
+        console.error('Order refresh error:', err);
+        if (isManual) {
+          var acctI18n = (window.theme && window.theme.i18n) || {};
+          showToast(acctI18n.ordersRefreshError || {{ 'customer.orders.refresh_error' | t | json }});
+        }
+        return false;
+      })
+      .finally(function() {
+        ordersRefreshInFlight = null;
+        if (isManual && refreshBtn) {
+          refreshBtn.disabled = false;
+          refreshBtn.classList.remove('is-loading');
+        }
+      });
+
+      return ordersRefreshInFlight;
+    }
+
+    function initOrderRefresh() {
+      var refreshBtn = document.querySelector('[data-lv-acct-refresh-orders]');
+      if (refreshBtn && !refreshBtn.dataset.lvAcctBound) {
+        refreshBtn.dataset.lvAcctBound = '1';
+        refreshBtn.addEventListener('click', function() {
+          refreshOrderStatuses(true);
+        });
+      }
+
+      if (!window.__lvAcctPageshowBound) {
+        window.__lvAcctPageshowBound = true;
+        window.addEventListener('pageshow', function(e) {
+          if (e.persisted) {
+            lastOrdersRefreshAt = 0;
+            refreshOrderStatuses(false);
+          }
+        });
+      }
+    }
+
     function initAddressModals() {
-      // Open modal triggers
-      document.querySelectorAll('[data-ad-open-modal]').forEach(function(trigger) {
-        trigger.addEventListener('click', function(e) {
-          e.preventDefault();
-          var modalId = this.getAttribute('data-ad-open-modal');
-          var modal = document.getElementById(modalId);
-          if (modal && typeof modal.showModal === 'function') {
-            modal.showModal();
-            // Trigger country change to populate provinces properly
-            var countrySelect = modal.querySelector('[data-ad-country]');
-            if (countrySelect) {
-              countrySelect.dispatchEvent(new Event('change'));
+      if (!document.documentElement.dataset.lvAcctModalsBound) {
+        document.documentElement.dataset.lvAcctModalsBound = '1';
+        document.addEventListener('click', function(e) {
+          var openTrigger = e.target.closest ? e.target.closest('[data-lv-acct-open-modal]') : null;
+          if (openTrigger) {
+            e.preventDefault();
+            var modalId = openTrigger.getAttribute('data-lv-acct-open-modal');
+            var modal = modalId ? document.getElementById(modalId) : null;
+            if (modal && typeof modal.showModal === 'function') {
+              modal.showModal();
+              var countrySelect = modal.querySelector('[data-lv-acct-country]');
+              if (countrySelect) {
+                countrySelect.dispatchEvent(new Event('change'));
+              }
+            }
+            return;
+          }
+
+          var closeTrigger = e.target.closest ? e.target.closest('[data-lv-acct-close-modal]') : null;
+          if (closeTrigger) {
+            e.preventDefault();
+            var closeModal = closeTrigger.closest('dialog');
+            if (closeModal && typeof closeModal.close === 'function') {
+              closeModal.close();
+            }
+            return;
+          }
+
+          if (e.target && e.target.tagName === 'DIALOG' && e.target.classList.contains('lv-acct-modal') && e.target.open) {
+            var rect = e.target.getBoundingClientRect();
+            var isInDialog = rect.width > 0 &&
+              rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
+              rect.left <= e.clientX && e.clientX <= rect.left + rect.width;
+            if (!isInDialog) {
+              e.target.close();
             }
           }
         });
-      });
-
-      // Close modal triggers
-      document.querySelectorAll('[data-ad-close-modal]').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          var modal = this.closest('dialog');
-          if (modal && typeof modal.close === 'function') {
-            modal.close();
-          }
-        });
-      });
-
-      // Close on backdrop click
-      document.querySelectorAll('dialog.ad-modal').forEach(function(modal) {
-        modal.addEventListener('click', function(e) {
-          var rect = modal.getBoundingClientRect();
-          var isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
-            rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
-          if (!isInDialog) {
-            modal.close();
-          }
-        });
-      });
+      }
 
       // Country & Province synchronization
-      document.querySelectorAll('[data-ad-country]').forEach(function(countrySelect) {
+      document.querySelectorAll('[data-lv-acct-country]').forEach(function(countrySelect) {
         var form = countrySelect.closest('form');
         if (!form) return;
-        var provSelect = form.querySelector('[data-ad-province]');
-        var provContainer = provSelect ? provSelect.closest('.ad-field') : null;
+        var provSelect = form.querySelector('[data-lv-acct-province]');
+        var provContainer = provSelect ? provSelect.closest('.lv-acct-field') : null;
 
         var defaultCountry = countrySelect.getAttribute('data-default');
         if (defaultCountry) {
@@ -951,7 +1539,15 @@
 
     function initAddressForms() {
       // AJAX Address Create & Update
-      document.querySelectorAll('form[data-ad-address-form]').forEach(function(form) {
+      var acctI18n = (window.theme && window.theme.i18n) || {};
+      var txtSaving = acctI18n.saving || {{ 'customer.addresses.saving' | t | json }};
+      var txtSaved = acctI18n.addressSaved || {{ 'customer.addresses.saved' | t | json }};
+      var txtSaveErr = acctI18n.addressSaveError || {{ 'customer.addresses.save_error' | t | json }};
+      var txtConfirmDelete = acctI18n.confirmDeleteAddress || {{ 'customer.addresses.delete_confirm' | t | json }};
+      var txtDeleted = acctI18n.addressDeleted || {{ 'customer.addresses.deleted' | t | json }};
+      var txtDeleteErr = acctI18n.addressDeleteError || {{ 'customer.addresses.delete_error' | t | json }};
+
+      document.querySelectorAll('form[data-lv-acct-address-form]').forEach(function(form) {
         form.addEventListener('submit', function(e) {
           e.preventDefault();
           var submitBtn = form.querySelector('button[type="submit"]');
@@ -959,7 +1555,10 @@
           if (submitBtn) {
             submitBtn.disabled = true;
             origBtnText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<span>Saving...</span>';
+            var sp = document.createElement('span');
+            sp.textContent = txtSaving;
+            submitBtn.innerHTML = '';
+            submitBtn.appendChild(sp);
           }
 
           var formData = new FormData(form);
@@ -974,7 +1573,7 @@
           .then(function() {
             var modal = form.closest('dialog');
             if (modal) modal.close();
-            showToast('Address saved successfully');
+            showToast(txtSaved);
             setTimeout(function() {
               if (window.location.hash !== '#addresses') {
                 window.location.hash = 'addresses';
@@ -988,16 +1587,16 @@
               submitBtn.disabled = false;
               submitBtn.innerHTML = origBtnText;
             }
-            showToast('Error saving address. Please try again.');
+            showToast(txtSaveErr);
           });
         });
       });
 
       // AJAX Address Delete
-      document.querySelectorAll('form[data-ad-delete-form]').forEach(function(delForm) {
+      document.querySelectorAll('form[data-lv-acct-delete-form]').forEach(function(delForm) {
         delForm.addEventListener('submit', function(e) {
           e.preventDefault();
-          if (!confirm('Are you sure you want to delete this address?')) {
+          if (!confirm(txtConfirmDelete)) {
             return;
           }
           var submitBtn = delForm.querySelector('button[type="submit"]');
@@ -1013,7 +1612,7 @@
             }
           })
           .then(function() {
-            showToast('Address removed successfully');
+            showToast(txtDeleted);
             setTimeout(function() {
               if (window.location.hash !== '#addresses') {
                 window.location.hash = 'addresses';
@@ -1024,23 +1623,247 @@
           .catch(function(err) {
             console.error('Address delete error:', err);
             if (submitBtn) submitBtn.disabled = false;
-            showToast('Error removing address.');
+            showToast(txtDeleteErr);
           });
         });
       });
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() {
-        initDashboardTabs();
-        initAddressModals();
-        initAddressForms();
+    function initAddressViewToggle() {
+      var grid = document.querySelector('[data-lv-acct-addresses-grid]');
+      var buttons = document.querySelectorAll('[data-lv-acct-addr-view]');
+      if (!grid || !buttons.length) return;
+
+      var storageKey = 'lv_acct_addr_view';
+
+      function applyView(mode) {
+        var view = mode === 'list' ? 'list' : 'grid';
+        grid.setAttribute('data-view', view);
+        buttons.forEach(function(btn) {
+          var isMatch = btn.getAttribute('data-lv-acct-addr-view') === view;
+          btn.classList.toggle('is-active', isMatch);
+          btn.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
+        });
+        try {
+          window.localStorage.setItem(storageKey, view);
+        } catch (err) {}
+      }
+
+      var savedView = 'grid';
+      try {
+        var stored = window.localStorage.getItem(storageKey);
+        if (stored === 'list' || stored === 'grid') {
+          savedView = stored;
+        }
+      } catch (err) {}
+      applyView(savedView);
+
+      buttons.forEach(function(btn) {
+        if (btn.dataset.lvAcctBound) return;
+        btn.dataset.lvAcctBound = '1';
+        btn.addEventListener('click', function() {
+          applyView(btn.getAttribute('data-lv-acct-addr-view'));
+        });
       });
-    } else {
+    }
+
+    function initMobileDrawer() {
+      var nav = document.getElementById('LvAcctSidebarNav');
+      var root = document.querySelector('[data-lv-acct-dashboard]');
+      if (!nav || !root) return;
+
+      var openBtn = root.querySelector('[data-lv-acct-drawer-open]');
+      var closeBtns = root.querySelectorAll('[data-lv-acct-drawer-close]');
+      var backdrop = root.querySelector('.lv-acct-drawer-backdrop');
+      var closeTimer = null;
+
+      function closeDrawer(restoreFocus) {
+        var wasOpen = nav.classList.contains('is-open');
+        var activeInsideNav = document.activeElement && nav.contains(document.activeElement);
+        nav.classList.remove('is-open');
+        if (backdrop) backdrop.classList.remove('is-open');
+        document.body.classList.remove('lv-acct-drawer-lock');
+        if (openBtn) openBtn.setAttribute('aria-expanded', 'false');
+
+        clearTimeout(closeTimer);
+        if (backdrop) {
+          closeTimer = setTimeout(function() {
+            if (!nav.classList.contains('is-open')) backdrop.hidden = true;
+          }, 280);
+        }
+
+        if ((restoreFocus || activeInsideNav) && wasOpen && openBtn && window.innerWidth <= 860) {
+          openBtn.focus({ preventScroll: true });
+        }
+      }
+
+      function openDrawer() {
+        if (window.innerWidth > 860) return;
+        clearTimeout(closeTimer);
+        if (backdrop) {
+          backdrop.hidden = false;
+          void backdrop.offsetWidth;
+          backdrop.classList.add('is-open');
+        }
+        nav.classList.add('is-open');
+        document.body.classList.add('lv-acct-drawer-lock');
+        if (openBtn) openBtn.setAttribute('aria-expanded', 'true');
+        var closeBtn = nav.querySelector('.lv-acct-nav__drawer-close');
+        if (closeBtn) {
+          requestAnimationFrame(function() { closeBtn.focus({ preventScroll: true }); });
+        }
+      }
+
+      closeMobileDrawerFn = closeDrawer;
+
+      if (nav.dataset.lvDrawerBound) return;
+      nav.dataset.lvDrawerBound = '1';
+
+      if (openBtn) {
+        openBtn.addEventListener('click', openDrawer);
+      }
+      closeBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() { closeDrawer(true); });
+      });
+
+      if (!document.documentElement.dataset.lvAcctDrawerGlobal) {
+        document.documentElement.dataset.lvAcctDrawerGlobal = '1';
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') {
+            var activeNav = document.getElementById('LvAcctSidebarNav');
+            if (activeNav && activeNav.classList.contains('is-open') && typeof closeMobileDrawerFn === 'function') {
+              closeMobileDrawerFn(true);
+            }
+          }
+        });
+        window.addEventListener('resize', function() {
+          if (window.innerWidth > 860) {
+            var activeNav = document.getElementById('LvAcctSidebarNav');
+            if (activeNav && activeNav.classList.contains('is-open') && typeof closeMobileDrawerFn === 'function') {
+              closeMobileDrawerFn(false);
+            }
+          }
+        }, { passive: true });
+      }
+    }
+
+    function initStickySync() {
+      var followUntil = 0;
+      var rafId = 0;
+
+      function syncStickyOffsets() {
+        var wrap = document.querySelector('.lv-acct-wrap[data-section-id]');
+        if (!wrap) return;
+        var hero = wrap.querySelector('.lv-acct-hero');
+        var layout = wrap.querySelector('[data-lv-acct-dashboard]');
+        var nav = wrap.querySelector('#LvAcctSidebarNav');
+
+        var headerWrap = document.querySelector('[data-header-wrapper]');
+        var headerStickyEl = headerWrap ? (headerWrap.closest('.shopify-section') || headerWrap) : null;
+        var stickyTop = 0;
+
+        if (headerStickyEl) {
+          var hStyle = window.getComputedStyle(headerStickyEl);
+          if (hStyle.position === 'sticky' || hStyle.position === 'fixed') {
+            var hRect = headerStickyEl.getBoundingClientRect();
+            if (hRect.top <= 4 && hRect.bottom > 2) {
+              stickyTop = Math.max(0, Math.round(hRect.bottom));
+            }
+          }
+        }
+
+        var heroH = hero ? Math.round(hero.getBoundingClientRect().height) : 98;
+        wrap.style.setProperty('--lv-acct-sticky-top', stickyTop + 'px');
+        wrap.style.setProperty('--lv-acct-hero-h', heroH + 'px');
+
+        if (window.innerWidth > 860 && hero && layout && nav) {
+          var layoutRect = layout.getBoundingClientRect();
+          var navStickyTop = stickyTop + heroH + 20;
+          var visualNavTop = Math.max(navStickyTop, Math.round(layoutRect.top));
+          var navMaxH = Math.max(360, window.innerHeight - visualNavTop - 24);
+          wrap.style.setProperty('--lv-acct-nav-max-h', navMaxH + 'px');
+
+          var navH = Math.round(nav.getBoundingClientRect().height);
+          var maxHeroTop = layoutRect.bottom - navH - 20 - heroH;
+          var heroTop = Math.round(Math.min(stickyTop, maxHeroTop));
+          wrap.style.setProperty('--lv-acct-hero-top', heroTop + 'px');
+          var heroRect = hero.getBoundingClientRect();
+          var isStuck = window.scrollY > 2 && heroRect.top <= heroTop + 1.5 && layoutRect.bottom > heroTop + heroH + 20;
+          hero.classList.toggle('is-stuck', isStuck);
+        } else {
+          wrap.style.removeProperty('--lv-acct-nav-max-h');
+          wrap.style.setProperty('--lv-acct-hero-top', stickyTop + 'px');
+          if (hero) hero.classList.remove('is-stuck');
+        }
+      }
+
+      function tickStickySync() {
+        syncStickyOffsets();
+        if (performance.now() < followUntil) {
+          rafId = requestAnimationFrame(tickStickySync);
+        } else {
+          rafId = 0;
+        }
+      }
+
+      function scheduleStickySync(durationMs) {
+        var until = performance.now() + (durationMs || 0);
+        if (until > followUntil) followUntil = until;
+        if (!rafId) {
+          rafId = requestAnimationFrame(tickStickySync);
+        }
+      }
+
+      scheduleStickySyncFn = scheduleStickySync;
+      syncStickyOffsets();
+
+      if (!document.documentElement.dataset.lvAcctStickyGlobal) {
+        document.documentElement.dataset.lvAcctStickyGlobal = '1';
+        window.addEventListener('scroll', function() { scheduleStickySync(340); }, { passive: true });
+        window.addEventListener('resize', function() { scheduleStickySync(120); }, { passive: true });
+        window.addEventListener('load', function() { scheduleStickySync(120); }, { passive: true });
+
+        var headerEl = document.querySelector('[data-header-wrapper]');
+        var headerSec = headerEl ? (headerEl.closest('.shopify-section') || headerEl) : null;
+        if (headerSec && window.MutationObserver) {
+          new MutationObserver(function() {
+            scheduleStickySync(340);
+          }).observe(headerSec, { attributes: true, attributeFilter: ['class', 'style'] });
+        }
+      }
+
+      var wrap = document.querySelector('.lv-acct-wrap[data-section-id]');
+      if (wrap && !wrap.dataset.lvStickyObserved && window.ResizeObserver) {
+        wrap.dataset.lvStickyObserved = '1';
+        var ro = new ResizeObserver(function() { scheduleStickySync(0); });
+        var heroEl = wrap.querySelector('.lv-acct-hero');
+        var layoutEl = wrap.querySelector('[data-lv-acct-dashboard]');
+        if (heroEl) ro.observe(heroEl);
+        if (layoutEl) ro.observe(layoutEl);
+      }
+    }
+
+    function initAll() {
+      initStickySync();
+      initMobileDrawer();
       initDashboardTabs();
+      initAddressViewToggle();
       initAddressModals();
       initAddressForms();
+      initOrderRefresh();
     }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAll);
+    } else {
+      initAll();
+    }
+
+    document.addEventListener('shopify:section:load', function(e) {
+      if (e.target && e.target.querySelector && e.target.querySelector('[data-lv-acct-dashboard]')) {
+        initAll();
+      }
+    });
   })();
 </script>
 

@@ -27,11 +27,11 @@
 -%}
 
 <style>
-  .cp { --cp-line: var(--lv-border); --cp-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62); --cp-soft: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)); font-family: 'Quicksand', -apple-system, sans-serif; }
+  .cp { --cp-line: var(--lv-border); --cp-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62); --cp-soft: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)); font-family: var(--FONT-STACK-BODY, sans-serif); }
   .cp__inner { width: 100%; max-width: none; margin: 0 auto; padding-left: var(--outer, 24px); padding-right: var(--outer, 24px); box-sizing: border-box; }
   .cp__head { text-align: center; margin: 0 0 28px; }
-  .cp__title { margin: 0 0 8px; font-size: clamp(24px, 3.4vw, 36px); font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.15; }
-  .cp__sub { margin: 0; font-size: 13px; color: var(--cp-muted); }
+  .cp__title { margin: 0 0 8px; font-family: var(--FONT-STACK-HEADING, sans-serif); font-size: calc(clamp(24px, 3.4vw, 36px) * var(--FONT-ADJUST-HEADING, 1)); font-weight: var(--FONT-WEIGHT-HEADING, 600); letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.14em); text-transform: var(--FONT-HEADING-TRANSFORM, uppercase); line-height: 1.15; }
+  .cp__sub { margin: 0; font-family: var(--FONT-STACK-SUBHEADING, inherit); font-size: 13px; color: var(--cp-muted); }
   .cp .lv-crumbs { justify-content: center; }
 
   /* Free shipping goal */
@@ -117,30 +117,32 @@
   }
 </style>
 
+{%- assign cart_title_text = 'cart.title' | t -%}
 <div class="cp color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
   data-section-id="{{ section.id }}"
   data-section-type="cart"
   style="padding-top: {{ section.settings.padding_top | default: 40 }}px; padding-bottom: {{ section.settings.padding_bottom | default: 60 }}px;">
   <div class="cp__inner">
 
-    {% render 'breadcrumb', current: 'Shopping cart' %}
+    {% render 'breadcrumb', current: cart_title_text %}
 
     <div class="cp__head">
-      <h1 class="cp__title">Shopping Cart</h1>
+      <h1 class="cp__title">{{ 'cart.title' | t }}</h1>
       <p class="cp__sub">
         {%- if cart.item_count > 0 -%}
-          {{ cart.item_count }} {% if cart.item_count == 1 %}item{% else %}items{% endif %} in your cart
+          {{ 'cart.page.item_count' | t: count: cart.item_count }}
         {%- else -%}
-          Review your chosen jewelry before proceeding to checkout.
+          {{ 'cart.page.empty_subtitle' | t }}
         {%- endif -%}
       </p>
     </div>
 
+    {%- assign cart_left_money = left_spend | money -%}
     <div class="cp-goal{% if cart.total_price >= threshold and cart.item_count > 0 %} is-done{% endif %}">
       {%- if cart.total_price >= threshold and cart.item_count > 0 -%}
-        <p><strong>Congratulations!</strong> Your order qualifies for free shipping.</p>
+        <p>{{ 'cart.page.free_shipping_unlocked_html' | t }}</p>
       {%- else -%}
-        <p>Add <strong>{{ left_spend | money }}</strong> more to qualify for <strong>free shipping</strong></p>
+        <p>{{ 'cart.page.free_shipping_remaining_html' | t: amount: cart_left_money }}</p>
       {%- endif -%}
       <div class="cp-goal__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress }}"><div class="cp-goal__fill" style="--p: {{ progress }}%;"></div></div>
     </div>
@@ -150,7 +152,7 @@
         <div class="cp__grid">
 
           <div class="cp-items">
-            <div class="cp-items__head"><span>Product</span><span>Quantity</span><span>Total</span></div>
+            <div class="cp-items__head"><span>{{ 'cart.page.columns.product' | t }}</span><span>{{ 'cart.page.columns.quantity' | t }}</span><span>{{ 'cart.page.columns.total' | t }}</span></div>
             {%- for item in cart.items -%}
               <div class="cp-item" data-cart-item>
                 <div class="cp-item__main">
@@ -174,17 +176,17 @@
                       {{ item.final_price | money }}
                       {%- if item.original_price > item.final_price -%}<s>{{ item.original_price | money }}</s>{%- endif -%}
                     </p>
-                    <a href="{{ routes.cart_change_url }}?line={{ forloop.index }}&quantity=0" class="cp-item__remove">Remove</a>
+                    <a href="{{ routes.cart_change_url }}?line={{ forloop.index }}&quantity=0" class="cp-item__remove">{{ 'cart.line_items.remove' | t }}</a>
                   </div>
                 </div>
 
                 <div class="cp-item__qty">
                   <div class="cp-qty">
-                    <a href="{{ routes.cart_change_url }}?line={{ forloop.index }}&quantity={{ item.quantity | minus: 1 }}" class="cp-qty__btn" aria-label="Decrease quantity">
+                    <a href="{{ routes.cart_change_url }}?line={{ forloop.index }}&quantity={{ item.quantity | minus: 1 }}" class="cp-qty__btn" aria-label="{{ 'products.product.decrease_quantity' | t }}">
                       <svg width="10" height="2" viewBox="0 0 10 2" fill="none" aria-hidden="true"><path d="M0.75 1H9.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                     </a>
                     <span class="cp-qty__val">{{ item.quantity }}</span>
-                    <a href="{{ routes.cart_change_url }}?line={{ forloop.index }}&quantity={{ item.quantity | plus: 1 }}" class="cp-qty__btn" aria-label="Increase quantity">
+                    <a href="{{ routes.cart_change_url }}?line={{ forloop.index }}&quantity={{ item.quantity | plus: 1 }}" class="cp-qty__btn" aria-label="{{ 'products.product.increase_quantity' | t }}">
                       <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 0.75V9.25M0.75 5H9.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                     </a>
                   </div>
@@ -201,28 +203,28 @@
             {%- endfor -%}
           </div>
 
-          <aside class="cp-sum" aria-label="Order summary">
-            <h2 class="cp-sum__title">Order summary</h2>
+          <aside class="cp-sum" aria-label="{{ 'cart.page.order_summary' | t }}">
+            <h2 class="cp-sum__title">{{ 'cart.page.order_summary' | t }}</h2>
             {%- for discount in cart.cart_level_discount_applications -%}
               <div class="cp-sum__row"><span>{{ discount.title }}</span><span class="is-discount">-{{ discount.total_allocated_amount | money }}</span></div>
             {%- endfor -%}
-            <div class="cp-sum__row"><span>Subtotal</span><span>{{ cart.items_subtotal_price | money }}</span></div>
-            <div class="cp-sum__row cp-sum__row--total"><span>Total</span><span>{{ cart.total_price | money }}</span></div>
-            <p class="cp-sum__note">Taxes and shipping calculated at checkout.</p>
+            <div class="cp-sum__row"><span>{{ 'cart.subtotal' | t }}</span><span>{{ cart.items_subtotal_price | money }}</span></div>
+            <div class="cp-sum__row cp-sum__row--total"><span>{{ 'cart.page.total' | t }}</span><span>{{ cart.total_price | money }}</span></div>
+            <p class="cp-sum__note">{{ 'cart.page.taxes_shipping_note' | t }}</p>
 
             {%- if section.settings.show_order_note -%}
-              <label class="cp-sum__label" for="cart-note">Order note</label>
-              <textarea class="cp-sum__textarea" id="cart-note" name="note" placeholder="Anything we should know? (optional)">{{ cart.note | escape }}</textarea>
+              <label class="cp-sum__label" for="cart-note">{{ 'cart.page.order_note_label' | t }}</label>
+              <textarea class="cp-sum__textarea" id="cart-note" name="note" placeholder="{{ 'cart.page.order_note_placeholder' | t }}">{{ cart.note | escape }}</textarea>
             {%- endif -%}
 
             <button type="submit" name="checkout" class="btn btn--primary btn-sliding-hover cp-sum__btn checkout__button">
-              <span>Proceed to checkout</span>
+              <span>{{ 'cart.checkout' | t }}</span>
             </button>
-            <a href="{{ routes.all_products_collection_url }}" class="cp-sum__continue">Continue shopping</a>
+            <a href="{{ routes.all_products_collection_url }}" class="cp-sum__continue">{{ 'cart.continue_shopping' | t }}</a>
 
             <p class="cp-sum__secure">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-              Secure checkout
+              {{ 'cart.page.secure_checkout' | t }}
             </p>
             {%- if section.settings.show_payment_icons -%}
               <div class="cp-pay">
@@ -240,10 +242,10 @@
         <div class="cp-empty__icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
         </div>
-        <h2 class="cp-empty__title">Your cart is empty</h2>
-        <p class="cp-empty__text">Looks like you have not added any jewelry yet.</p>
+        <h2 class="cp-empty__title">{{ 'cart.empty' | t }}</h2>
+        <p class="cp-empty__text">{{ 'cart.page.empty_text' | t }}</p>
         <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary btn-sliding-hover" style="display: inline-flex; align-items: center; justify-content: center; min-height: var(--ctl-h-lg, 52px); padding: 0 34px;">
-          <span>Start shopping</span>
+          <span>{{ 'cart.page.start_shopping' | t }}</span>
         </a>
       </div>
     {%- endif -%}
@@ -252,19 +254,19 @@
       <div class="cp-trust">
         <div class="cp-trust__item">
           <span class="cp-trust__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7.5" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/></svg></span>
-          <div><p class="cp-trust__title">Free shipping</p><p class="cp-trust__text">On qualifying orders</p></div>
+          <div><p class="cp-trust__title">{{ 'cart.page.trust.shipping_title' | t }}</p><p class="cp-trust__text">{{ 'cart.page.trust.shipping_text' | t }}</p></div>
         </div>
         <div class="cp-trust__item">
           <span class="cp-trust__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span>
-          <div><p class="cp-trust__title">Easy returns</p><p class="cp-trust__text">14 days to change your mind</p></div>
+          <div><p class="cp-trust__title">{{ 'cart.page.trust.returns_title' | t }}</p><p class="cp-trust__text">{{ 'cart.page.trust.returns_text' | t }}</p></div>
         </div>
         <div class="cp-trust__item">
           <span class="cp-trust__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span>
-          <div><p class="cp-trust__title">Secure payment</p><p class="cp-trust__text">Encrypted and protected</p></div>
+          <div><p class="cp-trust__title">{{ 'cart.page.trust.payment_title' | t }}</p><p class="cp-trust__text">{{ 'cart.page.trust.payment_text' | t }}</p></div>
         </div>
         <div class="cp-trust__item">
           <span class="cp-trust__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H8a2.5 2.5 0 0 1 0-5c2.5 0 4 5 4 5Zm0 0h4a2.5 2.5 0 0 0 0-5c-2.5 0-4 5-4 5Z"/></svg></span>
-          <div><p class="cp-trust__title">Gift ready</p><p class="cp-trust__text">Beautifully packaged</p></div>
+          <div><p class="cp-trust__title">{{ 'cart.page.trust.gift_title' | t }}</p><p class="cp-trust__text">{{ 'cart.page.trust.gift_text' | t }}</p></div>
         </div>
       </div>
     {%- endif -%}

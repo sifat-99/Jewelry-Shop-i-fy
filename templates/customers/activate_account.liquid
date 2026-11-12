@@ -3,9 +3,9 @@
   <div class="customer-auth-container">
     <div class="customer-auth-card">
       <div class="customer-auth-header">
-        <span class="customer-auth-badge">WELCOME</span>
-        <h1 class="customer-auth-title">{{ 'customer.activate_account.title' | default: 'Activate Account' }}</h1>
-        <p class="customer-auth-subtitle">{{ 'customer.activate_account.subtext' | default: 'Create your password to activate your account.' }}</p>
+        <span class="customer-auth-badge">{{ 'customer.activate_account.badge' | t }}</span>
+        <h1 class="customer-auth-title">{{ 'customer.activate_account.title' | t }}</h1>
+        <p class="customer-auth-subtitle">{{ 'customer.activate_account.subtext' | t }}</p>
       </div>
 
       {%- form 'activate_customer_password', class: 'customer-auth-form' -%}
@@ -16,7 +16,7 @@
         {%- endif -%}
 
         <div class="form-field">
-          <label for="password" class="form-label">{{ 'customer.activate_account.password' | default: 'Password' }}</label>
+          <label for="password" class="form-label">{{ 'customer.activate_account.password' | t }}</label>
           <input
             type="password"
             name="customer[password]"
@@ -28,7 +28,7 @@
         </div>
 
         <div class="form-field">
-          <label for="password_confirmation" class="form-label">{{ 'customer.activate_account.password_confirm' | default: 'Confirm Password' }}</label>
+          <label for="password_confirmation" class="form-label">{{ 'customer.activate_account.password_confirm' | t }}</label>
           <input
             type="password"
             name="customer[password_confirmation]"
@@ -40,11 +40,11 @@
         </div>
 
         <button type="submit" class="btn btn-sliding-hover customer-auth-btn">
-          <span>{{ 'customer.activate_account.submit' | default: 'ACTIVATE ACCOUNT' }}</span>
+          <span>{{ 'customer.activate_account.submit' | t }}</span>
         </button>
 
         <button type="submit" name="decline" class="btn btn-sliding-hover customer-auth-btn" style="margin-top: 10px;">
-          <span>{{ 'customer.activate_account.cancel' | default: 'DECLINE INVITATION' }}</span>
+          <span>{{ 'customer.activate_account.cancel' | t }}</span>
         </button>
       {%- endform -%}
     </div>

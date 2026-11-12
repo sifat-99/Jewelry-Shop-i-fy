@@ -196,6 +196,321 @@
     ]
   },
   {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Global Luxury Font Style"
+      },
+      {
+        "type": "paragraph",
+        "content": "Choose a curated fine-jewelry font pairing synced across your entire store, or keep Custom to select Heading, Subheading, Body, Navigation, and Button font families individually below."
+      },
+      {
+        "type": "select",
+        "id": "typography_preset",
+        "label": "Font style preset",
+        "options": [
+          { "value": "custom", "label": "Custom (use individual fonts below)" },
+          { "value": "parisian_haute", "label": "Parisian Haute Joaillerie (Cormorant + Plus Jakarta)" },
+          { "value": "modern_heirloom", "label": "Modern Heirloom (Playfair Display + Quicksand)" },
+          { "value": "sculptural_roman", "label": "Sculptural Roman (Cinzel + Montserrat / DM Sans)" },
+          { "value": "couture_editorial", "label": "Couture Editorial (Bodoni Moda + Jost / Inter)" },
+          { "value": "minimal_maison", "label": "Minimalist Maison (Marcellus + Plus Jakarta)" },
+          { "value": "italian_atelier", "label": "Italian Fine Gold (Italiana + Raleway / Jakarta)" },
+          { "value": "heritage_archive", "label": "Heritage Atelier (EB Garamond + DM Sans)" },
+          { "value": "diamond_gallery", "label": "Diamond Gallery (Prata + Jost)" },
+          { "value": "architectural_sans", "label": "Architectural Sans (Tenor Sans + Inter)" },
+          { "value": "warm_romance", "label": "Romantic Gold (Lora + Quicksand)" },
+          { "value": "boutique_classic", "label": "Boutique Classic (Quicksand)" }
+        ],
+        "default": "custom"
+      },
+      {
+        "type": "header",
+        "content": "Font Families (when preset is Custom)"
+      },
+      {
+        "type": "select",
+        "id": "typo_heading_font",
+        "label": "Heading font family (H1–H6, section & banner titles)",
+        "options": [
+          { "value": "cormorant_garamond", "label": "Cormorant Garamond — Parisian haute joaillerie" },
+          { "value": "playfair_display", "label": "Playfair Display — Timeless luxury editorial" },
+          { "value": "bodoni_moda", "label": "Bodoni Moda — Couture architectural Didone" },
+          { "value": "cinzel", "label": "Cinzel — Monumental engraved Roman" },
+          { "value": "marcellus", "label": "Marcellus — Refined sculpted classical" },
+          { "value": "italiana", "label": "Italiana — Delicate Italian gold display" },
+          { "value": "prata", "label": "Prata — Couture diamond lookbook serif" },
+          { "value": "eb_garamond", "label": "EB Garamond — Bespoke heirloom serif" },
+          { "value": "libre_baskerville", "label": "Libre Baskerville — Heritage serif" },
+          { "value": "lora", "label": "Lora — Warm calligraphic luxury serif" },
+          { "value": "tenor_sans", "label": "Tenor Sans — Paris fashion house sans" },
+          { "value": "jost", "label": "Jost — Modern geometric diamond sans" },
+          { "value": "plus_jakarta_sans", "label": "Plus Jakarta Sans — Silky luxury sans" },
+          { "value": "montserrat", "label": "Montserrat — Architectural tracked sans" },
+          { "value": "raleway", "label": "Raleway — Light airy editorial sans" },
+          { "value": "dm_sans", "label": "DM Sans — Precision minimalist sans" },
+          { "value": "inter", "label": "Inter — Swiss minimalist clarity" },
+          { "value": "quicksand", "label": "Quicksand — Soft boutique geometric" },
+          { "value": "shopify_heading", "label": "Shopify Heading Font Picker (below)" },
+          { "value": "shopify_body", "label": "Shopify Body Font Picker (below)" }
+        ],
+        "default": "cormorant_garamond"
+      },
+      {
+        "type": "select",
+        "id": "typo_subheading_font",
+        "label": "Subheading, eyebrow & accent font family",
+        "options": [
+          { "value": "match_heading", "label": "Follow Heading font" },
+          { "value": "match_body", "label": "Follow Body font" },
+          { "value": "quicksand", "label": "Quicksand — Soft boutique geometric" },
+          { "value": "jost", "label": "Jost — Modern geometric atelier sans" },
+          { "value": "plus_jakarta_sans", "label": "Plus Jakarta Sans — Refined luxury sans" },
+          { "value": "montserrat", "label": "Montserrat — Tracked uppercase sans" },
+          { "value": "raleway", "label": "Raleway — Airy couture sans" },
+          { "value": "tenor_sans", "label": "Tenor Sans — Minimalist Paris sans" },
+          { "value": "dm_sans", "label": "DM Sans — Clean minimalist sans" },
+          { "value": "inter", "label": "Inter — Crisp UI sans" },
+          { "value": "cormorant_garamond", "label": "Cormorant Garamond — Luxury italic serif" },
+          { "value": "playfair_display", "label": "Playfair Display — Editorial serif" },
+          { "value": "bodoni_moda", "label": "Bodoni Moda — Couture serif" },
+          { "value": "cinzel", "label": "Cinzel — Engraved Roman" },
+          { "value": "marcellus", "label": "Marcellus — Classical flared" },
+          { "value": "eb_garamond", "label": "EB Garamond — Heritage serif" },
+          { "value": "lora", "label": "Lora — Calligraphic serif" },
+          { "value": "shopify_heading", "label": "Shopify Heading Font Picker (below)" },
+          { "value": "shopify_body", "label": "Shopify Body Font Picker (below)" }
+        ],
+        "default": "quicksand"
+      },
+      {
+        "type": "select",
+        "id": "typo_body_font",
+        "label": "Body & product copy font family",
+        "options": [
+          { "value": "quicksand", "label": "Quicksand — Soft boutique geometric" },
+          { "value": "plus_jakarta_sans", "label": "Plus Jakarta Sans — Refined contemporary" },
+          { "value": "dm_sans", "label": "DM Sans — Clean precision UI" },
+          { "value": "jost", "label": "Jost — Geometric atelier sans" },
+          { "value": "montserrat", "label": "Montserrat — Balanced modern sans" },
+          { "value": "raleway", "label": "Raleway — Light editorial sans" },
+          { "value": "inter", "label": "Inter — Ultra-legible minimalist" },
+          { "value": "tenor_sans", "label": "Tenor Sans — Couture minimalist" },
+          { "value": "cormorant_garamond", "label": "Cormorant Garamond — Editorial serif" },
+          { "value": "eb_garamond", "label": "EB Garamond — Book-style serif" },
+          { "value": "lora", "label": "Lora — Readable luxury serif" },
+          { "value": "libre_baskerville", "label": "Libre Baskerville — Heritage serif" },
+          { "value": "shopify_body", "label": "Shopify Body Font Picker (below)" },
+          { "value": "shopify_heading", "label": "Shopify Heading Font Picker (below)" }
+        ],
+        "default": "quicksand"
+      },
+      {
+        "type": "select",
+        "id": "typo_nav_font",
+        "label": "Header & menu navigation font family",
+        "options": [
+          { "value": "match_body", "label": "Follow Body font" },
+          { "value": "match_subheading", "label": "Follow Subheading font" },
+          { "value": "match_heading", "label": "Follow Heading font" },
+          { "value": "jost", "label": "Jost — Modern geometric sans" },
+          { "value": "plus_jakarta_sans", "label": "Plus Jakarta Sans — Refined sans" },
+          { "value": "montserrat", "label": "Montserrat — Tracked uppercase sans" },
+          { "value": "raleway", "label": "Raleway — Light luxury sans" },
+          { "value": "quicksand", "label": "Quicksand — Soft geometric sans" },
+          { "value": "dm_sans", "label": "DM Sans — Minimalist sans" },
+          { "value": "inter", "label": "Inter — Swiss sans" },
+          { "value": "tenor_sans", "label": "Tenor Sans — Couture sans" },
+          { "value": "cinzel", "label": "Cinzel — Classical serif" },
+          { "value": "cormorant_garamond", "label": "Cormorant Garamond — Serif" }
+        ],
+        "default": "match_body"
+      },
+      {
+        "type": "select",
+        "id": "typo_button_font",
+        "label": "Buttons & CTAs font family",
+        "options": [
+          { "value": "match_body", "label": "Follow Body font" },
+          { "value": "match_subheading", "label": "Follow Subheading font" },
+          { "value": "match_heading", "label": "Follow Heading font" },
+          { "value": "plus_jakarta_sans", "label": "Plus Jakarta Sans" },
+          { "value": "jost", "label": "Jost" },
+          { "value": "montserrat", "label": "Montserrat" },
+          { "value": "quicksand", "label": "Quicksand" },
+          { "value": "dm_sans", "label": "DM Sans" },
+          { "value": "inter", "label": "Inter" },
+          { "value": "raleway", "label": "Raleway" },
+          { "value": "tenor_sans", "label": "Tenor Sans" },
+          { "value": "cinzel", "label": "Cinzel" },
+          { "value": "cormorant_garamond", "label": "Cormorant Garamond" }
+        ],
+        "default": "match_body"
+      },
+      {
+        "type": "select",
+        "id": "typo_card_title_target",
+        "label": "Product card & footer titles follow",
+        "options": [
+          { "value": "heading", "label": "Heading font (Editorial luxury cards)" },
+          { "value": "subheading", "label": "Subheading font (Crisp catalog feel)" },
+          { "value": "body", "label": "Body font (Minimalist look)" }
+        ],
+        "default": "heading"
+      },
+      {
+        "type": "header",
+        "content": "Heading Style & Proportions"
+      },
+      {
+        "type": "select",
+        "id": "typo_heading_weight",
+        "label": "Heading font weight",
+        "options": [
+          { "value": "auto", "label": "Auto — optimal for selected font" },
+          { "value": "400", "label": "Regular (400)" },
+          { "value": "500", "label": "Medium (500)" },
+          { "value": "600", "label": "Semi-bold (600)" },
+          { "value": "700", "label": "Bold (700)" }
+        ],
+        "default": "auto"
+      },
+      {
+        "type": "select",
+        "id": "typo_heading_case",
+        "label": "Heading capitalization",
+        "options": [
+          { "value": "auto", "label": "Auto — natural case for serifs, caps for engraved/sans" },
+          { "value": "none", "label": "Natural / Sentence case" },
+          { "value": "uppercase", "label": "UPPERCASE" }
+        ],
+        "default": "auto"
+      },
+      {
+        "type": "select",
+        "id": "typo_heading_spacing",
+        "label": "Heading letter spacing",
+        "options": [
+          { "value": "auto", "label": "Auto — tuned for selected font" },
+          { "value": "tight", "label": "Tight (-0.01em)" },
+          { "value": "balanced", "label": "Refined (0.02em)" },
+          { "value": "editorial", "label": "Editorial (0.06em)" },
+          { "value": "wide", "label": "Luxury wide (0.12em)" }
+        ],
+        "default": "auto"
+      },
+      {
+        "type": "range",
+        "id": "typo_heading_scale",
+        "label": "Heading size scale",
+        "min": 80,
+        "max": 125,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Subheading & Body Refinement"
+      },
+      {
+        "type": "select",
+        "id": "typo_subheading_case",
+        "label": "Subheading capitalization",
+        "options": [
+          { "value": "auto", "label": "Auto — natural for serifs, uppercase for sans" },
+          { "value": "uppercase", "label": "UPPERCASE" },
+          { "value": "none", "label": "Natural case" }
+        ],
+        "default": "auto"
+      },
+      {
+        "type": "range",
+        "id": "typo_subheading_scale",
+        "label": "Subheading & accent scale",
+        "min": 85,
+        "max": 125,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      },
+      {
+        "type": "select",
+        "id": "typo_body_weight",
+        "label": "Body text base weight (when Custom)",
+        "options": [
+          { "value": "400", "label": "Light / Regular (400)" },
+          { "value": "500", "label": "Medium (500)" }
+        ],
+        "default": "500"
+      },
+      {
+        "type": "range",
+        "id": "typo_body_scale",
+        "label": "Body size scale",
+        "min": 85,
+        "max": 125,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Navigation Typography"
+      },
+      {
+        "type": "range",
+        "id": "nav_font_size",
+        "label": "Navigation link size",
+        "min": 10,
+        "max": 18,
+        "step": 1,
+        "unit": "px",
+        "default": 13
+      },
+      {
+        "type": "select",
+        "id": "nav_font_weight",
+        "label": "Navigation weight",
+        "options": [
+          { "value": "400", "label": "Regular (400)" },
+          { "value": "500", "label": "Medium (500)" },
+          { "value": "600", "label": "Semi-bold (600)" },
+          { "value": "700", "label": "Bold (700)" }
+        ],
+        "default": "600"
+      },
+      {
+        "type": "checkbox",
+        "id": "nav_uppercase",
+        "label": "Uppercase navigation links",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Shopify Font Library (Optional)"
+      },
+      {
+        "type": "paragraph",
+        "content": "Only used if a font selector above is set to Shopify Font Picker."
+      },
+      {
+        "type": "font_picker",
+        "id": "typo_shopify_heading_font",
+        "label": "Shopify heading font",
+        "default": "playfair_display_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "typo_shopify_body_font",
+        "label": "Shopify body font",
+        "default": "dm_sans_n4"
+      }
+    ]
+  },
+  {
     "name": "Layout",
     "settings": [
       {
@@ -693,6 +1008,13 @@
         ],
         "default": "zoom_lift",
         "info": "Subtle animation when hovering a product card (desktop / mouse only)."
+      },
+      {
+        "type": "checkbox",
+        "id": "card_hover_second_image",
+        "label": "Show 2nd image on hover",
+        "default": true,
+        "info": "Reveals the product's 2nd image on desktop hover instead of zooming the image."
       },
       {
         "type": "checkbox",

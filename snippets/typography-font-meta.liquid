@@ -1,0 +1,67 @@
+{% doc %}
+  Returns font metadata for a curated jewelry typography key.
+  Output format: gf_spec~~css_stack~~category~~auto_weight~~auto_heading_ls~~auto_transform~~italic_stack
+
+  @param {string} font_key - Key matching a curated Google Font option in settings_schema.json.
+
+  @example
+  {% capture meta %}{% render 'typography-font-meta', font_key: 'cormorant_garamond' %}{% endcapture %}
+{% enddoc %}
+{%- liquid
+  case font_key
+    when 'shopify_heading'
+      if settings.typo_shopify_heading_font != blank
+        assign sf = settings.typo_shopify_heading_font
+        assign s_stack = "'" | append: sf.family | append: "', " | append: sf.fallback_families
+        assign s_w = sf.weight | default: '500'
+        echo 'shopify_heading~~' | append: s_stack | append: '~~shopify_custom~~' | append: s_w | append: '~~0.03em~~none~~' | append: s_stack
+      else
+        echo "Quicksand:wght@400;500;600;700~~'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif~~sans_geometric~~600~~0.08em~~uppercase~~Georgia, 'Times New Roman', serif"
+      endif
+    when 'shopify_body'
+      if settings.typo_shopify_body_font != blank
+        assign sf = settings.typo_shopify_body_font
+        assign s_stack = "'" | append: sf.family | append: "', " | append: sf.fallback_families
+        assign s_w = sf.weight | default: '400'
+        echo 'shopify_body~~' | append: s_stack | append: '~~shopify_custom~~' | append: s_w | append: '~~0.02em~~none~~' | append: s_stack
+      else
+        echo "Quicksand:wght@400;500;600;700~~'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif~~sans_geometric~~600~~0.08em~~uppercase~~Georgia, 'Times New Roman', serif"
+      endif
+    when 'cormorant_garamond'
+      echo "Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600~~'Cormorant Garamond', Georgia, serif~~serif_editorial~~500~~0.02em~~none~~'Cormorant Garamond', Georgia, serif"
+    when 'playfair_display'
+      echo "Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600~~'Playfair Display', Georgia, serif~~serif_editorial~~500~~0.015em~~none~~'Playfair Display', Georgia, serif"
+    when 'bodoni_moda'
+      echo "Bodoni+Moda:ital,wght@0,400;0,500;0,600;0,700;1,400~~'Bodoni Moda', Georgia, serif~~serif_editorial~~500~~0.01em~~none~~'Bodoni Moda', Georgia, serif"
+    when 'cinzel'
+      echo "Cinzel:wght@400;500;600;700~~'Cinzel', Georgia, serif~~serif_monumental~~500~~0.09em~~uppercase~~Georgia, 'Times New Roman', serif"
+    when 'marcellus'
+      echo "Marcellus~~'Marcellus', Georgia, serif~~serif_monumental~~400~~0.08em~~uppercase~~Georgia, 'Times New Roman', serif"
+    when 'italiana'
+      echo "Italiana~~'Italiana', Georgia, serif~~serif_editorial~~400~~0.025em~~none~~Georgia, 'Times New Roman', serif"
+    when 'prata'
+      echo "Prata~~'Prata', Georgia, serif~~serif_editorial~~400~~0.02em~~none~~Georgia, 'Times New Roman', serif"
+    when 'eb_garamond'
+      echo "EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500~~'EB Garamond', Georgia, serif~~serif_editorial~~500~~0.015em~~none~~'EB Garamond', Georgia, serif"
+    when 'libre_baskerville'
+      echo "Libre+Baskerville:ital,wght@0,400;0,700;1,400~~'Libre Baskerville', Georgia, serif~~serif_editorial~~400~~0.01em~~none~~'Libre Baskerville', Georgia, serif"
+    when 'lora'
+      echo "Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500~~'Lora', Georgia, serif~~serif_editorial~~500~~0.015em~~none~~'Lora', Georgia, serif"
+    when 'tenor_sans'
+      echo "Tenor+Sans~~'Tenor Sans', -apple-system, BlinkMacSystemFont, sans-serif~~sans_geometric~~400~~0.09em~~uppercase~~Georgia, 'Times New Roman', serif"
+    when 'jost'
+      echo "Jost:ital,wght@0,400;0,500;0,600;0,700;1,400~~'Jost', -apple-system, BlinkMacSystemFont, sans-serif~~sans_geometric~~500~~0.08em~~uppercase~~'Jost', -apple-system, BlinkMacSystemFont, sans-serif"
+    when 'plus_jakarta_sans'
+      echo "Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400~~'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif~~sans_geometric~~600~~0.07em~~uppercase~~'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif"
+    when 'montserrat'
+      echo "Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400~~'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif~~sans_geometric~~600~~0.09em~~uppercase~~'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif"
+    when 'raleway'
+      echo "Raleway:ital,wght@0,400;0,500;0,600;0,700;1,400~~'Raleway', -apple-system, BlinkMacSystemFont, sans-serif~~sans_geometric~~600~~0.09em~~uppercase~~'Raleway', -apple-system, BlinkMacSystemFont, sans-serif"
+    when 'dm_sans'
+      echo "DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400~~'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif~~sans_geometric~~600~~0.06em~~uppercase~~'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif"
+    when 'inter'
+      echo "Inter:wght@400;500;600;700~~'Inter', -apple-system, BlinkMacSystemFont, sans-serif~~sans_geometric~~600~~0.07em~~uppercase~~Georgia, 'Times New Roman', serif"
+    else
+      echo "Quicksand:wght@400;500;600;700~~'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif~~sans_geometric~~600~~0.08em~~uppercase~~Georgia, 'Times New Roman', serif"
+  endcase
+-%}

@@ -11,45 +11,46 @@
   "Write a review" button + dialog form. Posts JSON to the reviews API (Vercel), which saves a DRAFT metaobject.
   Accepts: endpoint (full https URL of /api/review), sid (unique id), product_id (optional), button_label
 {%- endcomment -%}
+{%- assign rf_default_btn = 'products.reviews.write_review' | t -%}
 <div class="rf" id="rf-{{ sid }}" data-endpoint="{{ endpoint | escape }}" data-product-id="{{ product_id }}">
-  <button type="button" class="btn btn--outline rf__open" data-rf-open>{{ button_label | default: 'Write a review' | escape }}</button>
+  <button type="button" class="btn btn--outline rf__open" data-rf-open>{{ button_label | default: rf_default_btn | escape }}</button>
 
   <dialog class="rf__dialog" data-rf-dialog aria-labelledby="rf-title-{{ sid }}">
     <form class="rf__form" data-rf-form novalidate>
-      <button type="button" class="rf__close" data-rf-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-      <h3 class="rf__title" id="rf-title-{{ sid }}">Write a review</h3>
-      <p class="rf__lead">Share your experience. Reviews appear after we approve them.</p>
+      <button type="button" class="rf__close" data-rf-close aria-label="{{ 'accessibility.close' | t }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <h3 class="rf__title" id="rf-title-{{ sid }}">{{ 'products.reviews.write_review' | t }}</h3>
+      <p class="rf__lead">{{ 'products.reviews.form_lead' | t }}</p>
 
       <fieldset class="rf__rating">
-        <legend>Your rating</legend>
+        <legend>{{ 'products.reviews.your_rating' | t }}</legend>
         <div class="rf__stars">
           {%- for i in (1..5) reversed -%}
-            <input type="radio" name="rating" id="rf-{{ sid }}-star-{{ i }}" value="{{ i }}"><label for="rf-{{ sid }}-star-{{ i }}" title="{{ i }} star{% if i > 1 %}s{% endif %}">★<span class="rf__sr">{{ i }} star{% if i > 1 %}s{% endif %}</span></label>
+            <input type="radio" name="rating" id="rf-{{ sid }}-star-{{ i }}" value="{{ i }}"><label for="rf-{{ sid }}-star-{{ i }}" title="{{ 'products.reviews.star_count' | t: count: i }}">★<span class="rf__sr">{{ 'products.reviews.star_count' | t: count: i }}</span></label>
           {%- endfor -%}
         </div>
       </fieldset>
 
-      <label class="rf__field"><span>Name</span><input type="text" name="name" maxlength="60" autocomplete="name" required></label>
+      <label class="rf__field"><span>{{ 'products.reviews.field_name' | t }}</span><input type="text" name="name" maxlength="60" autocomplete="name" required></label>
       <div class="rf__field rf__product" data-rf-product>
-        <span>Product <em>(optional)</em></span>
+        <span>{{ 'products.reviews.field_product_html' | t }}</span>
         <div class="rf__pbox"><svg class="rf__psi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input type="text" data-rf-psearch placeholder="Search a product..." autocomplete="off" value="{{ product_title | escape }}" aria-label="Search a product" role="combobox" aria-expanded="false" aria-controls="rf-plist-{{ sid }}">
-          <button type="button" class="rf__pclear" data-rf-pclear aria-label="Clear product" hidden>&times;</button>
+          <input type="text" data-rf-psearch placeholder="{{ 'products.reviews.search_product' | t }}" autocomplete="off" value="{{ product_title | escape }}" aria-label="{{ 'products.reviews.search_product' | t }}" role="combobox" aria-expanded="false" aria-controls="rf-plist-{{ sid }}">
+          <button type="button" class="rf__pclear" data-rf-pclear aria-label="{{ 'products.reviews.clear_product' | t }}" hidden>&times;</button>
           <ul class="rf__plist" id="rf-plist-{{ sid }}" data-rf-plist role="listbox" hidden></ul>
         </div>
       </div>
-      <label class="rf__field"><span>Review title <em>(optional)</em></span><input type="text" name="title" maxlength="80"></label>
-      <label class="rf__field"><span>Your review</span><textarea name="body" rows="5" maxlength="1500" required></textarea></label>
-      <div class="rf__hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+      <label class="rf__field"><span>{{ 'products.reviews.field_title_html' | t }}</span><input type="text" name="title" maxlength="80"></label>
+      <label class="rf__field"><span>{{ 'products.reviews.field_body' | t }}</span><textarea name="body" rows="5" maxlength="1500" required></textarea></label>
+      <div class="rf__hp" aria-hidden="true"><label>{{ 'products.reviews.field_website' | t }}<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
 
       <p class="rf__msg" data-rf-msg role="alert" hidden></p>
-      <button type="submit" class="btn btn--primary rf__submit" data-rf-submit><span class="btn__text-content">Submit review</span></button>
+      <button type="submit" class="btn btn--primary rf__submit" data-rf-submit><span class="btn__text-content">{{ 'products.reviews.submit' | t }}</span></button>
     </form>
     <div class="rf__done" data-rf-done hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
-      <h3 class="rf__title">Thank you!</h3>
-      <p class="rf__lead">Your review was received and will appear once it is approved.</p>
-      <button type="button" class="btn btn--outline" data-rf-close>Close</button>
+      <h3 class="rf__title">{{ 'products.reviews.done_title' | t }}</h3>
+      <p class="rf__lead">{{ 'products.reviews.done_lead' | t }}</p>
+      <button type="button" class="btn btn--outline" data-rf-close>{{ 'accessibility.close' | t }}</button>
     </div>
   </dialog>
 </div>
@@ -122,6 +123,17 @@
       var psearch = root.querySelector('[data-rf-psearch]');
       var plist = root.querySelector('[data-rf-plist]');
       var pclear = root.querySelector('[data-rf-pclear]');
+      var rfI18n = {
+        noProducts: {{ 'products.reviews.no_products' | t | json }},
+        errRating: {{ 'products.reviews.error_rating' | t | json }},
+        errName: {{ 'products.reviews.error_name' | t | json }},
+        errLength: {{ 'products.reviews.error_length' | t | json }},
+        errGeneric: {{ 'products.reviews.error_generic' | t | json }},
+        errNetwork: {{ 'products.reviews.error_network' | t | json }}
+      };
+      var suggestBase = (window.theme && window.theme.routes && window.theme.routes.predictive_search_url)
+        ? (window.theme.routes.predictive_search_url + '.json')
+        : {{ routes.predictive_search_url | append: '.json' | json }};
       var pid = root.dataset.productId || '';
       var ptimer = null, pseq = 0;
       var syncClear = function () { pclear.hidden = !psearch.value; };
@@ -129,7 +141,7 @@
       var pick = function (id, title) { pid = String(id); psearch.value = title; hideList(); syncClear(); };
       var render = function (items) {
         plist.innerHTML = '';
-        if (!items.length) { var n = document.createElement('li'); n.className = 'rf__pnone'; n.textContent = 'No products found'; plist.appendChild(n); }
+        if (!items.length) { var n = document.createElement('li'); n.className = 'rf__pnone'; n.textContent = rfI18n.noProducts; plist.appendChild(n); }
         items.forEach(function (p) {
           var li = document.createElement('li');
           var b = document.createElement('button');
@@ -144,7 +156,7 @@
       };
       var search = function (q) {
         var my = ++pseq;
-        fetch('/search/suggest.json?q=' + encodeURIComponent(q) + '&resources[type]=product&resources[limit]=5&resources[options][unavailable_products]=last')
+        fetch(suggestBase + '?q=' + encodeURIComponent(q) + '&resources[type]=product&resources[limit]=5&resources[options][unavailable_products]=last')
           .then(function (r) { return r.json(); })
           .then(function (j) {
             if (my !== pseq) return;
@@ -169,9 +181,9 @@
         msg.hidden = true;
         var fd = new FormData(form);
         var rating = fd.get('rating');
-        if (!rating) return fail('Please choose a star rating.');
-        if (!String(fd.get('name') || '').trim()) return fail('Please enter your name.');
-        if (String(fd.get('body') || '').trim().length < 10) return fail('Please write at least 10 characters.');
+        if (!rating) return fail(rfI18n.errRating);
+        if (!String(fd.get('name') || '').trim()) return fail(rfI18n.errName);
+        if (String(fd.get('body') || '').trim().length < 10) return fail(rfI18n.errLength);
         btn.disabled = true;
         fetch(root.dataset.endpoint, {
           method: 'POST',
@@ -184,9 +196,9 @@
           .then(function (j) {
             btn.disabled = false;
             if (j && j.ok) { form.reset(); form.hidden = true; done.hidden = false; }
-            else fail((j && j.error) || 'Something went wrong. Please try again.');
+            else fail((j && j.error) || rfI18n.errGeneric);
           })
-          .catch(function () { btn.disabled = false; fail('Network error. Please try again.'); });
+          .catch(function () { btn.disabled = false; fail(rfI18n.errNetwork); });
       });
     };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

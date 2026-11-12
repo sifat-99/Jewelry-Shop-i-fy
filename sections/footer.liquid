@@ -108,8 +108,8 @@
                         {% form 'customer', class: 'footer-newsletter-form' %}
                           <input type="hidden" name="contact[tags]" value="newsletter">
                           <div style="display: flex; gap: 8px;">
-                            <input type="email" name="contact[email]" placeholder="Your email" required style="flex: 1; padding: 10px 14px; border: 1px solid var(--border, var(--lv-border)); font-size: 12px; background: var(--bg, #fff); color: var(--text, #000);">
-                            <button type="submit" class="btn btn--primary" style="padding: 10px 18px; font-size: 11px; font-weight: 600; text-transform: uppercase;"><span>Join</span></button>
+                            <input type="email" name="contact[email]" placeholder="{{ 'general.newsletter_form.email_placeholder_short' | t }}" required style="flex: 1; padding: 10px 14px; border: 1px solid var(--border, var(--lv-border)); font-size: 12px; background: var(--bg, #fff); color: var(--text, #000);">
+                            <button type="submit" class="btn btn--primary" style="padding: 10px 18px; font-size: 11px; font-weight: 600; text-transform: uppercase;"><span>{{ 'general.newsletter_form.join' | t }}</span></button>
                           </div>
                         {% endform %}
                       </div>
@@ -161,15 +161,16 @@
 
                 <!-- Social Column -->
                 {%- if section.settings.show_social_column -%}
+                  {%- assign social_title_default = 'sections.footer.social_title' | t -%}
                   <div class="grid__item medium-up--one-quarter footer__block">
                     <p class="footer__title footer__accordion__head js"
                       data-accordion-trigger="accordion-footer-social"
                       aria-controls="accordion-footer-social"
                       role="button"
                       aria-haspopup="true"
-                      aria-label="{{ section.settings.social_column_title | default: 'Social' | escape }}"
+                      aria-label="{{ section.settings.social_column_title | default: social_title_default | escape }}"
                       aria-expanded="false">
-                        {{ section.settings.social_column_title | default: 'Social' }}
+                        {{ section.settings.social_column_title | default: social_title_default }}
                         <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
                     </p>
 
@@ -180,7 +181,7 @@
 
                     <label for="accordion-footer-social-checkbox"
                       class="footer__title footer__accordion__head no-js">
-                      {{ section.settings.social_column_title | default: 'Social' }}
+                      {{ section.settings.social_column_title | default: social_title_default }}
                       <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
                     </label>
 

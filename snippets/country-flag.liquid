@@ -1,0 +1,166 @@
+{% doc %}
+  Renders a crisp, sharp-cornered inline SVG country flag for a given locale or
+  language ISO code (e.g. `en`, `nl`, `de`, `fr`, `en-US`). Uses pure filled
+  shapes with no strokes or clipPath IDs to avoid CSS stroke overrides or ID collisions.
+
+  @param {string} iso - Language or locale ISO code
+
+  @example
+  {% render 'country-flag', iso: localization.language.iso_code %}
+{% enddoc %}
+
+{%- liquid
+  assign iso_clean = iso | default: '' | strip | downcase | replace: '_', '-'
+  assign lang_base = iso_clean | split: '-' | first
+  assign flag_key = lang_base
+
+  case iso_clean
+    when 'en-us'
+      assign flag_key = 'us'
+    when 'en-ca' or 'fr-ca'
+      assign flag_key = 'ca'
+    when 'en-au'
+      assign flag_key = 'au'
+    when 'nl-be' or 'fr-be'
+      assign flag_key = 'be'
+    when 'de-at'
+      assign flag_key = 'at'
+    when 'de-ch' or 'fr-ch' or 'it-ch'
+      assign flag_key = 'ch'
+    when 'pt-br'
+      assign flag_key = 'br'
+    when 'es-mx'
+      assign flag_key = 'mx'
+    when 'zh-tw' or 'zh-hant'
+      assign flag_key = 'tw'
+  endcase
+-%}
+
+<svg class="lv-lang__flag" viewBox="0 0 24 16" aria-hidden="true" focusable="false">
+  {%- case flag_key -%}
+    {%- when 'en' or 'gb' or 'au' -%}
+      <rect width="24" height="16" fill="#012169"/>
+      <polygon points="0,0 2.9,0 24,14.1 24,16 21.1,16 0,1.9" fill="#FFFFFF"/>
+      <polygon points="21.1,0 24,0 24,1.9 2.9,16 0,16 0,14.1" fill="#FFFFFF"/>
+      <polygon points="0,0 1.4,0 12,7.1 22.6,0 24,0 24,0.9 13.4,8 24,15.1 24,16 22.6,16 12,8.9 1.4,16 0,16 0,15.1 10.6,8 0,0.9" fill="#C8102E"/>
+      <rect x="9.5" y="0" width="5" height="16" fill="#FFFFFF"/>
+      <rect x="0" y="5.5" width="24" height="5" fill="#FFFFFF"/>
+      <rect x="10.5" y="0" width="3" height="16" fill="#C8102E"/>
+      <rect x="0" y="6.5" width="24" height="3" fill="#C8102E"/>
+    {%- when 'us' -%}
+      <rect width="24" height="16" fill="#FFFFFF"/>
+      <rect y="0" width="24" height="2.29" fill="#B22234"/>
+      <rect y="4.57" width="24" height="2.29" fill="#B22234"/>
+      <rect y="9.14" width="24" height="2.29" fill="#B22234"/>
+      <rect y="13.71" width="24" height="2.29" fill="#B22234"/>
+      <rect width="10.8" height="9.14" fill="#3C3B6E"/>
+      <circle cx="2.3" cy="2.2" r="0.65" fill="#FFFFFF"/>
+      <circle cx="5.4" cy="2.2" r="0.65" fill="#FFFFFF"/>
+      <circle cx="8.5" cy="2.2" r="0.65" fill="#FFFFFF"/>
+      <circle cx="3.85" cy="4.5" r="0.65" fill="#FFFFFF"/>
+      <circle cx="6.95" cy="4.5" r="0.65" fill="#FFFFFF"/>
+      <circle cx="2.3" cy="6.8" r="0.65" fill="#FFFFFF"/>
+      <circle cx="5.4" cy="6.8" r="0.65" fill="#FFFFFF"/>
+      <circle cx="8.5" cy="6.8" r="0.65" fill="#FFFFFF"/>
+    {%- when 'nl' -%}
+      <rect y="0" width="24" height="5.34" fill="#AE1C28"/>
+      <rect y="5.33" width="24" height="5.34" fill="#FFFFFF"/>
+      <rect y="10.66" width="24" height="5.34" fill="#21468B"/>
+    {%- when 'be' -%}
+      <rect x="0" width="8" height="16" fill="#111111"/>
+      <rect x="8" width="8" height="16" fill="#FAE042"/>
+      <rect x="16" width="8" height="16" fill="#ED2939"/>
+    {%- when 'de' -%}
+      <rect y="0" width="24" height="5.34" fill="#111111"/>
+      <rect y="5.33" width="24" height="5.34" fill="#DD0000"/>
+      <rect y="10.66" width="24" height="5.34" fill="#FFCE00"/>
+    {%- when 'at' -%}
+      <rect y="0" width="24" height="5.34" fill="#ED2939"/>
+      <rect y="5.33" width="24" height="5.34" fill="#FFFFFF"/>
+      <rect y="10.66" width="24" height="5.34" fill="#ED2939"/>
+    {%- when 'ch' -%}
+      <rect width="24" height="16" fill="#DA291C"/>
+      <rect x="10.4" y="3.4" width="3.2" height="9.2" fill="#FFFFFF"/>
+      <rect x="7.4" y="6.4" width="9.2" height="3.2" fill="#FFFFFF"/>
+    {%- when 'fr' -%}
+      <rect x="0" width="8" height="16" fill="#002395"/>
+      <rect x="8" width="8" height="16" fill="#FFFFFF"/>
+      <rect x="16" width="8" height="16" fill="#ED2939"/>
+    {%- when 'es' -%}
+      <rect y="0" width="24" height="4" fill="#AA151B"/>
+      <rect y="4" width="24" height="8" fill="#F1BF00"/>
+      <rect y="12" width="24" height="4" fill="#AA151B"/>
+      <rect x="5" y="6" width="2.4" height="4" fill="#AA151B"/>
+    {%- when 'mx' -%}
+      <rect x="0" width="8" height="16" fill="#006847"/>
+      <rect x="8" width="8" height="16" fill="#FFFFFF"/>
+      <rect x="16" width="8" height="16" fill="#CE1126"/>
+      <circle cx="12" cy="8" r="1.8" fill="#8C6239"/>
+    {%- when 'it' -%}
+      <rect x="0" width="8" height="16" fill="#009246"/>
+      <rect x="8" width="8" height="16" fill="#FFFFFF"/>
+      <rect x="16" width="8" height="16" fill="#CE2B37"/>
+    {%- when 'pt' -%}
+      <rect x="0" width="9.6" height="16" fill="#006600"/>
+      <rect x="9.6" width="14.4" height="16" fill="#FF0000"/>
+      <circle cx="9.6" cy="8" r="3" fill="#FFCC00"/>
+    {%- when 'br' -%}
+      <rect width="24" height="16" fill="#009B3A"/>
+      <polygon points="12,2 21.5,8 12,14 2.5,8" fill="#FEDF00"/>
+      <circle cx="12" cy="8" r="3.2" fill="#002776"/>
+    {%- when 'ca' -%}
+      <rect x="0" width="6" height="16" fill="#D80621"/>
+      <rect x="6" width="12" height="16" fill="#FFFFFF"/>
+      <rect x="18" width="6" height="16" fill="#D80621"/>
+      <polygon points="12,4.2 13.1,6.8 15.2,6.4 13.7,8.7 14.5,10.2 12.4,9.8 12.4,12 11.6,12 11.6,9.8 9.5,10.2 10.3,8.7 8.8,6.4 10.9,6.8" fill="#D80621"/>
+    {%- when 'sv' -%}
+      <rect width="24" height="16" fill="#006AA7"/>
+      <rect x="6.5" y="0" width="3" height="16" fill="#FECC00"/>
+      <rect x="0" y="6.5" width="24" height="3" fill="#FECC00"/>
+    {%- when 'da' -%}
+      <rect width="24" height="16" fill="#C60C30"/>
+      <rect x="6.5" y="0" width="2.8" height="16" fill="#FFFFFF"/>
+      <rect x="0" y="6.6" width="24" height="2.8" fill="#FFFFFF"/>
+    {%- when 'nb' or 'nn' or 'no' -%}
+      <rect width="24" height="16" fill="#BA0C2F"/>
+      <rect x="6" y="0" width="4" height="16" fill="#FFFFFF"/>
+      <rect x="0" y="6" width="24" height="4" fill="#FFFFFF"/>
+      <rect x="7" y="0" width="2" height="16" fill="#00205B"/>
+      <rect x="0" y="7" width="24" height="2" fill="#00205B"/>
+    {%- when 'fi' -%}
+      <rect width="24" height="16" fill="#FFFFFF"/>
+      <rect x="6.5" y="0" width="3.5" height="16" fill="#003580"/>
+      <rect x="0" y="6.25" width="24" height="3.5" fill="#003580"/>
+    {%- when 'pl' -%}
+      <rect y="0" width="24" height="8" fill="#FFFFFF"/>
+      <rect y="8" width="24" height="8" fill="#DC143C"/>
+    {%- when 'tr' -%}
+      <rect width="24" height="16" fill="#E30A17"/>
+      <circle cx="9.6" cy="8" r="3.8" fill="#FFFFFF"/>
+      <circle cx="10.7" cy="8" r="3" fill="#E30A17"/>
+      <polygon points="15.2,6.4 15.6,7.5 16.8,7.5 15.8,8.2 16.2,9.3 15.2,8.6 14.2,9.3 14.6,8.2 13.6,7.5 14.8,7.5" fill="#FFFFFF"/>
+    {%- when 'ja' -%}
+      <rect width="24" height="16" fill="#FFFFFF"/>
+      <circle cx="12" cy="8" r="4.2" fill="#BC002D"/>
+    {%- when 'zh' -%}
+      <rect width="24" height="16" fill="#DE2910"/>
+      <polygon points="4.8,2.6 5.4,4.4 7.3,4.4 5.8,5.5 6.3,7.3 4.8,6.2 3.3,7.3 3.8,5.5 2.3,4.4 4.2,4.4" fill="#FFDE00"/>
+      <circle cx="9.2" cy="3.2" r="0.7" fill="#FFDE00"/>
+      <circle cx="10.4" cy="4.8" r="0.7" fill="#FFDE00"/>
+      <circle cx="10.4" cy="6.8" r="0.7" fill="#FFDE00"/>
+      <circle cx="9.2" cy="8.4" r="0.7" fill="#FFDE00"/>
+    {%- when 'tw' -%}
+      <rect width="24" height="16" fill="#FE0000"/>
+      <rect width="12" height="8" fill="#000095"/>
+      <circle cx="6" cy="4" r="2.2" fill="#FFFFFF"/>
+    {%- when 'ko' -%}
+      <rect width="24" height="16" fill="#FFFFFF"/>
+      <circle cx="12" cy="8" r="3.6" fill="#CD2E3A"/>
+      <path d="M8.4,8 A3.6,3.6 0 0,0 15.6,8 A1.8,1.8 0 0,0 12,8 A1.8,1.8 0 0,1 8.4,8 Z" fill="#0047A0"/>
+    {%- else -%}
+      <rect width="24" height="16" fill="#F0E9DD"/>
+      <circle cx="12" cy="8" r="5" fill="#1A1A1A"/>
+      <rect x="8" y="7.4" width="8" height="1.2" fill="#F0E9DD"/>
+      <ellipse cx="12" cy="8" rx="2.1" ry="4.4" fill="#F0E9DD"/>
+  {%- endcase -%}
+</svg>

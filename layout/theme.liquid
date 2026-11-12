@@ -15,8 +15,11 @@
 
   <title>
     {{ page_title }}
-    {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' | escape }}"{% endif -%}
-    {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+    {%- if current_tags -%}
+      {%- assign meta_tags = current_tags | join: ', ' | escape -%}
+      &ndash; {{ 'general.meta.tags' | t: tags: meta_tags }}
+    {%- endif -%}
+    {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif -%}
     {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
   </title>
 
@@ -27,9 +30,7 @@
   {% render 'social-meta-tags' %}
 
   <!-- Fonts & Stylesheets -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  {% render 'theme-typography', part: 'head' %}
   {{ 'font-settings.css' | asset_url | stylesheet_tag }}
   {% render 'css-variables' %}
   {{ 'theme.css' | asset_url | stylesheet_tag }}
@@ -52,7 +53,8 @@
     .lv-rating-stars { display: inline-flex; align-items: center; gap: 2px; color: transparent; white-space: nowrap; }
     .lv-rating-stars__star { display: inline-block; color: transparent; font-size: 1em; font-weight: 700; line-height: 1; background: linear-gradient(90deg, var(--lv-rating-star-gold) 0 var(--lv-star-fill), var(--lv-rating-star-empty) var(--lv-star-fill) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 1px 0 var(--lv-rating-star-shadow)); }
     body {
-      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: var(--FONT-STACK-BODY, 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif);
+      font-weight: var(--FONT-WEIGHT-BODY, 500);
       color: var(--text, #000000);
       background-color: var(--bg, #ffffff);
       -webkit-font-smoothing: antialiased;
@@ -488,33 +490,36 @@
     }
 
     /* ==========================================================================
-       Anti-Fade High-Contrast Typography
-       Fixes washed-out / faded titles, headings, nav, and body text
+       Global Synced Luxury Typography & High-Contrast Palette
+       Driven by Theme settings > Typography
        ========================================================================== */
-    /* Universal Headings & Titles: Sharp, Rich, High-Contrast */
+    /* Universal Headings & Titles */
     h1, h2, h3, h4, h5, h6,
     .h1, .h2, .h3, .h4, .h5, .h6,
     .hero__title,
+    .hero__title p,
     .section__title,
     .standard__heading,
     .standard__heading p,
     .tile__title,
     [class*="heading-size-"] {
-      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
-      font-weight: 600 !important;
+      font-family: var(--FONT-STACK-HEADING) !important;
+      font-weight: var(--FONT-WEIGHT-HEADING) !important;
+      letter-spacing: var(--FONT-HEADING-LETTER-SPACING);
+      text-transform: var(--FONT-HEADING-TRANSFORM);
       color: var(--text, #111111) !important;
       opacity: 1 !important;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Subheadings, Kickers & Flourishes */
+    /* Section Flourished Headings */
     .kicker-flourished {
-      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
-      font-size: clamp(20px, 2.4vw, 28px) !important;
-      font-weight: 600 !important;
-      letter-spacing: 0.15em !important;
-      text-transform: uppercase !important;
+      font-family: var(--FONT-STACK-HEADING) !important;
+      font-size: calc(clamp(22px, 2.6vw, 30px) * var(--FONT-ADJUST-HEADING, 1)) !important;
+      font-weight: var(--FONT-WEIGHT-HEADING) !important;
+      letter-spacing: var(--FONT-HEADING-LETTER-SPACING) !important;
+      text-transform: var(--FONT-HEADING-TRANSFORM) !important;
       color: var(--text, #111111) !important;
       opacity: 1 !important;
       padding-bottom: 14px !important;
@@ -527,15 +532,41 @@
       width: 38px !important;
     }
 
-    /* Header Navigation Items: Deep crisp black, bold & legible */
+    /* Subheadings, Eyebrows & Accents */
+    .hero__subtitle,
+    .subheading,
+    .subtitle,
+    .type-accent,
+    .accent-title,
+    .accent-title-large,
+    [class*="accent-size-"],
+    .banner__subheading {
+      font-family: var(--FONT-STACK-SUBHEADING) !important;
+      text-transform: var(--FONT-SUBHEADING-TRANSFORM);
+      letter-spacing: var(--FONT-SUBHEADING-LETTER-SPACING);
+    }
+    .standard__kicker,
+    .lv-acct-eyebrow,
+    .search-eyebrow,
+    .pg-page__eyebrow,
+    .dp__eyebrow,
+    .sl-hero__eyebrow,
+    .sl-sec__eyebrow,
+    .sl-cta__eyebrow,
+    .account-eyebrow,
+    .customer-auth-eyebrow {
+      font-family: var(--TYPE-STACK-KICKER) !important;
+    }
+
+    /* Header Navigation Items */
     .navlink,
     .navlink--toplevel,
     .navlink--toplevel .navtext,
     .navtext {
-      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-family: var(--TYPE-STACK-NAV) !important;
       font-size: {{ settings.nav_font_size | default: 13 }}px !important;
       font-weight: {{ settings.nav_font_weight | default: 600 }} !important;
-      letter-spacing: 0.09em !important;
+      letter-spacing: var(--FONT-NAV-LETTER-SPACING, 0.09em) !important;
       color: var(--text, #111111) !important;
       opacity: 1 !important;
       text-transform: {% if settings.nav_uppercase %}uppercase{% else %}none{% endif %} !important;
@@ -562,7 +593,7 @@
     .btn, .btn--primary, .btn--outline, .btn--soft, .btn--white, .btn--full, .btn--large, .btn--hero, .btn--neutral, .btn--add-to-cart, .btn-sliding-hover, .hero__btn, button.btn {
       border-radius: {{ settings.button_border_radius | default: 0 }}px !important;
       border-width: {{ settings.button_border_thickness | default: 1 }}px !important;
-      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-family: var(--TYPE-STACK-BUTTON) !important;
       font-size: {{ settings.button_font_size | default: 12 }}px !important;
       font-weight: {{ settings.button_font_weight | default: 600 }} !important;
       letter-spacing: {{ settings.button_letter_spacing | default: 14 | divided_by: 100.0 }}em !important;
@@ -575,10 +606,12 @@
     input[type="text"], input[type="email"], input[type="password"], input[type="search"], textarea, select {
       border-radius: {{ settings.input_border_radius | default: 0 }}px !important;
       border-width: {{ settings.input_border_thickness | default: 1 }}px !important;
+      font-family: var(--FONT-STACK-BODY);
     }
     /* One border color for every field (Theme Palette > border); focus uses the text color */
     input[type="text"], input[type="email"], input[type="password"], input[type="search"], input[type="tel"], input[type="number"], input[type="url"], textarea, select {
       border-color: var(--lv-border);
+      font-family: var(--FONT-STACK-BODY);
     }
     input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="number"]:focus, input[type="url"]:focus, textarea:focus, select:focus {
       border-color: var(--text);
@@ -590,7 +623,7 @@
     .announcement [data-ticker-text] p,
     .announcement [data-ticker-text] strong,
     .announcement [data-ticker-text] a {
-      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-family: var(--TYPE-STACK-NAV) !important;
       font-size: 12.5px !important;
       font-weight: 600 !important;
       letter-spacing: 0.12em !important;
@@ -600,12 +633,13 @@
 
     /* Rich text & body paragraphs */
     body, p, li, .rte, .rte p {
+      font-family: var(--FONT-STACK-BODY);
       color: var(--text, #1a1a1a);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
     .rte p {
-      font-weight: 500;
+      font-weight: var(--FONT-WEIGHT-BODY, 500);
     }
     .text-muted, .text-gray-500, .text-gray-600 {
       color: #3b3632 !important;
@@ -613,11 +647,11 @@
 
     /* Product Grid Card Typography */
     .product__grid__title {
-      font-family: 'Quicksand', sans-serif !important;
-      font-size: 13px !important;
-      font-weight: 600 !important;
+      font-family: var(--FONT-STACK-CARD-TITLE, var(--FONT-STACK-HEADING)) !important;
+      font-size: var(--FONT-SIZE-CARD-TITLE, 13px) !important;
+      font-weight: var(--FONT-WEIGHT-CARD-TITLE, 600) !important;
       color: var(--text, #111111) !important;
-      letter-spacing: 0.08em !important;
+      letter-spacing: 0.04em !important;
       opacity: 1 !important;
     }
     .price-item--regular {
@@ -627,14 +661,16 @@
 
     /* Split Section Hero Titles & Subtitles */
     .collection-split__block .hero__title {
-      font-size: clamp(24px, 3.2vw, 38px) !important;
-      font-weight: 600 !important;
-      letter-spacing: 0.1em !important;
+      font-size: calc(clamp(24px, 3.2vw, 38px) * var(--FONT-ADJUST-HEADING, 1)) !important;
+      font-weight: var(--FONT-WEIGHT-HEADING, 600) !important;
+      letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.06em) !important;
+      text-transform: var(--FONT-HEADING-TRANSFORM, uppercase) !important;
       color: #ffffff !important;
       opacity: 1 !important;
       text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
     }
     .collection-split__block .hero__subtitle {
+      font-family: var(--FONT-STACK-SUBHEADING) !important;
       font-size: 13.5px !important;
       font-weight: 500 !important;
       letter-spacing: 0.06em !important;
@@ -645,7 +681,7 @@
 
     /* Footer Typography */
     .footer__title {
-      font-family: 'Quicksand', sans-serif !important;
+      font-family: var(--FONT-STACK-CARD-TITLE, var(--FONT-STACK-HEADING)) !important;
       font-size: 13px !important;
       font-weight: 700 !important;
       letter-spacing: 0.12em !important;
@@ -654,9 +690,9 @@
       opacity: 1 !important;
     }
     .footer__quicklinks a {
-      font-family: 'Quicksand', sans-serif !important;
+      font-family: var(--FONT-STACK-BODY) !important;
       font-size: 13px !important;
-      font-weight: 500 !important;
+      font-weight: var(--FONT-WEIGHT-BODY, 500) !important;
       color: var(--text, #222222) !important;
       opacity: 1 !important;
     }
@@ -695,6 +731,9 @@
         cart: '{{ routes.cart_url }}',
         cart_add_url: '{{ routes.cart_add_url }}',
         cart_change_url: '{{ routes.cart_change_url }}',
+        cart_update_url: '{{ routes.cart_update_url }}',
+        search_url: '{{ routes.search_url }}',
+        all_products_collection_url: '{{ routes.all_products_collection_url }}',
         product_recommendations_url: '{{ routes.product_recommendations_url }}',
         account_addresses_url: '{{ routes.account_addresses_url }}',
         predictive_search_url: '{{ routes.predictive_search_url }}'
@@ -717,10 +756,45 @@
       strings: {
         swatchesKey: "Colour",
         addToCart: {{ 'products.product.add_to_cart' | t | json }},
+        preOrder: {{ 'products.product.pre_order' | t | json }},
         soldOut: {{ 'products.product.sold_out' | t | json }},
         unavailable: {{ 'products.product.unavailable' | t | json }},
-        free: "Free",
-        from: "From"
+        sale: {{ 'products.product.sale' | t | json }},
+        subscription: {{ 'products.product.subscription' | t | json }},
+        successMessage: {{ 'products.product.link_copied' | t | json }},
+        noShippingAvailable: {{ 'cart.shipping.no_shipping_available' | t | json }},
+        stockout: {{ 'cart.general.stockout' | t | json }},
+        free: {{ 'products.product.free' | t | json }},
+        from: {{ 'products.product.from' | t | json }}
+      },
+      i18n: {
+        shopName: {{ shop.name | json }},
+        adding: {{ 'products.product.adding' | t | json }},
+        added: {{ 'products.product.added' | t | json }},
+        addToCart: {{ 'products.product.add_to_cart' | t | json }},
+        soldOut: {{ 'products.product.sold_out' | t | json }},
+        unavailable: {{ 'products.product.unavailable' | t | json }},
+        addFailed: {{ 'products.product.add_failed' | t | json }},
+        onlyLeftTemplate: {{ 'products.product.only_left_js' | t | json }},
+        percentOffTemplate: {{ 'products.product.percent_off' | t: percent: '__PERCENT__' | json }},
+        saleBadgeText: {{ 'products.product.sale_badge_text' | t | json }},
+        quickViewLoadError: {{ 'products.quick_view.load_error' | t | json }},
+        wishlistAdded: {{ 'products.wishlist.added' | t | json }},
+        wishlistRemoved: {{ 'products.wishlist.removed' | t | json }},
+        wishlistIn: {{ 'products.wishlist.in_wishlist' | t | json }},
+        wishlistAdd: {{ 'products.wishlist.add' | t | json }},
+        cartAddError: {{ 'cart.general.add_error' | t | json }},
+        cartNetworkError: {{ 'cart.general.network_error' | t | json }},
+        saving: {{ 'customer.addresses.saving' | t | json }},
+        addressSaved: {{ 'customer.addresses.saved' | t | json }},
+        addressSaveError: {{ 'customer.addresses.save_error' | t | json }},
+        confirmDeleteAddress: {{ 'customer.addresses.delete_confirm' | t | json }},
+        addressDeleted: {{ 'customer.addresses.deleted' | t | json }},
+        addressDeleteError: {{ 'customer.addresses.delete_error' | t | json }},
+        ordersRefreshed: {{ 'customer.orders.refreshed' | t | json }},
+        ordersRefreshError: {{ 'customer.orders.refresh_error' | t | json }},
+        showMore: {{ 'collections.filtering.show_more' | t | json }},
+        showLess: {{ 'collections.filtering.show_less' | t | json }}
       },
       settings: {
         badge_sale_type: {{ settings.sale_badge_type | default: "percentage" | json }},

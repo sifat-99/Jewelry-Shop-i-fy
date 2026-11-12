@@ -1,0 +1,463 @@
+{% doc %}
+  Renders an in-dashboard modal dialog containing complete details for a customer order
+  (statuses, fulfillments/tracking, line items with properties, price breakdown,
+  addresses, payment transactions, notes, and custom attributes).
+
+  @param {order} order - The Shopify Liquid order object to render
+
+  @example
+  {% render 'account-order-modal', order: order %}
+{% enddoc %}
+
+{%- assign fin_key = order.financial_status | default: 'pending' | downcase | replace: ' ', '_' -%}
+{%- assign ful_key = order.fulfillment_status | default: 'unfulfilled' | downcase | replace: ' ', '_' -%}
+
+<dialog
+  id="LvAcctOrderModal-{{ order.id }}"
+  class="lv-acct-modal lv-acct-modal--order"
+  aria-labelledby="LvAcctOrderModalTitle-{{ order.id }}"
+>
+  <div class="lv-acct-modal__inner lv-acct-om">
+    <div class="lv-acct-modal__head lv-acct-om__head">
+      <div class="lv-acct-om__head-info">
+        <span class="lv-acct-eyebrow">{{ 'customer.order.modal_eyebrow' | t }}</span>
+        <h3 id="LvAcctOrderModalTitle-{{ order.id }}" class="lv-acct-modal__title">
+          {{ 'customer.order.title' | t: name: order.name }}
+        </h3>
+        <p class="lv-acct-om__placed">
+          {%- capture placed_date_html -%}{{ order.created_at | time_tag: format: 'date_at_time' }}{%- endcapture -%}
+          {{ 'customer.order.date_html' | t: date: placed_date_html }}
+        </p>
+      </div>
+      <button
+        type="button"
+        class="lv-acct-modal__close"
+        data-lv-acct-close-modal
+        aria-label="{{ 'customer.order.close_modal' | t }}"
+      >&times;</button>
+    </div>
+
+    <div class="lv-acct-om__statuses">
+      {%- if order.cancelled -%}
+        <span class="lv-acct-pill lv-acct-pill--cancelled">{{ 'customer.order.cancelled' | t }}</span>
+      {%- endif -%}
+      <span class="lv-acct-pill lv-acct-pill--{{ fin_key }}">
+        {{ 'customer.order.payment_status_value' | t: status: order.financial_status_label }}
+      </span>
+      <span class="lv-acct-pill lv-acct-pill--{{ ful_key }}">
+        {{ 'customer.order.fulfillment_status_value' | t: status: order.fulfillment_status_label }}
+      </span>
+    </div>
+
+    {%- if order.cancelled -%}
+      <div class="lv-acct-om__notice" role="status">
+        <strong>{{ 'customer.order.cancelled_title' | t }}</strong>
+        {%- if order.cancelled_at != blank -%}
+          {%- capture cancelled_date_html -%}{{ order.cancelled_at | time_tag: format: 'date_at_time' }}{%- endcapture -%}
+          <span>{{ 'customer.order.cancelled_on_html' | t: date: cancelled_date_html }}</span>
+        {%- endif -%}
+        {%- if order.cancel_reason_label != blank -%}
+          {%- assign cr_escaped = order.cancel_reason_label | escape -%}
+          <p class="lv-acct-om__notice-reason">{{ 'customer.order.cancelled_reason' | t: reason: cr_escaped }}</p>
+        {%- elsif order.cancel_reason != blank -%}
+          {%- assign cr_escaped = order.cancel_reason | escape -%}
+          <p class="lv-acct-om__notice-reason">{{ 'customer.order.cancelled_reason' | t: reason: cr_escaped }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} Fulfillments & Tracking {%- endcomment -%}
+    {%- assign seen_fulfillment_keys = '' -%}
+    {%- capture fulfillment_cards_html -%}
+      {%- for item in order.line_items -%}
+        {%- if item.fulfillment -%}
+          {%- assign ful = item.fulfillment -%}
+          {%- capture ful_key_id -%}|{{ ful.created_at }}::{{ ful.tracking_number }}::{{ ful.tracking_url }}|{%- endcapture -%}
+          {%- unless seen_fulfillment_keys contains ful_key_id -%}
+            {%- assign seen_fulfillment_keys = seen_fulfillment_keys | append: ful_key_id -%}
+            <div class="lv-acct-om__ship-card">
+              <div class="lv-acct-om__ship-main">
+                <p class="lv-acct-om__ship-title">
+                  {{ 'customer.order.shipment' | t }}
+                  {%- if ful.tracking_company != blank %}
+                    <span class="lv-acct-om__carrier">&middot; {{ ful.tracking_company | escape }}</span>
+                  {%- endif -%}
+                </p>
+                {%- if ful.created_at != blank -%}
+                  {%- capture fulfilled_date_html -%}{{ ful.created_at | time_tag: format: 'date_at_time' }}{%- endcapture -%}
+                  <p class="lv-acct-om__ship-date">{{ 'customer.order.fulfilled_on_html' | t: date: fulfilled_date_html }}</p>
+                {%- endif -%}
+                {%- if ful.tracking_numbers.size > 0 -%}
+                  <p class="lv-acct-om__ship-track">
+                    {{ 'customer.order.tracking_label' | t }}
+                    {%- for tn in ful.tracking_numbers -%}
+                      <span class="lv-acct-om__mono">{{ tn | escape }}</span>{% unless forloop.last %}, {% endunless %}
+                    {%- endfor -%}
+                  </p>
+                {%- elsif ful.tracking_number != blank -%}
+                  <p class="lv-acct-om__ship-track">
+                    {{ 'customer.order.tracking_label' | t }} <span class="lv-acct-om__mono">{{ ful.tracking_number | escape }}</span>
+                  </p>
+                {%- endif -%}
+              </div>
+              {%- if ful.tracking_urls.size > 0 -%}
+                <div class="lv-acct-om__ship-actions">
+                  {%- for turl in ful.tracking_urls -%}
+                    <a
+                      href="{{ turl }}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm lv-acct-btn--ghost"
+                    >{% if ful.tracking_urls.size > 1 %}{{ 'customer.order.track_package_num' | t: number: forloop.index }}{% else %}{{ 'customer.order.track_package' | t }}{% endif %}</a>
+                  {%- endfor -%}
+                </div>
+              {%- elsif ful.tracking_url != blank -%}
+                <div class="lv-acct-om__ship-actions">
+                  <a
+                    href="{{ ful.tracking_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm lv-acct-btn--ghost"
+                  >{{ 'customer.order.track_package' | t }}</a>
+                </div>
+              {%- endif -%}
+            </div>
+          {%- endunless -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- assign fulfillment_cards_trimmed = fulfillment_cards_html | strip -%}
+
+    <div class="lv-acct-om__section">
+      <h4 class="lv-acct-om__subhead">{{ 'customer.order.shipping_tracking' | t }}</h4>
+      {%- if fulfillment_cards_trimmed != blank -%}
+        <div class="lv-acct-om__ships">
+          {{ fulfillment_cards_trimmed }}
+        </div>
+      {%- else -%}
+        <p class="lv-acct-om__muted-note">
+          {%- if order.cancelled -%}
+            {{ 'customer.order.no_shipments_cancelled' | t }}
+          {%- else -%}
+            {{ 'customer.order.no_shipments_status' | t: status: order.fulfillment_status_label }}
+          {%- endif -%}
+        </p>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Items Ordered {%- endcomment -%}
+    <div class="lv-acct-om__section">
+      <h4 class="lv-acct-om__subhead">{{ 'customer.order.items_ordered' | t: count: order.item_count }}</h4>
+      <div class="lv-acct-om__items">
+        {%- for item in order.line_items -%}
+          <div class="lv-acct-om__item">
+            <div class="lv-acct-om__item-media">
+              {%- if item.image -%}
+                {%- if item.url != blank -%}
+                  <a href="{{ item.url }}" class="lv-acct-om__thumb-link">
+                    <img
+                      src="{{ item.image | image_url: width: 160 }}"
+                      alt="{{ item.title | escape }}"
+                      width="68"
+                      height="68"
+                      loading="lazy"
+                      class="lv-acct-om__thumb"
+                    >
+                  </a>
+                {%- else -%}
+                  <img
+                    src="{{ item.image | image_url: width: 160 }}"
+                    alt="{{ item.title | escape }}"
+                    width="68"
+                    height="68"
+                    loading="lazy"
+                    class="lv-acct-om__thumb"
+                  >
+                {%- endif -%}
+              {%- else -%}
+                <div class="lv-acct-om__thumb lv-acct-om__thumb--empty" aria-hidden="true">LV</div>
+              {%- endif -%}
+            </div>
+
+            <div class="lv-acct-om__item-body">
+              {%- if item.url != blank -%}
+                <a href="{{ item.url }}" class="lv-acct-om__item-title">{{ item.product.title | default: item.title | escape }}</a>
+              {%- else -%}
+                <span class="lv-acct-om__item-title">{{ item.product.title | default: item.title | escape }}</span>
+              {%- endif -%}
+
+              {%- if item.variant.title != blank -%}
+                {%- unless item.variant.title == 'Default Title' -%}
+                  {%- assign variant_escaped = item.variant.title | escape -%}
+                  <p class="lv-acct-om__item-meta">{{ 'customer.order.variant_label' | t: variant: variant_escaped }}</p>
+                {%- endunless -%}
+              {%- endif -%}
+
+              {%- if item.sku != blank -%}
+                {%- assign sku_escaped = item.sku | escape -%}
+                <p class="lv-acct-om__item-meta">{{ 'customer.order.sku_label' | t: sku: sku_escaped }}</p>
+              {%- endif -%}
+
+              {%- if item.selling_plan_allocation != blank -%}
+                <p class="lv-acct-om__item-meta">{{ item.selling_plan_allocation.selling_plan.name | escape }}</p>
+              {%- endif -%}
+
+              {%- assign prop_size = item.properties | size -%}
+              {%- if prop_size > 0 -%}
+                <div class="lv-acct-om__props">
+                  {%- for p in item.properties -%}
+                    {%- assign first_char = p.first | slice: 0 -%}
+                    {%- unless p.last == blank or first_char == '_' -%}
+                      <div class="lv-acct-om__prop">
+                        <span class="lv-acct-om__prop-key">{{ p.first | escape }}:</span>
+                        {%- if p.last contains '/uploads/' -%}
+                          <a href="{{ p.last }}" target="_blank" rel="noopener noreferrer" class="lv-acct-link">{{ 'customer.order.view_uploaded_file' | t }}</a>
+                        {%- else -%}
+                          <span>{{ p.last | escape }}</span>
+                        {%- endif -%}
+                      </div>
+                    {%- endunless -%}
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+
+              {%- if item.line_level_discount_allocations.size > 0 -%}
+                <div class="lv-acct-om__item-discounts">
+                  {%- for disc in item.line_level_discount_allocations -%}
+                    <span class="lv-acct-om__disc-tag">
+                      {{ disc.discount_application.title | escape }} (&minus;{{ disc.amount | money }})
+                    </span>
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+
+              {%- if item.fulfillment -%}
+                {%- capture item_ful_date_html -%}{{ item.fulfillment.created_at | time_tag: format: 'abbreviated_date' }}{%- endcapture -%}
+                <p class="lv-acct-om__item-ful">
+                  {{ 'customer.order.fulfilled_short_html' | t: date: item_ful_date_html }}
+                  {%- if item.fulfillment.tracking_number != blank %}
+                    &middot;
+                    {%- if item.fulfillment.tracking_url != blank -%}
+                      <a href="{{ item.fulfillment.tracking_url }}" target="_blank" rel="noopener noreferrer" class="lv-acct-link">{{ item.fulfillment.tracking_number | escape }}</a>
+                    {%- else -%}
+                      <span class="lv-acct-om__mono">{{ item.fulfillment.tracking_number | escape }}</span>
+                    {%- endif -%}
+                  {%- endif -%}
+                </p>
+              {%- elsif item.successfully_fulfilled_quantity > 0 -%}
+                {%- if item.successfully_fulfilled_quantity < item.quantity -%}
+                  <p class="lv-acct-om__item-ful">{{ 'customer.order.partial_shipped' | t: fulfilled: item.successfully_fulfilled_quantity, quantity: item.quantity }}</p>
+                {%- endif -%}
+              {%- endif -%}
+            </div>
+
+            <div class="lv-acct-om__item-price">
+              <div class="lv-acct-om__unit-price">
+                {%- if item.original_price != item.final_price -%}
+                  <s>{{ item.original_price | money }}</s>
+                {%- endif -%}
+                <span>{{ item.final_price | money }}</span>
+                <span class="lv-acct-om__qty">&times; {{ item.quantity }}</span>
+              </div>
+              <div class="lv-acct-om__line-total">
+                {%- if item.original_line_price != item.final_line_price -%}
+                  <s>{{ item.original_line_price | money }}</s>
+                {%- endif -%}
+                <strong>{{ item.final_line_price | money }}</strong>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- comment -%} Totals Breakdown {%- endcomment -%}
+    <div class="lv-acct-om__section">
+      <h4 class="lv-acct-om__subhead">{{ 'customer.order.summary' | t }}</h4>
+      <div class="lv-acct-om__totals">
+        <div class="lv-acct-om__tot-row">
+          <span>{{ 'customer.order.subtotal' | t }}</span>
+          <span>{{ order.line_items_subtotal_price | money }}</span>
+        </div>
+
+        {%- if order.cart_level_discount_applications.size > 0 -%}
+          {%- for disc in order.cart_level_discount_applications -%}
+            {%- assign disc_title = disc.title | escape -%}
+            <div class="lv-acct-om__tot-row lv-acct-om__tot-row--discount">
+              <span>{{ 'customer.order.discount_named' | t: name: disc_title }}</span>
+              <span>&minus;{{ disc.total_allocated_amount | money }}</span>
+            </div>
+          {%- endfor -%}
+        {%- elsif order.total_discounts > 0 -%}
+          <div class="lv-acct-om__tot-row lv-acct-om__tot-row--discount">
+            <span>{{ 'customer.order.discounts' | t }}</span>
+            <span>&minus;{{ order.total_discounts | money }}</span>
+          </div>
+        {%- endif -%}
+
+        {%- if order.shipping_methods.size > 0 -%}
+          {%- for ship in order.shipping_methods -%}
+            {%- assign ship_title = ship.title | escape -%}
+            <div class="lv-acct-om__tot-row">
+              <span>{{ 'customer.order.shipping_named' | t: name: ship_title }}</span>
+              <span>{{ ship.price | money }}</span>
+            </div>
+          {%- endfor -%}
+        {%- elsif order.shipping_price > 0 -%}
+          <div class="lv-acct-om__tot-row">
+            <span>{{ 'customer.order.shipping' | t }}</span>
+            <span>{{ order.shipping_price | money }}</span>
+          </div>
+        {%- endif -%}
+
+        {%- if order.tax_lines.size > 0 -%}
+          {%- for tax_line in order.tax_lines -%}
+            {%- assign tax_title = tax_line.title | escape -%}
+            {%- assign tax_rate = tax_line.rate | times: 100 -%}
+            <div class="lv-acct-om__tot-row">
+              <span>{{ 'customer.order.tax_named' | t: title: tax_title, rate: tax_rate }}</span>
+              <span>{{ tax_line.price | money }}</span>
+            </div>
+          {%- endfor -%}
+        {%- elsif order.tax_price > 0 -%}
+          <div class="lv-acct-om__tot-row">
+            <span>{{ 'customer.order.tax' | t }}</span>
+            <span>{{ order.tax_price | money }}</span>
+          </div>
+        {%- endif -%}
+
+        <div class="lv-acct-om__tot-row lv-acct-om__tot-row--grand">
+          <span>{{ 'customer.order.total' | t }}</span>
+          <span>{{ order.total_price | money_with_currency }}</span>
+        </div>
+
+        {%- if order.total_refunded_amount > 0 -%}
+          <div class="lv-acct-om__tot-row lv-acct-om__tot-row--refund">
+            <span>{{ 'customer.order.refunded' | t }}</span>
+            <span>&minus;{{ order.total_refunded_amount | money_with_currency }}</span>
+          </div>
+          <div class="lv-acct-om__tot-row lv-acct-om__tot-row--net">
+            <span>{{ 'customer.order.net_total' | t }}</span>
+            <span>{{ order.total_net_amount | money_with_currency }}</span>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment -%} Addresses, Payment & Contact Grid {%- endcomment -%}
+    <div class="lv-acct-om__grid">
+      <div class="lv-acct-om__box">
+        <h4 class="lv-acct-om__subhead">{{ 'customer.order.shipping_address' | t }}</h4>
+        {%- if order.shipping_address -%}
+          <div class="lv-acct-om__addr">
+            {{ order.shipping_address | format_address }}
+            {%- if order.shipping_address.phone != blank -%}
+              <p class="lv-acct-om__addr-phone">{{ order.shipping_address.phone | escape }}</p>
+            {%- endif -%}
+          </div>
+        {%- else -%}
+          <p class="lv-acct-om__muted-note">{{ 'customer.order.no_shipping_address' | t }}</p>
+        {%- endif -%}
+      </div>
+
+      <div class="lv-acct-om__box">
+        <h4 class="lv-acct-om__subhead">{{ 'customer.order.billing_address' | t }}</h4>
+        {%- if order.billing_address -%}
+          <div class="lv-acct-om__addr">
+            {{ order.billing_address | format_address }}
+            {%- if order.billing_address.phone != blank -%}
+              <p class="lv-acct-om__addr-phone">{{ order.billing_address.phone | escape }}</p>
+            {%- endif -%}
+          </div>
+        {%- else -%}
+          <p class="lv-acct-om__muted-note">{{ 'customer.order.no_billing_address' | t }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if order.transactions.size > 0 or order.email != blank or order.phone != blank -%}
+      <div class="lv-acct-om__grid lv-acct-om__grid--meta">
+        {%- if order.transactions.size > 0 -%}
+          <div class="lv-acct-om__box">
+            <h4 class="lv-acct-om__subhead">{{ 'customer.order.payment_details' | t }}</h4>
+            <div class="lv-acct-om__txs">
+              {%- for tx in order.transactions -%}
+                <div class="lv-acct-om__tx">
+                  <div class="lv-acct-om__tx-top">
+                    <span class="lv-acct-om__tx-method">
+                      {{ tx.gateway_display_name | default: tx.gateway | escape }}
+                      {%- if tx.payment_details.credit_card_number != blank -%}
+                        &middot; {{ tx.payment_details.credit_card_company | escape }} {{ tx.payment_details.credit_card_number | escape }}
+                      {%- endif -%}
+                    </span>
+                    <span class="lv-acct-om__tx-amt">{{ tx.amount | money_with_currency }}</span>
+                  </div>
+                  <p class="lv-acct-om__tx-meta">
+                    {{ tx.kind | replace: '_', ' ' | capitalize }} &middot;
+                    {{ tx.status_label | default: tx.status | capitalize }}
+                    {%- if tx.created_at != blank -%}
+                      &middot; {{ tx.created_at | time_tag: format: 'date_at_time' }}
+                    {%- endif -%}
+                  </p>
+                </div>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if order.email != blank or order.phone != blank -%}
+          <div class="lv-acct-om__box">
+            <h4 class="lv-acct-om__subhead">{{ 'customer.order.customer_contact' | t }}</h4>
+            <div class="lv-acct-om__contact">
+              {%- if order.email != blank -%}
+                <p><span class="lv-acct-om__contact-label">{{ 'customer.order.email_label' | t }}</span> {{ order.email | escape }}</p>
+              {%- endif -%}
+              {%- if order.phone != blank -%}
+                <p><span class="lv-acct-om__contact-label">{{ 'customer.order.phone_label' | t }}</span> {{ order.phone | escape }}</p>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if order.note != blank -%}
+      <div class="lv-acct-om__box lv-acct-om__box--full">
+        <h4 class="lv-acct-om__subhead">{{ 'customer.order.order_note' | t }}</h4>
+        <p class="lv-acct-om__note">{{ order.note | escape | newline_to_br }}</p>
+      </div>
+    {%- endif -%}
+
+    {%- assign attr_size = order.attributes | size -%}
+    {%- if attr_size > 0 -%}
+      {%- capture attrs_html -%}
+        {%- for attr in order.attributes -%}
+          {%- assign attr_first = attr.first | slice: 0 -%}
+          {%- unless attr.last == blank or attr_first == '_' -%}
+            <div class="lv-acct-om__prop">
+              <span class="lv-acct-om__prop-key">{{ attr.first | escape }}:</span>
+              <span>{{ attr.last | escape }}</span>
+            </div>
+          {%- endunless -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+      {%- assign attrs_trimmed = attrs_html | strip -%}
+      {%- if attrs_trimmed != blank -%}
+        <div class="lv-acct-om__box lv-acct-om__box--full">
+          <h4 class="lv-acct-om__subhead">{{ 'customer.order.additional_details' | t }}</h4>
+          <div class="lv-acct-om__props">
+            {{ attrs_trimmed }}
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+
+    <div class="lv-acct-modal__foot">
+      <button
+        type="button"
+        class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm lv-acct-btn--ghost"
+        data-lv-acct-close-modal
+      >{{ 'customer.order.close' | t }}</button>
+    </div>
+  </div>
+</dialog>

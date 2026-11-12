@@ -16,9 +16,10 @@
 {% enddoc %}
 
 {%- liquid
-  assign toggle_pause_label = 'Pause video'
-  assign toggle_play_label = 'Play video'
-  assign accessible_label = alt_label | default: 'Showcase video' | strip
+  assign toggle_pause_label = 'accessibility.pause_video' | t | escape
+  assign toggle_play_label = 'accessibility.play_video' | t | escape
+  assign fallback_video_label = 'accessibility.showcase_video' | t
+  assign accessible_label = alt_label | default: fallback_video_label | strip
 -%}
 
 {%- if video != blank -%}

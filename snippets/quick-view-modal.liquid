@@ -4,9 +4,9 @@
 <!-- /snippets/quick-view-modal.liquid -->
 <div id="QuickViewUnderlay" class="qv-underlay" aria-hidden="true"></div>
 
-<div id="QuickViewModal" class="qv-modal" role="dialog" aria-modal="true" aria-label="Quick View" aria-hidden="true">
+<div id="QuickViewModal" class="qv-modal" role="dialog" aria-modal="true" aria-label="{{ 'products.product.quick_view' | t }}" aria-hidden="true">
   <div class="qv-modal__inner">
-    <button type="button" class="qv-close-btn" id="QuickViewClose" aria-label="Close modal">
+    <button type="button" class="qv-close-btn" id="QuickViewClose" aria-label="{{ 'accessibility.close_modal' | t }}">
       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -25,7 +25,7 @@
 <!-- Wishlist Toast Notification -->
 <div id="WishlistToast" class="wishlist-toast" aria-live="polite">
   <span class="wishlist-toast__icon">♥</span>
-  <span class="wishlist-toast__msg" id="WishlistToastMsg">Added to wishlist</span>
+  <span class="wishlist-toast__msg" id="WishlistToastMsg">{{ 'products.wishlist.added' | t }}</span>
 </div>
 
 <style>
@@ -68,7 +68,7 @@
     visibility: hidden;
     overflow: hidden; /* Desktop: modal does not scroll; only right column scrolls! */
     transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--FONT-STACK-BODY, sans-serif);
     box-sizing: border-box;
   }
   .qv-modal.is-open {
@@ -403,6 +403,37 @@
     text-decoration: line-through;
     cursor: not-allowed;
   }
+  .qv-option-group--letter .qv-option-current {
+    color: color-mix(in srgb, var(--text, #444444) 68%, transparent);
+    font-weight: 500;
+  }
+  .qv-option-group--letter .qv-option-values {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+    gap: 7px;
+  }
+  .qv-option-group--letter .qv-pill-btn {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    min-width: 0;
+    min-height: 36px;
+    padding: 0 2px;
+    border-color: color-mix(in srgb, var(--text, #111111) 16%, transparent);
+    font-weight: 500;
+  }
+  .qv-option-group--letter .qv-pill-btn.qv-pill-btn--letter-wide {
+    grid-column: span 2;
+    aspect-ratio: auto;
+    padding: 0 8px;
+  }
+  .qv-option-group--letter .qv-pill-btn:hover {
+    border-color: var(--text, #111111);
+    background: color-mix(in srgb, var(--text, #111111) 4%, var(--bg, #ffffff));
+  }
+  .qv-option-group--letter .qv-pill-btn.is-selected {
+    font-weight: 600;
+  }
 
   /* Quantity & Add to Cart Action Row (48px Identical Height & No Inner Borders) */
   .qv-action-row {
@@ -471,7 +502,7 @@
     height: 48px !important;
     min-height: 48px !important;
     border-radius: var(--btn-radius, 0px) !important;
-    font-family: 'Quicksand', -apple-system, sans-serif !important;
+    font-family: var(--TYPE-STACK-BUTTON, sans-serif) !important;
     font-size: 12px !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
@@ -663,7 +694,7 @@
     color: #ffffff;
     padding: 12px 24px;
     border-radius: 30px;
-    font-family: 'Quicksand', -apple-system, sans-serif;
+    font-family: var(--FONT-STACK-BODY, sans-serif);
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.08em;
@@ -844,18 +875,47 @@
         localStorage.setItem('bss_wishlist', JSON.stringify(wishlist));
       } catch(e) {}
 
+      var qvI18n = {
+        inWishlist: {{ 'products.wishlist.in_wishlist' | t | json }},
+        addWishlist: {{ 'products.wishlist.add' | t | json }},
+        wishlistAdded: {{ 'products.wishlist.added' | t | json }},
+        wishlistRemoved: {{ 'products.wishlist.removed' | t | json }},
+        loadError: {{ 'products.quick_view.load_error' | t | json }},
+        thumbnailAria: {{ 'products.quick_view.thumbnail_aria' | t: number: '__NUM__' | json }},
+        vendorFallback: {{ 'products.product.vendor_fallback' | t | json }},
+        typeFallback: {{ 'products.quick_view.type_fallback' | t | json }},
+        percentOff: {{ 'products.product.percent_off' | t: percent: '__PERCENT__' | json }},
+        taxNote: {{ 'products.quick_view.tax_note' | t | json }},
+        decreaseQty: {{ 'products.product.decrease_quantity' | t | json }},
+        quantity: {{ 'products.product.quantity.label' | t | json }},
+        increaseQty: {{ 'products.product.increase_quantity' | t | json }},
+        addToCart: {{ 'products.product.add_to_cart' | t | json }},
+        soldOut: {{ 'products.product.sold_out' | t | json }},
+        highlightWaterproof: {{ 'products.highlights.waterproof' | t | json }},
+        highlightWarranty: {{ 'products.highlights.warranty' | t | json }},
+        highlightHypoallergenic: {{ 'products.highlights.hypoallergenic' | t | json }},
+        highlightDispatch: {{ 'products.highlights.fast_dispatch' | t | json }},
+        fallbackDescHtml: {{ 'products.quick_view.fallback_description_html' | t: title: '__TITLE__' | json }},
+        descTitle: {{ 'products.quick_view.description_title' | t | json }},
+        shippingTitle: {{ 'products.product.shipping_returns' | t | json }},
+        shippingBodyHtml: {{ 'products.quick_view.shipping_returns_html' | t | json }},
+        materialTitle: {{ 'products.quick_view.material_guarantee' | t | json }},
+        materialBodyHtml: {{ 'products.quick_view.material_guarantee_html' | t | json }},
+        viewFullDetails: {{ 'products.quick_view.view_full_details' | t | json }}
+      };
+
       // Update buttons on page
       document.querySelectorAll('[data-wishlist-id="' + productId + '"]').forEach(function(el) {
         if (isAdded) {
           el.classList.add('is-active');
-          el.setAttribute('title', 'In wishlist');
+          el.setAttribute('title', qvI18n.inWishlist);
         } else {
           el.classList.remove('is-active');
-          el.setAttribute('title', 'Add to wishlist');
+          el.setAttribute('title', qvI18n.addWishlist);
         }
       });
 
-      showToast(isAdded ? 'Added to wishlist' : 'Removed from wishlist');
+      showToast(isAdded ? qvI18n.wishlistAdded : qvI18n.wishlistRemoved);
     };
 
     function syncWishlistIcons() {
@@ -865,10 +925,11 @@
       } catch(e) {
         wishlist = [];
       }
+      var inWishlistTitle = (window.theme && window.theme.i18n && window.theme.i18n.wishlistIn) || {{ 'products.wishlist.in_wishlist' | t | json }};
       wishlist.forEach(function(id) {
         document.querySelectorAll('[data-wishlist-id="' + id + '"]').forEach(function(el) {
           el.classList.add('is-active');
-          el.setAttribute('title', 'In wishlist');
+          el.setAttribute('title', inWishlistTitle);
         });
       });
     }
@@ -882,14 +943,17 @@
 
       contentEl.innerHTML = '<div class="qv-loading"><div class="qv-spinner"></div></div>';
 
-      fetch('/products/' + handle + '.js')
+      var rootUrl = (window.theme && window.theme.routes && window.theme.routes.root_url) ? window.theme.routes.root_url : {{ routes.root_url | json }};
+      if (rootUrl.slice(-1) !== '/') rootUrl += '/';
+      fetch(rootUrl + 'products/' + encodeURIComponent(handle) + '.js')
         .then(function(res) { return res.json(); })
         .then(function(product) {
           renderQuickView(product);
         })
         .catch(function(err) {
           console.error('Quick view error:', err);
-          contentEl.innerHTML = '<p style="text-align: center; padding: 40px; font-weight: 600;">Could not load product details.</p>';
+          var errMsg = (window.theme && window.theme.i18n && window.theme.i18n.quickViewLoadError) || {{ 'products.quick_view.load_error' | t | json }};
+          contentEl.innerHTML = '<p style="text-align: center; padding: 40px; font-weight: 600;">' + escapeHtml(errMsg) + '</p>';
         });
     }
 
@@ -902,6 +966,29 @@
 
     // === Quick View Modal Content Renderer ===
     function renderQuickView(product) {
+      var i18n = {
+        thumbnailAria: {{ 'products.quick_view.thumbnail_aria' | t: number: '__NUM__' | json }},
+        vendorFallback: {{ 'products.product.vendor_fallback' | t | json }},
+        typeFallback: {{ 'products.quick_view.type_fallback' | t | json }},
+        percentOff: {{ 'products.product.percent_off' | t: percent: '__PERCENT__' | json }},
+        taxNote: {{ 'products.quick_view.tax_note' | t | json }},
+        decreaseQty: {{ 'products.product.decrease_quantity' | t | json }},
+        quantity: {{ 'products.product.quantity.label' | t | json }},
+        increaseQty: {{ 'products.product.increase_quantity' | t | json }},
+        addToCart: {{ 'products.product.add_to_cart' | t | json }},
+        soldOut: {{ 'products.product.sold_out' | t | json }},
+        highlightWaterproof: {{ 'products.highlights.waterproof' | t | json }},
+        highlightWarranty: {{ 'products.highlights.warranty' | t | json }},
+        highlightHypoallergenic: {{ 'products.highlights.hypoallergenic' | t | json }},
+        highlightDispatch: {{ 'products.highlights.fast_dispatch' | t | json }},
+        fallbackDescHtml: {{ 'products.quick_view.fallback_description_html' | t: title: '__TITLE__' | json }},
+        descTitle: {{ 'products.quick_view.description_title' | t | json }},
+        shippingTitle: {{ 'products.product.shipping_returns' | t | json }},
+        shippingBodyHtml: {{ 'products.quick_view.shipping_returns_html' | t | json }},
+        materialTitle: {{ 'products.quick_view.material_guarantee' | t | json }},
+        materialBodyHtml: {{ 'products.quick_view.material_guarantee_html' | t | json }},
+        viewFullDetails: {{ 'products.quick_view.view_full_details' | t | json }}
+      };
       var currentVariant = product.variants[0];
       var hasDiscount = currentVariant.compare_at_price && currentVariant.compare_at_price > currentVariant.price;
       var discountPercent = 0;
@@ -924,7 +1011,7 @@
       if (product.images && product.images.length > 1) {
         html += '<div class="qv-thumbs-row">';
         product.images.forEach(function(img, idx) {
-          html += '<button type="button" class="qv-thumb ' + (idx === 0 ? 'is-active' : '') + '" data-img-src="' + img + '" aria-label="Thumbnail ' + (idx + 1) + '">';
+          html += '<button type="button" class="qv-thumb ' + (idx === 0 ? 'is-active' : '') + '" data-img-src="' + img + '" aria-label="' + escapeHtml(i18n.thumbnailAria.replace('__NUM__', idx + 1)) + '">';
           html += '  <img src="' + img + '" alt="" loading="lazy">';
           html += '</button>';
         });
@@ -939,9 +1026,9 @@
 
       // Breadcrumb / Category Meta
       html += '  <div class="qv-meta-row">';
-      html += '    <span class="qv-vendor">Jewelry Shop</span>';
+      html += '    <span class="qv-vendor">' + escapeHtml(product.vendor || i18n.vendorFallback) + '</span>';
       html += '    <span class="qv-meta-dot">•</span>';
-      html += '    <span class="qv-type">' + escapeHtml(product.type || 'LUXURY JEWELRY') + '</span>';
+      html += '    <span class="qv-type">' + escapeHtml(product.type || i18n.typeFallback) + '</span>';
       html += '  </div>';
 
       // Title
@@ -951,9 +1038,9 @@
       html += '  <div class="qv-price-row">';
       html += '    <span class="qv-price" id="QvPrice">' + formatMoney(currentVariant.price) + '</span>';
       html += '    <span class="qv-compare-price" id="QvComparePrice" style="' + (hasDiscount ? '' : 'display:none;') + '">' + formatMoney(currentVariant.compare_at_price) + '</span>';
-      html += '    <span class="qv-discount-badge" id="QvDiscountBadge" style="' + (hasDiscount && discountPercent > 0 ? '' : 'display:none;') + '">' + discountPercent + '% OFF</span>';
+      html += '    <span class="qv-discount-badge" id="QvDiscountBadge" style="' + (hasDiscount && discountPercent > 0 ? '' : 'display:none;') + '">' + escapeHtml(i18n.percentOff.replace('__PERCENT__', discountPercent)) + '</span>';
       html += '  </div>';
-      html += '  <div class="qv-tax-note">Tax included. Free shipping on qualifying orders.</div>';
+      html += '  <div class="qv-tax-note">' + escapeHtml(i18n.taxNote) + '</div>';
 
       html += '  <div class="qv-divider"></div>';
 
@@ -961,14 +1048,20 @@
       if (product.options && product.options.length > 0 && product.options[0].name !== 'Title') {
         html += '<div class="qv-options-wrap">';
         product.options.forEach(function(opt, optIdx) {
-          html += '<div class="qv-option-group" data-option-index="' + optIdx + '">';
+          var optNameLower = (opt.name || '').toLowerCase();
+          var isColorOpt = /color|colour|kleur/.test(optNameLower);
+          var isSizeOpt = /size|grootte|maat|lengte|length/.test(optNameLower);
+          var allSingleChar = opt.values && opt.values.length >= 6 && opt.values.every(function(v) { return String(v).trim().length === 1; });
+          var isLetterOpt = !isColorOpt && (/initial|letter|monogram|alfabet|alphabet|buchstabe|lettre|letra/.test(optNameLower) || (!isSizeOpt && allSingleChar));
+          html += '<div class="qv-option-group' + (isLetterOpt ? ' qv-option-group--letter' : '') + '" data-option-index="' + optIdx + '">';
           html += '  <div class="qv-option-header">';
           html += '    <span class="qv-option-label">' + escapeHtml(opt.name) + ':</span>';
           html += '    <span class="qv-option-current" id="QvOptVal_' + optIdx + '">' + escapeHtml(opt.values[0]) + '</span>';
           html += '  </div>';
           html += '  <div class="qv-option-values">';
           opt.values.forEach(function(val, valIdx) {
-            html += '<button type="button" class="qv-pill-btn ' + (valIdx === 0 ? 'is-selected' : '') + '" data-opt-idx="' + optIdx + '" data-val="' + escapeHtml(val) + '">' + escapeHtml(val) + '</button>';
+            var isWideLetterVal = isLetterOpt && String(val).trim().length > 3;
+            html += '<button type="button" class="qv-pill-btn ' + (valIdx === 0 ? 'is-selected ' : '') + (isWideLetterVal ? 'qv-pill-btn--letter-wide' : '') + '" data-opt-idx="' + optIdx + '" data-val="' + escapeHtml(val) + '">' + escapeHtml(val) + '</button>';
           });
           html += '  </div>';
           html += '</div>';
@@ -979,12 +1072,12 @@
       // Quantity Selector & Add to Cart Button (Identical 48px Height & Sliding Fill)
       html += '<div class="qv-action-row">';
       html += '  <div class="qv-qty-selector">';
-      html += '    <button type="button" class="qv-qty-btn" id="QvQtyMinus" aria-label="Decrease quantity">−</button>';
-      html += '    <input type="number" class="qv-qty-input" id="QvQtyInput" value="1" min="1" readonly aria-label="Quantity">';
-      html += '    <button type="button" class="qv-qty-btn" id="QvQtyPlus" aria-label="Increase quantity">+</button>';
+      html += '    <button type="button" class="qv-qty-btn" id="QvQtyMinus" aria-label="' + escapeHtml(i18n.decreaseQty) + '">−</button>';
+      html += '    <input type="number" class="qv-qty-input" id="QvQtyInput" value="1" min="1" readonly aria-label="' + escapeHtml(i18n.quantity) + '">';
+      html += '    <button type="button" class="qv-qty-btn" id="QvQtyPlus" aria-label="' + escapeHtml(i18n.increaseQty) + '">+</button>';
       html += '  </div>';
       html += '  <button type="button" class="qv-add-btn btn-sliding-hover" id="QvAddToCartBtn" data-variant-id="' + currentVariant.id + '" ' + (!currentVariant.available ? 'disabled' : '') + '>';
-      html += '    <span class="btn__text-content"><span id="QvBtnText">' + (currentVariant.available ? 'Add to Cart' : 'Sold Out') + '</span></span>';
+      html += '    <span class="btn__text-content"><span id="QvBtnText">' + escapeHtml(currentVariant.available ? i18n.addToCart : i18n.soldOut) + '</span></span>';
       html += '    <span class="qv-btn-spinner" id="QvBtnSpinner" style="display: none;">';
       html += '      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>';
       html += '    </span>';
@@ -995,30 +1088,26 @@
       html += '<div class="qv-highlights">';
       html += '  <div class="qv-highlight-item">';
       html += '    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>';
-      html += '    <span>100% Waterproof</span>';
+      html += '    <span>' + escapeHtml(i18n.highlightWaterproof) + '</span>';
       html += '  </div>';
       html += '  <div class="qv-highlight-item">';
       html += '    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
-      html += '    <span>Lifetime Color Warranty</span>';
+      html += '    <span>' + escapeHtml(i18n.highlightWarranty) + '</span>';
       html += '  </div>';
       html += '  <div class="qv-highlight-item">';
       html += '    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
-      html += '    <span>Hypoallergenic & Nickel-Free</span>';
+      html += '    <span>' + escapeHtml(i18n.highlightHypoallergenic) + '</span>';
       html += '  </div>';
       html += '  <div class="qv-highlight-item">';
       html += '    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>';
-      html += '    <span>Fast Tracked Dispatch</span>';
+      html += '    <span>' + escapeHtml(i18n.highlightDispatch) + '</span>';
       html += '  </div>';
       html += '</div>';
 
       // Full Product Details Accordions
       var cleanDescription = product.description ? product.description.trim() : '';
       if (!cleanDescription || cleanDescription === '<p></p>' || cleanDescription === '<div></div>') {
-        cleanDescription = '<p>Crafted to perfection, the <strong>' + escapeHtml(product.title) + '</strong> embodies timeless modern elegance. Designed for comfortable everyday wear and effortless stacking.</p>' +
-          '<p><strong>• Material:</strong> Premium 316L Stainless Steel with 18K PVD Gold Plating<br>' +
-          '<strong>• Water Resistance:</strong> 100% Waterproof, Heat & Sweat Resistant<br>' +
-          '<strong>• Skin Friendly:</strong> Hypoallergenic, Lead & Nickel Free<br>' +
-          '<strong>• Warranty:</strong> Guaranteed never to fade, tarnish, or turn green</p>';
+        cleanDescription = i18n.fallbackDescHtml.replace('__TITLE__', escapeHtml(product.title));
       }
 
       html += '<div class="qv-accordions">';
@@ -1026,7 +1115,7 @@
       // Tab 1: Product Description (Open by default)
       html += '  <div class="qv-accordion-item is-open">';
       html += '    <button type="button" class="qv-accordion-trigger" aria-expanded="true">';
-      html += '      <span>Product Description</span>';
+      html += '      <span>' + escapeHtml(i18n.descTitle) + '</span>';
       html += '      <span class="qv-accordion-icon">−</span>';
       html += '    </button>';
       html += '    <div class="qv-accordion-panel">';
@@ -1037,25 +1126,22 @@
       // Tab 2: Shipping & Returns
       html += '  <div class="qv-accordion-item">';
       html += '    <button type="button" class="qv-accordion-trigger" aria-expanded="false">';
-      html += '      <span>Shipping & Returns</span>';
+      html += '      <span>' + escapeHtml(i18n.shippingTitle) + '</span>';
       html += '      <span class="qv-accordion-icon">+</span>';
       html += '    </button>';
       html += '    <div class="qv-accordion-panel" style="display: none;">';
-      html += '      <p>• Orders are carefully packaged and dispatched within 24 to 48 hours.<br>';
-      html += '      • <strong>Free standard shipping</strong> is available on qualifying orders.<br>';
-      html += '      • Real-time parcel tracking provided immediately via email and SMS.<br>';
-      html += '      • 14 days easy returns and full satisfaction guarantee.</p>';
+      html += '      ' + i18n.shippingBodyHtml;
       html += '    </div>';
       html += '  </div>';
 
       // Tab 3: Material & Guarantee
       html += '  <div class="qv-accordion-item">';
       html += '    <button type="button" class="qv-accordion-trigger" aria-expanded="false">';
-      html += '      <span>Material & Guarantee</span>';
+      html += '      <span>' + escapeHtml(i18n.materialTitle) + '</span>';
       html += '      <span class="qv-accordion-icon">+</span>';
       html += '    </button>';
       html += '    <div class="qv-accordion-panel" style="display: none;">';
-      html += '      <p>Our jewelry is crafted from surgical-grade 316L waterproof stainless steel with durable 18K PVD gold coating. 100% waterproof, nickel-free, and retains its radiant shine for a lifetime—even in water, sweat, or perfumes.</p>';
+      html += '      ' + i18n.materialBodyHtml;
       html += '    </div>';
       html += '  </div>';
 
@@ -1063,7 +1149,7 @@
 
       // View Full Details Link
       html += '<a href="' + (product.url || '#') + '" class="qv-view-product">';
-      html += '  <span>View Full Product Details</span>';
+      html += '  <span>' + escapeHtml(i18n.viewFullDetails) + '</span>';
       html += '  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
       html += '</a>';
 
@@ -1146,7 +1232,7 @@
             if (discBadge) {
               if (isSale) {
                 var pct = Math.round(((matchedVariant.compare_at_price - matchedVariant.price) / matchedVariant.compare_at_price) * 100);
-                discBadge.textContent = pct + '% OFF';
+                discBadge.textContent = i18n.percentOff.replace('__PERCENT__', pct);
                 discBadge.style.display = '';
               } else {
                 discBadge.style.display = 'none';
@@ -1157,10 +1243,10 @@
               addBtn.setAttribute('data-variant-id', matchedVariant.id);
               if (matchedVariant.available) {
                 addBtn.disabled = false;
-                btnText.textContent = 'Add to Cart';
+                btnText.textContent = i18n.addToCart;
               } else {
                 addBtn.disabled = true;
-                btnText.textContent = 'Sold Out';
+                btnText.textContent = i18n.soldOut;
               }
             }
 
@@ -1217,7 +1303,7 @@
             if (spinner) spinner.style.display = 'none';
             if (btnText) {
               btnText.style.display = 'inline';
-              btnText.textContent = 'Add to Cart';
+              btnText.textContent = i18n.addToCart;
             }
           }
 
@@ -1232,7 +1318,8 @@
                 resetBtn();
               });
           } else {
-            fetch('/cart/add.js', {
+            var qvCartAddUrl = (window.theme && window.theme.routes && window.theme.routes.cart_add_url ? window.theme.routes.cart_add_url : {{ routes.cart_add_url | json }}) + '.js';
+            fetch(qvCartAddUrl, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ id: vId, quantity: qty })

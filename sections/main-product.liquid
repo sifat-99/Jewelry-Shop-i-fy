@@ -60,9 +60,11 @@
     assign engraving_on = true
   endif
   assign eng_max = eng_parts[1] | plus: 0
+  assign eng_default_label = 'products.engraving.label' | t
+  assign eng_default_ph = 'products.engraving.placeholder' | t
   assign eng_prop = eng_parts[2] | default: 'Engraving'
-  assign eng_label = eng_parts[3] | default: 'Engraving'
-  assign eng_placeholder = eng_parts[4] | default: 'e.g. Sarah, 14.02 or initials'
+  assign eng_label = eng_parts[3] | default: eng_default_label
+  assign eng_placeholder = eng_parts[4] | default: eng_default_ph
   assign eng_required = eng_parts[5]
 
   # Low stock
@@ -535,7 +537,7 @@
       border-color: var(--btn-selected-border, #111) !important;
       box-shadow: none !important;
     }
-    html body .pv-opt:not(.pv-opt--color) .pv-opt__input:checked + .pv-opt__pill::before {
+    html body .pv-opt:not(.pv-opt--color):not(.pv-opt--letter) .pv-opt__input:checked + .pv-opt__pill::before {
       content: ""; width: 5px; height: 9px; margin: -2px 2px 0 -2px; flex: none;
       border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(45deg);
     }
@@ -549,6 +551,68 @@
       width: 100%; min-height: 46px; padding: 0 14px; font-size: 14px; font-weight: 500;
       border: 1px solid var(--pv-line); border-radius: var(--input-radius, 0px);
       background: transparent; color: inherit; cursor: pointer;
+    }
+
+    /* ---------- Initial letter square tile grid ---------- */
+    html body .pv-opt--letter .pv-opt__selected {
+      color: var(--pv-muted, color-mix(in srgb, var(--text, #111) 62%, transparent));
+      font-weight: 500;
+    }
+    .pv-opt--letter .pv-opt__row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+      gap: 7px;
+    }
+    html body .pv-opt--letter .pv-opt__pill {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      min-width: 0 !important;
+      min-height: 36px !important;
+      padding: 0 2px !important;
+      border-radius: var(--btn-radius, 0px);
+      border: 1px solid color-mix(in srgb, var(--text, #111) 16%, transparent) !important;
+      background: var(--bg, #fff) !important;
+      color: var(--text, #111) !important;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    html body .pv-opt--letter .pv-opt__pill.pv-opt__pill--letter-wide {
+      grid-column: span 2;
+      aspect-ratio: auto;
+      padding: 0 8px !important;
+    }
+    html body .pv-opt--letter .pv-opt__pill:hover {
+      border-color: var(--text, #111) !important;
+      background: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)) !important;
+    }
+    html body .pv-opt--letter .pv-opt__input:checked + .pv-opt__pill {
+      background: var(--btn-selected-bg, #111) !important;
+      color: var(--btn-selected-text, #fff) !important;
+      border-color: var(--btn-selected-border, #111) !important;
+      font-weight: 600;
+      box-shadow: none !important;
+    }
+    html body .pv-opt--letter .pv-opt__input:checked + .pv-opt__pill::before {
+      display: none !important;
+      content: none !important;
+    }
+    html body .pv-opt--letter .pv-opt__input.is-unavailable + .pv-opt__pill {
+      opacity: 0.35;
+      text-decoration: line-through;
+    }
+    html body .pv-opt--letter .pv-opt__input.is-unavailable:checked + .pv-opt__pill {
+      opacity: 0.72;
+    }
+    @media (max-width: 480px) {
+      .pv-opt--letter .pv-opt__row {
+        grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+        gap: 6px;
+      }
+      html body .pv-opt--letter .pv-opt__pill {
+        min-height: 34px !important;
+        font-size: 12.5px;
+      }
     }
 
     .pv-sg-link { margin: -6px 0 18px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; }
@@ -615,7 +679,7 @@
     .pv-engrave__input:focus { border-color: var(--text, #111); }
     .pv-engrave__count { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--pv-muted); pointer-events: none; }
     .pv-engrave__preview { margin: 10px 0 0; font-size: 12px; color: var(--pv-muted); }
-    .pv-engrave__preview-text { display: inline-block; margin-left: 6px; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-style: italic; color: var(--text, #111); letter-spacing: 0.04em; }
+    .pv-engrave__preview-text { display: inline-block; margin-left: 6px; font-family: var(--FONT-STACK-HEADING-ITALIC, var(--FONT-STACK-HEADING, Georgia, serif)); font-size: 18px; font-style: italic; color: var(--text, #111); letter-spacing: 0.04em; }
     .pv-field-error { margin: 8px 0 0; font-size: 12px; font-weight: 600; color: #b3261e; }
     .pv-field-error[hidden], .pv-engrave__preview[hidden] { display: none; }
     .pv-engrave.has-error .pv-engrave__input { border-color: #b3261e; }
@@ -789,7 +853,7 @@
         <div class="pg__stage">
           {% render 'lv-loader', overlay: true %}
           {% render 'sale-badge', price: current_variant.price, compare: current_variant.compare_at_price, extra_class: 'lv-sale-badge--lg' %}
-          <div class="pg__track" data-pg-track tabindex="0" aria-label="Product images">
+          <div class="pg__track" data-pg-track tabindex="0" aria-label="{{ 'products.product.media.product_images' | t }}">
             {%- if media_count > 0 -%}
               {%- for media in product.media -%}
                 <div class="pg__slide"
@@ -811,7 +875,7 @@
                         decoding="async"
                         draggable="false">
                       {%- if enable_zoom -%}
-                        <button type="button" class="pg__zoom" data-pg-zoom aria-label="Zoom image">
+                        <button type="button" class="pg__zoom" data-pg-zoom aria-label="{{ 'products.product.media.zoom_image' | t }}">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M11 8v6M8 11h6"/></svg>
                         </button>
                       {%- endif -%}
@@ -834,17 +898,17 @@
           </div>
           {%- if has_multiple_media -%}
             <div class="pg__counter" data-pg-counter aria-hidden="true">1 / {{ media_count }}</div>
-            <button type="button" class="pg__arrow pg__arrow--prev" data-pg-prev aria-label="Previous image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(180deg)"><path d="m9 5 7 7-7 7"/></svg></button>
-            <button type="button" class="pg__arrow pg__arrow--next" data-pg-next aria-label="Next image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+            <button type="button" class="pg__arrow pg__arrow--prev" data-pg-prev aria-label="{{ 'products.product.previous_image' | t }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(180deg)"><path d="m9 5 7 7-7 7"/></svg></button>
+            <button type="button" class="pg__arrow pg__arrow--next" data-pg-next aria-label="{{ 'products.product.next_image' | t }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
           {%- endif -%}
         </div>
 
         {%- if has_multiple_media -%}
           <div class="pg__thumbs-wrap" data-pg-thumbs-wrap>
-          <button type="button" class="pg__nav pg__nav--prev" data-pg-thumbs-prev aria-label="Previous thumbnails" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(180deg)"><path d="m9 5 7 7-7 7"/></svg></button>
-          <div class="pg__thumbs" data-pg-thumbs role="tablist" aria-label="Product thumbnails">
+          <button type="button" class="pg__nav pg__nav--prev" data-pg-thumbs-prev aria-label="{{ 'products.product.media.previous_thumbnails' | t }}" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(180deg)"><path d="m9 5 7 7-7 7"/></svg></button>
+          <div class="pg__thumbs" data-pg-thumbs role="tablist" aria-label="{{ 'products.product.media.thumbnails' | t }}">
             {%- for media in product.media -%}
-              <button type="button" class="pg__thumb{% if forloop.first %} is-active{% endif %}" data-pg-thumb data-index="{{ forloop.index0 }}" aria-label="Show media {{ forloop.index }}">
+              <button type="button" class="pg__thumb{% if forloop.first %} is-active{% endif %}" data-pg-thumb data-index="{{ forloop.index0 }}" aria-label="{{ 'products.product.media.show_media' | t: index: forloop.index }}">
                 <img src="{{ media.preview_image | image_url: width: 200 }}" alt="" width="84" height="84" loading="lazy">
                 {%- unless media.media_type == 'image' -%}
                   <span class="pg__thumb-play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
@@ -852,7 +916,7 @@
               </button>
             {%- endfor -%}
           </div>
-          <button type="button" class="pg__nav pg__nav--next" data-pg-thumbs-next aria-label="Next thumbnails" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+          <button type="button" class="pg__nav pg__nav--next" data-pg-thumbs-next aria-label="{{ 'products.product.media.next_thumbnails' | t }}" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
           </div>
         {%- endif -%}
       </div>
@@ -878,15 +942,15 @@
         </div>
         {%- if cart.taxes_included or shop.shipping_policy.body != blank -%}
           <p style="margin: 0 0 6px; font-size: 11px; color: var(--pv-muted);">
-            {%- if cart.taxes_included -%}Tax included. {% endif -%}
-            {%- if shop.shipping_policy.body != blank -%}<a href="{{ shop.shipping_policy.url }}" style="text-decoration: underline;">Shipping</a> calculated at checkout.{%- endif -%}
+            {%- if cart.taxes_included -%}{{ 'products.product.include_taxes' | t }} {% endif -%}
+            {%- if shop.shipping_policy.body != blank -%}{{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}{%- endif -%}
           </p>
         {%- endif -%}
 
         <div class="pv-meta">
           <span class="pv-stock" data-pv-stock hidden></span>
           {%- if section.settings.show_sku -%}
-            <span class="pv-sku" data-pv-sku{% if current_variant.sku == blank %} hidden{% endif %}>SKU: <span data-pv-sku-val>{{ current_variant.sku }}</span></span>
+            <span class="pv-sku" data-pv-sku{% if current_variant.sku == blank %} hidden{% endif %}>{{ 'products.product.sku_prefix' | t }} <span data-pv-sku-val>{{ current_variant.sku }}</span></span>
           {%- endif -%}
         </div>
 
@@ -921,13 +985,53 @@
                 if oname contains 'engrav' or oname contains 'char'
                   assign is_engraving_opt = true
                 endif
+                assign is_initial_letter = false
+                if is_color == false
+                  if oname contains 'initial'
+                    assign is_initial_letter = true
+                  elsif oname contains 'letter'
+                    assign is_initial_letter = true
+                  elsif oname contains 'monogram'
+                    assign is_initial_letter = true
+                  elsif oname contains 'alfabet'
+                    assign is_initial_letter = true
+                  elsif oname contains 'alphabet'
+                    assign is_initial_letter = true
+                  elsif oname contains 'buchstabe'
+                    assign is_initial_letter = true
+                  elsif is_sizeish == false
+                    assign all_single_char = true
+                    if option.values.size < 6
+                      assign all_single_char = false
+                    else
+                      for val in option.values
+                        assign val_trimmed = val | strip
+                        if val_trimmed.size != 1
+                          assign all_single_char = false
+                          break
+                        endif
+                      endfor
+                    endif
+                    if all_single_char
+                      assign is_initial_letter = true
+                    endif
+                  endif
+                endif
                 assign use_select = false
-                if option.values.size > 10 and is_color == false
-                  assign use_select = true
+                if option.values.size > 10
+                  if is_color == false
+                    if is_initial_letter == false
+                      assign use_select = true
+                    endif
+                  endif
                 endif
                 assign wide = false
-                if is_color == false and is_sizeish == false
-                  assign wide = true
+                if is_color == false
+                  if is_sizeish == false
+                    if is_initial_letter == false
+                      assign wide = true
+                    endif
+                  endif
                 endif
                 assign opt_idx = forloop.index0
                 assign selected_extra = ''
@@ -946,12 +1050,13 @@
                 endif
               -%}
               {%- render 'product-eng-wrap', part: 'open', is_eng: is_engraving_opt, sid: section.id, label: eng_label, required: eng_required, max: eng_max, prop: eng_prop, placeholder: eng_placeholder, product: product, on: engraving_on, scheme: section.settings.engrave_scheme, layout: section.settings.engrave_layout -%}
-              <fieldset class="pv-opt{% if is_color %} pv-opt--color{% endif %}{% if wide %} pv-opt--wide{% endif %}" data-pv-option data-option-index="{{ opt_idx }}">
+              <fieldset class="pv-opt{% if is_color %} pv-opt--color{% endif %}{% if wide %} pv-opt--wide{% endif %}{% if is_initial_letter %} pv-opt--letter{% endif %}" data-pv-option data-option-index="{{ opt_idx }}">
                 <legend class="pv-opt__label">
                   <span>{{ option.name }}:</span>
                   <span class="pv-opt__selected" data-pv-selected>{{ option.selected_value }}{{ selected_extra }}</span>
                   {%- if is_sizeish and section.settings.size_guide_page != blank -%}
-                    <a class="pv-opt__guide" href="{{ section.settings.size_guide_page.url }}{% render 'product-size-guide-anchor', product: product %}" target="_blank" rel="noopener">{{ section.settings.size_guide_label | default: 'Size guide' }}</a>
+                    {%- assign pv_sg_default = 'products.product.size_guide' | t -%}
+                    <a class="pv-opt__guide" href="{{ section.settings.size_guide_page.url }}{% render 'product-size-guide-anchor', product: product %}" target="_blank" rel="noopener">{{ section.settings.size_guide_label | default: pv_sg_default }}</a>
                   {%- endif -%}
                 </legend>
 
@@ -993,8 +1098,9 @@
                           {%- assign extra_badge = '+€10' -%}
                         {%- endif -%}
                       {%- endif -%}
+                      {%- assign val_trimmed = value | strip -%}
                       <input type="radio" class="pv-opt__input" name="pv-{{ section.id }}-opt-{{ opt_idx }}" id="pv-{{ section.id }}-{{ opt_idx }}-{{ forloop.index }}" value="{{ value | escape }}" data-pv-radio data-option-index="{{ opt_idx }}"{% if option.selected_value == value %} checked{% endif %}>
-                      <label class="pv-opt__pill{% if extra_badge != blank %} pv-opt__pill--with-badge{% endif %}" for="pv-{{ section.id }}-{{ opt_idx }}-{{ forloop.index }}">
+                      <label class="pv-opt__pill{% if extra_badge != blank %} pv-opt__pill--with-badge{% endif %}{% if is_initial_letter %}{% if val_trimmed.size > 3 %} pv-opt__pill--letter-wide{% endif %}{% endif %}" for="pv-{{ section.id }}-{{ opt_idx }}-{{ forloop.index }}">
                         {%- if is_color -%}<span class="pv-opt__dot" style="--swatch: {{ dot_color | strip }};"></span>{%- endif -%}
                         <span>{{ value }}</span>
                         {%- if extra_badge != blank -%}
@@ -1015,17 +1121,17 @@
 
           <div class="pv-buy">
             <div class="pv-qty">
-              <button type="button" class="pv-qty__btn" data-pv-qty-minus aria-label="Decrease quantity">
+              <button type="button" class="pv-qty__btn" data-pv-qty-minus aria-label="{{ 'products.product.quantity.decrease' | t }}">
                 <svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1.5 5H8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </button>
-              <input type="number" class="pv-qty__input" name="quantity" value="1" min="1" inputmode="numeric" aria-label="Quantity" data-pv-qty>
-              <button type="button" class="pv-qty__btn" data-pv-qty-plus aria-label="Increase quantity">
+              <input type="number" class="pv-qty__input" name="quantity" value="1" min="1" inputmode="numeric" aria-label="{{ 'products.product.quantity.label' | t }}" data-pv-qty>
+              <button type="button" class="pv-qty__btn" data-pv-qty-plus aria-label="{{ 'products.product.quantity.increase' | t }}">
                 <svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 1.5V8.5M1.5 5H8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </button>
             </div>
             <div class="pv-atc">
               <button type="submit" name="add" class="btn btn--primary btn--full btn--add-to-cart product-add-to-cart-btn btn-sliding-hover" data-pv-atc{% unless current_variant.available %} disabled{% endunless %}>
-                <span class="btn__text-content" data-pv-atc-text>{% if current_variant.available %}Add to cart{% else %}Sold out{% endif %}</span>
+                <span class="btn__text-content" data-pv-atc-text>{% if current_variant.available %}{{ 'products.product.add_to_cart' | t }}{% else %}{{ 'products.product.sold_out' | t }}{% endif %}</span>
               </button>
             </div>
           </div>
@@ -1036,19 +1142,20 @@
         <div class="pv-acc-list">
           {%- if product.description != blank -%}
             <details class="pv-acc" open>
-              <summary>Description</summary>
+              <summary>{{ 'products.product.tabs.description' | t }}</summary>
               <div class="pv-acc__panel rte">{{ product.description }}</div>
             </details>
           {%- endif -%}
+          {%- render 'product-category-metafields', product: product -%}
           {%- if section.settings.shipping_content != blank -%}
             <details class="pv-acc">
-              <summary>Shipping &amp; returns</summary>
+              <summary>{{ 'products.product.tabs.shipping_returns' | t }}</summary>
               <div class="pv-acc__panel rte">{{ section.settings.shipping_content }}</div>
             </details>
           {%- endif -%}
           {%- if section.settings.material_content != blank -%}
             <details class="pv-acc">
-              <summary>Material &amp; care</summary>
+              <summary>{{ 'products.product.tabs.material_care' | t }}</summary>
               <div class="pv-acc__panel rte">{{ section.settings.material_content }}</div>
             </details>
           {%- endif -%}
@@ -1101,7 +1208,7 @@
       <div class="pv-sticky__price" data-pv-sticky-price>{{ current_variant.price | money }}</div>
     </div>
     <button type="button" class="btn btn--primary btn--add-to-cart btn-sliding-hover" data-pv-sticky-btn tabindex="-1"{% unless current_variant.available %} disabled{% endunless %}>
-      <span class="btn__text-content" data-pv-sticky-text>{% if current_variant.available %}Add to cart{% else %}Sold out{% endif %}</span>
+      <span class="btn__text-content" data-pv-sticky-text>{% if current_variant.available %}{{ 'products.product.add_to_cart' | t }}{% else %}{{ 'products.product.sold_out' | t }}{% endif %}</span>
     </button>
   </div>
 
@@ -1110,7 +1217,32 @@
   </script>
 
   <script type="application/json" data-pv-config>
-    { "lowStock": {{ low_stock }}, "title": {{ product.title | json }}, "engravingProp": {{ eng_prop | json }} }
+    {
+      "lowStock": {{ low_stock }},
+      "title": {{ product.title | json }},
+      "engravingProp": {{ eng_prop | json }},
+      "routes": {
+        "cartAddUrl": {{ routes.cart_add_url | json }},
+        "cartUrl": {{ routes.cart_url | json }}
+      },
+      "i18n": {
+        "addToCart": {{ 'products.product.add_to_cart' | t | json }},
+        "soldOut": {{ 'products.product.sold_out' | t | json }},
+        "unavailable": {{ 'products.product.unavailable' | t | json }},
+        "adding": {{ 'products.product.adding' | t | json }},
+        "added": {{ 'products.product.added_check' | t | json }},
+        "onlyLeft": {{ 'products.product.only_left' | t: count: '__COUNT__' | json }},
+        "percentOff": {{ 'products.product.percent_off' | t: percent: '__PERCENT__' | json }},
+        "addError": {{ 'products.product.add_failed' | t | json }},
+        "addRetryError": {{ 'products.product.add_failed_retry' | t | json }},
+        "lightboxLabel": {{ 'products.product.media.zoom_dialog' | t | json }},
+        "close": {{ 'accessibility.close' | t | json }},
+        "previousImage": {{ 'products.product.previous_image' | t | json }},
+        "nextImage": {{ 'products.product.next_image' | t | json }},
+        "zoomHintTitle": {{ 'products.product.media.zoom_toggle_title' | t | json }},
+        "zoomHint": {{ 'products.product.media.zoom_hint' | t | json }}
+      }
+    }
   </script>
 
   {% raw %}
@@ -1125,6 +1257,9 @@
       var variants = [], config = {};
       try { variants = JSON.parse($('[data-pv-variants]').textContent); } catch (e) {}
       try { config = JSON.parse($('[data-pv-config]').textContent); } catch (e) {}
+      var i18n = config.i18n || {};
+      var pvRoutes = config.routes || {};
+      function escAttr(s) { return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
       /* ---- sticky offset below a sticky header ---- */
       var header = document.querySelector('[data-header-height]');
@@ -1290,15 +1425,15 @@
         lb.className = 'pv-lightbox';
         lb.setAttribute('role', 'dialog');
         lb.setAttribute('aria-modal', 'true');
-        lb.setAttribute('aria-label', 'Product image zoom');
+        lb.setAttribute('aria-label', i18n.lightboxLabel || 'Product image zoom');
         lb.innerHTML = '<div class="pv-lightbox__count"></div>' +
-          '<button type="button" class="pv-lightbox__btn pv-lightbox__close" aria-label="Close">' + icons.close + '</button>' +
-          '<button type="button" class="pv-lightbox__btn pv-lightbox__prev" aria-label="Previous image">' + icons.prev + '</button>' +
-          '<div class="pv-lightbox__viewport" title="Click to zoom in or out">' +
+          '<button type="button" class="pv-lightbox__btn pv-lightbox__close" aria-label="' + escAttr(i18n.close || 'Close') + '">' + icons.close + '</button>' +
+          '<button type="button" class="pv-lightbox__btn pv-lightbox__prev" aria-label="' + escAttr(i18n.previousImage || 'Previous image') + '">' + icons.prev + '</button>' +
+          '<div class="pv-lightbox__viewport" title="' + escAttr(i18n.zoomHintTitle || 'Click to zoom in or out') + '">' +
             '<img class="pv-lightbox__img" alt="" draggable="false">' +
           '</div>' +
-          '<button type="button" class="pv-lightbox__btn pv-lightbox__next" aria-label="Next image">' + icons.next + '</button>' +
-          '<div class="pv-lightbox__hint">Click image to zoom &bull; Move mouse to inspect</div>';
+          '<button type="button" class="pv-lightbox__btn pv-lightbox__next" aria-label="' + escAttr(i18n.nextImage || 'Next image') + '">' + icons.next + '</button>' +
+          '<div class="pv-lightbox__hint">' + escAttr(i18n.zoomHint || '') + '</div>';
         document.body.appendChild(lb);
         lbViewport = lb.querySelector('.pv-lightbox__viewport');
         lbImg = lb.querySelector('.pv-lightbox__img');
@@ -1468,7 +1603,7 @@
         updateAvailability(vals);
         if (errorEl) errorEl.hidden = true;
         if (!v) {
-          setButton('Unavailable', true);
+          setButton(i18n.unavailable || 'Unavailable', true);
           if (stockEl) stockEl.hidden = true;
           return;
         }
@@ -1479,14 +1614,16 @@
         if (saleBadge) {
           saleBadge.hidden = !v.save;
           var sbText = saleBadge.querySelector('[data-lv-sale-text]');
-          if (sbText && saleBadge.dataset.type !== 'text' && v.save) sbText.textContent = v.save + '% OFF';
+          if (sbText && saleBadge.dataset.type !== 'text' && v.save) {
+            sbText.textContent = (i18n.percentOff || '__PERCENT__% OFF').replace('__PERCENT__', v.save);
+          }
         }
         if (saveEl) { saveEl.textContent = v.save ? '-' + v.save + '%' : ''; saveEl.hidden = !v.save; }
         if (skuWrap) { if (skuVal) skuVal.textContent = v.sku; skuWrap.hidden = !v.sku; }
-        setButton(v.available ? 'Add to cart' : 'Sold out', !v.available);
+        setButton(v.available ? (i18n.addToCart || 'Add to cart') : (i18n.soldOut || 'Sold out'), !v.available);
         if (stockEl) {
           if (v.available && v.inventory > 0 && config.lowStock > 0 && v.inventory <= config.lowStock) {
-            stockEl.textContent = 'Only ' + v.inventory + ' left';
+            stockEl.textContent = (i18n.onlyLeft || 'Only __COUNT__ left').replace('__COUNT__', v.inventory);
             stockEl.hidden = false;
           } else {
             stockEl.hidden = true;
@@ -1498,7 +1635,7 @@
         }
         if (vals && engInput) {
           vals.forEach(function (val) {
-            var m = String(val).match(/(\d+)\s*char/i);
+            var m = String(val).match(/(\d+)\s*(?:char|teken|karakter|caract|zeiche)/i);
             if (m) updateEngravingLimit(parseInt(m[1], 10));
           });
         }
@@ -1563,7 +1700,7 @@
         var iv = findVariant(initVals);
         if (iv) applyVariant(iv, initVals);
       } else if (variants[0] && stockEl && variants[0].available && variants[0].inventory > 0 && config.lowStock > 0 && variants[0].inventory <= config.lowStock) {
-        stockEl.textContent = 'Only ' + variants[0].inventory + ' left'; stockEl.hidden = false;
+        stockEl.textContent = (i18n.onlyLeft || 'Only __COUNT__ left').replace('__COUNT__', variants[0].inventory); stockEl.hidden = false;
       }
 
       /* ================= QUANTITY ================= */
@@ -1604,33 +1741,35 @@
         if (Object.keys(props).length) body.properties = props;
 
         busy = true;
-        var prevLabel = atcText ? atcText.textContent : 'Add to cart';
-        setButton('Adding...', true);
-        fetch((window.theme && window.theme.routes ? window.theme.routes.cart_add_url : '/cart/add') + '.js', {
+        var addText = i18n.addToCart || 'Add to cart';
+        var addingText = i18n.adding || 'Adding...';
+        var prevLabel = atcText ? atcText.textContent : addText;
+        setButton(addingText, true);
+        fetch((pvRoutes.cartAddUrl || '/cart/add') + '.js', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify(body)
         })
           .then(function (res) {
             return res.json().then(function (data) {
-              if (!res.ok) throw new Error(data.description || data.message || 'Could not add to cart');
+              if (!res.ok) throw new Error(data.description || data.message || (i18n.addError || 'Could not add to cart'));
               return data;
             });
           })
           .then(function () {
-            setButton('Added ✓', true);
-            return fetch('/cart.js').then(function (r) { return r.json(); });
+            setButton(i18n.added || 'Added ✓', true);
+            return fetch((pvRoutes.cartUrl || '/cart') + '.js').then(function (r) { return r.json(); });
           })
           .then(function (cart) {
             document.dispatchEvent(new CustomEvent('theme:cart:change', { detail: { cart: cart }, bubbles: true }));
             document.dispatchEvent(new CustomEvent('theme:cart:reload', { bubbles: true }));
             if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
-            setTimeout(function () { busy = false; setButton(prevLabel === 'Adding...' ? 'Add to cart' : prevLabel, false); }, 1800);
+            setTimeout(function () { busy = false; setButton(prevLabel === addingText ? addText : prevLabel, false); }, 1800);
           })
           .catch(function (err) {
             busy = false;
-            setButton(prevLabel === 'Adding...' ? 'Add to cart' : prevLabel, false);
-            showError(err && err.message ? err.message : 'Could not add to cart. Please try again.');
+            setButton(prevLabel === addingText ? addText : prevLabel, false);
+            showError(err && err.message ? err.message : (i18n.addRetryError || 'Could not add to cart. Please try again.'));
           });
       }
       if (form) form.addEventListener('submit', submitCart);

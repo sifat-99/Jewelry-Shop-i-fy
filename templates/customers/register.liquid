@@ -4,9 +4,9 @@
     
     <div class="customer-auth-card">
       <div class="customer-auth-header">
-        <span class="customer-auth-badge">BECOME A MEMBER</span>
-        <h1 class="customer-auth-title">{{ 'customer.register.title' | default: 'Create Account' }}</h1>
-        <p class="customer-auth-subtitle">{{ 'customer.register.subtext' | default: 'Join the Jewelry Shop circle for personalized jewelry, order tracking, and private privileges.' }}</p>
+        <span class="customer-auth-badge">{{ 'customer.register.badge' | t }}</span>
+        <h1 class="customer-auth-title">{{ 'customer.register.title' | t }}</h1>
+        <p class="customer-auth-subtitle">{{ 'customer.register.subtext' | t }}</p>
       </div>
 
       {%- form 'create_customer', class: 'customer-auth-form', novalidate: 'novalidate' -%}
@@ -17,7 +17,7 @@
         {%- endif -%}
 
         <div class="form-field">
-          <label for="RegisterFirstName" class="form-label">{{ 'customer.register.first_name' | default: 'First Name' }}</label>
+          <label for="RegisterFirstName" class="form-label">{{ 'customer.register.first_name' | t }}</label>
           <input
             type="text"
             name="customer[first_name]"
@@ -25,12 +25,12 @@
             {% if form.first_name %}value="{{ form.first_name | escape }}"{% endif %}
             autocomplete="given-name"
             class="form-input"
-            placeholder="First name"
+            placeholder="{{ 'customer.register.first_name_placeholder' | t }}"
           >
         </div>
 
         <div class="form-field">
-          <label for="RegisterLastName" class="form-label">{{ 'customer.register.last_name' | default: 'Last Name' }}</label>
+          <label for="RegisterLastName" class="form-label">{{ 'customer.register.last_name' | t }}</label>
           <input
             type="text"
             name="customer[last_name]"
@@ -38,12 +38,12 @@
             {% if form.last_name %}value="{{ form.last_name | escape }}"{% endif %}
             autocomplete="family-name"
             class="form-input"
-            placeholder="Last name"
+            placeholder="{{ 'customer.register.last_name_placeholder' | t }}"
           >
         </div>
 
         <div class="form-field">
-          <label for="RegisterEmail" class="form-label">{{ 'customer.register.email' | default: 'Email Address' }}</label>
+          <label for="RegisterEmail" class="form-label">{{ 'customer.register.email' | t }}</label>
           <input
             type="email"
             name="customer[email]"
@@ -53,7 +53,7 @@
             autocapitalize="off"
             autocomplete="email"
             class="form-input"
-            placeholder="yourname@example.com"
+            placeholder="{{ 'customer.register.email_placeholder' | t }}"
             required
             {% if form.errors contains 'email' %}
               aria-invalid="true"
@@ -62,7 +62,7 @@
         </div>
 
         <div class="form-field">
-          <label for="RegisterPassword" class="form-label">{{ 'customer.register.password' | default: 'Password' }}</label>
+          <label for="RegisterPassword" class="form-label">{{ 'customer.register.password' | t }}</label>
           <input
             type="password"
             name="customer[password]"
@@ -78,17 +78,17 @@
         </div>
 
         <button type="submit" class="btn btn-sliding-hover customer-auth-btn">
-          <span>{{ 'customer.register.submit' | default: 'CREATE ACCOUNT' }}</span>
+          <span>{{ 'customer.register.submit' | t }}</span>
         </button>
 
         <div class="customer-auth-footer">
           <p class="customer-auth-footer-text">
-            Already have an account? 
-            <a href="{{ routes.account_login_url }}" class="customer-auth-link">Sign in here</a>
+            {{ 'customer.register.already_have_account' | t }}
+            <a href="{{ routes.account_login_url }}" class="customer-auth-link">{{ 'customer.register.sign_in_here' | t }}</a>
           </p>
           <p class="customer-auth-footer-text">
             <a href="{{ routes.root_url }}" class="customer-auth-return">
-              &larr; Return to Store
+              &larr; {{ 'customer.account.return_to_store' | t }}
             </a>
           </p>
         </div>
@@ -139,13 +139,13 @@
     margin-bottom: 10px;
   }
   .customer-auth-title {
-    font-family: 'Quicksand', sans-serif;
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    font-family: var(--FONT-STACK-HEADING, sans-serif);
+    font-size: calc(26px * var(--FONT-ADJUST-HEADING, 1));
+    font-weight: var(--FONT-WEIGHT-HEADING, 700);
+    letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.06em);
     color: #111111;
     margin: 0 0 10px;
-    text-transform: uppercase;
+    text-transform: var(--FONT-HEADING-TRANSFORM, uppercase);
   }
   .customer-auth-subtitle {
     font-size: 13px;
@@ -187,7 +187,7 @@
     width: 100%;
     height: 48px;
     padding: 0 16px;
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--FONT-STACK-BODY, sans-serif);
     font-size: 13px;
     color: #111111;
     background: #faf9f6;

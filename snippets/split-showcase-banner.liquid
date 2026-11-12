@@ -104,13 +104,13 @@
     {%- endfor -%}
 
     {%- if should_show_dots and products.size > 1 -%}
-      <div class="split-showcase__dots" aria-label="Showcase slides">
+      <div class="split-showcase__dots" aria-label="{{ 'sections.featured_collection.showcase_slides' | t }}">
         {%- for sc_product in products -%}
           <button
             type="button"
             class="split-showcase__dot{% if forloop.first %} is-active{% endif %}"
             data-showcase-dot="{{ forloop.index0 }}"
-            aria-label="View {{ sc_product.title | escape }}"
+            aria-label="{{ 'sections.featured_collection.view_product_aria' | t: title: sc_product.title }}"
           ></button>
         {%- endfor -%}
       </div>

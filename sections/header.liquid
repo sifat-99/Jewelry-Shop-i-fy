@@ -13,7 +13,11 @@
   assign logo_ratio = header_logo.aspect_ratio | default: 2.5
   assign mobile_logo_align = section.settings.mobile_logo_alignment | default: settings.mobile_logo_alignment | default: 'center'
   assign mobile_logo_w = settings.logo_width_mobile | default: 110
-  assign account_dashboard_url = '/pages/account'
+  assign root_prefix = routes.root_url
+  unless root_prefix == '/'
+    assign root_prefix = root_prefix | append: '/'
+  endunless
+  assign account_dashboard_url = root_prefix | append: 'pages/account'
   if customer
     assign header_account_link = account_dashboard_url
   else
@@ -66,6 +70,11 @@
   unless modern
     assign hover_dim = false
   endunless
+  assign show_language_selector = section.settings.show_language_selector
+  if show_language_selector == nil
+    assign show_language_selector = true
+  endif
+  assign language_label_style = section.settings.language_label_style | default: 'code'
 -%}
 <style data-shopify>
   :root {
@@ -333,20 +342,21 @@
   }
   /* High-Contrast Luxury Header Navigation */
   .navlink--toplevel {
-    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.09em !important;
+    font-family: var(--TYPE-STACK-NAV, sans-serif) !important;
+    font-size: {{ settings.nav_font_size | default: 13 }}px !important;
+    font-weight: {{ settings.nav_font_weight | default: 600 }} !important;
+    letter-spacing: var(--FONT-NAV-LETTER-SPACING, 0.09em) !important;
     color: var(--text, #111111) !important;
     opacity: 1 !important;
-    text-transform: uppercase !important;
+    text-transform: {% if settings.nav_uppercase %}uppercase{% else %}none{% endif %} !important;
   }
   .navlink--toplevel .navtext {
-    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.09em !important;
+    font-family: var(--TYPE-STACK-NAV, sans-serif) !important;
+    font-size: {{ settings.nav_font_size | default: 13 }}px !important;
+    font-weight: {{ settings.nav_font_weight | default: 600 }} !important;
+    letter-spacing: var(--FONT-NAV-LETTER-SPACING, 0.09em) !important;
     color: var(--text, #111111) !important;
+    text-transform: {% if settings.nav_uppercase %}uppercase{% else %}none{% endif %} !important;
   }
   .header__menu__inner .menu__item .navlink--toplevel {
     opacity: 1 !important;
@@ -411,6 +421,72 @@
   .header__desktop__buttons--icons .header__desktop__button .navlink:hover,
   .header__desktop__buttons--icons .header__desktop__button .navlink:focus-visible {
     background-color: rgba(var(--color-foreground, 17, 17, 17), 0.08);
+  }
+  /* Logged-in customer avatar (profile image or first-letter badge) */
+  .lv-hdr-avatar {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex: 0 0 auto;
+    background: var(--text, #111111);
+    color: var(--bg, #ffffff);
+    border: 1px solid color-mix(in srgb, var(--text, #111111) 20%, transparent);
+    box-sizing: border-box;
+    line-height: 1;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .header__drawer .drawer__account .lv-hdr-avatar {
+    width: 28px;
+    height: 28px;
+  }
+  .navlink:hover .lv-hdr-avatar,
+  .drawer__account:hover .lv-hdr-avatar {
+    transform: scale(1.04);
+  }
+  .lv-hdr-avatar--has-img:not(.is-avatar-error) {
+    background: transparent;
+    border-color: color-mix(in srgb, var(--text, #111111) 24%, transparent);
+  }
+  .lv-hdr-avatar__letter {
+    position: relative;
+    z-index: 1;
+    font-family: var(--FONT-STACK-BODY, sans-serif);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    line-height: 1;
+    color: inherit;
+    user-select: none;
+  }
+  .lv-hdr-avatar__media,
+  .lv-hdr-avatar__media > *,
+  .lv-hdr-avatar__media img,
+  .lv-hdr-avatar__media svg {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block !important;
+    stroke: none !important;
+  }
+  .lv-hdr-avatar__media {
+    z-index: 2;
+    overflow: hidden;
+  }
+  .lv-hdr-avatar.is-avatar-error .lv-hdr-avatar__media {
+    display: none !important;
   }
 
   /* =============================================================
@@ -611,10 +687,10 @@
   .lv-dropdown-editorial__copy h3 {
     margin: 0 0 14px;
     color: var(--lv-dd-text, #111111);
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--FONT-STACK-HEADING, sans-serif);
     font-size: clamp(22px, 2vw, 32px);
-    font-weight: 500;
-    letter-spacing: 0.02em;
+    font-weight: var(--FONT-WEIGHT-HEADING, 500);
+    letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.02em);
     line-height: 1.15;
   }
   .lv-dropdown-editorial__description,
@@ -810,11 +886,11 @@
     justify-content: center !important;
     gap: 8px !important;
     text-decoration: none !important;
-    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-family: var(--TYPE-STACK-BUTTON, sans-serif) !important;
     font-size: 11px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.14em !important;
-    text-transform: uppercase !important;
+    font-weight: var(--TYPE-WEIGHT-BUTTON, 600) !important;
+    letter-spacing: var(--FONT-BUTTON-LETTER-SPACING, 0.14em) !important;
+    text-transform: var(--FONT-BUTTON-TRANSFORM, uppercase) !important;
     transition: all 0.25s ease-in-out !important;
     box-sizing: border-box !important;
     line-height: 1.2 !important;
@@ -975,6 +1051,7 @@
     .lv-dropdown-product,
     .dropdown__family {
       transition: opacity 0.25s ease;
+
     }
     .header__desktop__buttons:hover .header__desktop__button:not(:hover) {
       opacity: 0.72;
@@ -1028,15 +1105,34 @@
     {{ lv_t }} .navlink--toplevel,
     {{ lv_t }} .navlink--toplevel .navtext,
     {{ lv_t }} .header__desktop__button .navlink,
+    {{ lv_t }} .header__desktop__button .lv-lang__toggle,
     {{ lv_t }} .header__mobile__button,
     {{ lv_t }} .header__cart__status,
     {{ lv_t }} .header__cart__status span {
       color: var(--lv-tr-text) !important;
     }
-    {{ lv_t }} .header__desktop__button svg,
+    {{ lv_t }} .lv-lang__toggle {
+
+      border-color: color-mix(in srgb, var(--lv-tr-text) 28%, transparent) !important;
+      {% comment %} border: none !important; {% endcomment %}
+    }
+    {{ lv_t }} .header__desktop__button .navlink svg,
+    {{ lv_t }} .lv-lang__toggle svg.lv-lang__caret,
     {{ lv_t }} .header__mobile__button svg {
       color: var(--lv-tr-text) !important;
       stroke: var(--lv-tr-text) !important;
+    }
+    {{ lv_t }} .lv-hdr-avatar {
+      background: color-mix(in srgb, var(--lv-tr-text, #ffffff) 22%, rgba(17, 17, 17, 0.38)) !important;
+      color: var(--lv-tr-text, #ffffff) !important;
+      border-color: color-mix(in srgb, var(--lv-tr-text, #ffffff) 62%, transparent) !important;
+      backdrop-filter: blur(6px);
+    }
+    {{ lv_t }} .lv-hdr-avatar--has-img:not(.is-avatar-error) {
+      background: transparent !important;
+    }
+    {{ lv_t }} .lv-hdr-avatar__media svg {
+      stroke: none !important;
     }
     {%- if inverse_logo != blank -%}
       .logo__img--inverse { display: none !important; }
@@ -1047,6 +1143,324 @@
       {{ lv_t }} .header__logo .logo__img--color { filter: brightness(0) invert(1); }
     {%- endif -%}
   {%- endif -%}
+
+  /* ---------- Header Language Switcher (Sharp Theme Geometry + Country Flags) ---------- */
+  .header__desktop__button--lang {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: visible !important;
+  }
+  .lv-lang {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .lv-lang__form {
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+  }
+  .lv-lang--drawer,
+  .lv-lang--drawer .lv-lang__form {
+    display: block;
+    width: 100%;
+  }
+  .header__desktop__button svg.lv-lang__flag,
+  .header__drawer svg.lv-lang__flag,
+  svg.lv-lang__flag {
+    display: block;
+    width: 18px !important;
+    height: 12px !important;
+    flex: none;
+    border-radius: 0 !important;
+    outline: 1px solid rgba(0, 0, 0, 0.16);
+    outline-offset: -1px;
+    stroke: none !important;
+    stroke-width: 0 !important;
+    opacity: 1 !important;
+  }
+  .lv-lang__toggle {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 36px;
+    padding: 0 10px;
+    margin: 0 4px 0 0;
+    {% comment %} border: 1px solid color-mix(in srgb, var(--text, #111111) 18%, transparent); {% endcomment %}
+    border-radius: 0 !important;
+    background: transparent;
+    color: var(--text, #111111);
+    font-family: var(--TYPE-STACK-NAV, sans-serif);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+  }
+  .lv-lang__toggle:hover,
+  .lv-lang__toggle:focus-visible,
+  .lv-lang__toggle[aria-expanded="true"] {
+    background-color: rgba(var(--color-foreground, 17, 17, 17), 0.06);
+    border-color: color-mix(in srgb, var(--text, #111111) 45%, transparent);
+    outline: none;
+  }
+  .lv-lang__caret {
+    width: 10px !important;
+    height: 10px !important;
+    flex: none;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 1.8 !important;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.22s ease;
+  }
+  .lv-lang__toggle[aria-expanded="true"] .lv-lang__caret {
+    transform: rotate(180deg);
+  }
+
+  /* Dropdown popover matched to Global Dropdown Styling tokens (sharp 0 radius) */
+  .lv-lang__menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 6500;
+    min-width: 212px;
+    padding: 6px;
+    background-color: var(--lv-dd-global-bg, var(--bg, #ffffff));
+    color: var(--lv-dd-global-text, var(--text, #111111));
+    border: 1px solid var(--lv-dd-global-border, var(--lv-border, rgba(0, 0, 0, 0.12)));
+    border-radius: 0 !important;
+    box-shadow: var(--lv-dd-global-shadow, 0 12px 32px rgba(0, 0, 0, 0.1));
+    transform-origin: top right;
+    animation: lvLangDropIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .lv-lang__menu[hidden] {
+    display: none !important;
+  }
+  @keyframes lvLangDropIn {
+    from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .lv-lang__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .lv-lang__item {
+    margin: 0;
+    padding: 0;
+  }
+  .lv-lang__option {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 0 !important;
+    background: transparent;
+    color: color-mix(in srgb, var(--lv-dd-global-text, #111111) 74%, transparent);
+    font-family: var(--FONT-STACK-BODY, sans-serif);
+    font-size: var(--lv-dd-link-size, 12px);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.18s ease, color 0.18s ease;
+  }
+  .lv-lang__option:hover,
+  .lv-lang__option:focus-visible {
+    background-color: rgba(var(--color-foreground, 17, 17, 17), 0.05);
+    color: var(--lv-dd-global-text, #111111);
+    outline: none;
+  }
+  .lv-lang__option.is-active {
+    background-color: color-mix(in srgb, var(--lv-accent-deep, #806745) 12%, var(--lv-dd-global-bg, #ffffff));
+    box-shadow: inset 3px 0 0 var(--lv-accent-deep, #806745);
+    color: var(--lv-dd-global-text, #111111);
+    font-weight: 700;
+  }
+  .lv-lang__opt-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+  }
+  .lv-lang__opt-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex: none;
+  }
+  .lv-lang__check-spacer {
+    width: 13px;
+    height: 13px;
+    flex: none;
+  }
+  .header__desktop__button .lv-lang__menu .lv-lang__check,
+  .lv-lang__menu .lv-lang__check {
+    width: 13px !important;
+    height: 13px !important;
+    flex: none;
+    fill: none !important;
+    color: var(--lv-accent-deep, #806745) !important;
+    stroke: var(--lv-accent-deep, #806745) !important;
+    stroke-width: 2.2 !important;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 1 !important;
+  }
+  .lv-lang__opt-name,
+  .lv-lang__drawer-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lv-lang__code {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    flex: none;
+  }
+  .lv-lang__option.is-active .lv-lang__code {
+    opacity: 0.9;
+  }
+  .lv-lang__hint {
+    margin: 8px 0 0;
+    padding-top: 6px;
+    border-top: 1px solid color-mix(in srgb, var(--lv-dd-global-text, #111111) 10%, transparent);
+    font-size: 10.5px;
+    line-height: 1.4;
+    opacity: 0.65;
+  }
+
+  /* Mobile Side Drawer Bottom Language Switcher */
+  .header__drawer .drawer__top {
+    flex: 0 0 auto;
+  }
+  .header__drawer .drawer__inner {
+    flex: 1 1 0% !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .lv-drawer-lang-bar {
+    flex: 0 0 auto;
+    width: 100%;
+    margin-top: auto;
+    padding: 14px 18px calc(14px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--border, var(--lv-border, rgba(0, 0, 0, 0.1)));
+    background-color: var(--bg, #ffffff);
+    box-sizing: border-box;
+  }
+  .header__drawer.is-open .lv-drawer-lang-bar,
+  .header__drawer.drawer--visible .lv-drawer-lang-bar {
+    opacity: 1;
+  }
+  .lv-lang__drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .lv-lang__drawer-title {
+    font-family: var(--TYPE-STACK-KICKER, var(--FONT-STACK-BODY));
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text, #1a1a1a);
+    opacity: 0.6;
+  }
+  .lv-lang__drawer-current {
+    font-family: var(--FONT-STACK-BODY, sans-serif);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text, #1a1a1a);
+  }
+  .lv-lang__drawer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    max-height: 156px;
+    overflow-y: auto;
+  }
+  .lv-lang__drawer-grid--single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lv-lang__drawer-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    padding: 10px 11px;
+    border: 1px solid var(--border, var(--lv-border, rgba(0, 0, 0, 0.16)));
+    border-radius: 0 !important;
+    background: transparent;
+    color: var(--text, #1a1a1a);
+    font-family: var(--FONT-STACK-BODY, sans-serif);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .lv-lang__drawer-btn:hover,
+  .lv-lang__drawer-btn:focus-visible {
+    border-color: var(--text, #1a1a1a);
+    background-color: rgba(0, 0, 0, 0.04);
+    outline: none;
+  }
+  .lv-lang__drawer-btn.is-active {
+    background-color: var(--lv-ink, #1a1a1a);
+    border-color: var(--lv-ink, #1a1a1a);
+    color: #ffffff;
+    font-weight: 700;
+  }
+  .lv-lang__drawer-btn .lv-lang__check {
+    width: 13px !important;
+    height: 13px !important;
+    flex: none;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2.2 !important;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 1 !important;
+  }
+  .lv-lang__drawer-btn.is-active .lv-lang__flag {
+    outline-color: rgba(255, 255, 255, 0.28);
+  }
+  @media only screen and (max-width: 350px) {
+    .lv-lang__drawer-btn {
+      padding: 9px 8px;
+      font-size: 11.5px;
+    }
+  }
 </style>
 
 
@@ -1091,7 +1505,7 @@ data-header-cart-full="false"
     <div class="header__mobile__left">
       <button class="header__mobile__button"
         data-drawer-toggle="hamburger"
-        aria-label="Open menu"
+        aria-label="{{ 'sections.header.open_menu' | t }}"
         aria-haspopup="true"
         aria-expanded="false"
         aria-controls="header-menu">
@@ -1128,7 +1542,7 @@ data-header-cart-full="false"
        data-drawer-toggle="drawer-cart"
         href="{{ routes.cart_url }}">
         <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-bag" viewBox="0 0 24 24"><path class="icon-cart-full" d="M7 11h10v8H7z"/><path d="M4 6h16v16H4z"/><path d="M9 9V2h6v7"/></svg>
-        <span class="visually-hidden">Shopping cart</span>
+        <span class="visually-hidden">{{ 'cart.title' | t }}</span>
 
   <span class="header__cart__status">
     <span data-header-cart-price="{{ cart.total_price }}">
@@ -1190,9 +1604,8 @@ data-header-cart-full="false"
   </nav>
 </div>
               <div  data-takes-space class="header__desktop__bar__r">
-<div class="header__desktop__buttons header__desktop__buttons--icons" ><div class="header__desktop__button " >
-        <a href="{{ header_account_link }}" class="navlink"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-user" viewBox="0 0 24 24"><path d="m1 22 3.3-4h15.4l3.3 4M17.996 8.242a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
-            <span class="visually-hidden">My Account</span></a>
+<div class="header__desktop__buttons header__desktop__buttons--icons" >{%- if show_language_selector -%}<div class="header__desktop__button header__desktop__button--lang">{% render 'header-language-switcher', id_prefix: 'desktop', variant: 'desktop', label_style: language_label_style %}</div>{%- endif -%}<div class="header__desktop__button " >
+        <a href="{{ header_account_link }}" class="navlink"{% if customer %} title="{{ customer.name | default: customer.email | escape }}"{% endif %}>{%- render 'header-account-avatar', customer_obj: customer, show_guest_icon: true -%}<span class="visually-hidden">{{ 'customer.account.title' | t }}</span></a>
       </div>
 
 
@@ -1201,7 +1614,7 @@ data-header-cart-full="false"
         <a href="{{ routes.search_url }}" class="navlink" data-popdown-toggle="search-popdown">
 
             <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-search" viewBox="0 0 24 24"><path stroke-linecap="square" d="M10.1 17.7a7.6 7.6 0 1 0 0-15.2 7.6 7.6 0 0 0 0 15.2Zm11.4 3.8-5.7-5.7"/></svg>
-            <span class="visually-hidden">Search</span>
+            <span class="visually-hidden">{{ 'general.search.submit' | t }}</span>
 
         </a>
       </div>
@@ -1213,7 +1626,7 @@ data-header-cart-full="false"
         data-drawer-toggle="drawer-cart">
 
           <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-bag" viewBox="0 0 24 24"><path class="icon-cart-full" d="M7 11h10v8H7z"/><path d="M4 6h16v16H4z"/><path d="M9 9V2h6v7"/></svg>
-          <span class="visually-hidden">Shopping cart</span>
+          <span class="visually-hidden">{{ 'cart.title' | t }}</span>
 
   <span class="header__cart__status">
     <span data-header-cart-price="{{ cart.total_price }}">
@@ -1240,14 +1653,14 @@ data-header-cart-full="false"
 
   <nav class="drawer header__drawer display-none"
     data-drawer="hamburger"
-    aria-label="Main menu"
+    aria-label="{{ 'sections.header.main_menu' | t }}"
     id="header-menu">
     <div class="drawer__content">
       <div class="drawer__top">
         <div class="drawer__top__left">
-          <a class="drawer__account" href="{{ header_account_link }}">
-            <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-user" viewBox="0 0 24 24"><path d="m1 22 3.3-4h15.4l3.3 4M17.996 8.242a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
-            <span class="visually-hidden">My Account</span>
+          <a class="drawer__account" href="{{ header_account_link }}"{% if customer %} title="{{ customer.name | default: customer.email | escape }}"{% endif %}>
+            {%- render 'header-account-avatar', customer_obj: customer, show_guest_icon: true -%}
+            <span class="visually-hidden">{{ 'customer.account.title' | t }}</span>
           </a>
         </div>
 
@@ -1273,7 +1686,7 @@ data-header-cart-full="false"
         <button class="drawer__button drawer__close"
           data-first-focus
           data-drawer-toggle="hamburger"
-          aria-label="Close">
+          aria-label="{{ 'accessibility.close' | t }}">
           <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
@@ -1294,6 +1707,12 @@ data-header-cart-full="false"
   {%- endif -%}
         </div>
       </div>
+
+      {%- if show_language_selector -%}
+        <div class="drawer__bottom lv-drawer-lang-bar">
+          {% render 'header-language-switcher', id_prefix: 'drawer', variant: 'drawer', label_style: language_label_style %}
+        </div>
+      {%- endif -%}
     </div>
 
     <span class="drawer__underlay" data-drawer-underlay>
@@ -1452,6 +1871,113 @@ data-header-cart-full="false"
         }
       }
     });
+
+    // Header language switcher (Translate & Adapt / Shopify localization form)
+    if (!document.documentElement.dataset.lvLangBound) {
+      document.documentElement.dataset.lvLangBound = '1';
+
+      function closeAllLangMenus(exceptWrap) {
+        document.querySelectorAll('[data-lv-lang]').forEach(function(wrap) {
+          if (exceptWrap && wrap === exceptWrap) return;
+          var btn = wrap.querySelector('[data-lv-lang-toggle]');
+          var menu = wrap.querySelector('[data-lv-lang-menu]');
+          if (btn) btn.setAttribute('aria-expanded', 'false');
+          if (menu) menu.hidden = true;
+        });
+      }
+
+      document.addEventListener('click', function(e) {
+        var toggle = e.target.closest ? e.target.closest('[data-lv-lang-toggle]') : null;
+        if (toggle) {
+          e.preventDefault();
+          var wrap = toggle.closest('[data-lv-lang]');
+          var menu = wrap ? wrap.querySelector('[data-lv-lang-menu]') : null;
+          if (!wrap || !menu) return;
+          var wasOpen = toggle.getAttribute('aria-expanded') === 'true';
+          closeAllLangMenus(wrap);
+          if (wasOpen) {
+            toggle.setAttribute('aria-expanded', 'false');
+            menu.hidden = true;
+          } else {
+            toggle.setAttribute('aria-expanded', 'true');
+            menu.hidden = false;
+          }
+          return;
+        }
+
+        var option = e.target.closest ? e.target.closest('[data-lv-lang-option]') : null;
+        if (option) {
+          e.preventDefault();
+          var optWrap = option.closest('[data-lv-lang]');
+          var form = optWrap ? optWrap.querySelector('form') : null;
+          var input = optWrap ? optWrap.querySelector('[data-lv-lang-input]') : null;
+          var localeVal = option.getAttribute('data-value');
+          if (!localeVal || !form || !input) return;
+          if (input.value === localeVal && option.classList.contains('is-active')) {
+            closeAllLangMenus();
+            return;
+          }
+          input.value = localeVal;
+          closeAllLangMenus();
+          form.submit();
+          return;
+        }
+
+        if (!e.target.closest || !e.target.closest('[data-lv-lang]')) {
+          closeAllLangMenus();
+        }
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+          var openBtn = document.querySelector('[data-lv-lang-toggle][aria-expanded="true"]');
+          if (openBtn) {
+            closeAllLangMenus();
+            openBtn.focus();
+          }
+          return;
+        }
+
+        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+        var wrap = e.target.closest ? e.target.closest('[data-lv-lang]') : null;
+        if (!wrap) return;
+        var menu = wrap.querySelector('[data-lv-lang-menu]');
+        if (!menu || menu.hidden) return;
+        var opts = Array.prototype.slice.call(menu.querySelectorAll('[data-lv-lang-option]'));
+        if (!opts.length) return;
+        e.preventDefault();
+        var idx = opts.indexOf(document.activeElement);
+        if (e.key === 'ArrowDown') {
+          opts[idx < opts.length - 1 ? idx + 1 : 0].focus();
+        } else {
+          opts[idx > 0 ? idx - 1 : opts.length - 1].focus();
+        }
+      });
+    }
+
+    // Logged-in avatar image fallback: reveal initial letter if profile image fails to load
+    if (!document.documentElement.dataset.lvAvatarBound) {
+      document.documentElement.dataset.lvAvatarBound = '1';
+      document.addEventListener('error', function(e) {
+        var img = e.target;
+        if (!img || img.tagName !== 'IMG') return;
+        var wrap = img.closest ? img.closest('[data-lv-avatar]') : null;
+        if (wrap) wrap.classList.add('is-avatar-error');
+      }, true);
+      function checkBrokenAvatars() {
+        document.querySelectorAll('[data-lv-avatar] img').forEach(function(img) {
+          if (img.complete && img.naturalWidth === 0) {
+            var wrap = img.closest ? img.closest('[data-lv-avatar]') : null;
+            if (wrap) wrap.classList.add('is-avatar-error');
+          }
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkBrokenAvatars);
+      } else {
+        checkBrokenAvatars();
+      }
+    }
   })();
 </script>
 
@@ -1531,6 +2057,9 @@ data-header-cart-full="false"
     { "type": "image_picker", "id": "inverse_logo", "label": "Light logo for transparent header", "info": "Optional. If empty, the normal logo is turned white automatically.", "visible_if": "{{ section.settings.header_design == 'modern' }}" },
     { "type": "checkbox", "id": "header_hover_dim", "label": "Soften other items on hover", "info": "Nav links, header icons and mega menu cards/links.", "default": true, "visible_if": "{{ section.settings.header_design == 'modern' }}" },
     { "type": "link_list", "id": "main_menu_link_list", "label": "Navigation menu", "default": "main-menu", "info": "Choose the menu to display in the header from Online Store > Navigation" },
+    { "type": "header", "content": "Language Switcher" },
+    { "type": "checkbox", "id": "show_language_selector", "label": "Show language switcher", "info": "Works with Shopify Translate & Adapt. Published store languages appear automatically.", "default": true },
+    { "type": "select", "id": "language_label_style", "label": "Desktop toggle label", "options": [ { "value": "code", "label": "Language code (e.g. EN)" }, { "value": "name", "label": "Language name (e.g. English)" } ], "default": "code", "visible_if": "{{ section.settings.show_language_selector }}" },
     { "type": "header", "content": "Global Dropdown Styling" },
     { "type": "color", "id": "dropdown_global_bg", "label": "Dropdown background", "default": "#ffffff" },
     { "type": "color", "id": "dropdown_global_text", "label": "Dropdown text color", "default": "#111111" },

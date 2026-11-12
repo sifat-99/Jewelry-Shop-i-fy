@@ -16,21 +16,32 @@
           "type": "slide",
           "settings": {
             "media_type": "video",
-            "video": "shopify://files/videos/banner video 1.mp4",
-            "video_focus": "center",
+            "video": "shopify://files/videos/Video in Dark Green Bright Yellow Modern Elegance Style (4) (1).mp4",
+            "video_focus": "bottom",
             "subheading": "Prachtige stukken om van generatie op generatie door te geven",
             "heading": "Explore the shop",
             "button_label": "Shop all jewellery",
             "button_link": "/collections/bestsellers",
             "text_position": "bottom-left",
+            "text_align": "auto",
+            "content_width": "medium",
+            "button_style": "theme",
+            "button_label_2": "Show New Arraival",
+            "button_link_2": "shopify://collections/new",
+            "button_style_2": "outline_light",
+            "buttons_layout": "inline",
+            "buttons_align": "auto",
             "text_tone": "light",
             "heading_color": "#ffffff",
             "subheading_color": "#ffffff",
             "button_bg": "#ffffff",
             "button_text": "#111111",
-            "color_scheme": "scheme-5",
+            "color_scheme": "scheme-2",
             "overlay_style": "gradient",
-            "overlay_opacity": 40
+            "overlay_opacity": 40,
+            "overlay_color": "#000000",
+            "content_backdrop": "none",
+            "backdrop_opacity": 35
           }
         }
       },
@@ -51,7 +62,7 @@
         "padding_bottom": 0,
         "autoplay": true,
         "autoplay_speed": 3000,
-        "color_scheme": "",
+        "color_scheme": "scheme-2",
         "overlay_opacity": 0
       }
     },
@@ -96,60 +107,88 @@
           "type": "tile",
           "settings": {
             "color_scheme": "scheme-5",
+            "media_type": "video",
             "image": "shopify://shop_images/1-15.webp",
+            "video": "shopify://files/videos/Gold_jewelry_commercial_showcasi…_59333e7c.mp4",
+            "video_focus": "center",
             "subheading": "",
             "title": "",
             "banner_link": "",
-            "button_label": "",
+            "button_label": "Gentlemen",
             "button_link": "shopify://collections/men",
             "link": "",
-            "text_position": "center",
-            "overlay_opacity": 0
+            "text_position": "bottom-left",
+            "text_align": "left",
+            "text_tone": "scheme",
+            "button_style": "link",
+            "overlay_style": "gradient",
+            "overlay_opacity": 70
           }
         },
         "tile_CQghb9": {
           "type": "tile",
           "settings": {
             "color_scheme": "scheme-5",
+            "media_type": "video",
             "image": "shopify://shop_images/1-16.webp",
+            "video": "shopify://files/videos/Gold_pendant_with_fingerprint_en…_56dd761e.mp4",
+            "video_focus": "center",
             "subheading": "",
             "title": "",
             "banner_link": "",
-            "button_label": "",
+            "button_label": "Fingerprint Jewelry",
             "button_link": "shopify://collections/fingerprint-jewelry",
             "link": "",
-            "text_position": "center",
-            "overlay_opacity": 0
+            "text_position": "bottom-left",
+            "text_align": "left",
+            "text_tone": "scheme",
+            "button_style": "link",
+            "overlay_style": "gradient",
+            "overlay_opacity": 80
           }
         },
         "tile_2": {
           "type": "tile",
           "settings": {
             "color_scheme": "scheme-5",
+            "media_type": "video",
             "image": "shopify://shop_images/The_rings.webp",
+            "video": "shopify://files/videos/Gold_and_diamond_rings_resting_0f1e7571.mp4",
+            "video_focus": "center",
             "subheading": "",
             "title": "",
             "banner_link": "",
-            "button_label": "",
+            "button_label": "The Ring",
             "button_link": "",
             "link": "shopify://collections/rings",
-            "text_position": "center",
-            "overlay_opacity": 0
+            "text_position": "bottom-left",
+            "text_align": "left",
+            "text_tone": "scheme",
+            "button_style": "link",
+            "overlay_style": "gradient",
+            "overlay_opacity": 80
           }
         },
         "tile_3": {
           "type": "tile",
           "settings": {
             "color_scheme": "scheme-5",
+            "media_type": "video",
             "image": "shopify://shop_images/1-8.webp",
+            "video": "shopify://files/videos/Gold_hand_chain_on_hand_7bde86de.mp4",
+            "video_focus": "center",
             "subheading": "",
             "title": "",
             "banner_link": "",
-            "button_label": "",
+            "button_label": "Hand Chain",
             "button_link": "",
             "link": "shopify://collections/handchains",
-            "text_position": "center",
-            "overlay_opacity": 0
+            "text_position": "bottom-left",
+            "text_align": "left",
+            "text_tone": "scheme",
+            "button_style": "link",
+            "overlay_style": "gradient",
+            "overlay_opacity": 80
           }
         }
       },
@@ -163,6 +202,8 @@
         "color_scheme": "",
         "heading": "",
         "subheading": "",
+        "heading_position": "above",
+        "heading_align": "center",
         "layout_style": "cols_4",
         "grid_height": "medium",
         "tile_aspect_ratio": "3_2",

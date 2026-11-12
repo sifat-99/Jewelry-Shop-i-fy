@@ -24,21 +24,25 @@
         <div class="fnl__ok" role="status">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
           <div>
-            <p class="fnl__ok-title">{{ s.newsletter_success | default: 'Thank you for subscribing!' | escape }}</p>
+            {%- assign nl_success_default = 'general.newsletter_form.success' | t -%}
+            <p class="fnl__ok-title">{{ s.newsletter_success | default: nl_success_default | escape }}</p>
             {%- if s.newsletter_show_discount and nl_code != blank -%}
-              <p class="fnl__ok-code">Your code: <strong>{{ nl_code | escape }}</strong></p>
+              <p class="fnl__ok-code">{{ 'general.newsletter_form.code_html' | t: code: nl_code }}</p>
             {%- endif -%}
           </div>
         </div>
       {%- else -%}
+        {%- assign nl_placeholder_default = 'general.newsletter_form.email_placeholder' | t -%}
+        {%- assign nl_submit_default = 'general.newsletter_form.submit' | t -%}
+        {%- assign nl_error_default = 'general.newsletter_form.invalid_email' | t -%}
         <input type="hidden" name="contact[tags]" value="newsletter">
-        <label class="fnl__sr" for="fnl-email">Email</label>
+        <label class="fnl__sr" for="fnl-email">{{ 'general.newsletter_form.email_label' | t }}</label>
         <div class="fnl__row">
-          <input id="fnl-email" class="fnl__input" type="email" name="contact[email]" required autocomplete="email" placeholder="{{ s.newsletter_placeholder | default: 'Your email address' | escape }}" value="{{ form.email | escape }}">
-          <button type="submit" class="btn btn--primary fnl__btn" data-button-style="{{ s.newsletter_button_style | default: 'secondary' | escape }}"><span class="btn__text-content">{{ s.newsletter_button | default: 'Subscribe' | escape }}</span></button>
+          <input id="fnl-email" class="fnl__input" type="email" name="contact[email]" required autocomplete="email" placeholder="{{ s.newsletter_placeholder | default: nl_placeholder_default | escape }}" value="{{ form.email | escape }}">
+          <button type="submit" class="btn btn--primary fnl__btn" data-button-style="{{ s.newsletter_button_style | default: 'secondary' | escape }}"><span class="btn__text-content">{{ s.newsletter_button | default: nl_submit_default | escape }}</span></button>
         </div>
         {%- if form.errors -%}
-          <p class="fnl__err" role="alert">{{ form.errors.messages['email'] | default: 'Please enter a valid email address.' }}</p>
+          <p class="fnl__err" role="alert">{{ form.errors.messages['email'] | default: nl_error_default }}</p>
         {%- endif -%}
         {%- if s.newsletter_note != blank -%}<p class="fnl__note">{{ s.newsletter_note | escape }}</p>{%- endif -%}
       {%- endif -%}

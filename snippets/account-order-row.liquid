@@ -7,23 +7,52 @@
   {% render 'account-order-row', order: order %}
 {% enddoc %}
 {%- comment -%} One order row for the account dashboard. Expects: order {%- endcomment -%}
-<div class="ad-order">
-  <div class="ad-order__id">
-    <a href="{{ order.customer_url }}" class="ad-order__num">{{ order.name }}</a>
-    <p class="ad-order__date">{{ order.created_at | date: '%B %d, %Y' }}</p>
-    <div class="ad-order__thumbs">
+<div class="lv-acct-order">
+  <div class="lv-acct-order__id">
+    <button
+      type="button"
+      class="lv-acct-order__num"
+      data-lv-acct-open-modal="LvAcctOrderModal-{{ order.id }}"
+      aria-haspopup="dialog"
+    >
+      {{- order.name -}}
+    </button>
+    <p class="lv-acct-order__date">{{ order.created_at | time_tag: format: 'date' }}</p>
+    <div class="lv-acct-order__thumbs">
       {%- for item in order.line_items limit: 4 -%}
-        {%- if item.image -%}<img src="{{ item.image | image_url: width: 120 }}" alt="{{ item.title | escape }}" title="{{ item.title | escape }}" class="ad-order__thumb" width="52" height="52" loading="lazy">{%- endif -%}
+        {%- if item.image -%}<img src="{{ item.image | image_url: width: 120 }}" alt="{{ item.title | escape }}" title="{{ item.title | escape }}" class="lv-acct-order__thumb" width="52" height="52" loading="lazy">{%- endif -%}
       {%- endfor -%}
-      {%- if order.line_items.size > 4 -%}<span class="ad-order__more">+{{ order.line_items.size | minus: 4 }} more</span>{%- endif -%}
+      {%- if order.line_items.size > 4 -%}{%- assign extra_items_count = order.line_items.size | minus: 4 -%}<span class="lv-acct-order__more">{{ 'customer.orders.more_items' | t: count: extra_items_count }}</span>{%- endif -%}
     </div>
   </div>
-  <div class="ad-order__status">
-    <span class="ad-pill ad-pill--{{ order.financial_status }}">{{ order.financial_status_label }}</span>
-    <span class="ad-pill ad-pill--{{ order.fulfillment_status }}">{{ order.fulfillment_status_label }}</span>
+  {%- assign fin_key = order.financial_status | default: 'pending' | downcase | replace: ' ', '_' -%}
+  {%- assign ful_key = order.fulfillment_status | default: 'unfulfilled' | downcase | replace: ' ', '_' -%}
+  {%- assign has_tracking = false -%}
+  {%- for item in order.line_items -%}
+    {%- if item.fulfillment -%}
+      {%- if item.fulfillment.tracking_number != blank or item.fulfillment.tracking_url != blank -%}
+        {%- assign has_tracking = true -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+  <div class="lv-acct-order__status">
+    {%- if order.cancelled -%}
+      <span class="lv-acct-pill lv-acct-pill--cancelled">{{ 'customer.order.cancelled' | t }}</span>
+    {%- endif -%}
+    <span class="lv-acct-pill lv-acct-pill--{{ fin_key }}">{{ order.financial_status_label }}</span>
+    <span class="lv-acct-pill lv-acct-pill--{{ ful_key }}">{{ order.fulfillment_status_label }}</span>
+    {%- if has_tracking -%}
+      <span class="lv-acct-pill lv-acct-pill--tracking">{{ 'customer.orders.tracking_available' | t }}</span>
+    {%- endif -%}
   </div>
-  <div class="ad-order__buy">
-    <span class="ad-order__total">{{ order.total_price | money_with_currency }}</span>
-    <a href="{{ order.customer_url }}" class="btn btn-sliding-hover ad-btn ad-btn--sm">View order</a>
+  <div class="lv-acct-order__buy">
+    <span class="lv-acct-order__total">{{ order.total_price | money_with_currency }}</span>
+    <button
+      type="button"
+      class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm"
+      data-lv-acct-open-modal="LvAcctOrderModal-{{ order.id }}"
+      aria-haspopup="dialog"
+    >{{ 'customer.orders.view_order' | t }}</button>
   </div>
 </div>

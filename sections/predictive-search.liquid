@@ -15,15 +15,16 @@
       assign total_results = total_results | plus: predictive_search.resources.articles.size
     endif
   -%}
+  {%- assign escaped_terms = predictive_search.terms | escape -%}
   <div class="wrapper">
     <span class="predictive-search-status visually-hidden" data-predictive-search-live-region-count-value role="status">
       {%- if total_results > 0 -%}
-        {{ total_results }} results: {{ predictive_search.resources.products.size }} products
+        {{ 'general.search.predictive_live_region' | t: total: total_results, products: predictive_search.resources.products.size }}
       {%- else -%}
-        No results found for “{{ predictive_search.terms | escape }}”. Check the spelling or use a different word or phrase.
+        {{ 'general.search.no_results_check' | t: terms: escaped_terms }}
       {%- endif -%}
     </span>
-    <div class="search__results__wrapper" id="predictive-search-results" role="listbox" aria-label="Search for “{{ predictive_search.terms | escape }}”">
+    <div class="search__results__wrapper" id="predictive-search-results" role="listbox" aria-label="{{ 'general.search.search_for_terms' | t: terms: escaped_terms }}">
       {%- if total_results > 0 -%}
         <div class="search__results__outer">
           <div class="search__results__other">
@@ -31,12 +32,12 @@
               <div class="search__results__products">
                 <div class="search__results__products__title">
                   <div id="search_product_results_heading" class="search__results__heading">
-                    <p class="search__results__title">Products</p>
+                    <p class="search__results__title">{{ 'general.search.products' | t }}</p>
                     <span class="badge">{{ predictive_search.resources.products.size }}</span>
                   </div>
                 </div>
 
-                <ul aria-label="Products" class="search__results__products__list">
+                <ul aria-label="{{ 'general.search.products' | t }}" class="search__results__products__list">
                   {%- for product in predictive_search.resources.products -%}
                     <div class="product__inline animates" style="animation-delay: {{ forloop.index | times: 90 | plus: 10 }}ms;" role="option" aria-selected="false">
                       <a href="{{ product.url }}" class="product__inline__link">
@@ -76,11 +77,11 @@
             {%- if predictive_search.resources.collections.size > 0 -%}
               <div class="search__results__other__list">
                 <div id="search_collection_results_heading" class="search__results__heading">
-                  <p class="search__results__title">Collections</p>
+                  <p class="search__results__title">{{ 'general.search.collections' | t }}</p>
                   <span class="badge">{{ predictive_search.resources.collections.size }}</span>
                 </div>
 
-                <ul aria-label="Collections" role="group" class="search__results__collections__list">
+                <ul aria-label="{{ 'general.search.collections' | t }}" role="group" class="search__results__collections__list">
                   {%- for collection in predictive_search.resources.collections -%}
                     <div class="other__inline animates" style="animation-delay: {{ forloop.index | times: 90 | plus: 820 }}ms;" id="predictive-search-option-collection-{{ forloop.index }}" role="option" aria-selected="false">
                       <p class="other__inline__title">
@@ -97,8 +98,8 @@
         <div class="search__results__empty">
           <div aria-live="polite">
             <p>
-              No results for
-              <em>{{ predictive_search.terms | escape }}</em>
+              {{ 'general.search.no_results_for' | t }}
+              <em>{{ escaped_terms }}</em>
             </p>
           </div>
         </div>
@@ -113,7 +114,7 @@
           type="button"
           onclick="this.closest('form').submit();"
         >
-          <span data-predictive-search-search-for-text>Search for “{{ predictive_search.terms | escape }}”</span>
+          <span data-predictive-search-search-for-text>{{ 'general.search.search_for_terms' | t: terms: escaped_terms }}</span>
           <span class="ml-r2 accent-size-5 [&>svg]:inline-block">
             <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
           </span>

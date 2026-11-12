@@ -24,9 +24,29 @@
     endif
   endfor
   assign cat_list = cats | split: '||'
-  assign contact_link = cfg.faq_cta_link | default: routes.root_url | append: 'pages/contact'
-  if cfg.faq_cta_link != blank
-    assign contact_link = cfg.faq_cta_link
+  assign root_prefix = routes.root_url
+  unless root_prefix == '/'
+    assign root_prefix = root_prefix | append: '/'
+  endunless
+  assign contact_link = cfg.faq_cta_link
+  if contact_link == blank
+    assign contact_link = root_prefix | append: 'pages/contact'
+  endif
+  assign faq_search_ph = cfg.faq_search_placeholder
+  if faq_search_ph == blank
+    assign faq_search_ph = 'pages.faq.search_placeholder' | t
+  endif
+  assign faq_cta_title = cfg.faq_cta_title
+  if faq_cta_title == blank
+    assign faq_cta_title = 'pages.faq.cta_title' | t
+  endif
+  assign faq_cta_text = cfg.faq_cta_text
+  if faq_cta_text == blank
+    assign faq_cta_text = 'pages.faq.cta_text' | t
+  endif
+  assign faq_cta_label = cfg.faq_cta_label
+  if faq_cta_label == blank
+    assign faq_cta_label = 'pages.faq.cta_label' | t
   endif
 -%}
 <style>
@@ -87,12 +107,12 @@
   <aside class="faq__side">
     <div class="faq__search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input type="search" placeholder="{{ cfg.faq_search_placeholder | default: 'Search questions' }}" aria-label="Search questions" data-faq-search autocomplete="off">
+      <input type="search" placeholder="{{ faq_search_ph }}" aria-label="{{ 'pages.faq.search_label' | t }}" data-faq-search autocomplete="off">
     </div>
 
     {%- if cat_list.size > 0 -%}
-      <div class="faq__cats" role="tablist" aria-label="Question categories" data-faq-cats>
-        <button type="button" class="faq__cat is-active" data-faq-cat="" role="tab" aria-selected="true">All questions <small>{{ total }}</small></button>
+      <div class="faq__cats" role="tablist" aria-label="{{ 'pages.faq.categories_label' | t }}" data-faq-cats>
+        <button type="button" class="faq__cat is-active" data-faq-cat="" role="tab" aria-selected="true">{{ 'pages.faq.all_questions' | t }} <small>{{ total }}</small></button>
         {%- for c in cat_list -%}
           {%- if c != blank -%}
             <button type="button" class="faq__cat" data-faq-cat="{{ c | escape }}" role="tab" aria-selected="false">{{ c }} <small data-faq-count></small></button>
@@ -102,9 +122,9 @@
     {%- endif -%}
 
     <div class="faq__help">
-      <p class="faq__help-title">{{ cfg.faq_cta_title | default: 'Still have questions?' }}</p>
-      <p class="faq__help-text">{{ cfg.faq_cta_text | default: 'Our team is happy to help with sizing, engraving and orders.' }}</p>
-      <a href="{{ contact_link }}" class="btn btn--primary btn-sliding-hover" style="display: flex; align-items: center; justify-content: center; min-height: var(--ctl-h, 46px);"><span class="btn__text-content">{{ cfg.faq_cta_label | default: 'Contact us' }}</span></a>
+      <p class="faq__help-title">{{ faq_cta_title }}</p>
+      <p class="faq__help-text">{{ faq_cta_text }}</p>
+      <a href="{{ contact_link }}" class="btn btn--primary btn-sliding-hover" style="display: flex; align-items: center; justify-content: center; min-height: var(--ctl-h, 46px);"><span class="btn__text-content">{{ faq_cta_label }}</span></a>
     </div>
   </aside>
 
@@ -124,7 +144,7 @@
         {%- endif -%}
       {%- endfor -%}
     </div>
-    <p class="faq__empty" data-faq-empty hidden>No questions match your search. Try another word, or <a href="{{ contact_link }}">contact us</a>.</p>
+    <p class="faq__empty" data-faq-empty hidden>{{ 'pages.faq.no_results_html' | t: contact_url: contact_link }}</p>
   </div>
 </div>
 

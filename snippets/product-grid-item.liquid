@@ -73,10 +73,16 @@
     assign show_discount_badge = true
   endif
 
+  assign show_second_image = settings.card_hover_second_image
+  if show_second_image == nil
+    assign show_second_image = true
+  endif
+
   # Variant & Size Detection
   assign has_size_variants = false
   assign size_option_index = 0
-  assign option_label = 'Option'
+  assign option_label = 'products.product.option_default' | t
+  assign option_label_found = false
 
   unless product.has_only_default_variant
     if product.variants.size > 1
@@ -86,10 +92,11 @@
         if opt_name contains 'size' or opt_name contains 'maat' or opt_name contains 'ring' or opt_name contains 'lengte' or opt_name contains 'length' or opt_name contains 'taille' or opt_name contains 'letter' or opt_name contains 'initial' or opt_name contains 'pendant' or opt_name contains 'charm'
           assign size_option_index = forloop.index0
           assign option_label = option.name
+          assign option_label_found = true
           break
         endif
       endfor
-      if option_label == 'Option' and product.options.size > 0
+      if option_label_found == false and product.options.size > 0
         assign option_label = product.options[0]
       endif
     endif
@@ -97,7 +104,7 @@
 
   if product == blank
     assign has_size_variants = true
-    assign option_label = 'Size'
+    assign option_label = 'products.product.size_default' | t
   endif
 
   # Calculate unique variant count for this option
@@ -130,9 +137,10 @@
 -%}
 
 <product-grid-item
-  aria-label="{{ product.title | default: demo_title | default: 'Jewelry Shop' | escape }}"
+  aria-label="{{ product.title | default: demo_title | default: shop.name | escape }}"
   class="product-grid-item lv-product-card{% if extra_class != blank %} {{ extra_class }}{% endif %}"
   data-hover="{{ settings.card_hover_effect | default: 'zoom_lift' }}"
+  data-second-image="{{ show_second_image }}"
   style="--card-radius: {{ card_radius }}px;"
   data-item-id="{{ product.id | default: fallback_index }}"
   data-price="{{ product.price | divided_by: 100.0 | default: 0 }}"
@@ -147,7 +155,7 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: var(--FONT-STACK-BODY, sans-serif);
     }
     .lv-card-media-wrap {
       position: relative;
@@ -197,11 +205,8 @@
       z-index: 2;
       pointer-events: auto;
     }
-    .lv-card-media-wrap:hover .card-media-slide.is-active {
-      transform: scale(1.03);
-    }
 
-    /* Hover animation (Theme settings > Product Card > Hover animation). Pointer devices only. */
+    /* Hover animation (Theme settings > Product Card > Hover animation / Show 2nd image). Pointer devices only. */
     @media (hover: hover) and (prefers-reduced-motion: no-preference) {
       .lv-product-card[data-hover*="lift"] {
         transition: transform 0.5s cubic-bezier(0.22, 0.8, 0.3, 1);
@@ -210,14 +215,27 @@
       .lv-product-card[data-hover*="lift"]:hover { transform: translateY(-5px); }
       .lv-product-card[data-hover*="lift"] .lv-card-media-wrap { transition: box-shadow 0.5s ease; }
       .lv-product-card[data-hover*="lift"]:hover .lv-card-media-wrap { box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.24); }
-      .lv-product-card[data-hover*="zoom"] .card-media-slide {
+      .lv-product-card[data-hover*="zoom"]:not([data-second-image="true"]) .card-media-slide {
         transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.9s cubic-bezier(0.22, 0.8, 0.3, 1);
       }
-      .lv-product-card[data-hover*="zoom"] .lv-card-media-wrap:hover .card-media-slide.is-active { transform: scale(1.06); }
+      .lv-product-card[data-hover*="zoom"]:not([data-second-image="true"]) .lv-card-media-wrap:hover .card-media-slide.is-active { transform: scale(1.06); }
       .lv-product-card .product__grid__title { transition: letter-spacing 0.4s ease; }
       .lv-product-card[data-hover*="lift"]:hover .product__grid__title { letter-spacing: 0.1em !important; }
     }
-    .lv-product-card[data-hover="none"] .lv-card-media-wrap:hover .card-media-slide.is-active { transform: none; }
+    @media (hover: hover) {
+      .lv-product-card[data-second-image="true"] .card-media-slide[data-slide-index="1"] {
+        visibility: visible;
+        pointer-events: none;
+        transition: opacity 0.38s ease;
+      }
+      .lv-product-card[data-second-image="true"] .lv-card-media-wrap:hover .card-media-slider[data-current-index="0"]:not([data-manual-nav="true"]) .card-media-slide[data-slide-index="1"] {
+        opacity: 1;
+        z-index: 3;
+        pointer-events: auto;
+      }
+    }
+    .lv-product-card[data-hover="none"] .lv-card-media-wrap:hover .card-media-slide.is-active,
+    .lv-product-card[data-second-image="true"] .lv-card-media-wrap:hover .card-media-slide { transform: translateZ(0); }
 
     /* 1. Ribbon Discount Badge (Top-Left) */
 
@@ -494,7 +512,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: var(--TYPE-STACK-BUTTON, sans-serif);
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.12em;
@@ -564,7 +582,7 @@
     .lv-card-bar-sizes {
       display: flex !important;
       align-items: center !important;
-      gap: 5px !important;
+      gap: 6px !important;
       padding: 0 8px !important;
       width: 100% !important;
       height: 100% !important;
@@ -573,6 +591,7 @@
       scrollbar-width: none !important;
       -webkit-overflow-scrolling: touch !important;
       scroll-behavior: smooth !important;
+      scroll-padding-inline: 26px !important;
       box-sizing: border-box !important;
       justify-content: flex-start !important;
       user-select: none !important;
@@ -635,22 +654,33 @@
     .lv-card-size-pill {
       position: relative !important;
       display: inline-flex !important;
+      flex: 0 0 auto !important;
+      flex-shrink: 0 !important;
       align-items: center !important;
       justify-content: center !important;
+      width: auto !important;
       min-width: 32px !important;
+      max-width: none !important;
       height: 30px !important;
-      padding: 0 8px !important;
+      padding: 0 10px !important;
       margin: 0 !important;
       background: var(--bg, #ffffff) !important;
       border: 1px solid var(--lv-border) !important;
       border-radius: var(--btn-radius, 0px) !important;
       color: var(--text, #111111) !important;
-      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-family: var(--TYPE-STACK-BUTTON, sans-serif) !important;
       font-size: 11px !important;
       font-weight: 600 !important;
+      line-height: 1 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
       cursor: pointer !important;
       box-sizing: border-box !important;
       transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, transform 150ms ease !important;
+    }
+    .lv-card-size-text {
+      white-space: nowrap !important;
+      line-height: 1 !important;
     }
 
     /* High contrast black hover on size pills */
@@ -752,24 +782,39 @@
         font-size: 11px !important;
         letter-spacing: 0.1em !important;
       }
+      .lv-card-size-nav {
+        width: 20px !important;
+      }
+      .lv-card-size-nav-prev {
+        background: linear-gradient(90deg, var(--bg, #ffffff) 62%, transparent) !important;
+        padding-right: 4px !important;
+      }
+      .lv-card-size-nav-next {
+        background: linear-gradient(-90deg, var(--bg, #ffffff) 62%, transparent) !important;
+        padding-left: 4px !important;
+      }
       .lv-card-size-pill {
+        flex: 0 0 auto !important;
+        flex-shrink: 0 !important;
+        width: auto !important;
         min-width: 26px !important;
+        max-width: none !important;
         height: 26px !important;
-        font-size: 11px !important;
-        padding: 0 4px !important;
+        font-size: 10px !important;
+        padding: 0 7px !important;
       }
     }
 
     .product__grid__price[data-price-design] .price-item--regular {
       display: inline-block;
-      font-family: 'Quicksand', sans-serif;
+      font-family: var(--FONT-STACK-BODY, sans-serif);
       font-size: var(--card-price-size, 15px);
       font-weight: 600;
       line-height: 1.35;
       color: var(--text, #171717);
     }
     .product__grid__price[data-price-design="editorial_serif"] .price-item--regular {
-      font-family: Georgia, 'Times New Roman', serif;
+      font-family: var(--FONT-STACK-HEADING-ITALIC, var(--FONT-STACK-HEADING, Georgia, serif));
       font-weight: 500;
       letter-spacing: 0.01em;
     }
@@ -780,7 +825,7 @@
     }
     .product__grid__price[data-on-sale="true"] .price-item--regular { color: #8c2b3f; }
     .product__grid__price .price-item--compare {
-      font-family: 'Quicksand', sans-serif;
+      font-family: var(--FONT-STACK-BODY, sans-serif);
       font-size: 12px;
       line-height: 1.35;
       color: color-mix(in srgb, var(--text, #999999) 62%, transparent);
@@ -802,8 +847,8 @@
             type="button"
             class="lv-card-action-btn card-wishlist-btn"
             data-wishlist-id="{{ product.id }}"
-            title="Add to wishlist"
-            aria-label="Add to wishlist"
+            title="{{ 'products.wishlist.add' | t }}"
+            aria-label="{{ 'products.wishlist.add' | t }}"
           >
             <svg class="icon-wishlist-outline" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -820,8 +865,8 @@
             type="button"
             class="lv-card-action-btn card-quickview-btn"
             data-quickview-handle="{{ product.handle }}"
-            title="Quick view"
-            aria-label="Quick view"
+            title="{{ 'products.product.quick_view' | t }}"
+            aria-label="{{ 'products.product.quick_view' | t }}"
           >
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -837,8 +882,8 @@
       <button
         type="button"
         class="lv-card-nav-arrow card-nav-prev {% unless show_arrows_mobile %}hide-on-mobile{% endunless %}"
-        title="Previous image"
-        aria-label="Previous image"
+        title="{{ 'products.product.previous_image' | t }}"
+        aria-label="{{ 'products.product.previous_image' | t }}"
       >
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M15 18l-6-6 6-6"/>
@@ -847,8 +892,8 @@
       <button
         type="button"
         class="lv-card-nav-arrow card-nav-next {% unless show_arrows_mobile %}hide-on-mobile{% endunless %}"
-        title="Next image"
-        aria-label="Next image"
+        title="{{ 'products.product.next_image' | t }}"
+        aria-label="{{ 'products.product.next_image' | t }}"
       >
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 18l6-6-6-6"/>
@@ -857,7 +902,8 @@
     {%- endif -%}
 
     <!-- 4. Product Image Slider Container -->
-    <a href="{{ product.url | default: routes.all_products_collection_url }}" class="lv-card-img-link" aria-label="{{ product.title | default: demo_title | default: 'Jewelry Shop' | escape }}">
+    {%- assign fallback_shop_label = 'products.product.vendor_fallback' | t -%}
+    <a href="{{ product.url | default: routes.all_products_collection_url }}" class="lv-card-img-link" aria-label="{{ product.title | default: demo_title | default: fallback_shop_label | escape }}">
       <div class="card-media-slider" data-current-index="0" data-total-slides="{{ card_media.size | default: 1 }}">
         {%- if card_media.size > 0 -%}
           {%- for item in card_media limit: 6 -%}
@@ -888,13 +934,15 @@
             data-slide-index="0"
           >
         {%- else -%}
+          {%- assign default_product_image_label = 'products.product.product_image' | t -%}
+          {%- assign default_placeholder_label = 'products.product.placeholder' | t -%}
           <svg
             class="card-media-slide is-active"
             data-slide-index="0"
             viewBox="0 0 900 900"
             preserveAspectRatio="xMidYMid slice"
             role="img"
-            aria-label="{{ demo_title | default: 'Product image' | escape }}"
+            aria-label="{{ demo_title | default: default_product_image_label | escape }}"
             style="width:100%;height:100%;display:block;"
           >
             <rect width="900" height="900" fill="#ece7df"/>
@@ -902,8 +950,8 @@
               <circle cx="450" cy="372" r="58"/>
               <path d="M416 322l16-28h36l16 28"/>
             </g>
-            <text x="450" y="510" text-anchor="middle" font-family="Quicksand, sans-serif" font-size="30" letter-spacing="6" fill="#8d8272" font-weight="600">PRODUCT IMAGE</text>
-            <text x="450" y="556" text-anchor="middle" font-family="Quicksand, sans-serif" font-size="22" letter-spacing="3" fill="#a79c8b">{{ demo_title | default: 'Placeholder' | upcase | escape }}</text>
+            <text x="450" y="510" text-anchor="middle" font-family="sans-serif" font-size="30" letter-spacing="6" fill="#8d8272" font-weight="600">{{ default_product_image_label | upcase | escape }}</text>
+            <text x="450" y="556" text-anchor="middle" font-family="sans-serif" font-size="22" letter-spacing="3" fill="#a79c8b">{{ demo_title | default: default_placeholder_label | upcase | escape }}</text>
           </svg>
         {%- endif -%}
       </div>
@@ -920,12 +968,12 @@
             <div class="lv-card-action-bar lv-card-sizes-bar" data-product-handle="{{ product.handle }}">
               <!-- Initial 'Add to Cart' State -->
               <div class="lv-card-bar-label btn__text-content">
-                <span>Add to Cart</span>
+                <span>{{ 'products.product.add_to_cart' | t }}</span>
               </div>
 
               <!-- Size Options State on Hover/Active with Smooth Carousel & Arrows -->
               <div class="lv-card-bar-sizes-wrap">
-                <button type="button" class="lv-card-size-nav lv-card-size-nav-prev is-hidden" aria-label="Previous options" tabindex="-1">
+                <button type="button" class="lv-card-size-nav lv-card-size-nav-prev is-hidden" aria-label="{{ 'products.product.previous_options' | t }}" tabindex="-1">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
 
@@ -942,7 +990,7 @@
                           class="lv-card-size-pill {% unless variant.available %}is-sold-out{% endunless %}"
                           data-variant-id="{{ variant.id }}"
                           data-size="{{ size_val | escape }}"
-                          {% unless variant.available %}disabled title="Sold out"{% else %}title="Add {{ size_val | escape }}"{% endunless %}
+                          {% unless variant.available %}disabled title="{{ 'products.product.sold_out' | t }}"{% else %}title="{{ 'products.product.add_option' | t: value: size_val }}"{% endunless %}
                           aria-label="{{ size_val | escape }}"
                         >
                           <span class="lv-card-size-text">{{ size_val }}</span>
@@ -960,7 +1008,7 @@
                   {%- endif -%}
                 </div>
 
-                <button type="button" class="lv-card-size-nav lv-card-size-nav-next is-hidden" aria-label="Next options" tabindex="-1">
+                <button type="button" class="lv-card-size-nav lv-card-size-nav-next is-hidden" aria-label="{{ 'products.product.next_options' | t }}" tabindex="-1">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </button>
               </div>
@@ -971,11 +1019,11 @@
               type="button"
               class="lv-card-action-bar lv-card-direct-add-btn"
               data-variant-id="{{ current_variant.id }}"
-              title="Add to cart"
-              aria-label="Add to cart"
+              title="{{ 'products.product.add_to_cart' | t }}"
+              aria-label="{{ 'products.product.add_to_cart' | t }}"
             >
               <span class="lv-card-bar-label btn__text-content">
-                <span>Add to Cart</span>
+                <span>{{ 'products.product.add_to_cart' | t }}</span>
               </span>
               <span class="lv-card-size-spinner" style="display: none;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
@@ -984,9 +1032,9 @@
           {%- endif -%}
         {%- else -%}
           <!-- Product Sold Out -->
-          <div class="lv-card-action-bar is-disabled" title="Sold out">
+          <div class="lv-card-action-bar is-disabled" title="{{ 'products.product.sold_out' | t }}">
             <span class="lv-card-bar-label btn__text-content" style="opacity: 0.5;">
-              <span>Sold Out</span>
+              <span>{{ 'products.product.sold_out' | t }}</span>
             </span>
           </div>
         {%- endif -%}
@@ -996,16 +1044,16 @@
 
   <!-- Product Info: Title & Price -->
   <div class="product__grid__info text-{{ settings.product_card_text_alignment | default: 'left' }}" style="text-align: {{ settings.product_card_text_alignment | default: 'left' }};">
-    <a href="{{ product.url | default: routes.all_products_collection_url }}" data-grid-link aria-label="{{ product.title | default: demo_title | default: 'Jewelry Shop' | escape }}">
+    <a href="{{ product.url | default: routes.all_products_collection_url }}" data-grid-link aria-label="{{ product.title | default: demo_title | default: fallback_shop_label | escape }}">
       {%- if settings.show_vendor -%}
         <div class="product__grid__vendor" style="font-size: 10.5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-light, #555); margin-bottom: 3px;">
-          Jewelry Shop
+          {{ product.vendor | default: fallback_shop_label }}
         </div>
       {%- endif -%}
 
       <div class="product__grid__title__wrapper">
-        <p class="product__grid__title" style="font-family: 'Quicksand', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 6px 0; color: var(--text);">
-          {{ product.title | default: demo_title | default: 'Jewelry Shop' }}
+        <p class="product__grid__title" style="font-family: var(--FONT-STACK-CARD-TITLE, var(--FONT-STACK-HEADING)); font-size: var(--FONT-SIZE-CARD-TITLE, 13px); font-weight: var(--FONT-WEIGHT-CARD-TITLE, 600); letter-spacing: 0.04em; margin: 0 0 6px 0; color: var(--text);">
+          {{ product.title | default: demo_title | default: fallback_shop_label }}
         </p>
       </div>
 
@@ -1053,7 +1101,8 @@
             if (callback) callback();
           });
       } else {
-        fetch('/cart/add.js', {
+        var cartAddUrl = (window.theme && window.theme.routes && window.theme.routes.cart_add_url ? window.theme.routes.cart_add_url : {{ routes.cart_add_url | json }}) + '.js';
+        fetch(cartAddUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: variantId, quantity: 1 })
@@ -1163,11 +1212,59 @@
       }
     }, true);
 
-    // Initial check on mouseover/hover
+    function syncAllCardBars() {
+      document.querySelectorAll('.lv-card-sizes-bar').forEach(updateBarArrows);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', syncAllCardBars);
+    } else {
+      syncAllCardBars();
+    }
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(syncAllCardBars);
+    }
+    var lvResizeTimer = null;
+    window.addEventListener('resize', function() {
+      clearTimeout(lvResizeTimer);
+      lvResizeTimer = setTimeout(syncAllCardBars, 120);
+    });
+
+    // Initial check on hover/focus across card or quick-add bar
     document.addEventListener('mouseover', function(e) {
+      var bar = e.target.closest('.lv-card-sizes-bar');
+      if (!bar) {
+        var wrap = e.target.closest('.lv-card-media-wrap');
+        if (wrap) bar = wrap.querySelector('.lv-card-sizes-bar');
+      }
+      if (bar) {
+        updateBarArrows(bar);
+      }
+    });
+    document.addEventListener('focusin', function(e) {
       var bar = e.target.closest('.lv-card-sizes-bar');
       if (bar) {
         updateBarArrows(bar);
+      }
+    });
+
+    // Reset manual slider override when leaving a card at slide 0, and promote 2nd image loading on hover
+    document.addEventListener('mouseover', function(e) {
+      var wrap = e.target.closest('.lv-card-media-wrap');
+      if (!wrap) return;
+      var card = wrap.closest('.lv-product-card[data-second-image="true"]');
+      if (card) {
+        var secondSlide = wrap.querySelector('.card-media-slide[data-slide-index="1"][loading="lazy"]');
+        if (secondSlide) secondSlide.setAttribute('loading', 'eager');
+      }
+    });
+    document.addEventListener('mouseout', function(e) {
+      var wrap = e.target.closest('.lv-card-media-wrap');
+      if (!wrap) return;
+      if (e.relatedTarget && wrap.contains(e.relatedTarget)) return;
+      var slider = wrap.querySelector('.card-media-slider[data-manual-nav="true"]');
+      if (slider && slider.getAttribute('data-current-index') === '0') {
+        slider.removeAttribute('data-manual-nav');
       }
     });
 
@@ -1222,8 +1319,9 @@
           var wrap = navPrev.closest('.lv-card-bar-sizes-wrap');
           var track = wrap ? wrap.querySelector('.lv-card-bar-sizes') : null;
           if (track) {
-            track.scrollBy({ left: -130, behavior: 'smooth' });
-            setTimeout(function() { updateBarArrows(sizesBar); }, 250);
+            var prevStep = Math.max(96, Math.round(track.clientWidth * 0.72));
+            track.scrollBy({ left: -prevStep, behavior: 'smooth' });
+            setTimeout(function() { updateBarArrows(sizesBar); }, 350);
           }
           return;
         }
@@ -1235,8 +1333,9 @@
           var wrap = navNext.closest('.lv-card-bar-sizes-wrap');
           var track = wrap ? wrap.querySelector('.lv-card-bar-sizes') : null;
           if (track) {
-            track.scrollBy({ left: 130, behavior: 'smooth' });
-            setTimeout(function() { updateBarArrows(sizesBar); }, 250);
+            var nextStep = Math.max(96, Math.round(track.clientWidth * 0.72));
+            track.scrollBy({ left: nextStep, behavior: 'smooth' });
+            setTimeout(function() { updateBarArrows(sizesBar); }, 350);
           }
           return;
         }
@@ -1316,6 +1415,19 @@
         var currIdx = parseInt(slider.getAttribute('data-current-index') || '0', 10);
         if (isNaN(currIdx)) currIdx = 0;
         var total = slides.length;
+        var card = cardMedia.closest('.lv-product-card');
+        if (
+          card &&
+          card.getAttribute('data-second-image') === 'true' &&
+          !slider.hasAttribute('data-manual-nav') &&
+          currIdx === 0 &&
+          window.matchMedia &&
+          window.matchMedia('(hover: hover)').matches &&
+          cardMedia.matches(':hover')
+        ) {
+          currIdx = 1;
+        }
+        slider.setAttribute('data-manual-nav', 'true');
         var nextIdx;
 
         if (navArrow.classList.contains('card-nav-next')) {

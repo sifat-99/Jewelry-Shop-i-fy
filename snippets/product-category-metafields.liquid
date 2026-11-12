@@ -1,0 +1,22 @@
+{% doc %}
+  Renders the product's Shopify category (taxonomy) metafields as selectable chips, e.g. Color, Jewelry material, Jewelry type.
+  Reads every metafield in the "shopify" namespace and prints nothing when the product has none.
+
+  @param {product} product - The product to read the category metafields from
+  @param {string} [heading] - Optional heading above the attributes
+  @param {boolean} [link_values] - Link each value to the filtered collection (needs the filter in Search & Discovery)
+
+  @example
+  {% render 'product-category-metafields', product: product, heading: 'Details', link_values: true %}
+{% enddoc %}
+{%- liquid
+  assign cm_html = ''
+  assign has_any = false
+  assign cm_dbg = ''
+  for mf in product.metafields.shopify
+    assign cm_key = mf[0]
+    assign cm_meta = mf[1]
+    assign cm_dbg = cm_dbg | append: cm_key | append: ','
+  endfor
+-%}
+<!-- LVCM: {{ cm_dbg }} -->

@@ -45,18 +45,18 @@
     object-fit: contain;
   }
   .icon-box h4 {
-    font-family: 'Quicksand', sans-serif;
-    font-size: 13.5px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-family: var(--FONT-STACK-HEADING, sans-serif);
+    font-size: 14px;
+    font-weight: var(--FONT-WEIGHT-HEADING, 600);
+    text-transform: var(--FONT-HEADING-TRANSFORM, uppercase);
+    letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.08em);
     margin: 0 0 6px 0;
     color: var(--text, #111111);
   }
   .icon-box p {
-    font-family: 'Quicksand', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
+    font-family: var(--FONT-STACK-BODY, sans-serif);
+    font-size: 12.5px;
+    font-weight: var(--FONT-WEIGHT-BODY, 500);
     color: var(--text, #2b2622);
     margin: 0;
     line-height: 1.5;
@@ -85,7 +85,8 @@
         <div class="icon-box" {{ block.shopify_attributes }}>
           <div class="icon-svg-wrap">
             {%- if block.settings.custom_icon != blank -%}
-              <img src="{{ block.settings.custom_icon | image_url: width: 88 }}" alt="{{ block.settings.title | default: 'Icon' | escape }}" width="44" height="44" loading="lazy">
+              {%- assign icon_default_alt = 'sections.trust_icons.icon_alt' | t -%}
+              <img src="{{ block.settings.custom_icon | image_url: width: 88 }}" alt="{{ block.settings.title | default: icon_default_alt | escape }}" width="44" height="44" loading="lazy">
             {%- else -%}
               {%- case block.settings.icon_name -%}
                 {%- when 'waterproof' -%}
@@ -122,29 +123,29 @@
         <div class="icon-svg-wrap">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
         </div>
-        <h4>Free Shipping from €39</h4>
-        <p>Fast dispatch within 24-48 hours</p>
+        <h4>{{ 'sections.trust_icons.shipping_title' | t }}</h4>
+        <p>{{ 'sections.trust_icons.shipping_text' | t }}</p>
       </div>
       <div class="icon-box">
         <div class="icon-svg-wrap">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
         </div>
-        <h4>100% Waterproof</h4>
-        <p>Stainless steel, never discolors or tarnishes</p>
+        <h4>{{ 'sections.trust_icons.waterproof_title' | t }}</h4>
+        <p>{{ 'sections.trust_icons.waterproof_text' | t }}</p>
       </div>
       <div class="icon-box">
         <div class="icon-svg-wrap">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
         </div>
-        <h4>Personal Touch</h4>
-        <p>Custom engraving crafted with precision</p>
+        <h4>{{ 'sections.trust_icons.engraving_title' | t }}</h4>
+        <p>{{ 'sections.trust_icons.engraving_text' | t }}</p>
       </div>
       <div class="icon-box">
         <div class="icon-svg-wrap">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
         </div>
-        <h4>14 Days Returns</h4>
-        <p>Hassle-free return policy</p>
+        <h4>{{ 'sections.trust_icons.returns_title' | t }}</h4>
+        <p>{{ 'sections.trust_icons.returns_text' | t }}</p>
       </div>
     {%- endif -%}
   </div>

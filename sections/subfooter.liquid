@@ -1,12 +1,12 @@
 <!-- /sections/subfooter.liquid -->
 {%- liquid
   assign current_year = 'now' | date: '%Y'
-  assign default_copyright = '© {year} {shop_name}. All rights reserved.'
   assign copyright_raw = section.settings.copyright_text
   if copyright_raw == blank
-    assign copyright_raw = default_copyright
+    assign copyright_rendered = 'sections.subfooter.copyright_default' | t: year: current_year, shop_name: shop.name
+  else
+    assign copyright_rendered = copyright_raw | replace: '{year}', current_year | replace: '{shop_name}', shop.name
   endif
-  assign copyright_rendered = copyright_raw | replace: '{year}', current_year | replace: '{shop_name}', shop.name
 
   if settings.use_brand_logo and shop.brand.logo != blank
     assign fallback_logo = shop.brand.logo
@@ -73,12 +73,15 @@
         <!-- Custom Trust Badges / Extra Logos (if enabled) -->
         {%- if section.settings.show_trust_badges -%}
           {%- assign tb_h = section.settings.trust_badges_height | default: 24 -%}
+          {%- assign tb_alt_1 = 'sections.subfooter.trust_badge_alt' | t: number: 1 -%}
+          {%- assign tb_alt_2 = 'sections.subfooter.trust_badge_alt' | t: number: 2 -%}
+          {%- assign tb_alt_3 = 'sections.subfooter.trust_badge_alt' | t: number: 3 -%}
           <div class="subfooter__trust-badges" style="--badge-h: {{ tb_h }}px;">
             {%- if section.settings.trust_badge_1 != blank -%}
               {%- assign tb1_ratio = section.settings.trust_badge_1.aspect_ratio | default: 3.0 -%}
               {%- assign tb1_w = tb_h | times: tb1_ratio | round -%}
               {%- if section.settings.trust_badge_1_link != blank -%}<a href="{{ section.settings.trust_badge_1_link }}" class="subfooter__trust-badge-link" target="_blank" rel="noopener">{%- endif -%}
-                <img src="{{ section.settings.trust_badge_1 | image_url: height: 60 }}" alt="{{ section.settings.trust_badge_1.alt | default: 'Trust Badge 1' | escape }}" width="{{ tb1_w }}" height="{{ tb_h }}" class="subfooter__trust-img" loading="lazy">
+                <img src="{{ section.settings.trust_badge_1 | image_url: height: 60 }}" alt="{{ section.settings.trust_badge_1.alt | default: tb_alt_1 | escape }}" width="{{ tb1_w }}" height="{{ tb_h }}" class="subfooter__trust-img" loading="lazy">
               {%- if section.settings.trust_badge_1_link != blank -%}</a>{%- endif -%}
             {%- endif -%}
 
@@ -86,7 +89,7 @@
               {%- assign tb2_ratio = section.settings.trust_badge_2.aspect_ratio | default: 3.0 -%}
               {%- assign tb2_w = tb_h | times: tb2_ratio | round -%}
               {%- if section.settings.trust_badge_2_link != blank -%}<a href="{{ section.settings.trust_badge_2_link }}" class="subfooter__trust-badge-link" target="_blank" rel="noopener">{%- endif -%}
-                <img src="{{ section.settings.trust_badge_2 | image_url: height: 60 }}" alt="{{ section.settings.trust_badge_2.alt | default: 'Trust Badge 2' | escape }}" width="{{ tb2_w }}" height="{{ tb_h }}" class="subfooter__trust-img" loading="lazy">
+                <img src="{{ section.settings.trust_badge_2 | image_url: height: 60 }}" alt="{{ section.settings.trust_badge_2.alt | default: tb_alt_2 | escape }}" width="{{ tb2_w }}" height="{{ tb_h }}" class="subfooter__trust-img" loading="lazy">
               {%- if section.settings.trust_badge_2_link != blank -%}</a>{%- endif -%}
             {%- endif -%}
 
@@ -94,7 +97,7 @@
               {%- assign tb3_ratio = section.settings.trust_badge_3.aspect_ratio | default: 3.0 -%}
               {%- assign tb3_w = tb_h | times: tb3_ratio | round -%}
               {%- if section.settings.trust_badge_3_link != blank -%}<a href="{{ section.settings.trust_badge_3_link }}" class="subfooter__trust-badge-link" target="_blank" rel="noopener">{%- endif -%}
-                <img src="{{ section.settings.trust_badge_3 | image_url: height: 60 }}" alt="{{ section.settings.trust_badge_3.alt | default: 'Trust Badge 3' | escape }}" width="{{ tb3_w }}" height="{{ tb_h }}" class="subfooter__trust-img" loading="lazy">
+                <img src="{{ section.settings.trust_badge_3 | image_url: height: 60 }}" alt="{{ section.settings.trust_badge_3.alt | default: tb_alt_3 | escape }}" width="{{ tb3_w }}" height="{{ tb_h }}" class="subfooter__trust-img" loading="lazy">
               {%- if section.settings.trust_badge_3_link != blank -%}</a>{%- endif -%}
             {%- endif -%}
           </div>
@@ -109,9 +112,10 @@
               {%- assign cpi_w = section.settings.custom_payment_image_width | default: 240 -%}
               {%- assign cpi_ratio = section.settings.custom_payment_image.aspect_ratio | default: 4.0 -%}
               {%- assign cpi_h = cpi_w | divided_by: cpi_ratio | round -%}
+              {%- assign pay_alt_default = 'sections.subfooter.payment_methods_alt' | t -%}
               <img
                 src="{{ section.settings.custom_payment_image | image_url: width: cpi_w }}"
-                alt="{{ section.settings.custom_payment_image.alt | default: 'Supported Payment Methods' | escape }}"
+                alt="{{ section.settings.custom_payment_image.alt | default: pay_alt_default | escape }}"
                 width="{{ cpi_w }}"
                 height="{{ cpi_h }}"
                 loading="lazy"
@@ -352,19 +356,21 @@
                   </li>
                 {%- endif -%}
 
+                {%- assign payment_fallback_label = 'sections.footer.payment_method' | t -%}
                 {%- if section.settings.payment_cod -%}
-                  <li class="subfooter__payment-item" title="Cash on Delivery">
+                  {%- assign cod_label = 'sections.footer.cash_on_delivery' | t -%}
+                  <li class="subfooter__payment-item" title="{{ cod_label | escape }}">
                     {%- if section.settings.payment_cod_icon != blank -%}
                       <img
                         src="{{ section.settings.payment_cod_icon | image_url: height: 48 }}"
-                        alt="{{ section.settings.payment_cod_icon.alt | default: 'Cash on Delivery' | escape }}"
+                        alt="{{ section.settings.payment_cod_icon.alt | default: cod_label | escape }}"
                         width="38"
                         height="24"
                         class="subfooter__payment-icon-img"
                         loading="lazy"
                       >
                     {%- else -%}
-                      <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-label="Cash on Delivery"><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#1A7F37" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z"/><text x="19" y="15" fill="#fff" font-family="'Quicksand',sans-serif" font-weight="700" font-size="9" text-anchor="middle" letter-spacing="1">COD</text></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-label="{{ cod_label | escape }}"><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path fill="#1A7F37" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z"/><text x="19" y="15" fill="#fff" font-family="sans-serif" font-weight="700" font-size="9" text-anchor="middle" letter-spacing="1">COD</text></svg>
                     {%- endif -%}
                   </li>
                 {%- endif -%}
@@ -391,10 +397,10 @@
                   {%- assign icon_key = 'custom_payment_' | append: i | append: '_icon' -%}
                   {%- assign title_key = 'custom_payment_' | append: i | append: '_title' -%}
                   {%- if section.settings[enable_key] and section.settings[icon_key] != blank -%}
-                    <li class="subfooter__payment-item" title="{{ section.settings[title_key] | default: 'Payment' | escape }}">
+                    <li class="subfooter__payment-item" title="{{ section.settings[title_key] | default: payment_fallback_label | escape }}">
                       <img
                         src="{{ section.settings[icon_key] | image_url: height: 48 }}"
-                        alt="{{ section.settings[title_key] | default: 'Payment' | escape }}"
+                        alt="{{ section.settings[title_key] | default: payment_fallback_label | escape }}"
                         width="38"
                         height="24"
                         class="subfooter__payment-icon-img"
@@ -406,12 +412,12 @@
 
                 {%- for block in section.blocks -%}
                   {%- if block.type == 'custom_payment' and block.settings.icon != blank -%}
-                    <li class="subfooter__payment-item" title="{{ block.settings.title | default: 'Payment' | escape }}" {{ block.shopify_attributes }}>
+                    <li class="subfooter__payment-item" title="{{ block.settings.title | default: payment_fallback_label | escape }}" {{ block.shopify_attributes }}>
                       {%- if block.settings.link != blank -%}
-                        <a href="{{ block.settings.link }}" target="_blank" rel="noopener" aria-label="{{ block.settings.title | escape }}">
+                        <a href="{{ block.settings.link }}" target="_blank" rel="noopener" aria-label="{{ block.settings.title | default: payment_fallback_label | escape }}">
                           <img
                             src="{{ block.settings.icon | image_url: height: 48 }}"
-                            alt="{{ block.settings.title | default: 'Payment' | escape }}"
+                            alt="{{ block.settings.title | default: payment_fallback_label | escape }}"
                             width="38"
                             height="24"
                             class="subfooter__payment-icon-img"
@@ -421,7 +427,7 @@
                       {%- else -%}
                         <img
                           src="{{ block.settings.icon | image_url: height: 48 }}"
-                          alt="{{ block.settings.title | default: 'Payment' | escape }}"
+                          alt="{{ block.settings.title | default: payment_fallback_label | escape }}"
                           width="38"
                           height="24"
                           class="subfooter__payment-icon-img"

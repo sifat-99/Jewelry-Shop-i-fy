@@ -2,13 +2,14 @@
 <div class="customer-account-page page-width">
   <header class="account-header">
     <div class="account-header__meta">
-      <span class="account-badge">VIP PRIVILEGES</span>
-      <h1 class="account-title">{{ 'customer.account.title' | default: 'My Account' }}</h1>
-      <p class="account-welcome">Welcome back, {{ customer.first_name | default: customer.name }}!</p>
+      <span class="account-badge">{{ 'customer.account.vip_badge' | t }}</span>
+      <h1 class="account-title">{{ 'customer.account.title' | t }}</h1>
+      {%- assign customer_display_name = customer.first_name | default: customer.name -%}
+      <p class="account-welcome">{{ 'customer.account.welcome_back_name' | t: name: customer_display_name }}</p>
     </div>
     <div class="account-header__actions">
       <a href="{{ routes.account_logout_url }}" class="btn btn-sliding-hover account-logout-btn">
-        {{ 'customer.log_out' | default: 'Log Out' }}
+        {{ 'customer.log_out' | t }}
       </a>
     </div>
   </header>
@@ -16,7 +17,7 @@
   <div class="account-grid">
     <!-- Order History -->
     <div class="account-orders">
-      <h2 class="account-section-title">{{ 'customer.orders.title' | default: 'Order History' }}</h2>
+      <h2 class="account-section-title">{{ 'customer.orders.title' | t }}</h2>
 
       {%- paginate customer.orders by 20 -%}
         {%- if customer.orders.size > 0 -%}
@@ -24,11 +25,11 @@
             <table class="account-orders-table">
               <thead>
                 <tr>
-                  <th>Order</th>
-                  <th>Date</th>
-                  <th>Payment</th>
-                  <th>Fulfillment</th>
-                  <th>Total</th>
+                  <th>{{ 'customer.orders.order_number' | t }}</th>
+                  <th>{{ 'customer.orders.date' | t }}</th>
+                  <th>{{ 'customer.orders.payment_status' | t }}</th>
+                  <th>{{ 'customer.orders.fulfillment_status' | t }}</th>
+                  <th>{{ 'customer.orders.total' | t }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -55,9 +56,9 @@
           {%- endif -%}
         {%- else -%}
           <div class="account-empty-state">
-            <p>{{ 'customer.orders.none' | default: "You haven't placed any orders yet." }}</p>
+            <p>{{ 'customer.orders.none' | t }}</p>
             <a href="{{ routes.all_products_collection_url }}" class="btn btn-sliding-hover account-btn">
-              START SHOPPING
+              {{ 'customer.account.start_shopping' | t }}
             </a>
           </div>
         {%- endif -%}
@@ -66,21 +67,21 @@
 
     <!-- Account Details / Addresses -->
     <div class="account-details">
-      <h2 class="account-section-title">{{ 'customer.account.details' | default: 'Account Details' }}</h2>
+      <h2 class="account-section-title">{{ 'customer.account.details' | t }}</h2>
       <div class="account-card">
         <p class="account-name"><strong>{{ customer.name | escape }}</strong></p>
         <p class="account-email">{{ customer.email | escape }}</p>
 
         {%- if customer.default_address -%}
           <div class="account-address-default">
-            <h3 class="address-subhead">Default Shipping Address</h3>
+            <h3 class="address-subhead">{{ 'customer.addresses.default_shipping' | t }}</h3>
             {{ customer.default_address | format_address }}
           </div>
         {%- endif -%}
 
         <div class="account-card-action">
           <a href="{{ routes.account_addresses_url }}" class="account-link">
-            View & Manage Addresses ({{ customer.addresses_count }}) &rarr;
+            {{ 'customer.account.view_addresses_with_count' | t: count: customer.addresses_count }} &rarr;
           </a>
         </div>
       </div>
@@ -114,11 +115,11 @@
     margin-bottom: 6px;
   }
   .account-title {
-    font-family: 'Quicksand', sans-serif;
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-family: var(--FONT-STACK-HEADING, sans-serif);
+    font-size: calc(32px * var(--FONT-ADJUST-HEADING, 1));
+    font-weight: var(--FONT-WEIGHT-HEADING, 700);
+    letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.04em);
+    text-transform: var(--FONT-HEADING-TRANSFORM, uppercase);
     margin: 0 0 6px;
   }
   .account-welcome {
@@ -141,11 +142,11 @@
     }
   }
   .account-section-title {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--FONT-STACK-HEADING, sans-serif);
     font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-weight: var(--FONT-WEIGHT-HEADING, 700);
+    letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.08em);
+    text-transform: var(--FONT-HEADING-TRANSFORM, uppercase);
     margin: 0 0 20px;
     padding-bottom: 12px;
     border-bottom: 1px solid #f0ede6;

@@ -165,18 +165,18 @@
     data-cart-message-container
     data-drawer="drawer-cart"
     id="drawer-cart">
-    <div class="drawer__content" aria-label="Shopping cart">
+    <div class="drawer__content" aria-label="{{ 'cart.title' | t }}">
       
       <!-- Top Bar: Title & Close 'X' Button -->
       <div class="drawer__top">
         <div class="drawer__top__left">
-          <p class="cart__drawer__title">Shopping cart</p>
+          <p class="cart__drawer__title">{{ 'cart.title' | t }}</p>
         </div>
 
         <button class="drawer__button drawer__close"
           data-first-focus
           data-drawer-toggle="drawer-cart"
-          aria-label="Close">
+          aria-label="{{ 'accessibility.close' | t }}">
           <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
@@ -191,6 +191,13 @@
             assign free_shipping_limit = 39
           endif
           assign free_shipping_limit_cents = free_shipping_limit | times: 100
+          if cart.total_price < free_shipping_limit_cents
+            assign free_shipping_left_money = free_shipping_limit_cents | minus: cart.total_price | money
+          else
+            assign free_shipping_left_money = 0 | money
+          endif
+          assign free_shipping_left_html = '<span data-left-to-spend class="strong">' | append: free_shipping_left_money | append: '</span>'
+          assign free_shipping_threshold_money = free_shipping_limit_cents | money
         -%}
         <p class="cart__message {% if cart.total_price >= free_shipping_limit_cents and cart.item_count > 0 %}is-success{% endif %}" data-cart-message="true" data-limit="{{ free_shipping_limit }}">
           <small class="cart__graph">
@@ -206,18 +213,10 @@
             </svg>
           </small>
 
-          <span class="cart__message-success">Congratulations! Your order qualifies for free shipping</span>
+          <span class="cart__message-success">{{ 'cart.shipping_bar.unlocked' | t }}</span>
 
           <span class="cart__message-default">
-            Yet 
-            <span data-left-to-spend class="strong">
-              {%- if cart.total_price < free_shipping_limit_cents -%}
-                {{ free_shipping_limit_cents | minus: cart.total_price | money }}
-              {%- else -%}
-                {{ 0 | money }}
-              {%- endif -%}
-            </span>
-            for free shipping
+            {{ 'cart.shipping_bar.remaining_html' | t: amount: free_shipping_left_html }}
           </span>
         </p>
 
@@ -227,7 +226,7 @@
         <div class="{% if cart.item_count > 0 %}cart--hidden{% endif %}" data-cart-empty style="{% if cart.item_count > 0 %}display: none;{% endif %}">
           <div class="cart__empty align--middle-center">
             <div class="wrapper">
-              <p class="body-size-7 m-0">Your shopping cart is empty</p>
+              <p class="body-size-7 m-0">{{ 'cart.empty' | t }}</p>
               <div class="image-overlay" style="--overlay-opacity: 0.05;"></div>
             </div>
           </div>
@@ -236,7 +235,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-classic-cart" viewBox="0 0 24 24"><path d="M20.5 16.5H5.715l1.082-4.195-2.126-7.456L3.715 1.5H1.5m5.22 10h11.702l3.002-6.13s.428-.87-.745-.87H4.5m2 16.986a1 1 0 1 0 2 .028 1 1 0 0 0-2-.028Zm11 .014a1 1 0 1 0 2 0 1 1 0 0 0-2 0Z"/><circle class="icon-cart-full" cx="13" cy="4.5" r="4"/></svg>
             </div>
             <p class="cart__continue__link">
-              Continue shopping
+              {{ 'cart.continue_shopping' | t }}
             </p>
           </a>
         </div>
@@ -258,7 +257,7 @@
 
           <form id="cart-form" action="{{ routes.cart_url }}" method="post" novalidate class="cart">
             <button type="submit" name="checkout" class="btn btn--primary btn--large btn--full checkout__button" data-button-style="{{ settings.cart_checkout_button_style | default: 'solid' | escape }}">
-              <span>Proceed to Checkout •</span>
+              <span>{{ 'cart.checkout' | t }} •</span>
               <span data-cart-final style="margin-left: 4px;">
                 {{ cart.total_price | money }}
               </span>
@@ -272,12 +271,12 @@
         <div class="drawer__bottom drawer__bottom--notes {% if cart.item_count == 0 %}cart--hidden{% endif %}" data-cart-bottom style="{% if cart.item_count == 0 %}display: none;{% endif %}">
           <center>
             <div style="font-weight: bold; text-transform: uppercase; margin: 10px 0; font-size: 13px; letter-spacing: 0.05em;">
-              Free shipping on orders over {{ free_shipping_limit_cents | money }}
+              {{ 'cart.shipping_bar.notice' | t: amount: free_shipping_threshold_money }}
             </div>
           </center>
 
           <center>
-            <img src="https://cdn.shopify.com/s/files/1/0642/5221/5561/files/Conversie_afbeeldingen_Shopify_11.png?v=1727602721" alt="Payment Methods" style="width: 70%; padding-bottom: 5px;" width="300" height="40" loading="lazy">
+            <img src="https://cdn.shopify.com/s/files/1/0642/5221/5561/files/Conversie_afbeeldingen_Shopify_11.png?v=1727602721" alt="{{ 'cart.payment_methods' | t }}" style="width: 70%; padding-bottom: 5px;" width="300" height="40" loading="lazy">
           </center>
         </div>
         {%- endcapture -%}
@@ -388,6 +387,11 @@
     }
 
     // Global Cart Drawer Open/Close Helpers
+    var routesObj = (typeof theme !== 'undefined' && theme.routes) ? theme.routes : {};
+    var cartJsonUrl = (routesObj.cart || {{ routes.cart_url | json }}) + '.js';
+    var cartAddJsonUrl = (routesObj.cart_add_url || {{ routes.cart_add_url | json }}) + '.js';
+    var addingText = (typeof theme !== 'undefined' && theme.i18n && theme.i18n.adding) ? theme.i18n.adding : {{ 'products.product.adding' | t | json }};
+
     window.openCartDrawer = function() {
       var drawer = document.getElementById('drawer-cart');
       if (drawer) {
@@ -395,7 +399,7 @@
       }
       document.dispatchEvent(new CustomEvent('theme:cart:reload', { bubbles: true }));
       // Direct live cart fetch and UI sync
-      fetch('/cart.js')
+      fetch(cartJsonUrl)
         .then(function(res) { return res.json(); })
         .then(function(cart) {
           syncCartDrawerUI(cart);
@@ -416,7 +420,7 @@
       var bodyObj = { id: variantId, quantity: quantity };
       if (properties) bodyObj.properties = properties;
 
-      return fetch('/cart/add.js', {
+      return fetch(cartAddJsonUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyObj)
@@ -424,7 +428,7 @@
       .then(function(res) { return res.json(); })
       .then(function(item) {
         window.openCartDrawer();
-        fetch('/cart.js')
+        fetch(cartJsonUrl)
           .then(function(r) { return r.json(); })
           .then(function(cart) {
             syncCartDrawerUI(cart);
@@ -448,7 +452,7 @@
         if (variantId) {
           quickBtn.disabled = true;
           var originalText = quickBtn.textContent;
-          quickBtn.textContent = 'Adding...';
+          quickBtn.textContent = addingText;
           window.addToCartAjax(variantId, 1).then(function() {
             quickBtn.disabled = false;
             quickBtn.textContent = originalText;
@@ -469,7 +473,7 @@
 
     // Run on initial page load to ensure state consistency
     document.addEventListener('DOMContentLoaded', function() {
-      fetch('/cart.js')
+      fetch(cartJsonUrl)
         .then(function(res) { return res.json(); })
         .then(function(cart) {
           syncCartDrawerUI(cart);

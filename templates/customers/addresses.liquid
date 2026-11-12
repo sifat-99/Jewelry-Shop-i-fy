@@ -2,12 +2,12 @@
 <div class="customer-account-page page-width">
   <header class="account-header">
     <div class="account-header__meta">
-      <span class="account-badge">ADDRESS BOOK</span>
-      <h1 class="account-title">{{ 'customer.addresses.title' | default: 'Saved Addresses' }}</h1>
+      <span class="account-badge">{{ 'customer.addresses.badge' | t }}</span>
+      <h1 class="account-title">{{ 'customer.addresses.title' | t }}</h1>
     </div>
     <div class="account-header__actions">
       <a href="{{ routes.account_url }}" class="btn btn-sliding-hover account-logout-btn">
-        &larr; Return to Account
+        &larr; {{ 'customer.account.return' | t }}
       </a>
     </div>
   </header>
@@ -19,7 +19,7 @@
           {%- for address in customer.addresses -%}
             <div class="account-card" style="margin-bottom: 24px;">
               {%- if address == customer.default_address -%}
-                <span class="account-badge" style="color: #111;">DEFAULT ADDRESS</span>
+                <span class="account-badge" style="color: #111;">{{ 'customer.addresses.default_badge' | t }}</span>
               {%- endif -%}
               {{ address | format_address }}
             </div>

@@ -10,15 +10,54 @@
   Accepts: blocks, cfg (section.settings), page_title, page_content
 {%- endcomment -%}
 {%- liquid
+  assign root_prefix = routes.root_url
+  unless root_prefix == '/'
+    assign root_prefix = root_prefix | append: '/'
+  endunless
+  assign contact_page_url = root_prefix | append: 'pages/contact'
   assign book_link = cfg.perm_button_link
   if book_link == blank
-    assign book_link = routes.root_url | append: 'pages/contact'
+    assign book_link = contact_page_url
   endif
   assign cta_link = cfg.perm_cta_link
   if cta_link == blank
     assign cta_link = book_link
   endif
   assign shop_link = routes.all_products_collection_url
+
+  assign perm_eyebrow = cfg.perm_eyebrow
+  if perm_eyebrow == blank
+    assign perm_eyebrow = 'pages.permanent.eyebrow' | t
+  endif
+  assign perm_default_heading = 'pages.permanent.heading' | t
+  assign perm_slide1_title = cfg.perm_slide_1_title
+  if perm_slide1_title == blank
+    assign perm_slide1_title = 'pages.permanent.slide_1_title' | t
+  endif
+  assign perm_slide2_title = cfg.perm_slide_2_title
+  if perm_slide2_title == blank
+    assign perm_slide2_title = 'pages.permanent.slide_2_title' | t
+  endif
+  assign perm_slide3_title = cfg.perm_slide_3_title
+  if perm_slide3_title == blank
+    assign perm_slide3_title = 'pages.permanent.slide_3_title' | t
+  endif
+  assign perm_slide4_title = cfg.perm_slide_4_title
+  if perm_slide4_title == blank
+    assign perm_slide4_title = 'pages.permanent.slide_4_title' | t
+  endif
+  assign perm_story_title = cfg.perm_story_title
+  if perm_story_title == blank
+    assign perm_story_title = 'pages.permanent.story_title' | t
+  endif
+  assign perm_steps_eyebrow = cfg.perm_steps_eyebrow
+  if perm_steps_eyebrow == blank
+    assign perm_steps_eyebrow = 'pages.permanent.steps_eyebrow' | t
+  endif
+  assign perm_steps_title = cfg.perm_steps_title
+  if perm_steps_title == blank
+    assign perm_steps_title = 'pages.permanent.steps_title' | t
+  endif
 -%}
 {% render 'landing-css' %}
 
@@ -121,7 +160,7 @@
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-family: var(--TYPE-STACK-BUTTON, sans-serif) !important;
     font-size: 11px !important;
     font-weight: 700 !important;
     letter-spacing: 0.16em !important;
@@ -504,7 +543,7 @@
     min-height: 48px !important;
     padding: 0 34px !important;
     border-radius: var(--btn-radius, 0px) !important;
-    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-family: var(--TYPE-STACK-BUTTON, sans-serif) !important;
     font-size: 11.5px !important;
     font-weight: 700 !important;
     letter-spacing: 0.16em !important;
@@ -590,13 +629,13 @@
 <!-- HERO SECTION: COPY ON LEFT, ROTATING SHOWCASE ON RIGHT -->
 <section class="sl-hero">
   <div class="sl-hero__copy">
-    <p class="sl-hero__eyebrow">{{ cfg.perm_eyebrow | default: 'Aurelle Atelier Experience' }}</p>
-    <h1 class="sl-hero__title">{% if cfg.perm_heading != blank %}{{ cfg.perm_heading }}{% else %}{{ page_title | default: 'Permanent Jewelry On-Site' }}{% endif %}</h1>
+    <p class="sl-hero__eyebrow">{{ perm_eyebrow }}</p>
+    <h1 class="sl-hero__title">{% if cfg.perm_heading != blank %}{{ cfg.perm_heading }}{% else %}{{ page_title | default: perm_default_heading }}{% endif %}</h1>
     <p class="sl-hero__lead">
       {%- if cfg.perm_lead != blank and cfg.perm_lead != 'A bracelet, anklet or necklace fitted to you and welded closed, with no clasp. Made to be worn every day, in the shower, at the beach, always.' -%}
         {{ cfg.perm_lead }}
       {%- else -%}
-        An intimate in-person jewelry experience. We measure, custom-fit, and permanently micro-weld a clasp-free 14K gold-filled or surgical-grade 316L chain directly around your wrist, neck, or ankle. Designed to accompany you through every shower, swim, milestone, and quiet morning—without ever tarnishing or fading.
+        {{ 'pages.permanent.lead_fallback' | t }}
       {%- endif -%}
     </p>
     <div class="sl-hero__btns">
@@ -605,12 +644,12 @@
           {%- if cfg.perm_button_label != blank and cfg.perm_button_label != 'Book a session' -%}
             {{ cfg.perm_button_label }}
           {%- else -%}
-            Book An Appointment
+            {{ 'pages.permanent.book_btn' | t }}
           {%- endif -%}
         </span>
       </a>
       <a href="#how-it-works" class="btn btn-sliding-hover sl-btn">
-        <span class="btn__text-content">The Welding Process</span>
+        <span class="btn__text-content">{{ 'pages.permanent.welding_process_btn' | t }}</span>
       </a>
     </div>
   </div>
@@ -619,34 +658,36 @@
     <div class="perm-media-rotator" id="permMediaRotator">
       {%- if cfg.perm_image != blank -%}
         <!-- Custom Hero Slides Configured in Theme Settings -->
+        {%- assign perm_fallback_alt1 = 'pages.permanent.slide_1_alt' | t -%}
         <div class="perm-slide is-active" data-slide-index="0">
           <img src="{{ cfg.perm_image | image_url: width: 1200 }}"
-               alt="{{ cfg.perm_image.alt | default: cfg.perm_slide_1_title | default: 'Aurelle Permanent Welded Bracelet' | escape }}"
+               alt="{{ cfg.perm_image.alt | default: cfg.perm_slide_1_title | default: perm_fallback_alt1 | escape }}"
                width="1200" height="1200"
                loading="eager">
           <div class="perm-slide__overlay"></div>
           <div class="perm-slide__card">
             <div>
-              <span class="perm-slide__badge">Atelier Spotlight</span>
-              <span class="perm-slide__title">{{ cfg.perm_slide_1_title | default: 'Welded Paperclip Bracelet' }}</span>
+              <span class="perm-slide__badge">{{ 'pages.permanent.spotlight_badge' | t }}</span>
+              <span class="perm-slide__title">{{ perm_slide1_title }}</span>
             </div>
-            <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">Book Session</span></a>
+            <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">{{ 'pages.permanent.book_session_short' | t }}</span></a>
           </div>
         </div>
 
         {%- if cfg.perm_image_2 != blank -%}
+          {%- assign perm_fallback_alt2 = 'pages.permanent.slide_2_alt' | t -%}
           <div class="perm-slide" data-slide-index="1">
             <img src="{{ cfg.perm_image_2 | image_url: width: 1200 }}"
-                 alt="{{ cfg.perm_image_2.alt | default: cfg.perm_slide_2_title | default: '14K Gold & Silver Permanent Chains' | escape }}"
+                 alt="{{ cfg.perm_image_2.alt | default: cfg.perm_slide_2_title | default: perm_fallback_alt2 | escape }}"
                  width="1200" height="1200"
                  loading="lazy">
             <div class="perm-slide__overlay"></div>
             <div class="perm-slide__card">
               <div>
-                <span class="perm-slide__badge">Atelier Spotlight</span>
-                <span class="perm-slide__title">{{ cfg.perm_slide_2_title | default: 'Dainty Cable & Figaro Chains' }}</span>
+                <span class="perm-slide__badge">{{ 'pages.permanent.spotlight_badge' | t }}</span>
+                <span class="perm-slide__title">{{ perm_slide2_title }}</span>
               </div>
-              <a href="{{ shop_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">View Chains</span></a>
+              <a href="{{ shop_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">{{ 'pages.permanent.view_chains' | t }}</span></a>
             </div>
           </div>
         {%- endif -%}
@@ -654,16 +695,16 @@
         {%- if cfg.perm_image_3 != blank -%}
           <div class="perm-slide" data-slide-index="2">
             <img src="{{ cfg.perm_image_3 | image_url: width: 1200 }}"
-                 alt="{{ cfg.perm_image_3.alt | default: cfg.perm_slide_3_title | default: 'Claspless Everyday Layers' | escape }}"
+                 alt="{{ cfg.perm_image_3.alt | default: perm_slide3_title | escape }}"
                  width="1200" height="1200"
                  loading="lazy">
             <div class="perm-slide__overlay"></div>
             <div class="perm-slide__card">
               <div>
-                <span class="perm-slide__badge">Atelier Spotlight</span>
-                <span class="perm-slide__title">{{ cfg.perm_slide_3_title | default: 'Claspless Everyday Layers' }}</span>
+                <span class="perm-slide__badge">{{ 'pages.permanent.spotlight_badge' | t }}</span>
+                <span class="perm-slide__title">{{ perm_slide3_title }}</span>
               </div>
-              <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">Book Session</span></a>
+              <a href="{{ book_link }}" class="perm-slide__btn"><span class="perm-slide__btn-text">{{ 'pages.permanent.book_session_short' | t }}</span></a>
             </div>
           </div>
         {%- endif -%}
@@ -671,16 +712,16 @@
         {%- if cfg.perm_image_4 != blank -%}
           <div class="perm-slide" data-slide-index="3">
             <img src="{{ cfg.perm_image_4 | image_url: width: 1200 }}"
-                 alt="{{ cfg.perm_image_4.alt | default: cfg.perm_slide_4_title | default: 'Micro-Pulse Arc Welding' | escape }}"
+                 alt="{{ cfg.perm_image_4.alt | default: perm_slide4_title | escape }}"
                  width="1200" height="1200"
                  loading="lazy">
             <div class="perm-slide__overlay"></div>
             <div class="perm-slide__card">
               <div>
-                <span class="perm-slide__badge">Atelier Spotlight</span>
-                <span class="perm-slide__title">{{ cfg.perm_slide_4_title | default: 'Micro-Pulse Arc Welding' }}</span>
+                <span class="perm-slide__badge">{{ 'pages.permanent.spotlight_badge' | t }}</span>
+                <span class="perm-slide__title">{{ perm_slide4_title }}</span>
               </div>
-              <a href="#how-it-works" class="perm-slide__btn"><span class="perm-slide__btn-text">Learn How</span></a>
+              <a href="#how-it-works" class="perm-slide__btn"><span class="perm-slide__btn-text">{{ 'pages.permanent.learn_how' | t }}</span></a>
             </div>
           </div>
         {%- endif -%}
@@ -713,10 +754,10 @@
               <div class="perm-slide__overlay"></div>
               <div class="perm-slide__card">
                 <div>
-                  <span class="perm-slide__badge">Atelier Spotlight</span>
+                  <span class="perm-slide__badge">{{ 'pages.permanent.spotlight_badge' | t }}</span>
                   <a href="{{ prod.url }}" class="perm-slide__title">{{ prod.title }}</a>
                 </div>
-                <a href="{{ prod.url }}" class="perm-slide__btn"><span class="perm-slide__btn-text">View Piece</span></a>
+                <a href="{{ prod.url }}" class="perm-slide__btn"><span class="perm-slide__btn-text">{{ 'pages.permanent.view_piece' | t }}</span></a>
               </div>
             </div>
             {%- assign found_perm_slides = found_perm_slides | plus: 1 -%}
@@ -726,7 +767,7 @@
 
         {%- if found_perm_slides == 0 -%}
           <div class="perm-slide is-active">
-            <img src="{{ 'menu_bracelet.jpg' | asset_url }}" alt="Aurelle Permanent Welded Bracelet" width="1200" height="1200" loading="eager">
+            <img src="{{ 'menu_bracelet.jpg' | asset_url }}" alt="{{ 'pages.permanent.slide_1_alt' | t }}" width="1200" height="1200" loading="eager">
           </div>
         {%- endif -%}
       {%- endif -%}
@@ -745,41 +786,42 @@
 <!-- ATELIER TRUST STATS -->
 <section class="ab-stats">
   <div class="ab-stat">
-    <p class="ab-stat__num">100%</p>
-    <p class="ab-stat__label">Waterproof & Sweat-Proof</p>
+    <p class="ab-stat__num">{{ 'pages.permanent.stat1_num' | t }}</p>
+    <p class="ab-stat__label">{{ 'pages.permanent.stat1_label' | t }}</p>
   </div>
   <div class="ab-stat">
-    <p class="ab-stat__num">14K & Steel</p>
-    <p class="ab-stat__label">Solid Gold-Filled & 316L Core</p>
+    <p class="ab-stat__num">{{ 'pages.permanent.stat2_num' | t }}</p>
+    <p class="ab-stat__label">{{ 'pages.permanent.stat2_label' | t }}</p>
   </div>
   <div class="ab-stat">
-    <p class="ab-stat__num">Claspless</p>
-    <p class="ab-stat__label">Precision Micro-Pulse Welded</p>
+    <p class="ab-stat__num">{{ 'pages.permanent.stat3_num' | t }}</p>
+    <p class="ab-stat__label">{{ 'pages.permanent.stat3_label' | t }}</p>
   </div>
   <div class="ab-stat">
-    <p class="ab-stat__num">Lifetime</p>
-    <p class="ab-stat__label">Free Re-Welds & Color Warranty</p>
+    <p class="ab-stat__num">{{ 'pages.permanent.stat4_num' | t }}</p>
+    <p class="ab-stat__label">{{ 'pages.permanent.stat4_label' | t }}</p>
   </div>
 </section>
 
 <!-- THE PERMANENT JEWELRY EXPERIENCE & METALLURGY -->
 <section class="ab-story">
   <div class="ab-story__media">
+    {%- assign perm_story_alt_fallback = 'pages.permanent.story_alt' | t -%}
     {%- if cfg.perm_story_image != blank -%}
       <img src="{{ cfg.perm_story_image | image_url: width: 1200 }}"
-           alt="{{ cfg.perm_story_image.alt | default: cfg.perm_story_title | default: 'Permanent Welded Jewelry Experience' | escape }}"
+           alt="{{ cfg.perm_story_image.alt | default: cfg.perm_story_title | default: perm_story_alt_fallback | escape }}"
            width="1200"
            height="1200"
            loading="lazy">
     {%- elsif cfg.perm_image != blank -%}
       <img src="{{ cfg.perm_image | image_url: width: 1200 }}"
-           alt="{{ cfg.perm_story_title | default: 'Permanent Welded Jewelry Experience' | escape }}"
+           alt="{{ cfg.perm_story_title | default: perm_story_alt_fallback | escape }}"
            width="1200"
            height="1200"
            loading="lazy">
     {%- else -%}
       <img src="{{ 'menu_bracelet.jpg' | asset_url }}"
-           alt="Permanent Welded Jewelry Experience - Aurelle Fine Jewelry"
+           alt="{{ 'pages.permanent.story_alt_full' | t }}"
            width="1200"
            height="1200"
            loading="lazy"
@@ -787,21 +829,15 @@
     {%- endif -%}
   </div>
   <div>
-    <p class="sl-sec__eyebrow">Behind the Craft</p>
-    <h2 class="ab-story__title">{{ cfg.perm_story_title | default: 'Welded to last. Designed to never take off.' }}</h2>
+    <p class="sl-sec__eyebrow">{{ 'pages.permanent.story_eyebrow' | t }}</p>
+    <h2 class="ab-story__title">{{ perm_story_title }}</h2>
     <div class="rte ab-story__body">
       {%- if cfg.perm_story_body != blank -%}
         {{ cfg.perm_story_body }}
       {%- else -%}
-        <p>
-          Permanent jewelry is the modern evolution of classic friendship jewelry—elevated into heirloom-grade fine metals. In our private studio, our certified jewelry artisans measure an unbroken chain directly around your wrist, ankle, or neck to achieve an exact millimeter drape tailored to your lifestyle.
-        </p>
-        <p>
-          Using a specialized jeweler's micro-pulse arc welder, we connect the jump ring with a quick, safe, and painless flash of light. No clasps that twist around, snag on delicate knitwear, or accidentally come undone. Because our chains are forged from non-magnetic medical-grade metals, they pass effortlessly through TSA airport security scanners.
-        </p>
-        <p>
-          Should you ever need your permanent chain removed for a medical MRI or surgery, it can be gently snipped at the welded jump ring with standard scissors. Whenever you are ready, simply bring it back to our atelier—we provide complimentary lifetime re-welds for all Aurelle permanent pieces.
-        </p>
+        <p>{{ 'pages.permanent.story_p1' | t }}</p>
+        <p>{{ 'pages.permanent.story_p2' | t }}</p>
+        <p>{{ 'pages.permanent.story_p3' | t }}</p>
       {%- endif -%}
     </div>
   </div>
@@ -809,38 +845,36 @@
 
 <!-- QUOTE CALLOUT -->
 <div class="perm-quote-box">
-  <p class="perm-quote-text">
-    "A permanent welded piece isn't just jewelry. It's a memory you wear forever—an unbroken bond that stays with you through every chapter."
-  </p>
-  <p class="perm-quote-author">The Aurelle Atelier Philosophy</p>
+  <p class="perm-quote-text">{{ 'pages.permanent.quote_text' | t }}</p>
+  <p class="perm-quote-author">{{ 'pages.permanent.quote_author' | t }}</p>
 </div>
 
 <!-- HOW IT WORKS: 5-STEP JOURNEY -->
 <section class="sl-sec" id="how-it-works">
   <div class="sl-sec__head">
-    <p class="sl-sec__eyebrow">{{ cfg.perm_steps_eyebrow | default: 'The On-Site Atelier Process' }}</p>
-    <h2 class="sl-sec__title">{{ cfg.perm_steps_title | default: 'How Permanent Welding Works' }}</h2>
+    <p class="sl-sec__eyebrow">{{ perm_steps_eyebrow }}</p>
+    <h2 class="sl-sec__title">{{ perm_steps_title }}</h2>
   </div>
   <div class="sl-steps">
     <div class="sl-step">
-      <h3 class="sl-step__title">1. Select Your Chain</h3>
-      <p class="sl-step__text">Choose from our curated assortment of 14K yellow gold, rose gold, and surgical steel chains, from minimalist cable to bold paperclip and figaro links.</p>
+      <h3 class="sl-step__title">{{ 'pages.permanent.step1_title' | t }}</h3>
+      <p class="sl-step__text">{{ 'pages.permanent.step1_text' | t }}</p>
     </div>
     <div class="sl-step">
-      <h3 class="sl-step__title">2. Personalize with Charms</h3>
-      <p class="sl-step__text">Elevate your piece with custom laser-engraved initial discs, genuine freshwater pearls, sparkling birthstones, or celestial tokens.</p>
+      <h3 class="sl-step__title">{{ 'pages.permanent.step2_title' | t }}</h3>
+      <p class="sl-step__text">{{ 'pages.permanent.step2_text' | t }}</p>
     </div>
     <div class="sl-step">
-      <h3 class="sl-step__title">3. Custom Tailored Fit</h3>
-      <p class="sl-step__text">Our artisan measures the chain directly against your skin to find your ideal fit—whether you prefer a snug tailored drape or effortless movement.</p>
+      <h3 class="sl-step__title">{{ 'pages.permanent.step3_title' | t }}</h3>
+      <p class="sl-step__text">{{ 'pages.permanent.step3_text' | t }}</p>
     </div>
     <div class="sl-step">
-      <h3 class="sl-step__title">4. The Micro-Weld Spark</h3>
-      <p class="sl-step__text">With protective eyewear and a soft leather shield placed over your skin, a gentle pulse of light fuses the ring closed in less than a second. 100% painless and safe.</p>
+      <h3 class="sl-step__title">{{ 'pages.permanent.step4_title' | t }}</h3>
+      <p class="sl-step__text">{{ 'pages.permanent.step4_text' | t }}</p>
     </div>
     <div class="sl-step">
-      <h3 class="sl-step__title">5. Forever Claspless</h3>
-      <p class="sl-step__text">Walk away with a seamless heirloom designed for 24/7 wear. Shower, swim, sweat, and sleep in your piece without a second thought.</p>
+      <h3 class="sl-step__title">{{ 'pages.permanent.step5_title' | t }}</h3>
+      <p class="sl-step__text">{{ 'pages.permanent.step5_text' | t }}</p>
     </div>
   </div>
 </section>
@@ -848,30 +882,30 @@
 <!-- VALUES & COMMITMENTS -->
 <section class="sl-sec">
   <div class="sl-sec__head">
-    <p class="sl-sec__eyebrow">Crafted Without Compromise</p>
-    <h2 class="sl-sec__title">Why Choose Aurelle Permanent</h2>
+    <p class="sl-sec__eyebrow">{{ 'pages.permanent.why_eyebrow' | t }}</p>
+    <h2 class="sl-sec__title">{{ 'pages.permanent.why_title' | t }}</h2>
   </div>
   <div class="sl-features">
     <div class="sl-feature">
       <span class="sl-feature__icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
       </span>
-      <h3 class="sl-feature__title">Medical-Grade & Hypoallergenic</h3>
-      <p class="sl-feature__text">Crafted with zero nickel and zero lead. Biocompatible metals that are gentle on sensitive skin and guaranteed never to turn skin green or irritate.</p>
+      <h3 class="sl-feature__title">{{ 'pages.permanent.feat1_title' | t }}</h3>
+      <p class="sl-feature__text">{{ 'pages.permanent.feat1_text' | t }}</p>
     </div>
     <div class="sl-feature">
       <span class="sl-feature__icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7L12 3Z"/></svg>
       </span>
-      <h3 class="sl-feature__title">Private Events & Pop-Ups</h3>
-      <p class="sl-feature__text">Book our mobile permanent jewelry bar for bridal showers, bachelorette trips, birthdays, or corporate celebrations. We bring the full studio to you.</p>
+      <h3 class="sl-feature__title">{{ 'pages.permanent.feat2_title' | t }}</h3>
+      <p class="sl-feature__text">{{ 'pages.permanent.feat2_text' | t }}</p>
     </div>
     <div class="sl-feature">
       <span class="sl-feature__icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1Z"/></svg>
       </span>
-      <h3 class="sl-feature__title">Free Lifetime Re-Welds</h3>
-      <p class="sl-feature__text">Need to remove your permanent chain for surgery or medical imaging? Simply snip the jump ring and bring it back—we re-weld it for free, always.</p>
+      <h3 class="sl-feature__title">{{ 'pages.permanent.feat3_title' | t }}</h3>
+      <p class="sl-feature__text">{{ 'pages.permanent.feat3_text' | t }}</p>
     </div>
   </div>
 </section>
@@ -883,19 +917,19 @@
 <!-- BOTTOM CTA: FULL BLEED WITH THEME SOFT TINT & HARMONIZED BUTTONS -->
 <section class="sl-cta">
   <div class="sl-cta__inner">
-    <p class="sl-cta__eyebrow" style="color: var(--pp-muted, #777777) !important;">Atelier Bookings & Concierge</p>
+    <p class="sl-cta__eyebrow" style="color: var(--pp-muted, #777777) !important;">{{ 'pages.permanent.cta_eyebrow' | t }}</p>
     <h2 class="sl-cta__title" style="color: var(--text, #000000) !important; opacity: 1 !important;">
       {%- if cfg.perm_cta_title != blank and cfg.perm_cta_title != 'Ready for yours?' -%}
         {{ cfg.perm_cta_title }}
       {%- else -%}
-        Ready For Your Permanent Piece?
+        {{ 'pages.permanent.cta_title' | t }}
       {%- endif -%}
     </h2>
     <p class="sl-cta__text" style="color: color-mix(in srgb, var(--text, #444444) 88%, transparent) !important; opacity: 1 !important;">
       {%- if cfg.perm_cta_text != blank and cfg.perm_cta_text != 'Tell us about your event, studio visit or group booking and we will find a date that works.' -%}
         {{ cfg.perm_cta_text }}
       {%- else -%}
-        Join us at our studio or book a private permanent jewelry bar for bridal showers, birthdays, or celebrations. Contact our concierge to reserve your date.
+        {{ 'pages.permanent.cta_text' | t }}
       {%- endif -%}
     </p>
     <div class="sl-cta__actions">
@@ -904,12 +938,12 @@
           {%- if cfg.perm_cta_label != blank and cfg.perm_cta_label != 'Get in touch' -%}
             {{ cfg.perm_cta_label }}
           {%- else -%}
-            Book Your Session
+            {{ 'pages.permanent.cta_button' | t }}
           {%- endif -%}
         </span>
       </a>
-      <a href="{{ routes.root_url }}pages/contact" class="btn btn-sliding-hover sl-btn sl-cta__btn-secondary">
-        <span class="btn__text-content">Inquire Private Event</span>
+      <a href="{{ contact_page_url }}" class="btn btn-sliding-hover sl-btn sl-cta__btn-secondary">
+        <span class="btn__text-content">{{ 'pages.permanent.cta_secondary' | t }}</span>
       </a>
     </div>
   </div>

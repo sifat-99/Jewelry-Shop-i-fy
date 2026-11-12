@@ -11,12 +11,12 @@
           <a href="{{ item.url_to_remove }}"
             data-remove-key="{{ item.key }}"
             tabindex="0"
-            aria-label="Remove {{ item.title | escape }}">
+            aria-label="{{ 'cart.line_items.remove_aria' | t: title: item.title }}">
             <span class="cart__remove__icon">
               <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-trash" viewBox="0 0 24 24"><path d="m19.5 4-1.072 18H5.571L4.5 4M10 9v8m4-8v8M3 4h18M9 4V2h6v2"/></svg>
             </span>
             <span class="cart__remove badge">
-              Delete
+              {{ 'cart.line_items.delete' | t }}
             </span>
           </a>
         </div>
@@ -82,12 +82,12 @@
 
         <div class="cart__items__quantity">
           <div class="quantity__wrapper" data-quantity-selector>
-            <button class="quantity__button quantity__button--minus" data-decrease-quantity type="button" aria-label="Decrease quantity">
+            <button class="quantity__button quantity__button--minus" data-decrease-quantity type="button" aria-label="{{ 'products.product.decrease_quantity' | t }}">
               <svg width="10" height="2" viewBox="0 0 10 2" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M0.75 1H9.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
             </button>
-            <label for="updates_{{ item.key }}" class="visually-hidden">Quantity</label>
+            <label for="updates_{{ item.key }}" class="visually-hidden">{{ 'products.product.quantity.label' | t }}</label>
             <input data-quantity-input
               data-update-cart="{{ item.key }}"
               class="quantity__input"
@@ -96,7 +96,7 @@
               id="updates_{{ item.key }}"
               name="updates[]"
               value="{{ item.quantity }}"/>
-            <button class="quantity__button quantity__button--plus" data-increase-quantity type="button" aria-label="Increase quantity">
+            <button class="quantity__button quantity__button--plus" data-increase-quantity type="button" aria-label="{{ 'products.product.increase_quantity' | t }}">
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M5 0.75V9.25M0.75 5H9.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>

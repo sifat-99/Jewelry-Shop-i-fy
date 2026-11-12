@@ -1,0 +1,419 @@
+{% doc %}
+  Resolves global luxury jewelry typography presets and custom font selectors.
+  Use part: 'head' in <head> before css-variables to load active Google/Shopify fonts,
+  and part: 'vars' inside :root {} in css-variables / password layout.
+
+  @param {string} [part] - Output part: 'head' (default) for font <link>/@font-face tags, or 'vars' for :root CSS variables.
+
+  @example
+  {% render 'theme-typography', part: 'head' %}
+  {% render 'theme-typography', part: 'vars' %}
+{% enddoc %}
+{%- liquid
+  assign out_part = part | default: 'head'
+  assign preset = settings.typography_preset | default: 'custom'
+
+  assign h_key = settings.typo_heading_font | default: 'cormorant_garamond'
+  assign sh_key = settings.typo_subheading_font | default: 'quicksand'
+  assign b_key = settings.typo_body_font | default: 'quicksand'
+  assign n_key = settings.typo_nav_font | default: 'match_body'
+  assign btn_key = settings.typo_button_font | default: 'match_body'
+
+  assign preset_h_weight = nil
+  assign preset_h_case = nil
+  assign preset_h_ls = nil
+  assign preset_sh_weight = nil
+  assign preset_b_weight = nil
+
+  case preset
+    when 'parisian_haute'
+      assign h_key = 'cormorant_garamond'
+      assign sh_key = 'plus_jakarta_sans'
+      assign b_key = 'plus_jakarta_sans'
+      assign n_key = 'plus_jakarta_sans'
+      assign btn_key = 'plus_jakarta_sans'
+      assign preset_h_weight = '500'
+      assign preset_h_case = 'none'
+      assign preset_h_ls = '0.02em'
+      assign preset_sh_weight = '600'
+      assign preset_b_weight = '400'
+    when 'modern_heirloom'
+      assign h_key = 'playfair_display'
+      assign sh_key = 'quicksand'
+      assign b_key = 'quicksand'
+      assign n_key = 'quicksand'
+      assign btn_key = 'quicksand'
+      assign preset_h_weight = '500'
+      assign preset_h_case = 'none'
+      assign preset_h_ls = '0.015em'
+      assign preset_sh_weight = '600'
+      assign preset_b_weight = '500'
+    when 'sculptural_roman'
+      assign h_key = 'cinzel'
+      assign sh_key = 'montserrat'
+      assign b_key = 'dm_sans'
+      assign n_key = 'montserrat'
+      assign btn_key = 'montserrat'
+      assign preset_h_weight = '500'
+      assign preset_h_case = 'uppercase'
+      assign preset_h_ls = '0.09em'
+      assign preset_sh_weight = '600'
+      assign preset_b_weight = '400'
+    when 'couture_editorial'
+      assign h_key = 'bodoni_moda'
+      assign sh_key = 'jost'
+      assign b_key = 'inter'
+      assign n_key = 'jost'
+      assign btn_key = 'jost'
+      assign preset_h_weight = '500'
+      assign preset_h_case = 'none'
+      assign preset_h_ls = '0.01em'
+      assign preset_sh_weight = '500'
+      assign preset_b_weight = '400'
+    when 'minimal_maison'
+      assign h_key = 'marcellus'
+      assign sh_key = 'plus_jakarta_sans'
+      assign b_key = 'plus_jakarta_sans'
+      assign n_key = 'plus_jakarta_sans'
+      assign btn_key = 'plus_jakarta_sans'
+      assign preset_h_weight = '400'
+      assign preset_h_case = 'uppercase'
+      assign preset_h_ls = '0.08em'
+      assign preset_sh_weight = '600'
+      assign preset_b_weight = '400'
+    when 'italian_atelier'
+      assign h_key = 'italiana'
+      assign sh_key = 'raleway'
+      assign b_key = 'plus_jakarta_sans'
+      assign n_key = 'raleway'
+      assign btn_key = 'raleway'
+      assign preset_h_weight = '400'
+      assign preset_h_case = 'none'
+      assign preset_h_ls = '0.025em'
+      assign preset_sh_weight = '600'
+      assign preset_b_weight = '400'
+    when 'heritage_archive'
+      assign h_key = 'eb_garamond'
+      assign sh_key = 'dm_sans'
+      assign b_key = 'dm_sans'
+      assign n_key = 'dm_sans'
+      assign btn_key = 'dm_sans'
+      assign preset_h_weight = '500'
+      assign preset_h_case = 'none'
+      assign preset_h_ls = '0.015em'
+      assign preset_sh_weight = '600'
+      assign preset_b_weight = '400'
+    when 'diamond_gallery'
+      assign h_key = 'prata'
+      assign sh_key = 'jost'
+      assign b_key = 'jost'
+      assign n_key = 'jost'
+      assign btn_key = 'jost'
+      assign preset_h_weight = '400'
+      assign preset_h_case = 'none'
+      assign preset_h_ls = '0.02em'
+      assign preset_sh_weight = '500'
+      assign preset_b_weight = '400'
+    when 'architectural_sans'
+      assign h_key = 'tenor_sans'
+      assign sh_key = 'inter'
+      assign b_key = 'inter'
+      assign n_key = 'inter'
+      assign btn_key = 'inter'
+      assign preset_h_weight = '400'
+      assign preset_h_case = 'uppercase'
+      assign preset_h_ls = '0.09em'
+      assign preset_sh_weight = '600'
+      assign preset_b_weight = '400'
+    when 'warm_romance'
+      assign h_key = 'lora'
+      assign sh_key = 'quicksand'
+      assign b_key = 'quicksand'
+      assign n_key = 'quicksand'
+      assign btn_key = 'quicksand'
+      assign preset_h_weight = '500'
+      assign preset_h_case = 'none'
+      assign preset_h_ls = '0.015em'
+      assign preset_sh_weight = '600'
+      assign preset_b_weight = '500'
+    when 'boutique_classic'
+      assign h_key = 'quicksand'
+      assign sh_key = 'quicksand'
+      assign b_key = 'quicksand'
+      assign n_key = 'quicksand'
+      assign btn_key = 'quicksand'
+      assign preset_h_weight = '600'
+      assign preset_h_case = 'uppercase'
+      assign preset_h_ls = '0.08em'
+      assign preset_sh_weight = '600'
+      assign preset_b_weight = '500'
+  endcase
+
+  if sh_key == 'match_heading'
+    assign sh_key = h_key
+  elsif sh_key == 'match_body'
+    assign sh_key = b_key
+  endif
+
+  if n_key == 'match_body'
+    assign n_key = b_key
+  elsif n_key == 'match_subheading'
+    assign n_key = sh_key
+  elsif n_key == 'match_heading'
+    assign n_key = h_key
+  endif
+
+  if btn_key == 'match_body'
+    assign btn_key = b_key
+  elsif btn_key == 'match_subheading'
+    assign btn_key = sh_key
+  elsif btn_key == 'match_heading'
+    assign btn_key = h_key
+  endif
+
+  assign active_keys_raw = h_key | append: '|' | append: sh_key | append: '|' | append: b_key | append: '|' | append: n_key | append: '|' | append: btn_key
+  assign active_keys_arr = active_keys_raw | split: '|'
+-%}
+
+{%- if out_part == 'head' -%}
+  {%- liquid
+    assign seen_tokens = ','
+    assign gf_specs = ''
+    assign need_shopify_heading = false
+    assign need_shopify_body = false
+
+    for k in active_keys_arr
+      if k == 'shopify_heading'
+        assign need_shopify_heading = true
+      elsif k == 'shopify_body'
+        assign need_shopify_body = true
+      else
+        assign token = ',' | append: k | append: ','
+        unless seen_tokens contains token
+          assign seen_tokens = seen_tokens | append: k | append: ','
+          capture meta_raw
+            render 'typography-font-meta', font_key: k
+          endcapture
+          assign meta_parts = meta_raw | strip | split: '~~'
+          assign gf_spec = meta_parts[0]
+          if gf_spec != blank and gf_spec != 'shopify_heading' and gf_spec != 'shopify_body'
+            if gf_specs != blank
+              assign gf_specs = gf_specs | append: '&family=' | append: gf_spec
+            else
+              assign gf_specs = 'family=' | append: gf_spec
+            endif
+          endif
+        endunless
+      endif
+    endfor
+  -%}
+  {%- if gf_specs != blank -%}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?{{ gf_specs }}&display=swap" rel="stylesheet">
+  {%- endif -%}
+  {%- if need_shopify_heading or need_shopify_body -%}
+    <style>
+      {%- if need_shopify_heading and settings.typo_shopify_heading_font != blank -%}
+        {{ settings.typo_shopify_heading_font | font_face: font_display: 'swap' }}
+        {%- assign sh_bold = settings.typo_shopify_heading_font | font_modify: 'weight', 'bold' -%}
+        {%- if sh_bold != blank -%}{{ sh_bold | font_face: font_display: 'swap' }}{%- endif -%}
+        {%- assign sh_italic = settings.typo_shopify_heading_font | font_modify: 'style', 'italic' -%}
+        {%- if sh_italic != blank -%}{{ sh_italic | font_face: font_display: 'swap' }}{%- endif -%}
+      {%- endif -%}
+      {%- if need_shopify_body and settings.typo_shopify_body_font != blank -%}
+        {{ settings.typo_shopify_body_font | font_face: font_display: 'swap' }}
+        {%- assign sb_bold = settings.typo_shopify_body_font | font_modify: 'weight', 'bold' -%}
+        {%- if sb_bold != blank -%}{{ sb_bold | font_face: font_display: 'swap' }}{%- endif -%}
+        {%- assign sb_med = settings.typo_shopify_body_font | font_modify: 'weight', '500' -%}
+        {%- if sb_med != blank -%}{{ sb_med | font_face: font_display: 'swap' }}{%- endif -%}
+      {%- endif -%}
+    </style>
+  {%- endif -%}
+{%- else -%}
+  {%- liquid
+    assign sh_auto_case = 'uppercase'
+    for idx in (0..4)
+      assign role_key = active_keys_arr[idx]
+      capture role_meta_raw
+        render 'typography-font-meta', font_key: role_key
+      endcapture
+      assign role_meta = role_meta_raw | strip | split: '~~'
+      case idx
+        when 0
+          assign h_stack = role_meta[1]
+          assign h_cat = role_meta[2]
+          assign h_auto_w = role_meta[3]
+          assign h_auto_ls = role_meta[4]
+          assign h_auto_case = role_meta[5]
+          assign h_italic_stack = role_meta[6]
+        when 1
+          assign sh_stack = role_meta[1]
+          assign sh_cat = role_meta[2]
+          assign sh_auto_w = role_meta[3]
+          if sh_cat == 'serif_editorial'
+            assign sh_auto_case = 'none'
+          endif
+        when 2
+          assign b_stack = role_meta[1]
+        when 3
+          assign n_stack = role_meta[1]
+        when 4
+          assign btn_stack = role_meta[1]
+      endcase
+    endfor
+
+    assign h_weight = settings.typo_heading_weight | default: 'auto'
+    if h_weight == 'auto'
+      if preset_h_weight != blank
+        assign h_weight = preset_h_weight
+      else
+        assign h_weight = h_auto_w
+      endif
+    endif
+
+    assign h_case = settings.typo_heading_case | default: 'auto'
+    if h_case == 'auto'
+      if preset_h_case != blank
+        assign h_case = preset_h_case
+      else
+        assign h_case = h_auto_case
+      endif
+    endif
+
+    assign h_spacing_opt = settings.typo_heading_spacing | default: 'auto'
+    case h_spacing_opt
+      when 'tight'
+        assign h_ls = '-0.01em'
+      when 'balanced'
+        assign h_ls = '0.02em'
+      when 'editorial'
+        assign h_ls = '0.06em'
+      when 'wide'
+        assign h_ls = '0.12em'
+      else
+        if preset_h_ls != blank
+          assign h_ls = preset_h_ls
+        else
+          assign h_ls = h_auto_ls
+        endif
+    endcase
+
+    assign user_h_scale = settings.typo_heading_scale | default: 100 | divided_by: 100.0
+    assign optical_boost = 1.0
+    if h_cat == 'serif_editorial'
+      assign optical_boost = 1.1
+    endif
+    assign h_scale = user_h_scale | times: optical_boost | round: 3
+
+    assign sh_case = settings.typo_subheading_case | default: 'auto'
+    if sh_case == 'auto'
+      assign sh_case = sh_auto_case
+    endif
+    assign sh_ls = '0.06em'
+    if sh_case == 'uppercase'
+      assign sh_ls = '0.12em'
+    endif
+    assign sh_weight = preset_sh_weight | default: sh_auto_w
+    assign sh_scale = settings.typo_subheading_scale | default: 100 | divided_by: 100.0
+
+    assign b_weight = settings.typo_body_weight | default: '500'
+    if preset != 'custom' and preset_b_weight != blank
+      assign b_weight = preset_b_weight
+    endif
+    assign b_scale = settings.typo_body_scale | default: 100 | divided_by: 100.0
+
+    assign card_target = settings.typo_card_title_target | default: 'heading'
+    case card_target
+      when 'subheading'
+        assign card_title_stack = sh_stack
+        assign card_title_w = sh_weight
+        assign card_title_sz = '13px'
+      when 'body'
+        assign card_title_stack = b_stack
+        assign card_title_w = '600'
+        assign card_title_sz = '13px'
+      else
+        assign card_title_stack = h_stack
+        assign card_title_w = h_weight
+        if h_cat == 'serif_editorial'
+          assign card_title_sz = '15px'
+        else
+          assign card_title_sz = '13px'
+        endif
+    endcase
+
+    assign nav_uppercase = settings.nav_uppercase
+    if nav_uppercase == nil
+      assign nav_uppercase = true
+    endif
+    assign nav_transform = 'none'
+    if nav_uppercase
+      assign nav_transform = 'uppercase'
+    endif
+
+    assign btn_uppercase = settings.button_uppercase
+    if btn_uppercase == nil
+      assign btn_uppercase = true
+    endif
+    assign btn_transform = 'none'
+    if btn_uppercase
+      assign btn_transform = 'uppercase'
+    endif
+    assign btn_ls = settings.button_letter_spacing | default: 14 | divided_by: 100.0 | append: 'em'
+  -%}
+  --FONT-STACK-BODY: {{ b_stack }};
+  --FONT-STYLE-BODY: normal;
+  --FONT-WEIGHT-BODY: {{ b_weight }};
+  --FONT-WEIGHT-BODY-BOLD: 700;
+  --FONT-ADJUST-BODY: {{ b_scale }};
+  --FONT-BODY-TRANSFORM: none;
+  --FONT-BODY-LETTER-SPACING: 0.01em;
+
+  --FONT-STACK-HEADING: {{ h_stack }};
+  --FONT-STACK-HEADING-ITALIC: {{ h_italic_stack }};
+  --FONT-STYLE-HEADING: normal;
+  --FONT-WEIGHT-HEADING: {{ h_weight }};
+  --FONT-WEIGHT-HEADING-BOLD: 700;
+  --FONT-ADJUST-HEADING: {{ h_scale }};
+  --FONT-HEADING-TRANSFORM: {{ h_case }};
+  --FONT-HEADING-LETTER-SPACING: {{ h_ls }};
+
+  --FONT-STACK-SUBHEADING: {{ sh_stack }};
+  --FONT-WEIGHT-SUBHEADING: {{ sh_weight }};
+  --FONT-SUBHEADING-TRANSFORM: {{ sh_case }};
+  --FONT-SUBHEADING-LETTER-SPACING: {{ sh_ls }};
+
+  --FONT-STACK-ACCENT: {{ sh_stack }};
+  --FONT-STYLE-ACCENT: normal;
+  --FONT-WEIGHT-ACCENT: {{ sh_weight }};
+  --FONT-WEIGHT-ACCENT-BOLD: 700;
+  --FONT-ADJUST-ACCENT: {{ sh_scale }};
+  --FONT-ACCENT-TRANSFORM: {{ sh_case }};
+  --FONT-ACCENT-LETTER-SPACING: {{ sh_ls }};
+
+  --TYPE-STACK-NAV: {{ n_stack }};
+  --TYPE-STYLE-NAV: normal;
+  --TYPE-ADJUST-NAV: 1.0;
+  --TYPE-WEIGHT-NAV: {{ settings.nav_font_weight | default: 600 }};
+  --FONT-NAV-TRANSFORM: {{ nav_transform }};
+  --FONT-NAV-LETTER-SPACING: 0.09em;
+
+  --TYPE-STACK-BUTTON: {{ btn_stack }};
+  --TYPE-STYLE-BUTTON: normal;
+  --TYPE-ADJUST-BUTTON: 1.0;
+  --TYPE-WEIGHT-BUTTON: {{ settings.button_font_weight | default: 600 }};
+  --FONT-BUTTON-TRANSFORM: {{ btn_transform }};
+  --FONT-BUTTON-LETTER-SPACING: {{ btn_ls }};
+
+  --TYPE-STACK-KICKER: {{ sh_stack }};
+  --TYPE-STYLE-KICKER: normal;
+  --TYPE-ADJUST-KICKER: {{ sh_scale }};
+  --TYPE-WEIGHT-KICKER: 600;
+  --FONT-KICKER-TRANSFORM: uppercase;
+  --FONT-KICKER-LETTER-SPACING: 0.16em;
+
+  --FONT-STACK-CARD-TITLE: {{ card_title_stack }};
+  --FONT-WEIGHT-CARD-TITLE: {{ card_title_w }};
+  --FONT-SIZE-CARD-TITLE: {{ card_title_sz }};
+{%- endif -%}

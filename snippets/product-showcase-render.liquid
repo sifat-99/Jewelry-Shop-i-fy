@@ -145,7 +145,8 @@
                 alt_label: video_alt
               %}
             {%- else -%}
-              {%- assign media_alt = image.alt | default: image_heading | default: sc_collection.title | default: 'Showcase image' -%}
+              {%- assign sc_image_default = 'sections.featured_collection.showcase_image' | t -%}
+              {%- assign media_alt = image.alt | default: image_heading | default: sc_collection.title | default: sc_image_default -%}
               {%- if image_link != blank -%}
                 <a
                   href="{{ image_link }}"
@@ -272,7 +273,7 @@
             type="button"
             class="showcase__arrow showcase__arrow--prev"
             data-showcase-prev
-            aria-label="Previous products"
+            aria-label="{{ 'sections.featured_collection.previous_products' | t }}"
           >
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="15 18 9 12 15 6"></polyline>
@@ -307,7 +308,7 @@
             type="button"
             class="showcase__arrow showcase__arrow--next"
             data-showcase-next
-            aria-label="Next products"
+            aria-label="{{ 'sections.featured_collection.next_products' | t }}"
           >
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="9 18 15 12 9 6"></polyline>
@@ -365,10 +366,11 @@
   h2.showcase__heading {
     margin: 0;
     font-family: var(--FONT-STACK-HEADING, inherit);
-    font-weight: 500;
-    letter-spacing: -0.02em;
+    font-weight: var(--FONT-WEIGHT-HEADING, 500);
+    letter-spacing: var(--FONT-HEADING-LETTER-SPACING, -0.02em);
+    text-transform: var(--FONT-HEADING-TRANSFORM, none);
     line-height: 1.08;
-    font-size: clamp(30px, calc(30px + (100vw - 320px) * 22 / 1600), 52px);
+    font-size: calc(clamp(30px, calc(30px + (100vw - 320px) * 22 / 1600), 52px) * var(--FONT-ADJUST-HEADING, 1));
     color: var(--text, var(--lv-ink, #111111)) !important;
   }
 
@@ -609,15 +611,17 @@
   h2.showcase__caption-heading {
     margin: 0;
     font-family: var(--FONT-STACK-HEADING, inherit);
-    font-weight: 500;
-    letter-spacing: -0.015em;
+    font-weight: var(--FONT-WEIGHT-HEADING, 500);
+    letter-spacing: var(--FONT-HEADING-LETTER-SPACING, -0.015em);
+    text-transform: var(--FONT-HEADING-TRANSFORM, none);
     line-height: 1.12;
-    font-size: clamp(24px, 2.2vw, 36px);
+    font-size: calc(clamp(24px, 2.2vw, 36px) * var(--FONT-ADJUST-HEADING, 1));
     color: var(--lv-ivory, #ffffff) !important;
   }
 
   .showcase__caption-subtitle {
     margin: 8px 0 0;
+    font-family: var(--FONT-STACK-SUBHEADING, inherit);
     font-size: clamp(13px, 1vw, 15px);
     line-height: 1.5;
     color: rgba(255, 255, 255, 0.9);

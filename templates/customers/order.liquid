@@ -2,13 +2,14 @@
 <div class="customer-account-page page-width">
   <header class="account-header">
     <div class="account-header__meta">
-      <span class="account-badge">ORDER SUMMARY</span>
+      <span class="account-badge">{{ 'customer.order.badge' | t }}</span>
       <h1 class="account-title">{{ order.name }}</h1>
-      <p class="account-welcome">Placed on {{ order.created_at | time_tag: format: 'date_at_time' }}</p>
+      {%- capture order_date_html -%}{{ order.created_at | time_tag: format: 'date_at_time' }}{%- endcapture -%}
+      <p class="account-welcome">{{ 'customer.order.date_html' | t: date: order_date_html }}</p>
     </div>
     <div class="account-header__actions">
       <a href="{{ routes.account_url }}" class="btn btn-sliding-hover account-logout-btn">
-        &larr; Return to Account
+        &larr; {{ 'customer.account.return' | t }}
       </a>
     </div>
   </header>
@@ -18,11 +19,11 @@
       <table class="account-orders-table">
         <thead>
           <tr>
-            <th>Product</th>
-            <th>SKU</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Total</th>
+            <th>{{ 'customer.order.product' | t }}</th>
+            <th>{{ 'customer.order.sku' | t }}</th>
+            <th>{{ 'customer.order.price' | t }}</th>
+            <th>{{ 'customer.order.quantity' | t }}</th>
+            <th>{{ 'customer.order.total' | t }}</th>
           </tr>
         </thead>
         <tbody>
@@ -47,11 +48,11 @@
         </tbody>
         <tfoot>
           <tr>
-            <th colspan="4">Subtotal</th>
+            <th colspan="4">{{ 'customer.order.subtotal' | t }}</th>
             <td>{{ order.line_items_subtotal_price | money }}</td>
           </tr>
           <tr>
-            <th colspan="4">Total</th>
+            <th colspan="4">{{ 'customer.order.total' | t }}</th>
             <td><strong>{{ order.total_net_amount | money_with_currency }}</strong></td>
           </tr>
         </tfoot>
@@ -60,12 +61,12 @@
 
     <div class="account-details">
       <div class="account-card">
-        <h3 class="address-subhead">Billing Address</h3>
-        <p>Status: {{ order.financial_status_label }}</p>
+        <h3 class="address-subhead">{{ 'customer.order.billing_address' | t }}</h3>
+        <p>{{ 'customer.order.status_label' | t: status: order.financial_status_label }}</p>
         {{ order.billing_address | format_address }}
 
-        <h3 class="address-subhead" style="margin-top: 20px;">Shipping Address</h3>
-        <p>Status: {{ order.fulfillment_status_label }}</p>
+        <h3 class="address-subhead" style="margin-top: 20px;">{{ 'customer.order.shipping_address' | t }}</h3>
+        <p>{{ 'customer.order.status_label' | t: status: order.fulfillment_status_label }}</p>
         {{ order.shipping_address | format_address }}
       </div>
     </div>

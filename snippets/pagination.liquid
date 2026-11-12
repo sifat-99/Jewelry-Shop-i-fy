@@ -13,7 +13,7 @@
 {%- endcomment -%}
 
 {%- if paginate.pages > 1 -%}
-  <nav class="lv-pagination-wrapper {{ class }}" role="navigation" aria-label="Pagination">
+  <nav class="lv-pagination-wrapper {{ class }}" role="navigation" aria-label="{{ 'general.pagination.label' | t }}">
     {%- render 'pagination-css' -%}
 
     <ul class="lv-pagination" role="list">
@@ -23,15 +23,15 @@
           <a
             href="{{ paginate.previous.url }}"
             class="lv-pagination__arrow lv-pagination__prev"
-            aria-label="Previous page"
+            aria-label="{{ 'general.pagination.previous_aria' | t }}"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-            <span class="lv-pagination__arrow-text">Prev</span>
+            <span class="lv-pagination__arrow-text">{{ 'general.pagination.previous' | t }}</span>
           </a>
         {%- else -%}
           <span class="lv-pagination__arrow lv-pagination__prev is-disabled" aria-disabled="true">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-            <span class="lv-pagination__arrow-text">Prev</span>
+            <span class="lv-pagination__arrow-text">{{ 'general.pagination.previous' | t }}</span>
           </span>
         {%- endif -%}
       </li>
@@ -43,7 +43,7 @@
             <a
               href="{{ part.url }}"
               class="lv-pagination__link"
-              aria-label="Page {{ part.title }}"
+              aria-label="{{ 'general.pagination.page_aria' | t: page: part.title }}"
             >
               {{ part.title }}
             </a>
@@ -67,14 +67,14 @@
           <a
             href="{{ paginate.next.url }}"
             class="lv-pagination__arrow lv-pagination__next"
-            aria-label="Next page"
+            aria-label="{{ 'general.pagination.next_aria' | t }}"
           >
-            <span class="lv-pagination__arrow-text">Next</span>
+            <span class="lv-pagination__arrow-text">{{ 'general.pagination.next' | t }}</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
           </a>
         {%- else -%}
           <span class="lv-pagination__arrow lv-pagination__next is-disabled" aria-disabled="true">
-            <span class="lv-pagination__arrow-text">Next</span>
+            <span class="lv-pagination__arrow-text">{{ 'general.pagination.next' | t }}</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
           </span>
         {%- endif -%}
@@ -82,7 +82,7 @@
     </ul>
 
     <div class="lv-pagination__summary">
-      Page {{ paginate.current_page }} of {{ paginate.pages }} ({{ paginate.items }} total)
+      {{ 'general.pagination.summary' | t: current: paginate.current_page, total: paginate.pages, items: paginate.items }}
     </div>
   </nav>
 {%- endif -%}

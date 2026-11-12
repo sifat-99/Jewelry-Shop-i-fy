@@ -5,6 +5,48 @@
   if section.settings.image != blank and layout == 'split'
     assign has_image = true
   endif
+  assign root_prefix = routes.root_url
+  unless root_prefix == '/'
+    assign root_prefix = root_prefix | append: '/'
+  endunless
+  assign account_return_to = root_prefix | append: 'pages/account'
+
+  assign lg_badge = section.settings.badge
+  if lg_badge == blank
+    assign lg_badge = 'customer.login_page.badge' | t
+  endif
+  assign lg_title = section.settings.title
+  if lg_title == blank
+    assign lg_title = 'customer.login_page.title' | t
+  endif
+  assign lg_subtitle = section.settings.subtitle
+  if lg_subtitle == blank
+    assign lg_subtitle = 'customer.login_page.subtitle' | t
+  endif
+  assign lg_button_label = section.settings.button_label
+  if lg_button_label == blank
+    assign lg_button_label = 'customer.login_page.sign_in' | t
+  endif
+  assign lg_side_title = section.settings.side_title
+  if lg_side_title == blank
+    assign lg_side_title = 'customer.login_page.side_title' | t
+  endif
+  assign lg_side_text = section.settings.side_text
+  if lg_side_text == blank
+    assign lg_side_text = 'customer.login_page.side_text' | t
+  endif
+  assign lg_b1 = section.settings.benefit_1
+  if lg_b1 == blank
+    assign lg_b1 = 'customer.login_page.benefit_1' | t
+  endif
+  assign lg_b2 = section.settings.benefit_2
+  if lg_b2 == blank
+    assign lg_b2 = 'customer.login_page.benefit_2' | t
+  endif
+  assign lg_b3 = section.settings.benefit_3
+  if lg_b3 == blank
+    assign lg_b3 = 'customer.login_page.benefit_3' | t
+  endif
 -%}
 
 <div class="lg lg--{{ layout }} color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
@@ -135,13 +177,13 @@
             alt="" width="{{ section.settings.image.width }}" height="{{ section.settings.image.height }}" loading="eager">
         {%- endif -%}
         <div class="lg__side-body">
-          {%- if section.settings.side_title != blank -%}<h2 class="lg__side-title">{{ section.settings.side_title }}</h2>{%- endif -%}
-          {%- if section.settings.side_text != blank -%}<p class="lg__side-text">{{ section.settings.side_text }}</p>{%- endif -%}
-          {%- if section.settings.benefit_1 != blank or section.settings.benefit_2 != blank or section.settings.benefit_3 != blank -%}
+          {%- if lg_side_title != blank -%}<h2 class="lg__side-title">{{ lg_side_title }}</h2>{%- endif -%}
+          {%- if lg_side_text != blank -%}<p class="lg__side-text">{{ lg_side_text }}</p>{%- endif -%}
+          {%- if lg_b1 != blank or lg_b2 != blank or lg_b3 != blank -%}
             <ul class="lg__benefits">
-              {%- if section.settings.benefit_1 != blank -%}<li>{{ section.settings.benefit_1 }}</li>{%- endif -%}
-              {%- if section.settings.benefit_2 != blank -%}<li>{{ section.settings.benefit_2 }}</li>{%- endif -%}
-              {%- if section.settings.benefit_3 != blank -%}<li>{{ section.settings.benefit_3 }}</li>{%- endif -%}
+              {%- if lg_b1 != blank -%}<li>{{ lg_b1 }}</li>{%- endif -%}
+              {%- if lg_b2 != blank -%}<li>{{ lg_b2 }}</li>{%- endif -%}
+              {%- if lg_b3 != blank -%}<li>{{ lg_b3 }}</li>{%- endif -%}
             </ul>
           {%- endif -%}
         </div>
@@ -153,31 +195,31 @@
       <!-- ===== Sign in ===== -->
       <div class="lg__card" id="CustomerLoginForm" data-lg-login>
         <div class="lg__head">
-          {%- if section.settings.badge != blank -%}<span class="lg__badge">{{ section.settings.badge }}</span>{%- endif -%}
-          <h1 class="lg__title">{{ section.settings.title | default: 'Sign in' }}</h1>
-          {%- if section.settings.subtitle != blank -%}<p class="lg__sub">{{ section.settings.subtitle }}</p>{%- endif -%}
+          {%- if lg_badge != blank -%}<span class="lg__badge">{{ lg_badge }}</span>{%- endif -%}
+          <h1 class="lg__title">{{ lg_title }}</h1>
+          {%- if lg_subtitle != blank -%}<p class="lg__sub">{{ lg_subtitle }}</p>{%- endif -%}
         </div>
 
         {%- form 'customer_login', class: 'lg__form', novalidate: 'novalidate' -%}
-          <input type="hidden" name="return_to" value="/pages/account">
+          <input type="hidden" name="return_to" value="{{ account_return_to }}">
           {%- if form.errors -%}
             <div class="lg__msg lg__msg--error" role="alert">{{ form.errors | default_errors }}</div>
           {%- endif -%}
 
           <div class="lg__field">
-            <label for="CustomerEmail" class="lg__label">Email address</label>
-            <input type="email" name="customer[email]" id="CustomerEmail" class="lg__input" autocomplete="email" autocorrect="off" autocapitalize="off" placeholder="yourname@example.com" required{% if form.errors contains 'form' %} aria-invalid="true"{% endif %}>
+            <label for="CustomerEmail" class="lg__label">{{ 'customer.login_page.email' | t }}</label>
+            <input type="email" name="customer[email]" id="CustomerEmail" class="lg__input" autocomplete="email" autocorrect="off" autocapitalize="off" placeholder="{{ 'customer.login_page.email_placeholder' | t }}" required{% if form.errors contains 'form' %} aria-invalid="true"{% endif %}>
           </div>
 
           {%- if form.password_needed -%}
             <div class="lg__field">
               <div class="lg__label-row">
-                <label for="CustomerPassword" class="lg__label">Password</label>
-                <button type="button" class="lg__link" data-lg-show-recover>Forgot password?</button>
+                <label for="CustomerPassword" class="lg__label">{{ 'customer.login_page.password' | t }}</label>
+                <button type="button" class="lg__link" data-lg-show-recover>{{ 'customer.login_page.forgot_password' | t }}</button>
               </div>
               <div class="lg__input-wrap">
-                <input type="password" name="customer[password]" id="CustomerPassword" class="lg__input" autocomplete="current-password" placeholder="Your password" required{% if form.errors contains 'form' %} aria-invalid="true"{% endif %}>
-                <button type="button" class="lg__eye" data-lg-eye aria-label="Show password" aria-pressed="false">
+                <input type="password" name="customer[password]" id="CustomerPassword" class="lg__input" autocomplete="current-password" placeholder="{{ 'customer.login_page.password_placeholder' | t }}" required{% if form.errors contains 'form' %} aria-invalid="true"{% endif %}>
+                <button type="button" class="lg__eye" data-lg-eye aria-label="{{ 'customer.login_page.show_password' | t }}" data-show-label="{{ 'customer.login_page.show_password' | t | escape }}" data-hide-label="{{ 'customer.login_page.hide_password' | t | escape }}" aria-pressed="false">
                   <svg class="lg__eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3.2"/></svg>
                   <svg class="lg__eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5a10 10 0 0 1 1.4-.1c6.5 0 10.5 7.1 10.5 7.1a17 17 0 0 1-3.2 4M6.5 6.7A16.5 16.5 0 0 0 1.5 12S5.5 19.5 12 19.5a9.7 9.7 0 0 0 4.2-.9M9.9 9.9a3.2 3.2 0 0 0 4.2 4.2"/></svg>
                 </button>
@@ -186,14 +228,14 @@
           {%- endif -%}
 
           <button type="submit" class="btn btn--primary btn-sliding-hover lg__submit">
-            <span class="btn__text-content">{{ section.settings.button_label | default: 'Sign in' }}</span>
+            <span class="btn__text-content">{{ lg_button_label }}</span>
           </button>
         {%- endform -%}
 
         <div class="lg__foot">
-          <p>New here? <a href="{{ routes.account_register_url }}">Create an account</a></p>
+          <p>{{ 'customer.login_page.new_here' | t }} <a href="{{ routes.account_register_url }}">{{ 'customer.login_page.create_account' | t }}</a></p>
           {%- if section.settings.show_return_link -%}
-            <p><a href="{{ routes.root_url }}" class="lg__back">&larr; Return to store</a></p>
+            <p><a href="{{ routes.root_url }}" class="lg__back">&larr; {{ 'customer.account.return_to_store' | t }}</a></p>
           {%- endif -%}
         </div>
       </div>
@@ -201,9 +243,9 @@
       <!-- ===== Recover password ===== -->
       <div class="lg__card" id="RecoverPasswordForm" data-lg-recover hidden>
         <div class="lg__head">
-          <span class="lg__badge">Reset access</span>
-          <h2 class="lg__title">Reset password</h2>
-          <p class="lg__sub">Enter your email and we will send you a link to choose a new password.</p>
+          <span class="lg__badge">{{ 'customer.recover_password.badge' | t }}</span>
+          <h2 class="lg__title">{{ 'customer.recover_password.title' | t }}</h2>
+          <p class="lg__sub">{{ 'customer.recover_password.subtext' | t }}</p>
         </div>
 
         {%- form 'recover_customer_password', class: 'lg__form' -%}
@@ -212,21 +254,21 @@
             <div class="lg__msg lg__msg--error" role="alert" data-lg-recover-state="error">{{ form.errors | default_errors }}</div>
           {%- endif -%}
           {%- if recover_done -%}
-            <div class="lg__msg lg__msg--ok" role="status" data-lg-recover-state="ok">We have sent you an email with a link to reset your password.</div>
+            <div class="lg__msg lg__msg--ok" role="status" data-lg-recover-state="ok">{{ 'customer.recover_password.success' | t }}</div>
           {%- endif -%}
 
           <div class="lg__field">
-            <label for="RecoverEmail" class="lg__label">Email address</label>
-            <input type="email" name="email" id="RecoverEmail" class="lg__input" autocomplete="email" autocorrect="off" autocapitalize="off" placeholder="yourname@example.com" required{% if form.errors %} aria-invalid="true"{% endif %}>
+            <label for="RecoverEmail" class="lg__label">{{ 'customer.login_page.email' | t }}</label>
+            <input type="email" name="email" id="RecoverEmail" class="lg__input" autocomplete="email" autocorrect="off" autocapitalize="off" placeholder="{{ 'customer.login_page.email_placeholder' | t }}" required{% if form.errors %} aria-invalid="true"{% endif %}>
           </div>
 
           <button type="submit" class="btn btn--primary btn-sliding-hover lg__submit">
-            <span class="btn__text-content">Send reset link</span>
+            <span class="btn__text-content">{{ 'customer.recover_password.submit' | t }}</span>
           </button>
         {%- endform -%}
 
         <div class="lg__foot">
-          <p>Remembered it? <a href="#login" data-lg-show-login>Back to sign in</a></p>
+          <p>{{ 'customer.recover_password.remembered' | t }} <a href="#login" data-lg-show-login>{{ 'customer.recover_password.cancel' | t }}</a></p>
         </div>
       </div>
 
@@ -275,7 +317,7 @@
           var show = input.type === 'password';
           input.type = show ? 'text' : 'password';
           btn.setAttribute('aria-pressed', show ? 'true' : 'false');
-          btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+          btn.setAttribute('aria-label', show ? (btn.getAttribute('data-hide-label') || 'Hide password') : (btn.getAttribute('data-show-label') || 'Show password'));
         });
       });
     })();
@@ -310,26 +352,22 @@
     {
       "type": "text",
       "id": "badge",
-      "label": "Small label",
-      "default": "My account"
+      "label": "Small label"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "Heading",
-      "default": "Sign in"
+      "label": "Heading"
     },
     {
       "type": "textarea",
       "id": "subtitle",
-      "label": "Subheading",
-      "default": "Access your orders, saved details and exclusive jewelry member privileges."
+      "label": "Subheading"
     },
     {
       "type": "text",
       "id": "button_label",
-      "label": "Button label",
-      "default": "Sign in"
+      "label": "Button label"
     },
     {
       "type": "checkbox",
@@ -360,32 +398,27 @@
     {
       "type": "text",
       "id": "side_title",
-      "label": "Heading",
-      "default": "Welcome back"
+      "label": "Heading"
     },
     {
       "type": "textarea",
       "id": "side_text",
-      "label": "Text",
-      "default": "Jewelry made to be worn every day and personal enough to keep forever."
+      "label": "Text"
     },
     {
       "type": "text",
       "id": "benefit_1",
-      "label": "Benefit 1",
-      "default": "Track your orders"
+      "label": "Benefit 1"
     },
     {
       "type": "text",
       "id": "benefit_2",
-      "label": "Benefit 2",
-      "default": "Faster checkout with saved details"
+      "label": "Benefit 2"
     },
     {
       "type": "text",
       "id": "benefit_3",
-      "label": "Benefit 3",
-      "default": "Easy 14 day returns"
+      "label": "Benefit 3"
     },
     {
       "type": "header",

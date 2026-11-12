@@ -10,14 +10,61 @@
   Accepts: blocks, cfg (section.settings), page_title, page_content
 {%- endcomment -%}
 {%- liquid
+  assign root_prefix = routes.root_url
+  unless root_prefix == '/'
+    assign root_prefix = root_prefix | append: '/'
+  endunless
+  assign contact_page_url = root_prefix | append: 'pages/contact'
   assign shop_link = cfg.about_button_link
   if shop_link == blank
     assign shop_link = routes.all_products_collection_url
   endif
   assign cta_link = cfg.about_cta_link
   if cta_link == blank
-    assign cta_link = routes.root_url | append: 'pages/contact'
+    assign cta_link = contact_page_url
   endif
+
+  assign ab_eyebrow = cfg.about_eyebrow
+  if ab_eyebrow == blank
+    assign ab_eyebrow = 'pages.about.eyebrow' | t
+  endif
+  assign ab_heading = cfg.about_heading
+  if ab_heading == blank
+    assign ab_heading = 'pages.about.heading' | t
+  endif
+  assign ab_lead = cfg.about_lead
+  if ab_lead == blank
+    assign ab_lead = 'pages.about.lead' | t
+  endif
+  assign ab_btn_label = cfg.about_button_label
+  if ab_btn_label == blank
+    assign ab_btn_label = 'pages.about.button_label' | t
+  endif
+  assign ab_story_eyebrow = cfg.about_story_eyebrow
+  if ab_story_eyebrow == blank
+    assign ab_story_eyebrow = 'pages.about.story_eyebrow' | t
+  endif
+  assign ab_story_title = cfg.about_story_title
+  if ab_story_title == blank
+    assign ab_story_title = 'pages.about.story_title' | t
+  endif
+  assign ab_values_title = cfg.about_values_title
+  if ab_values_title == blank
+    assign ab_values_title = 'pages.about.values_title' | t
+  endif
+  assign ab_cta_title = cfg.about_cta_title
+  if ab_cta_title == blank
+    assign ab_cta_title = 'pages.about.cta_title' | t
+  endif
+  assign ab_cta_text = cfg.about_cta_text
+  if ab_cta_text == blank
+    assign ab_cta_text = 'pages.about.cta_text' | t
+  endif
+  assign ab_cta_label = cfg.about_cta_label
+  if ab_cta_label == blank
+    assign ab_cta_label = 'pages.about.cta_label' | t
+  endif
+  assign ab_brand_fallback = 'pages.about.brand_fallback' | t
 
   assign has_stats = false
   assign has_values = false
@@ -127,7 +174,7 @@
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-family: var(--TYPE-STACK-BUTTON, sans-serif) !important;
     font-size: 11px !important;
     font-weight: 700 !important;
     letter-spacing: 0.16em !important;
@@ -353,7 +400,7 @@
     min-height: 48px !important;
     padding: 0 34px !important;
     border-radius: var(--btn-radius, 0px) !important;
-    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-family: var(--TYPE-STACK-BUTTON, sans-serif) !important;
     font-size: 11.5px !important;
     font-weight: 700 !important;
     letter-spacing: 0.16em !important;
@@ -439,14 +486,14 @@
 <!-- HERO SECTION: STORY ON LEFT, ROTATING 2ND PRODUCT IMAGES ON RIGHT -->
 <section class="sl-hero">
   <div class="sl-hero__copy">
-    <p class="sl-hero__eyebrow">{{ cfg.about_eyebrow | default: 'Our Heritage & Philosophy' }}</p>
-    <h1 class="sl-hero__title">{{ cfg.about_heading | default: 'Crafted for Everyday Elegance' }}</h1>
+    <p class="sl-hero__eyebrow">{{ ab_eyebrow }}</p>
+    <h1 class="sl-hero__title">{{ ab_heading }}</h1>
     <p class="sl-hero__lead">
-      {{ cfg.about_lead | default: "Aurelle was founded with a singular conviction: fine jewelry shouldn't be reserved for velvet boxes and special occasions. We forge waterproof, tarnish-free, and hypoallergenic heirlooms designed to accompany you through every shower, swim, milestone, and quiet morning." }}
+      {{ ab_lead }}
     </p>
     <div class="sl-hero__btns">
-      <a href="{{ shop_link }}" class="btn btn--primary btn-sliding-hover sl-btn"><span class="btn__text-content">{{ cfg.about_button_label | default: 'Explore The Collection' }}</span></a>
-      <a href="{{ routes.root_url }}pages/contact" class="btn btn-sliding-hover sl-btn"><span class="btn__text-content">Contact Atelier</span></a>
+      <a href="{{ shop_link }}" class="btn btn--primary btn-sliding-hover sl-btn"><span class="btn__text-content">{{ ab_btn_label }}</span></a>
+      <a href="{{ contact_page_url }}" class="btn btn-sliding-hover sl-btn"><span class="btn__text-content">{{ 'pages.about.contact_atelier' | t }}</span></a>
     </div>
   </div>
 
@@ -456,33 +503,34 @@
         <!-- Custom Hero Slide 1 configured by merchant in Theme Settings -->
         <div class="about-slide is-active" data-slide-index="0">
           <img src="{{ cfg.about_image | image_url: width: 1200 }}"
-               alt="{{ cfg.about_image.alt | default: cfg.about_heading | default: 'Aurelle Fine Jewelry' | escape }}"
+               alt="{{ cfg.about_image.alt | default: cfg.about_heading | default: ab_brand_fallback | escape }}"
                width="1200" height="1200"
                loading="eager">
           <div class="about-slide__overlay"></div>
           <div class="about-slide__card">
             <div>
-              <span class="about-slide__badge">Atelier Spotlight</span>
-              <span class="about-slide__title">{{ cfg.about_heading | default: 'Aurelle Fine Jewelry' }}</span>
+              <span class="about-slide__badge">{{ 'pages.about.spotlight_badge' | t }}</span>
+              <span class="about-slide__title">{{ cfg.about_heading | default: ab_brand_fallback }}</span>
             </div>
-            <a href="{{ shop_link }}" class="about-slide__btn"><span class="about-slide__btn-text">Shop Collection</span></a>
+            <a href="{{ shop_link }}" class="about-slide__btn"><span class="about-slide__btn-text">{{ 'pages.about.shop_collection' | t }}</span></a>
           </div>
         </div>
 
         {%- if cfg.about_image_slide_2 != blank -%}
           <!-- Custom Hero Slide 2 configured by merchant in Theme Settings -->
           <div class="about-slide" data-slide-index="1">
+            {%- assign ab_slide2_title = 'pages.about.slide_2_title' | t -%}
             <img src="{{ cfg.about_image_slide_2 | image_url: width: 1200 }}"
-                 alt="{{ cfg.about_image_slide_2.alt | default: 'Waterproof Fine Jewelry' | escape }}"
+                 alt="{{ cfg.about_image_slide_2.alt | default: ab_slide2_title | escape }}"
                  width="1200" height="1200"
                  loading="lazy">
             <div class="about-slide__overlay"></div>
             <div class="about-slide__card">
               <div>
-                <span class="about-slide__badge">Atelier Spotlight</span>
-                <span class="about-slide__title">Waterproof Fine Jewelry</span>
+                <span class="about-slide__badge">{{ 'pages.about.spotlight_badge' | t }}</span>
+                <span class="about-slide__title">{{ ab_slide2_title }}</span>
               </div>
-              <a href="{{ shop_link }}" class="about-slide__btn"><span class="about-slide__btn-text">Explore Pieces</span></a>
+              <a href="{{ shop_link }}" class="about-slide__btn"><span class="about-slide__btn-text">{{ 'pages.about.explore_pieces' | t }}</span></a>
             </div>
           </div>
           <div class="about-slide-nav" id="aboutSlideDots">
@@ -513,10 +561,10 @@
               <div class="about-slide__overlay"></div>
               <div class="about-slide__card">
                 <div>
-                  <span class="about-slide__badge">Atelier Spotlight</span>
+                  <span class="about-slide__badge">{{ 'pages.about.spotlight_badge' | t }}</span>
                   <a href="{{ prod.url }}" class="about-slide__title">{{ prod.title }}</a>
                 </div>
-                <a href="{{ prod.url }}" class="about-slide__btn"><span class="about-slide__btn-text">View Piece</span></a>
+                <a href="{{ prod.url }}" class="about-slide__btn"><span class="about-slide__btn-text">{{ 'pages.about.view_piece' | t }}</span></a>
               </div>
             </div>
             {%- assign found_slides = found_slides | plus: 1 -%}
@@ -526,7 +574,7 @@
 
         {%- if found_slides == 0 -%}
           <div class="about-slide is-active">
-            <img src="{{ 'split_banner_2.jpg' | asset_url }}" alt="Aurelle Atelier" width="1200" height="960" loading="eager">
+            <img src="{{ 'split_banner_2.jpg' | asset_url }}" alt="{{ 'pages.about.atelier_alt' | t }}" width="1200" height="960" loading="eager">
           </div>
         {%- elsif found_slides > 1 -%}
           <div class="about-slide-nav" id="aboutSlideDots">
@@ -553,20 +601,20 @@
     {%- endfor -%}
   {%- else -%}
     <div class="ab-stat">
-      <p class="ab-stat__num">100%</p>
-      <p class="ab-stat__label">Waterproof & Sweat-Proof</p>
+      <p class="ab-stat__num">{{ 'pages.about.stat1_num' | t }}</p>
+      <p class="ab-stat__label">{{ 'pages.about.stat1_label' | t }}</p>
     </div>
     <div class="ab-stat">
-      <p class="ab-stat__num">18K Gold</p>
-      <p class="ab-stat__label">Molecular PVD Vacuum Bonded</p>
+      <p class="ab-stat__num">{{ 'pages.about.stat2_num' | t }}</p>
+      <p class="ab-stat__label">{{ 'pages.about.stat2_label' | t }}</p>
     </div>
     <div class="ab-stat">
-      <p class="ab-stat__num">Lifetime</p>
-      <p class="ab-stat__label">Color & Tarnish Warranty</p>
+      <p class="ab-stat__num">{{ 'pages.about.stat3_num' | t }}</p>
+      <p class="ab-stat__label">{{ 'pages.about.stat3_label' | t }}</p>
     </div>
     <div class="ab-stat">
-      <p class="ab-stat__num">0% Nickel</p>
-      <p class="ab-stat__label">Hypoallergenic & Sensitive Safe</p>
+      <p class="ab-stat__num">{{ 'pages.about.stat4_num' | t }}</p>
+      <p class="ab-stat__label">{{ 'pages.about.stat4_label' | t }}</p>
     </div>
   {%- endif -%}
 </section>
@@ -574,21 +622,22 @@
 <!-- THE AURELLE STORY & METALLURGY -->
 <section class="ab-story">
   <div class="ab-story__media">
+    {%- assign ab_craft_alt = 'pages.about.craft_alt' | t -%}
     {%- if cfg.about_image_2 != blank -%}
       <img src="{{ cfg.about_image_2 | image_url: width: 1200 }}"
-           alt="{{ cfg.about_image_2.alt | default: cfg.about_story_title | default: 'Aurelle Jewelry Craftsmanship' | escape }}"
+           alt="{{ cfg.about_image_2.alt | default: cfg.about_story_title | default: ab_craft_alt | escape }}"
            width="{{ cfg.about_image_2.width }}"
            height="{{ cfg.about_image_2.height }}"
            loading="lazy">
     {%- elsif cfg.about_image != blank -%}
       <img src="{{ cfg.about_image | image_url: width: 1200 }}"
-           alt="{{ cfg.about_image.alt | default: 'Aurelle Fine Jewelry' | escape }}"
+           alt="{{ cfg.about_image.alt | default: ab_brand_fallback | escape }}"
            width="{{ cfg.about_image.width }}"
            height="{{ cfg.about_image.height }}"
            loading="lazy">
     {%- else -%}
       <img src="{{ 'mosaic_1.jpg' | asset_url }}"
-           alt="Aurelle Fine Jewelry - Everyday Elegance"
+           alt="{{ 'pages.about.fallback_alt' | t }}"
            width="1200"
            height="1200"
            loading="lazy"
@@ -596,21 +645,15 @@
     {%- endif -%}
   </div>
   <div>
-    <p class="sl-sec__eyebrow">{{ cfg.about_story_eyebrow | default: 'Behind the Craft' }}</p>
-    <h2 class="ab-story__title">{{ cfg.about_story_title | default: 'Jewelry that moves with your life' }}</h2>
+    <p class="sl-sec__eyebrow">{{ ab_story_eyebrow }}</p>
+    <h2 class="ab-story__title">{{ ab_story_title }}</h2>
     <div class="rte ab-story__body">
       {%- if cfg.about_story != blank -%}
         {{ cfg.about_story }}
       {%- else -%}
-        <p>
-          Every piece in the Aurelle collection begins with surgical-grade 316L stainless steel—the exact metal celebrated in luxury Swiss horology for its supreme tensile strength and imperviousness to corrosion.
-        </p>
-        <p>
-          Through Physical Vapor Deposition (PVD), real 18-karat gold is vaporized and molecularly bonded within high-vacuum chambers. The resulting finish is up to 10 times more resilient than traditional electroplating, allowing your jewelry to withstand ocean saltwater, chlorinated pools, daily perfumes, and workout sweat without ever tarnishing, flaking, or turning skin green.
-        </p>
-        <p>
-          In our private atelier, our master artisans finish, polish, and laser-engrave every piece individually. From meaningful coordinates and Roman numerals to loved ones' initials, we turn metal into memory.
-        </p>
+        <p>{{ 'pages.about.story_p1' | t }}</p>
+        <p>{{ 'pages.about.story_p2' | t }}</p>
+        <p>{{ 'pages.about.story_p3' | t }}</p>
       {%- endif -%}
       {{ page_content }}
     </div>
@@ -619,17 +662,15 @@
 
 <!-- QUOTE CALLOUT -->
 <div class="about-quote-box">
-  <p class="about-quote-text">
-    "We don't create jewelry to be locked away in velvet boxes. We forge pieces you put on once, and never have to take off."
-  </p>
-  <p class="about-quote-author">The Aurelle Design Philosophy</p>
+  <p class="about-quote-text">{{ 'pages.about.quote_text' | t }}</p>
+  <p class="about-quote-author">{{ 'pages.about.quote_author' | t }}</p>
 </div>
 
 <!-- VALUES SECTION -->
 <section class="sl-sec">
   <div class="sl-sec__head">
-    <p class="sl-sec__eyebrow">Our Guiding Values</p>
-    <h2 class="sl-sec__title">{{ cfg.about_values_title | default: 'What Defines Aurelle' }}</h2>
+    <p class="sl-sec__eyebrow">{{ 'pages.about.values_eyebrow' | t }}</p>
+    <h2 class="sl-sec__title">{{ ab_values_title }}</h2>
   </div>
   <div class="sl-features">
     {%- if has_values -%}
@@ -655,22 +696,22 @@
         <span class="sl-feature__icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
         </span>
-        <h3 class="sl-feature__title">Engineered to Last</h3>
-        <p class="sl-feature__text">Forged from surgical-grade 316L stainless steel that will never oxidize, rust, or turn skin green—even with daily wear in water.</p>
+        <h3 class="sl-feature__title">{{ 'pages.about.val1_title' | t }}</h3>
+        <p class="sl-feature__text">{{ 'pages.about.val1_text' | t }}</p>
       </div>
       <div class="sl-feature">
         <span class="sl-feature__icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1Z"/></svg>
         </span>
-        <h3 class="sl-feature__title">Bespoke Laser Artistry</h3>
-        <p class="sl-feature__text">Every custom initial, anniversary date, and meaningful coordinate is permanently etched in-house using micro-laser precision.</p>
+        <h3 class="sl-feature__title">{{ 'pages.about.val2_title' | t }}</h3>
+        <p class="sl-feature__text">{{ 'pages.about.val2_text' | t }}</p>
       </div>
       <div class="sl-feature">
         <span class="sl-feature__icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7L12 3Z"/></svg>
         </span>
-        <h3 class="sl-feature__title">Direct Luxury, Honest Pricing</h3>
-        <p class="sl-feature__text">We eliminate traditional luxury markups, delivering heirloom-quality pieces directly from our atelier into your hands.</p>
+        <h3 class="sl-feature__title">{{ 'pages.about.val3_title' | t }}</h3>
+        <p class="sl-feature__text">{{ 'pages.about.val3_text' | t }}</p>
       </div>
     {%- endif -%}
   </div>
@@ -679,15 +720,15 @@
 <!-- BOTTOM CTA -->
 <section class="sl-cta">
   <div class="sl-cta__inner">
-    <p class="sl-cta__eyebrow" style="color: var(--pp-muted, #777777) !important;">Atelier Concierge</p>
-    <h2 class="sl-cta__title" style="color: var(--text, #000000) !important; opacity: 1 !important;">{{ cfg.about_cta_title | default: 'Find Your Signature Piece' }}</h2>
-    <p class="sl-cta__text" style="color: color-mix(in srgb, var(--text, #444444) 88%, transparent) !important; opacity: 1 !important;">{{ cfg.about_cta_text | default: 'Explore our curated collection of waterproof rings, necklaces, and engravable keepsakes, or consult our concierge team for personalized guidance.' }}</p>
+    <p class="sl-cta__eyebrow" style="color: var(--pp-muted, #777777) !important;">{{ 'pages.about.cta_eyebrow' | t }}</p>
+    <h2 class="sl-cta__title" style="color: var(--text, #000000) !important; opacity: 1 !important;">{{ ab_cta_title }}</h2>
+    <p class="sl-cta__text" style="color: color-mix(in srgb, var(--text, #444444) 88%, transparent) !important; opacity: 1 !important;">{{ ab_cta_text }}</p>
     <div class="sl-cta__actions">
       <a href="{{ shop_link }}" class="btn btn--primary btn-sliding-hover sl-btn sl-cta__btn-primary">
-        <span class="btn__text-content">Explore Collection</span>
+        <span class="btn__text-content">{{ 'pages.about.cta_explore' | t }}</span>
       </a>
       <a href="{{ cta_link }}" class="btn btn-sliding-hover sl-btn sl-cta__btn-secondary">
-        <span class="btn__text-content">{{ cfg.about_cta_label | default: 'Get In Touch' }}</span>
+        <span class="btn__text-content">{{ ab_cta_label }}</span>
       </a>
     </div>
   </div>

@@ -1,8 +1,84 @@
 <!-- /sections/section-collection.liquid -->
 {%- liquid
+  assign current_product = product
+  assign current_collection_ctx = collection
+  assign use_prod_col = section.settings.use_product_collection
+  if use_prod_col == nil
+    assign use_prod_col = true
+  endif
+
   assign featured_collection = collections[section.settings.collection]
-  if featured_collection == blank or featured_collection.products_count == 0
+
+  if featured_collection == blank
+    if use_prod_col
+      if current_product != blank
+        if current_collection_ctx != blank
+          assign ctx_excluded = false
+          case current_collection_ctx.handle
+            when 'all', 'frontpage'
+              assign ctx_excluded = true
+          endcase
+          unless ctx_excluded
+            for cp in current_collection_ctx.products limit: 2
+              if cp.id != current_product.id
+                assign featured_collection = current_collection_ctx
+                break
+              endif
+            endfor
+          endunless
+        endif
+
+        if featured_collection == blank
+          for pc in current_product.collections
+            assign skip_broad = false
+            case pc.handle
+              when 'all', 'frontpage', 'all-products', 'new', 'new-arrivals', 'bestsellers', 'best-sellers', 'featured', 'sale', 'outlet', 'jewellery', 'jewelry'
+                assign skip_broad = true
+            endcase
+            unless skip_broad
+              for cp in pc.products limit: 2
+                if cp.id != current_product.id
+                  assign featured_collection = pc
+                  break
+                endif
+              endfor
+              if featured_collection != blank
+                break
+              endif
+            endunless
+          endfor
+        endif
+
+        if featured_collection == blank
+          for pc in current_product.collections
+            assign skip_root = false
+            case pc.handle
+              when 'all', 'frontpage'
+                assign skip_root = true
+            endcase
+            unless skip_root
+              for cp in pc.products limit: 2
+                if cp.id != current_product.id
+                  assign featured_collection = pc
+                  break
+                endif
+              endfor
+              if featured_collection != blank
+                break
+              endif
+            endunless
+          endfor
+        endif
+      endif
+    endif
+  endif
+
+  if featured_collection == blank
     assign featured_collection = collections.all
+  else
+    if featured_collection.products_count == 0
+      assign featured_collection = collections.all
+    endif
   endif
 
   assign shuffle_enabled = section.settings.shuffle_products
@@ -14,6 +90,10 @@
   assign pool_limit = display_limit
   if shuffle_enabled
     assign pool_limit = 48
+  endif
+  assign loop_fetch_limit = pool_limit
+  if current_product != blank
+    assign loop_fetch_limit = pool_limit | plus: 1
   endif
 -%}
 
@@ -57,19 +137,32 @@
       <h2 class="kicker-flourished mb-r9">{{ section.settings.title }}</h2>
     {%- endif -%}
     {%- if section.settings.subtitle != blank -%}
-      <p style="text-align: center; font-family: 'Quicksand', sans-serif; font-size: 13.5px; font-weight: 500; color: var(--text, #2b2622); margin: -6px auto 26px auto; letter-spacing: 0.05em; max-width: 600px; opacity: 1;">{{ section.settings.subtitle }}</p>
+      <p style="text-align: center; font-family: var(--FONT-STACK-SUBHEADING, sans-serif); font-size: calc(13.5px * var(--FONT-ADJUST-ACCENT, 1)); font-weight: var(--FONT-WEIGHT-SUBHEADING, 500); color: var(--text, #2b2622); margin: -6px auto 26px auto; letter-spacing: var(--FONT-SUBHEADING-LETTER-SPACING, 0.05em); text-transform: var(--FONT-SUBHEADING-TRANSFORM, none); max-width: 600px; opacity: 1;">{{ section.settings.subtitle }}</p>
     {%- endif -%}
 
     <div class="lv-product-grid" style="{% render 'product-grid-vars', settings: section.settings %}">
+      {%- assign rendered_count = 0 -%}
       {%- if featured_collection.products.size > 0 -%}
-        {%- for product in featured_collection.products limit: pool_limit -%}
-          {%- assign extra_cls = '' -%}
-          {%- if forloop.index > display_limit and shuffle_enabled -%}
-            {%- assign extra_cls = 'lv-shuffled-hidden' -%}
+        {%- for rec_product in featured_collection.products limit: loop_fetch_limit -%}
+          {%- if current_product != blank -%}
+            {%- if rec_product.id == current_product.id -%}
+              {%- continue -%}
+            {%- endif -%}
           {%- endif -%}
-          {% render 'product-grid-item', product: product, fallback_index: forloop.index, card_border_radius: section.settings.card_border_radius, extra_class: extra_cls %}
+          {%- assign rendered_count = rendered_count | plus: 1 -%}
+          {%- assign extra_cls = '' -%}
+          {%- if shuffle_enabled -%}
+            {%- if rendered_count > display_limit -%}
+              {%- assign extra_cls = 'lv-shuffled-hidden' -%}
+            {%- endif -%}
+          {%- endif -%}
+          {% render 'product-grid-item', product: rec_product, fallback_index: rendered_count, card_border_radius: section.settings.card_border_radius, extra_class: extra_cls %}
+          {%- if rendered_count >= pool_limit -%}
+            {%- break -%}
+          {%- endif -%}
         {%- endfor -%}
-      {%- else -%}
+      {%- endif -%}
+      {%- if rendered_count == 0 -%}
         {%- for i in (1..display_limit) -%}
           {% render 'product-grid-item', fallback_index: i, card_border_radius: section.settings.card_border_radius %}
         {%- endfor -%}
@@ -127,8 +220,8 @@
 
     {%- if section.settings.show_view_all -%}
       <div style="text-align: center; margin-top: 36px;">
-        <a href="{{ featured_collection.url | default: routes.all_products_collection_url }}" class="btn btn--outline btn-sliding-hover" style="display: inline-flex; padding: 12px 32px; font-family: 'Quicksand', sans-serif; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none;">
-          <span class="btn__text-content">View All Products</span>
+        <a href="{{ featured_collection.url | default: routes.all_products_collection_url }}" class="btn btn--outline btn-sliding-hover" style="display: inline-flex; padding: 12px 32px; font-family: var(--TYPE-STACK-BUTTON, sans-serif); font-size: 12px; font-weight: var(--TYPE-WEIGHT-BUTTON, 600); text-transform: var(--FONT-BUTTON-TRANSFORM, uppercase); letter-spacing: var(--FONT-BUTTON-LETTER-SPACING, 0.15em); text-decoration: none;">
+          <span class="btn__text-content">{{ 'collections.general.view_all_products' | t }}</span>
         </a>
       </div>
     {%- endif -%}
@@ -161,6 +254,13 @@
       "type": "collection",
       "id": "collection",
       "label": "Collection"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_product_collection",
+      "label": "Use current product's collection on product pages",
+      "default": true,
+      "info": "On product pages, shows products from the opened product's collection when no specific collection is selected above."
     },
     {
       "type": "range",

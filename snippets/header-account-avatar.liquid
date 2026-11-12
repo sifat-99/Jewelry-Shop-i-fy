@@ -1,0 +1,84 @@
+{% doc %}
+  Renders the customer account avatar in the header or account dashboard:
+  custom/Shop profile image when available, uppercase initial fallback when no image exists,
+  or the guest account SVG icon when logged out.
+
+  @param {customer} [customer_obj] - Logged-in Shopify customer object
+  @param {string} [fallback_text] - Optional override text for the initial/monogram fallback
+  @param {boolean} [show_guest_icon] - Render the user SVG outline icon when logged out
+  @param {string} [wrapper_class] - Base CSS class for the avatar container
+
+  @example
+  {% render 'header-account-avatar', customer_obj: customer, show_guest_icon: true %}
+{% enddoc %}
+{%- liquid
+  assign cust = customer_obj | default: customer
+  assign cls = wrapper_class | default: 'lv-hdr-avatar'
+  assign custom_avatar = blank
+  assign shopify_avatar_html = ''
+  assign has_avatar_img = false
+  assign resolved_text = fallback_text | default: '' | strip
+
+  if cust != blank
+    if resolved_text == blank
+      assign fn_first = cust.first_name | strip | slice: 0, 1 | upcase
+      assign name_first = cust.name | strip | slice: 0, 1 | upcase
+      assign email_first = cust.email | strip | slice: 0, 1 | upcase
+      if fn_first != blank
+        assign resolved_text = fn_first
+      elsif name_first != blank
+        assign resolved_text = name_first
+      elsif email_first != blank
+        assign resolved_text = email_first
+      else
+        assign resolved_text = 'U'
+      endif
+    endif
+
+    if cust.metafields.custom.avatar != blank
+      if cust.metafields.custom.avatar.value != blank
+        assign custom_avatar = cust.metafields.custom.avatar.value
+      endif
+    endif
+    if custom_avatar == blank
+      if cust.metafields.custom.profile_image != blank
+        if cust.metafields.custom.profile_image.value != blank
+          assign custom_avatar = cust.metafields.custom.profile_image.value
+        endif
+      endif
+    endif
+
+    if custom_avatar != blank
+      assign has_avatar_img = true
+    elsif cust.has_avatar?
+      capture shopify_avatar_html
+        echo cust | avatar
+      endcapture
+      assign shopify_avatar_html = shopify_avatar_html | strip
+      if shopify_avatar_html != blank
+        assign has_avatar_img = true
+      endif
+    endif
+  endif
+-%}
+{%- if cust != blank -%}
+  {%- assign avatar_alt = cust.name | default: cust.email | default: 'customer.account.title' | t -%}
+  <span class="{{ cls }}{% if has_avatar_img %} {{ cls }}--has-img{% endif %}" data-lv-avatar aria-hidden="true">
+    <span class="{{ cls }}__letter">{{ resolved_text | escape }}</span>
+    {%- if custom_avatar != blank -%}
+      <span class="{{ cls }}__media">
+        <img
+          src="{{ custom_avatar | image_url: width: 160, height: 160, crop: 'center' }}"
+          alt="{{ avatar_alt | escape }}"
+          width="80"
+          height="80"
+          loading="eager"
+        >
+      </span>
+    {%- elsif shopify_avatar_html != blank -%}
+      <span class="{{ cls }}__media">{{ shopify_avatar_html }}</span>
+    {%- endif -%}
+  </span>
+{%- elsif show_guest_icon -%}
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-user" viewBox="0 0 24 24"><path d="m1 22 3.3-4h15.4l3.3 4M17.996 8.242a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
+{%- endif -%}

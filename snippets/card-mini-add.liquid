@@ -54,7 +54,7 @@
   data-title="{{ product.title | default: demo_title | escape }}"
   data-image="{% if product.featured_image != blank %}{{ product.featured_image | image_url: width: 160 }}{% endif %}"
   data-price="{% if product != blank %}{{ product.price | money }}{% else %}€{{ demo_price | default: '49.00' }}{% endif %}"
-  aria-label="Add to cart"
+  aria-label="{{ 'products.product.add_to_cart' | t }}"
   aria-haspopup="dialog"
 >
   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -68,12 +68,12 @@
       {%- assign base_price = product.variants.first.price -%}
       {%- for v in product.variants -%}
         <button type="button" class="lv-msheet__opt" data-variant-id="{{ v.id }}" data-price="{{ v.price | money | escape }}"{% unless v.available %} disabled{% endunless %}>
-          <span class="lv-msheet__opt-label">{% if product.has_only_default_variant %}Add to cart{% else %}{{ v.title | escape }}{% endif %}</span>
+          <span class="lv-msheet__opt-label">{% if product.has_only_default_variant %}{{ 'products.product.add_to_cart' | t }}{% else %}{{ v.title | escape }}{% endif %}</span>
           {%- if product.price_varies -%}
             {%- assign delta = v.price | minus: base_price -%}
             <span class="lv-msheet__opt-delta">{% if delta > 0 %}+{{ delta | money }}{% elsif delta < 0 %}-{{ delta | abs | money }}{% else %}+{{ 0 | money }}{% endif %}</span>
           {%- endif -%}
-          {%- if v.available == false -%}<span class="lv-msheet__opt-note">Sold out</span>{%- endif -%}
+          {%- if v.available == false -%}<span class="lv-msheet__opt-note">{{ 'products.product.sold_out' | t }}</span>{%- endif -%}
         </button>
       {%- endfor -%}
     {%- else -%}

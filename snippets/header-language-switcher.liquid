@@ -1,0 +1,148 @@
+{% doc %}
+  Renders a header localization language switcher backed by Shopify's native
+  `localization` form and Translate & Adapt locales.
+
+  @param {string} id_prefix - Unique prefix to avoid duplicate element IDs
+  @param {string} [variant] - Layout variant: 'desktop' (header dropdown) or 'drawer' (mobile drawer bottom bar)
+  @param {string} [label_style] - Desktop toggle label display: 'code' (e.g. EN) or 'name' (e.g. English)
+
+  @example
+  {% render 'header-language-switcher', id_prefix: 'desktop', variant: 'desktop', label_style: section.settings.language_label_style %}
+{% enddoc %}
+
+{%- liquid
+  assign switcher_variant = variant | default: 'desktop'
+  assign switcher_label_style = label_style | default: 'code'
+  assign current_lang = localization.language
+  assign current_iso = current_lang.iso_code | default: request.locale.iso_code | default: 'en'
+  assign current_iso_down = current_iso | strip | downcase
+  assign current_iso_short = current_iso | split: '-' | first | upcase
+  assign current_endonym = current_lang.endonym_name | default: current_iso_short | capitalize
+  assign form_dom_id = 'HeaderLangForm-' | append: id_prefix
+  assign list_dom_id = 'HeaderLangList-' | append: id_prefix
+  assign toggle_label = current_iso_short
+  if switcher_label_style == 'name'
+    assign toggle_label = current_endonym
+  endif
+-%}
+
+<div class="lv-lang lv-lang--{{ switcher_variant }}" data-lv-lang>
+  {%- form 'localization', id: form_dom_id, class: 'lv-lang__form' -%}
+    <input
+      type="hidden"
+      name="locale_code"
+      value="{{ current_iso | escape }}"
+      data-lv-lang-input
+    >
+
+    {%- if switcher_variant == 'drawer' -%}
+      <div class="lv-lang__drawer-head">
+        <span class="lv-lang__drawer-title">{{ 'sections.header.language_label' | t }}</span>
+        <span class="lv-lang__drawer-current">{{ current_endonym }}</span>
+      </div>
+      <div class="lv-lang__drawer-grid{% if localization.available_languages.size <= 1 %} lv-lang__drawer-grid--single{% endif %}" role="group" aria-label="{{ 'sections.header.select_language' | t }}">
+        {%- for language in localization.available_languages -%}
+          {%- liquid
+            assign lang_iso = language.iso_code
+            assign lang_iso_down = lang_iso | strip | downcase
+            assign is_active = false
+            if lang_iso_down == current_iso_down
+              assign is_active = true
+            endif
+          -%}
+          <button
+            type="button"
+            class="lv-lang__drawer-btn{% if is_active %} is-active{% endif %}"
+            data-lv-lang-option
+            data-value="{{ lang_iso | escape }}"
+            lang="{{ lang_iso | escape }}"
+            aria-pressed="{% if is_active %}true{% else %}false{% endif %}"
+          >
+            <span class="lv-lang__opt-left">
+              {% render 'country-flag', iso: lang_iso %}
+              <span class="lv-lang__drawer-name">{{ language.endonym_name | capitalize }}</span>
+            </span>
+            {%- if is_active -%}
+              <svg class="lv-lang__check" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <polyline points="3 8.5 6.5 12 13 4.5"/>
+              </svg>
+            {%- endif -%}
+          </button>
+        {%- endfor -%}
+      </div>
+      {%- if request.design_mode and localization.available_languages.size <= 1 -%}
+        <p class="lv-lang__hint">{{ 'sections.header.publish_languages_hint' | t }}</p>
+      {%- endif -%}
+    {%- else -%}
+      <button
+        type="button"
+        class="lv-lang__toggle"
+        data-lv-lang-toggle
+        aria-expanded="false"
+        aria-haspopup="listbox"
+        aria-controls="{{ list_dom_id }}"
+        aria-label="{{ 'sections.header.language_current' | t: language: current_endonym }}"
+      >
+        {% render 'country-flag', iso: current_iso %}
+        <span class="lv-lang__label">{{ toggle_label }}</span>
+        <svg class="lv-lang__caret" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+          <polyline points="2.5 4.25 6 7.75 9.5 4.25"/>
+        </svg>
+      </button>
+
+      <div
+        class="lv-lang__menu"
+        data-lv-lang-menu
+        hidden
+      >
+        <ul
+          id="{{ list_dom_id }}"
+          class="lv-lang__list"
+          role="listbox"
+          aria-label="Select language"
+        >
+          {%- for language in localization.available_languages -%}
+            {%- liquid
+              assign lang_iso = language.iso_code
+              assign lang_iso_down = lang_iso | strip | downcase
+              assign is_active = false
+              if lang_iso_down == current_iso_down
+                assign is_active = true
+              endif
+            -%}
+            <li class="lv-lang__item" role="none">
+              <button
+                type="button"
+                role="option"
+                class="lv-lang__option{% if is_active %} is-active{% endif %}"
+                data-lv-lang-option
+                data-value="{{ lang_iso | escape }}"
+                lang="{{ lang_iso | escape }}"
+                hreflang="{{ lang_iso | escape }}"
+                aria-selected="{% if is_active %}true{% else %}false{% endif %}"
+              >
+                <span class="lv-lang__opt-left">
+                  {% render 'country-flag', iso: lang_iso %}
+                  <span class="lv-lang__opt-name">{{ language.endonym_name | capitalize }}</span>
+                </span>
+                <span class="lv-lang__opt-right">
+                  <span class="lv-lang__code">{{ lang_iso | split: '-' | first | upcase }}</span>
+                  {%- if is_active -%}
+                    <svg class="lv-lang__check" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <polyline points="3 8.5 6.5 12 13 4.5"/>
+                    </svg>
+                  {%- else -%}
+                    <span class="lv-lang__check-spacer" aria-hidden="true"></span>
+                  {%- endif -%}
+                </span>
+              </button>
+            </li>
+          {%- endfor -%}
+        </ul>
+        {%- if request.design_mode and localization.available_languages.size <= 1 -%}
+          <p class="lv-lang__hint">Publish more languages in Settings &rarr; Languages to switch live.</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  {%- endform -%}
+</div>

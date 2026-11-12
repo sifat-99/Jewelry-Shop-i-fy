@@ -14,15 +14,18 @@
   Accepts: sid, label, required ('true'|'false'), max, prop, placeholder
            titled: true shows the title (only when there is no "Engraving: ..." option legend above, so the title never appears twice)
 {%- endcomment -%}
+{%- assign eng_default_label = 'products.engraving.label' | t -%}
+{%- assign eng_default_ph = 'products.engraving.placeholder' | t -%}
+{%- capture eng_max_span -%}<span data-pv-engrave-max>{{ max }}</span>{%- endcapture -%}
 <div class="pv-engrave" data-pv-engrave data-required="{{ required }}">
   <label for="pv-engrave-{{ sid }}" class="pv-engrave__label">
-    {%- if titled %}<span class="pv-engrave__title">{{ label }}</span>{% endif %}
-    <span class="pv-optional">{% if required == 'true' %}Required{% else %}Optional{% endif %} &middot; max. <span data-pv-engrave-max>{{ max }}</span> characters</span>
+    {%- if titled %}<span class="pv-engrave__title">{{ label | default: eng_default_label }}</span>{% endif %}
+    <span class="pv-optional">{% if required == 'true' %}{{ 'products.engraving.required' | t }}{% else %}{{ 'products.engraving.optional' | t }}{% endif %} &middot; {{ 'products.engraving.max_chars_html' | t: max: eng_max_span }}</span>
   </label>
   <div class="pv-engrave__field">
-    <input type="text" class="pv-engrave__input" id="pv-engrave-{{ sid }}" name="properties[{{ prop | escape }}]" maxlength="{{ max }}" autocomplete="off" placeholder="{{ placeholder | escape }}" data-pv-engrave-input data-property="{{ prop | escape }}">
+    <input type="text" class="pv-engrave__input" id="pv-engrave-{{ sid }}" name="properties[{{ prop | escape }}]" maxlength="{{ max }}" autocomplete="off" placeholder="{{ placeholder | default: eng_default_ph | escape }}" data-pv-engrave-input data-property="{{ prop | escape }}">
     <span class="pv-engrave__count" data-pv-engrave-count>0/{{ max }}</span>
   </div>
-  <p class="pv-engrave__preview" data-pv-engrave-preview hidden>Preview <span class="pv-engrave__preview-text" data-pv-engrave-preview-text></span></p>
-  <p class="pv-field-error" data-pv-engrave-error role="alert" hidden>Please add your engraving text.</p>
+  <p class="pv-engrave__preview" data-pv-engrave-preview hidden>{{ 'products.engraving.preview' | t }} <span class="pv-engrave__preview-text" data-pv-engrave-preview-text></span></p>
+  <p class="pv-field-error" data-pv-engrave-error role="alert" hidden>{{ 'products.engraving.error_required' | t }}</p>
 </div>

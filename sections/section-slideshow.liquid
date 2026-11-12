@@ -89,9 +89,51 @@
             assign slide_index = forloop.index0
             assign tone = block.settings.text_tone | default: 'dark'
             assign has_text = false
-            if block.settings.heading != blank or block.settings.subheading != blank or block.settings.button_label != blank
+            if block.settings.heading != blank or block.settings.subheading != blank or block.settings.button_label != blank or block.settings.button_label_2 != blank
               assign has_text = true
             endif
+
+            comment
+              Content placement helpers: effective text alignment, button row alignment, content width and optional backdrop behind the text.
+            endcomment
+            assign pos_value = block.settings.text_position | default: 'middle-center'
+            assign eff_align = 'center'
+            if pos_value contains 'left'
+              assign eff_align = 'left'
+            elsif pos_value contains 'right'
+              assign eff_align = 'right'
+            endif
+            assign text_align_pick = block.settings.text_align | default: 'auto'
+            if text_align_pick != 'auto'
+              assign eff_align = text_align_pick
+            endif
+            assign btn_align = block.settings.buttons_align | default: 'auto'
+            if btn_align == 'auto'
+              assign btn_align = eff_align
+            endif
+            case btn_align
+              when 'left'
+                assign btn_justify = 'flex-start'
+              when 'right'
+                assign btn_justify = 'flex-end'
+              else
+                assign btn_justify = 'center'
+            endcase
+            case block.settings.content_width
+              when 'narrow'
+                assign content_w = '480px'
+              when 'wide'
+                assign content_w = '860px'
+              when 'full'
+                assign content_w = '100%'
+              else
+                assign content_w = '640px'
+            endcase
+            assign backdrop = block.settings.content_backdrop | default: 'none'
+            assign backdrop_alpha = block.settings.backdrop_opacity | default: 35 | divided_by: 100.0
+            assign bd_color = block.settings.overlay_color | default: '#000000'
+            assign button_style_1 = block.settings.button_style | default: 'theme'
+            assign button_style_2 = block.settings.button_style_2 | default: 'outline_light'
 
             assign use_video = false
             if block.settings.media_type == 'video'
@@ -198,30 +240,49 @@
               {%- render 'banner-overlay',
                 opacity: slide_overlay,
                 style: block.settings.overlay_style,
-                position: block.settings.text_position
+                position: block.settings.text_position,
+                color: block.settings.overlay_color
               -%}
 
               {%- if has_text -%}
                 <div class="banner__content-wrapper banner__content--{{ block.settings.text_position | default: 'center' | replace: 'middle-', '' }}">
-                  <div class="banner__content js-overflow-content" style="{%- render 'banner-text-style', settings: block.settings -%}">
+                  <div class="banner__content js-overflow-content{% if backdrop != 'none' %} banner__content--bd banner__content--bd-{{ backdrop }}{% endif %}"
+                    style="{%- render 'banner-text-style', settings: block.settings -%} --banner-content-w: {{ content_w }}; text-align: {{ eff_align }};{% if backdrop != 'none' %} --banner-bd: {{ bd_color | color_modify: 'alpha', backdrop_alpha }};{% endif %}">
                     {%- if block.settings.subheading != blank -%}
                       <p class="banner__subheading">{{ block.settings.subheading }}</p>
                     {%- endif -%}
                     {%- if block.settings.heading != blank -%}
                       <h2 class="banner__title">{{ block.settings.heading }}</h2>
                     {%- endif -%}
-                    {%- if block.settings.button_label != blank -%}
-                      <a href="{{ block.settings.button_link | default: routes.all_products_collection_url }}" class="btn--soft btn--hero banner__button btn-sliding-hover">
-                        <span class="btn__text-content">{{ block.settings.button_label }}</span>
-                      </a>
+                    {%- if block.settings.button_label != blank or block.settings.button_label_2 != blank -%}
+                      <div class="banner__buttons{% if block.settings.buttons_layout == 'stacked' %} banner__buttons--stacked{% endif %}" style="--banner-btn-justify: {{ btn_justify }};">
+                        {%- if block.settings.button_label != blank -%}
+                          {%- if button_style_1 == 'theme' -%}
+                            <a href="{{ block.settings.button_link | default: routes.all_products_collection_url }}" class="btn--soft btn--hero banner__button btn-sliding-hover">
+                              <span class="btn__text-content">{{ block.settings.button_label }}</span>
+                            </a>
+                          {%- else -%}
+                            <a href="{{ block.settings.button_link | default: routes.all_products_collection_url }}" class="banner__button banner__btn banner__btn--{{ button_style_1 | replace: '_', '-' }}">{{ block.settings.button_label }}</a>
+                          {%- endif -%}
+                        {%- endif -%}
+                        {%- if block.settings.button_label_2 != blank -%}
+                          {%- if button_style_2 == 'theme' -%}
+                            <a href="{{ block.settings.button_link_2 | default: routes.all_products_collection_url }}" class="btn--soft btn--hero banner__button btn-sliding-hover">
+                              <span class="btn__text-content">{{ block.settings.button_label_2 }}</span>
+                            </a>
+                          {%- else -%}
+                            <a href="{{ block.settings.button_link_2 | default: routes.all_products_collection_url }}" class="banner__button banner__btn banner__btn--{{ button_style_2 | replace: '_', '-' }}">{{ block.settings.button_label_2 }}</a>
+                          {%- endif -%}
+                        {%- endif -%}
+                      </div>
                     {%- endif -%}
                   </div>
                 </div>
               {%- endif -%}
 
               {%- if section.blocks.size > 1 -%}
-                <div data-slide-custom-prev class="custom-prev-next-button previous" aria-label="Previous slide" role="button"></div>
-                <div data-slide-custom-next class="custom-prev-next-button next" aria-label="Next slide" role="button"></div>
+                <div data-slide-custom-prev class="custom-prev-next-button previous" aria-label="{{ 'sections.slideshow.previous_slide' | t }}" role="button"></div>
+                <div data-slide-custom-next class="custom-prev-next-button next" aria-label="{{ 'sections.slideshow.next_slide' | t }}" role="button"></div>
               {%- endif -%}
 
             </div>
@@ -240,7 +301,7 @@
   </div>
 
   {%- if is_fullscreen and section.settings.show_scroll_cue -%}
-    <button type="button" class="banner__scroll-cue{% if section.settings.scroll_cue_devices != 'all' %} banner__scroll-cue--desktop-only{% endif %}" data-banner-scroll-cue aria-label="Scroll to next section">
+    <button type="button" class="banner__scroll-cue{% if section.settings.scroll_cue_devices != 'all' %} banner__scroll-cue--desktop-only{% endif %}" data-banner-scroll-cue aria-label="{{ 'sections.slideshow.scroll_next' | t }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
     </button>
   {%- endif -%}
@@ -547,6 +608,94 @@
           "default": "middle-center"
         },
         {
+          "type": "select",
+          "id": "text_align",
+          "label": "Text alignment",
+          "info": "Auto follows the text position.",
+          "options": [
+            { "value": "auto", "label": "Auto (follow position)" },
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "auto"
+        },
+        {
+          "type": "select",
+          "id": "content_width",
+          "label": "Content width",
+          "options": [
+            { "value": "narrow", "label": "Narrow" },
+            { "value": "medium", "label": "Medium" },
+            { "value": "wide", "label": "Wide" },
+            { "value": "full", "label": "Full width" }
+          ],
+          "default": "medium"
+        },
+        {
+          "type": "header",
+          "content": "Buttons"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button 1 style",
+          "options": [
+            { "value": "theme", "label": "Theme button (Button colors)" },
+            { "value": "solid_dark", "label": "Solid dark" },
+            { "value": "solid_light", "label": "Solid light" },
+            { "value": "outline_light", "label": "Outline light" },
+            { "value": "outline_dark", "label": "Outline dark" }
+          ],
+          "default": "theme"
+        },
+        {
+          "type": "text",
+          "id": "button_label_2",
+          "label": "Button 2 label"
+        },
+        {
+          "type": "url",
+          "id": "button_link_2",
+          "label": "Button 2 link"
+        },
+        {
+          "type": "select",
+          "id": "button_style_2",
+          "label": "Button 2 style",
+          "options": [
+            { "value": "theme", "label": "Theme button (Button colors)" },
+            { "value": "solid_dark", "label": "Solid dark" },
+            { "value": "solid_light", "label": "Solid light" },
+            { "value": "outline_light", "label": "Outline light" },
+            { "value": "outline_dark", "label": "Outline dark" }
+          ],
+          "default": "outline_light"
+        },
+        {
+          "type": "select",
+          "id": "buttons_layout",
+          "label": "Buttons layout",
+          "options": [
+            { "value": "inline", "label": "Side by side" },
+            { "value": "stacked", "label": "Stacked" }
+          ],
+          "default": "inline"
+        },
+        {
+          "type": "select",
+          "id": "buttons_align",
+          "label": "Buttons alignment",
+          "info": "Auto follows the text alignment.",
+          "options": [
+            { "value": "auto", "label": "Auto (follow text)" },
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "auto"
+        },
+        {
           "type": "header",
           "content": "Content colors"
         },
@@ -622,6 +771,34 @@
           "unit": "%",
           "label": "Overlay darkness",
           "default": 0
+        },
+        {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "Overlay color",
+          "default": "#000000"
+        },
+        {
+          "type": "select",
+          "id": "content_backdrop",
+          "label": "Backdrop behind the text",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "glass", "label": "Glass (soft blur)" },
+            { "value": "panel", "label": "Solid panel" }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "range",
+          "id": "backdrop_opacity",
+          "min": 10,
+          "max": 90,
+          "step": 5,
+          "unit": "%",
+          "label": "Backdrop strength",
+          "default": 35,
+          "visible_if": "{{ block.settings.content_backdrop != 'none' }}"
         }
       ]
     }

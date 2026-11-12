@@ -8,29 +8,870 @@
  * ------------------------------------------------------------
  */
 {
-  "general": {
-    "search": {
-      "placeholder": "Search our jewelry collection...",
-      "submit": "Search"
-    }
-  },
   "accessibility": {
-    "skip_to_text": "Skip to content",
-    "close": "Close"
+    "close": "Sluiten",
+    "close_dialog": "Dialoogvenster sluiten",
+    "close_modal": "Venster sluiten",
+    "pause_video": "Video pauzeren",
+    "play_video": "Video afspelen",
+    "showcase_video": "Showcase-video",
+    "skip_to_text": "Ga naar inhoud"
   },
-  "products": {
-    "product": {
-      "add_to_cart": "Add to Cart",
-      "sold_out": "Sold out",
-      "unavailable": "Unavailable",
-      "choose_options": "Choose options"
-    }
+  "breadcrumbs": {
+    "all_products": "Alle producten",
+    "home": "Home",
+    "label": "Kruimelpad"
   },
   "cart": {
-    "title": "Shopping Cart",
-    "subtotal": "Subtotal",
-    "checkout": "Proceed to Checkout",
-    "empty": "Your shopping cart is empty",
-    "continue_shopping": "Continue Shopping"
+    "checkout": "Doorgaan naar de kassa",
+    "continue_shopping": "Verder winkelen",
+    "empty": "Je winkelwagen is leeg",
+    "general": {
+      "add_error": "Kan artikel niet aan winkelwagen toevoegen",
+      "network_error": "Netwerkfout. Probeer het opnieuw.",
+      "stockout": "Niet meer voorraad beschikbaar"
+    },
+    "line_items": {
+      "delete": "Artikel verwijderen",
+      "remove": "Verwijderen",
+      "remove_aria": "{{ title }} verwijderen uit winkelwagen"
+    },
+    "page": {
+      "columns": {
+        "product": "Product",
+        "quantity": "Aantal",
+        "total": "Totaal"
+      },
+      "empty_subtitle": "Je winkelwagen is momenteel leeg",
+      "empty_text": "Ontdek onze waterdichte roestvrijstalen sieraden, ontworpen om elke dag te stralen.",
+      "free_shipping_remaining_html": "Voeg nog <strong>{{ amount }}</strong> toe voor gratis verzending",
+      "free_shipping_unlocked_html": "Je hebt <strong>gratis verzending</strong> ontgrendeld",
+      "item_count": {
+        "one": "{{ count }} artikel in je winkelwagen",
+        "other": "{{ count }} artikelen in je winkelwagen"
+      },
+      "order_note_label": "Opmerking bij bestelling",
+      "order_note_placeholder": "Voeg een cadeaukaartje of bezorginstructies toe...",
+      "order_summary": "Besteloverzicht",
+      "secure_checkout": "Veilig en versleuteld afrekenen",
+      "start_shopping": "Begin met winkelen",
+      "taxes_shipping_note": "Btw en verzendkosten worden bij het afrekenen berekend.",
+      "total": "Totaal",
+      "trust": {
+        "gift_text": "Inclusief luxe sieradendoosje of -zakje",
+        "gift_title": "Luxe verpakking",
+        "payment_text": "Veilig betalen met iDEAL, Klarna & creditcard",
+        "payment_title": "Veilig betalen",
+        "returns_text": "Eenvoudig ruilen en retourneren binnen 14 dagen",
+        "returns_title": "14 dagen retourrecht",
+        "shipping_text": "Gratis bezorging bij bestellingen vanaf €39",
+        "shipping_title": "Gratis verzending"
+      }
+    },
+    "payment_methods": "Geaccepteerde betaalmethoden",
+    "shipping": {
+      "no_shipping_available": "Geen verzendtarieven beschikbaar voor deze bestemming"
+    },
+    "shipping_bar": {
+      "notice": "Gratis verzending vanaf {{ amount }}",
+      "remaining_html": "Besteed nog {{ amount }} voor gratis verzending",
+      "unlocked": "Gratis verzending ontgrendeld!"
+    },
+    "subtotal": "Subtotaal",
+    "title": "Winkelwagen"
+  },
+  "collections": {
+    "filtering": {
+      "active": "Actieve filters",
+      "clear": "Wissen",
+      "clear_all": "Alles wissen",
+      "clear_all_filters": "Alle filters wissen",
+      "close_filters": "Filters sluiten",
+      "colour": "Kleur",
+      "colours_list": {
+        "gold": "Goud"
+      },
+      "filters": "Filters",
+      "materials": "Materialen",
+      "materials_list": {
+        "stainless_steel": "Roestvrij staal"
+      },
+      "max_price": "Max. prijs",
+      "max_price_slider": "Maximumprijs",
+      "min_price": "Min. prijs",
+      "min_price_slider": "Minimumprijs",
+      "price": "Prijs",
+      "ring_size": "Ringmaat",
+      "show_less": "Minder tonen",
+      "show_more": "Meer tonen",
+      "style": "Stijl",
+      "styles": {
+        "basic_bracelets": "Basic armbanden",
+        "charm_bracelets": "Bedelarmbanden",
+        "chunky_rings": "Grove ringen",
+        "delicate_bracelets": "Fijne armbanden",
+        "double_bracelets": "Dubbele armbanden",
+        "drop_earrings": "Oorhangers",
+        "flower_bracelets": "Bloemarmbanden",
+        "link_bracelets": "Schakelarmbanden",
+        "pendant_necklaces": "Kettingen met hanger",
+        "statement_rings": "Statement ringen"
+      },
+      "view_results_html": {
+        "one": "Bekijk {{ count }} product",
+        "other": "Bekijk {{ count }} producten"
+      }
+    },
+    "general": {
+      "collection_label": "Collectie",
+      "grid_view": "Rasterweergave",
+      "items_with_count_html": {
+        "one": "{{ count }} product",
+        "other": "{{ count }} producten"
+      },
+      "list_view": "Lijstweergave",
+      "no_matches": "Geen producten gevonden voor je filters",
+      "no_matches_hint": "Probeer een of meer filters te verwijderen om meer sieraden te bekijken.",
+      "product_layout": "Productweergave",
+      "products_per_page": "Producten per pagina",
+      "show_label": "Toon:",
+      "sub_collections": "Subcollecties",
+      "view_all_products": "Alle producten bekijken"
+    },
+    "sorting": {
+      "az": "Alfabetisch, A-Z",
+      "best_selling": "Best verkocht",
+      "date_descending": "Datum, nieuw naar oud",
+      "featured": "Uitgelicht",
+      "price_ascending": "Prijs, laag naar hoog",
+      "price_descending": "Prijs, hoog naar laag",
+      "title": "Sorteren op",
+      "za": "Alfabetisch, Z-A"
+    }
+  },
+  "customer": {
+    "account": {
+      "atelier_eyebrow": "Atelier",
+      "bestsellers": "Bekijk bestsellers",
+      "close_nav": "Accountmenu sluiten",
+      "concierge_email_link": "Stuur een bericht",
+      "concierge_permanent_link": "Afspraak maken",
+      "concierge_permanent_text": "Op maat gelaste armbanden en enkelbandjes, vakkundig geplaatst door onze specialisten.",
+      "concierge_permanent_title": "Permanente sieraden",
+      "concierge_questions_text": "Hulp nodig bij styling, gravure of vragen over je bestelling?",
+      "concierge_questions_title": "Persoonlijk advies",
+      "concierge_sizing_link": "Open maattabel",
+      "concierge_sizing_text": "Vind binnen enkele seconden de perfecte ring-, armband- of kettingmaat.",
+      "concierge_sizing_title": "Maatadvies",
+      "concierge_title": "Klantenservice & Concierge",
+      "delivery_address": "Bezorgadres",
+      "details": "Accountgegevens",
+      "explore_collection": "Collectie bekijken",
+      "explore_collections": "Collecties bekijken",
+      "guest_desc": "Log in om je bestellingen te bekijken, leveringen te volgen, adressen te beheren en je verlanglijst te openen.",
+      "guest_eyebrow": "Klantportaal",
+      "guest_perk1_sub": "Volg elke zending van ons atelier tot aan je deur",
+      "guest_perk1_title": "Live bestelstatus",
+      "guest_perk2_sub": "Sla bezorgadressen op voor sneller afrekenen",
+      "guest_perk2_title": "Opgeslagen adressen",
+      "guest_perk3_sub": "Bekijk je favoriete gouden en stalen sieraden op elk moment",
+      "guest_perk3_title": "Verlanglijst",
+      "guest_title": "Jouw Aurelle-account",
+      "latest_order": "Laatste bestelling",
+      "manage": "Beheren",
+      "member_fallback": "Lid",
+      "menu": "Menu",
+      "mobile_dashboard": "Accountmenu",
+      "nav_addresses": "Adressen",
+      "nav_aria": "Accountnavigatie",
+      "nav_concierge": "Concierge",
+      "nav_orders": "Bestellingen",
+      "nav_overview": "Overzicht",
+      "nav_saved": "Opgeslagen",
+      "open_nav": "Accountmenu openen",
+      "perk_returns": "14 dagen retourrecht",
+      "perk_shipping": "Gratis verzending €39+",
+      "perk_waterproof": "100% waterproof",
+      "quick_contact": "Contact",
+      "quick_contact_sub": "Spreek met ons team",
+      "quick_shop": "Winkelen",
+      "quick_shop_sub": "Ontdek de collectie",
+      "quick_size": "Maattabel",
+      "quick_size_sub": "Vind jouw maat",
+      "quick_track": "Bestelling volgen",
+      "quick_track_sub": "Bekijk verzendstatus",
+      "return": "Terug naar account",
+      "return_to_store": "Terug naar de winkel",
+      "saved_empty_text": "Klik op het hartje bij je favoriete sieraden om ze hier op te slaan.",
+      "saved_empty_title": "Je verlanglijst is nog leeg",
+      "saved_eyebrow": "Verlanglijst",
+      "saved_title": "Opgeslagen sieraden",
+      "sections_aria": "Dashboardsecties",
+      "start_shopping": "Begin met winkelen",
+      "stat_orders": "Bestellingen",
+      "stat_status": "Status",
+      "stat_total_spent": "Totaal besteed",
+      "title": "Account",
+      "view_addresses_with_count": {
+        "one": "Adres bekijken ({{ count }})",
+        "other": "Adressen bekijken ({{ count }})"
+      },
+      "view_all": "Alles bekijken",
+      "view_wishlist": "Bekijk verlanglijst",
+      "vip_badge": "VIP",
+      "vip_short": "VIP",
+      "welcome_back": "Welkom terug",
+      "welcome_back_name": "Welkom terug, {{ name }}"
+    },
+    "activate_account": {
+      "badge": "Account activeren",
+      "cancel": "Uitnodiging weigeren",
+      "password": "Wachtwoord",
+      "password_confirm": "Bevestig wachtwoord",
+      "submit": "Account activeren",
+      "subtext": "Maak een wachtwoord aan om je account te activeren.",
+      "title": "Account activeren"
+    },
+    "addresses": {
+      "add": "Adres toevoegen",
+      "add_new": "Adres toevoegen",
+      "address1": "Adres",
+      "address2_optional": "Huisnummertoevoeging / etage (optioneel)",
+      "badge": "Bezorggegevens",
+      "cancel": "Annuleren",
+      "city": "Plaats",
+      "company_optional": "Bedrijf (optioneel)",
+      "country": "Land / Regio",
+      "default_badge": "Standaard",
+      "default_pill": "Standaard",
+      "default_shipping": "Standaard bezorgadres",
+      "delete": "Verwijderen",
+      "delete_confirm": "Weet je zeker dat je dit adres wilt verwijderen?",
+      "delete_error": "Kan adres niet verwijderen. Probeer het opnieuw.",
+      "deleted": "Adres verwijderd.",
+      "delivery_eyebrow": "Bezorging",
+      "edit": "Bewerken",
+      "edit_address": "Adres bewerken",
+      "first_name": "Voornaam",
+      "grid": "Raster",
+      "grid_view": "Rasterweergave",
+      "last_name": "Achternaam",
+      "layout_view_aria": "Adresweergave",
+      "list": "Lijst",
+      "list_view": "Lijstweergave",
+      "none_default": "Nog geen standaard bezorgadres opgeslagen.",
+      "none_text": "Sla je bezorggegevens op om de volgende keer sneller af te rekenen.",
+      "none_title": "Geen opgeslagen adressen",
+      "phone_optional": "Telefoonnummer (optioneel)",
+      "province": "Provincie / Staat",
+      "save_error": "Kan adres niet opslaan. Controleer de velden.",
+      "saved": "Adres opgeslagen.",
+      "saved_count": {
+        "one": "Opgeslagen adressen ({{ count }})",
+        "other": "Opgeslagen adressen ({{ count }})"
+      },
+      "saving": "Opslaan...",
+      "set_default": "Instellen als standaardadres",
+      "title": "Adressen",
+      "update": "Wijzigingen opslaan",
+      "zip": "Postcode"
+    },
+    "log_out": "Uitloggen",
+    "login_page": {
+      "badge": "Klantentoegang",
+      "benefit_1": "Realtime bestelstatus en live track & trace-updates",
+      "benefit_2": "Opgeslagen bezorgadressen voor razendsnel afrekenen",
+      "benefit_3": "Prioriteitstoegang tot nieuwe collecties en persoonlijke service",
+      "create_account": "Account aanmaken",
+      "email": "E-mailadres",
+      "email_placeholder": "jij@voorbeeld.nl",
+      "forgot_password": "Wachtwoord vergeten?",
+      "hide_password": "Wachtwoord verbergen",
+      "new_here": "Nieuw hier?",
+      "password": "Wachtwoord",
+      "password_placeholder": "Vul je wachtwoord in",
+      "show_password": "Wachtwoord tonen",
+      "side_text": "Beheer je bestellingen, bekijk opgeslagen sieraden en blijf verbonden met ons atelier.",
+      "side_title": "De Aurelle Circle",
+      "sign_in": "Inloggen",
+      "subtitle": "Vul je gegevens in om toegang te krijgen tot je accountdashboard.",
+      "title": "Welkom terug"
+    },
+    "order": {
+      "additional_details": "Aanvullende gegevens",
+      "badge": "Bestelgegevens",
+      "billing_address": "Factuuradres",
+      "cancelled": "Geannuleerd",
+      "cancelled_on_html": "Geannuleerd op {{ date }}",
+      "cancelled_reason": "Reden: {{ reason }}",
+      "cancelled_title": "Bestelling geannuleerd",
+      "close": "Sluiten",
+      "close_modal": "Besteldetails sluiten",
+      "customer_contact": "Contactgegevens",
+      "date_html": "Geplaatst op {{ date }}",
+      "discount_named": "Korting ({{ name }})",
+      "discounts": "Kortingen",
+      "email_label": "E-mail:",
+      "fulfilled_on_html": "Verzonden op {{ date }}",
+      "fulfilled_short_html": "Verzonden {{ date }}",
+      "fulfillment_status_value": "Verzending: {{ status }}",
+      "items_ordered": {
+        "one": "Bestelde artikelen ({{ count }})",
+        "other": "Bestelde artikelen ({{ count }})"
+      },
+      "modal_eyebrow": "Besteloverzicht",
+      "net_total": "Nettototaal",
+      "no_billing_address": "Geen factuuradres opgegeven.",
+      "no_shipments_cancelled": "Deze bestelling is geannuleerd.",
+      "no_shipments_status": "Status: {{ status }}. Track & trace-gegevens verschijnen hier zodra je bestelling is verzonden.",
+      "no_shipping_address": "Geen bezorgadres opgegeven.",
+      "order_note": "Opmerking bij bestelling",
+      "partial_shipped": "{{ fulfilled }} van {{ quantity }} verzonden",
+      "payment_details": "Betaaloverzicht",
+      "payment_status_value": "Betaling: {{ status }}",
+      "phone_label": "Telefoon:",
+      "price": "Prijs",
+      "product": "Product",
+      "quantity": "Aantal",
+      "refunded": "Terugbetaald",
+      "shipment": "Zending",
+      "shipping": "Verzending",
+      "shipping_address": "Bezorgadres",
+      "shipping_named": "Verzending ({{ name }})",
+      "shipping_tracking": "Verzending & track & trace",
+      "sku": "SKU",
+      "sku_label": "SKU: {{ sku }}",
+      "status_label": "Status: {{ status }}",
+      "subtotal": "Subtotaal",
+      "summary": "Prijsoverzicht",
+      "tax": "Btw",
+      "tax_named": "Btw ({{ title }} {{ rate }}%)",
+      "title": "Bestelling {{ name }}",
+      "total": "Totaal",
+      "track_package": "Pakket volgen",
+      "track_package_num": "Pakket {{ number }} volgen",
+      "tracking_label": "Track & trace-nummer",
+      "variant_label": "Optie: {{ variant }}",
+      "view_uploaded_file": "Geüpload bestand bekijken"
+    },
+    "orders": {
+      "date": "Datum",
+      "fulfillment_status": "Verzendstatus",
+      "history_eyebrow": "Geschiedenis",
+      "more_items": {
+        "one": "+{{ count }} meer",
+        "other": "+{{ count }} meer"
+      },
+      "my_orders_count": {
+        "one": "Mijn bestellingen ({{ count }})",
+        "other": "Mijn bestellingen ({{ count }})"
+      },
+      "none": "Je hebt nog geen bestellingen geplaatst.",
+      "none_list_text": "Zodra je een bestelling plaatst, verschijnt deze hier met alle details.",
+      "none_overview_text": "Ontdek onze waterdichte collectie en plaats je eerste bestelling.",
+      "none_title": "Nog geen bestellingen",
+      "order_number": "Bestelling",
+      "payment_status": "Betaalstatus",
+      "refresh_error": "Kan bestelstatus niet vernieuwen.",
+      "refresh_status": "Status vernieuwen",
+      "refreshed": "Bestelstatus bijgewerkt.",
+      "title": "Bestelgeschiedenis",
+      "total": "Totaal",
+      "tracking_available": "Track & trace beschikbaar",
+      "view_order": "Bekijk bestelling"
+    },
+    "recover_password": {
+      "badge": "Wachtwoord herstellen",
+      "cancel": "Terug naar inloggen",
+      "remembered": "Wachtwoord weer herinnerd?",
+      "submit": "Herstellink verzenden",
+      "subtext": "Vul je e-mailadres in en we sturen je een link om je wachtwoord opnieuw in te stellen.",
+      "success": "We hebben je een e-mail gestuurd met een link om je wachtwoord te wijzigen.",
+      "title": "Stel je wachtwoord opnieuw in"
+    },
+    "register": {
+      "already_have_account": "Heb je al een account?",
+      "badge": "Account aanmaken",
+      "email": "E-mailadres",
+      "email_placeholder": "jij@voorbeeld.nl",
+      "first_name": "Voornaam",
+      "first_name_placeholder": "Je voornaam",
+      "last_name": "Achternaam",
+      "last_name_placeholder": "Je achternaam",
+      "password": "Wachtwoord",
+      "sign_in_here": "Log hier in",
+      "submit": "Account aanmaken",
+      "subtext": "Word lid van ons atelier om bestellingen te volgen en favorieten op te slaan.",
+      "title": "Account aanmaken"
+    },
+    "reset_password": {
+      "badge": "Nieuw wachtwoord",
+      "password": "Wachtwoord",
+      "password_confirm": "Bevestig wachtwoord",
+      "submit": "Wachtwoord opnieuw instellen",
+      "subtext": "Kies een nieuw wachtwoord voor je account.",
+      "title": "Wachtwoord opnieuw instellen"
+    }
+  },
+  "general": {
+    "404": {
+      "all_jewelry": "Bekijk alle sieraden",
+      "back_to_home": "Terug naar home",
+      "subtext": "De pagina die je zoekt is mogelijk verplaatst of bestaat niet meer.",
+      "title": "Pagina niet gevonden"
+    },
+    "meta": {
+      "page": "Pagina {{ page }}",
+      "tags": "Getagd \"{{ tags }}\""
+    },
+    "newsletter_form": {
+      "code_html": "Gebruik code <strong>{{ code }}</strong> bij het afrekenen.",
+      "email_label": "E-mailadres",
+      "email_placeholder": "Vul je e-mailadres in...",
+      "email_placeholder_short": "Je e-mailadres",
+      "invalid_email": "Vul een geldig e-mailadres in.",
+      "join": "Inschrijven",
+      "newsletter_confirmation": "Bedankt voor je inschrijving!",
+      "submit": "Inschrijven",
+      "success": "Welkom bij de lijst — je bent ingeschreven."
+    },
+    "pagination": {
+      "label": "Paginering",
+      "next": "Volgende",
+      "next_aria": "Volgende pagina",
+      "page_aria": "Pagina {{ page }}",
+      "previous": "Vorige",
+      "previous_aria": "Vorige pagina",
+      "summary": "Pagina {{ current }} van {{ total }} ({{ items }} artikelen)"
+    },
+    "password_page": {
+      "admin_link_html": "Ben je de winkeleigenaar? <a href=\"/admin\">Log hier in</a>",
+      "copyright_html": "&copy; {{ year }} {{ shop_name }}. Alle rechten voorbehouden.",
+      "enter_store": "Openen met wachtwoord",
+      "login_form_heading": "Winkel openen met wachtwoord",
+      "login_form_password_label": "Wachtwoord",
+      "login_form_password_placeholder": "Vul het winkelwachtwoord in",
+      "login_form_password_subtitle": "Vul het onderstaande wachtwoord in om toegang te krijgen.",
+      "modal_admin_link_html": "Ben je de winkeleigenaar? <a href=\"/admin\">Log hier in</a>",
+      "modal_title": "Besloten toegang",
+      "newsletter_caption": "Hoor als eerste wanneer onze nieuwe collectie live gaat.",
+      "notify_me": "Houd mij op de hoogte",
+      "page_title": "Binnenkort geopend &ndash; {{ shop_name }}"
+    },
+    "search": {
+      "browse_collections": "Bekijk collecties",
+      "clear": "Wissen",
+      "clear_search": "Zoekopdracht wissen",
+      "collections": "Collecties",
+      "empty_desc_html": "Geen sieraden gevonden voor &ldquo;<strong>{{ terms }}</strong>&rdquo;. Probeer een andere zoekterm of bekijk onze collecties hieronder.",
+      "empty_title": "Geen overeenkomende sieraden gevonden",
+      "explore_all": "Bekijk alle sieraden",
+      "label": "Zoek in onze winkel",
+      "loading": "Zoeken...",
+      "no_results_check": "Geen resultaten gevonden voor \"{{ terms }}\".",
+      "no_results_for": "Geen resultaten gevonden voor",
+      "page_eyebrow": "Doorzoek ons atelier",
+      "page_lead": "Vind gegraveerde sieraden, waterdichte basics, kettingen, ringen en cadeaus.",
+      "page_placeholder": "Zoek ringen, kettingen, gravures...",
+      "placeholder": "Doorzoek onze sieradencollectie...",
+      "popular_label": "Populair:",
+      "popular_terms": "Gouden ring, Ketting, Armband, Gravure, Oorbellen",
+      "predictive_live_region": "{{ total }} zoekresultaten waarvan {{ products }} producten",
+      "products": "Producten",
+      "reset": "Zoekveld leegmaken",
+      "results_with_count_html": {
+        "one": "<strong>{{ count }}</strong> resultaat voor &ldquo;<strong>{{ terms }}</strong>&rdquo;",
+        "other": "<strong>{{ count }}</strong> resultaten voor &ldquo;<strong>{{ terms }}</strong>&rdquo;"
+      },
+      "search_for_terms": "Zoeken naar \"{{ terms }}\"",
+      "submit": "Zoekopdracht",
+      "title": "Zoeken"
+    }
+  },
+  "pages": {
+    "about": {
+      "atelier_alt": "Een kijkje in ons sieradenatelier",
+      "brand_fallback": "Fijne sieraden",
+      "button_label": "Bericht versturen",
+      "contact_atelier": "Neem contact op",
+      "craft_alt": "Detailopname van waterdichte sieraden",
+      "cta_explore": "Ontdek de collectie",
+      "cta_eyebrow": "Alledaagse luxe",
+      "cta_label": "Bekijk sieraden",
+      "cta_text": "Tijdloze waterdichte sieraden van gerecycled 316L roestvrij staal met een duurzame gouden finish.",
+      "cta_title": "Ontdek sieraden die altijd bij je blijven",
+      "explore_pieces": "Bekijk sieraden",
+      "eyebrow": "Ons verhaal",
+      "fallback_alt": "Tijdloze gouden sieraden",
+      "heading": "Gemaakt om elke dag te stralen",
+      "lead": "Betekenisvolle waterdichte sieraden, ontworpen voor moeiteloze elegantie van 's ochtends vroeg tot 's avonds laat.",
+      "quote_author": "Oprichter, Aurelle Atelier",
+      "quote_text": "Mooie sieraden horen elke dag gedragen en gekoesterd te worden, zonder dat je je zorgen hoeft te maken.",
+      "shop_collection": "Collectie bekijken",
+      "slide_2_title": "Waterdichte alledaagse elegantie",
+      "spotlight_badge": "Uitgelicht ontwerp",
+      "stat1_label": "Waterproof & verkleurt niet",
+      "stat1_num": "100%",
+      "stat2_label": "Kleurgarantie",
+      "stat2_num": "2 jaar",
+      "stat3_label": "Gerecycled staal",
+      "stat3_num": "316L",
+      "stat4_label": "Tevreden klanten",
+      "stat4_num": "50K+",
+      "story_eyebrow": "Filosofie",
+      "story_p1": "Ontstaan vanuit het verlangen naar moeiteloze elegantie, combineert elk sieraad verfijnde lijnen met duurzame kwaliteit.",
+      "story_p2": "Wij werken met huidvriendelijk gerecycled roestvrij staal en een sterke 18K gouden PVD-coating die bestand is tegen water, sporten en parfum.",
+      "story_p3": "Van persoonlijke vingerafdrukgravures tot permanent gelaste armbanden: elk sieraad vertelt een uniek verhaal.",
+      "story_title": "Ontworpen om altijd te dragen",
+      "val1_text": "Douche, zwem en leef vrijuit — onze PVD-goudlaag verkleurt niet en blijft stralen.",
+      "val1_title": "Waterdicht vakmanschap",
+      "val2_text": "Vervaardigd uit gerecycled 316L chirurgisch staal, zacht en hypoallergeen voor de gevoelige huid.",
+      "val2_title": "Bewuste materialen",
+      "val3_text": "Met 2 jaar kleurgarantie en persoonlijke gravures uit eigen atelier.",
+      "val3_title": "Gegarandeerde glans",
+      "values_eyebrow": "Onze waarden",
+      "values_title": "Waar ieder sieraad voor staat",
+      "view_piece": "Bekijk sieraad"
+    },
+    "contact": {
+      "email_card_label": "E-mail ons",
+      "eyebrow": "Neem contact op",
+      "follow_card_label": "Volg ons",
+      "form_email": "E-mailadres",
+      "form_error_heading": "Controleer de volgende gegevens:",
+      "form_message": "Bericht",
+      "form_name": "Je naam",
+      "form_phone": "Telefoonnummer",
+      "form_privacy": "Je bericht komt direct bij onze klantenservice terecht. We reageren meestal binnen 24 uur.",
+      "form_submit": "Bericht versturen",
+      "form_subtitle": "Vragen over maten, gravures, bestellingen of permanente sieraden? Stuur ons gerust een bericht.",
+      "form_success": "Bedankt voor je bericht — we nemen zo spoedig mogelijk contact met je op.",
+      "form_title": "Stuur ons een bericht",
+      "hours_card_label": "Openingstijden",
+      "optional": "optioneel",
+      "phone_card_label": "Bel ons",
+      "studio_card_label": "Bezoek ons atelier"
+    },
+    "faq": {
+      "all_questions": "Alle vragen",
+      "categories_label": "Vraagcategorieën",
+      "cta_label": "Neem contact op",
+      "cta_text": "Onze sieradenspecialisten helpen je graag met maatadvies, onderhoud of vragen over graveren.",
+      "cta_title": "Heb je nog vragen?",
+      "eyebrow": "Klantenservice",
+      "no_results_html": "Geen vragen gevonden voor je zoekopdracht. <a href=\"{{ contact_url }}\">Neem contact op met onze klantenservice</a> voor persoonlijk advies.",
+      "search_label": "Zoek in veelgestelde vragen",
+      "search_placeholder": "Zoek vragen over verzending, maten, gravures..."
+    },
+    "permanent": {
+      "book_btn": "Sessie boeken",
+      "book_session_short": "Boek sessie",
+      "cta_button": "Afspraak reserveren",
+      "cta_eyebrow": "Persoonlijke atelierervaring",
+      "cta_secondary": "Contact opnemen",
+      "cta_text": "Boek een individuele sessie, duo-afspraak of besloten event bij ons in de boutique.",
+      "cta_title": "Klaar voor jouw permanente sieraad?",
+      "eyebrow": "Permanente sieraden",
+      "feat1_text": "Volledig op maat gemaakt voor jouw pols, enkel of vinger — zonder sluiting.",
+      "feat1_title": "Naadloos & zonder sluiting",
+      "feat2_text": "Fijne kettingen van topkwaliteit die dag en nacht comfortabel gedragen kunnen worden.",
+      "feat2_title": "Dagelijks draagcomfort",
+      "feat3_text": "Personaliseer je sieraad met subtiele bedels, initialen of betekenisvolle symbolen.",
+      "feat3_title": "Betekenisvolle bedels",
+      "heading": "Voor altijd op maat gelast",
+      "lead_fallback": "Op maat gemaakte armbanden, enkelbandjes en ringen die binnen enkele minuten naadloos worden gelast.",
+      "learn_how": "Hoe het werkt",
+      "quote_author": "Permanent Jewelry Studio",
+      "quote_text": "Meer dan een sieraad — een blijvende herinnering naadloos op maat gelast.",
+      "slide_1_alt": "Op maat gelaste permanente armband",
+      "slide_1_title": "Kies jouw ketting",
+      "slide_2_alt": "Micro-lassen van permanente sieraden",
+      "slide_2_title": "Precisie micro-lassen",
+      "slide_3_title": "Naadloze pasvorm",
+      "slide_4_title": "Alledaags draagcomfort",
+      "spotlight_badge": "Populaire schakels",
+      "stat1_label": "Gemiddelde sessieduur",
+      "stat1_num": "15 min",
+      "stat2_label": "Sluitingen nodig",
+      "stat2_num": "0",
+      "stat3_label": "Pijnloos & snel",
+      "stat3_num": "100%",
+      "stat4_label": "Waterproof draagcomfort",
+      "stat4_num": "24/7",
+      "step1_text": "Kies uit onze collectie verfijnde gouden, roségouden en zilveren schakels.",
+      "step1_title": "Kies je schakel",
+      "step2_text": "Voeg desgewenst initialen, geboortestenen of subtiele bedels toe.",
+      "step2_title": "Kies eventuele bedels",
+      "step3_text": "Onze specialist meet de ketting nauwkeurig op maat om je pols of enkel.",
+      "step3_title": "Nauwkeurig op maat",
+      "step4_text": "Met een snelle, pijnloze lichtflits wordt het verbindingsringetje direct gesloten.",
+      "step4_title": "Direct micro-lassen",
+      "step5_text": "Loop naar buiten met jouw tijdloze sieraad zonder sluiting — klaar voor elke dag.",
+      "step5_title": "Draag elke dag",
+      "steps_eyebrow": "Vijf eenvoudige stappen",
+      "steps_title": "Wat kun je verwachten",
+      "story_alt": "Permanente sieraden sessie",
+      "story_alt_full": "Permanente sieraden sessie in ons atelier",
+      "story_eyebrow": "De ervaring",
+      "story_p1": "Permanente sieraden vieren mijlpalen, vriendschappen en dagelijkse luxe zonder vervelende sluitingen.",
+      "story_p2": "Met geavanceerde micro-lastechnologie verbinden wij de uiteinden van jouw ketting veilig en pijnloos.",
+      "story_p3": "Boek alleen of samen met je beste vriendin, partner of familie voor een bijzonder moment.",
+      "story_title": "Een blijvende herinnering, in seconden gelast",
+      "view_chains": "Bekijk schakels",
+      "view_piece": "Bekijk schakel",
+      "welding_process_btn": "Het lasproces",
+      "why_eyebrow": "Waarom permanent",
+      "why_title": "De voordelen van permanente sieraden"
+    }
+  },
+  "products": {
+    "engraving": {
+      "error_required": "Vul eerst je graveertekst in voordat je het artikel toevoegt.",
+      "label": "Graveertekst",
+      "max_chars_html": "Maximaal {{ max }} tekens",
+      "max_short": "Max. {{ max }} tekens",
+      "optional": "Optioneel",
+      "personalise": "Personaliseer",
+      "placeholder": "Vul initialen of datum in...",
+      "preview": "Voorbeeld",
+      "required": "Verplicht"
+    },
+    "highlights": {
+      "fast_dispatch": "Snelle verzending",
+      "hypoallergenic": "Hypoallergeen",
+      "warranty": "2 jaar kleurgarantie",
+      "waterproof": "100% waterproof"
+    },
+    "product": {
+      "add_failed": "Kan artikel niet toevoegen",
+      "add_failed_retry": "Kan artikel niet toevoegen. Probeer het opnieuw.",
+      "add_option": "Voeg {{ value }} toe",
+      "add_to_cart": "In winkelwagen",
+      "added": "Toegevoegd!",
+      "added_check": "Toegevoegd ✓",
+      "adding": "Toevoegen...",
+      "choose_options": "Opties kiezen",
+      "choose_size_or_option": "Kies een optie:",
+      "decrease_quantity": "Aantal verlagen",
+      "free": "Gratis",
+      "from": "Vanaf",
+      "include_taxes": "Inclusief btw.",
+      "increase_quantity": "Aantal verhogen",
+      "link_copied": "Link gekopieerd naar klembord",
+      "media": {
+        "next_thumbnails": "Volgende miniaturen",
+        "previous_thumbnails": "Vorige miniaturen",
+        "product_images": "Productafbeeldingen",
+        "show_media": "Toon afbeelding {{ index }}",
+        "thumbnails": "Productminiaturen",
+        "zoom_dialog": "Ingeroemde productafbeelding",
+        "zoom_hint": "Scroll of knijp om in te zoomen",
+        "zoom_image": "Afbeelding vergroten",
+        "zoom_toggle_title": "Klik om afbeelding te vergroten"
+      },
+      "next_image": "Volgende afbeelding",
+      "next_options": "Volgende opties",
+      "only_left": {
+        "one": "Nog maar {{ count }} op voorraad",
+        "other": "Nog maar {{ count }} op voorraad"
+      },
+      "only_left_js": "Nog maar __COUNT__ op voorraad",
+      "option_default": "Optie",
+      "percent_off": "{{ percent }}% KORTING",
+      "placeholder": "Productvoorbeeld",
+      "pre_order": "Pre-order",
+      "previous_image": "Vorige afbeelding",
+      "previous_options": "Vorige opties",
+      "product_image": "Productafbeelding",
+      "quantity": {
+        "decrease": "Aantal verlagen",
+        "increase": "Aantal verhogen",
+        "label": "Aantal"
+      },
+      "quick_view": "Snelle weergave",
+      "sale": "Aanbieding",
+      "sale_badge_text": "AANBIEDING",
+      "select_size_or_option": "Selecteer maat of optie:",
+      "shipping_policy_html": "<a href=\"{{ link }}\">Verzendkosten</a> worden bij het afrekenen berekend.",
+      "shipping_returns": "Verzending & Retour",
+      "size_default": "Maat",
+      "size_guide": "Maattabel",
+      "sku_prefix": "SKU:",
+      "sold_out": "Uitverkocht",
+      "subscription": "Abonnement",
+      "tabs": {
+        "description": "Beschrijving",
+        "material_care": "Materiaal & Onderhoud",
+        "shipping_returns": "Verzending & Retour"
+      },
+      "unavailable": "Niet beschikbaar",
+      "vendor_fallback": "Fijne sieraden"
+    },
+    "quick_view": {
+      "description_title": "Beschrijving",
+      "fallback_description_html": "<p>Ontdek <strong>{{ title }}</strong> — vervaardigd uit waterdicht roestvrij staal om elke dag te dragen.</p>",
+      "load_error": "Kan productvoorbeeld niet laden.",
+      "material_guarantee": "Materiaal & Garantie",
+      "material_guarantee_html": "Vervaardigd uit hypoallergeen <strong>waterproof roestvrij staal</strong> met <strong>2 jaar kleurgarantie</strong>.",
+      "shipping_returns_html": "<strong>Gratis verzending vanaf €39</strong> en eenvoudig <strong>14 dagen retourrecht</strong> op ongedragen sieraden.",
+      "tax_note": "Inclusief btw. Verzendkosten berekend bij het afrekenen.",
+      "thumbnail_aria": "Bekijk miniatuur {{ number }}",
+      "type_fallback": "Sieraden",
+      "view_full_details": "Bekijk alle details"
+    },
+    "reviews": {
+      "based_on": {
+        "one": "Gebaseerd op {{ count }} beoordeling",
+        "other": "Gebaseerd op {{ count }} beoordelingen"
+      },
+      "clear_product": "Productselectie wissen",
+      "count": {
+        "one": "{{ count }} beoordeling",
+        "other": "{{ count }} beoordelingen"
+      },
+      "done_lead": "Je beoordeling is ontvangen en wordt binnenkort gecontroleerd.",
+      "done_title": "Bedankt voor je beoordeling!",
+      "empty_admin_hint": "Voeg klantbeoordelingen toe via metaobjects of sectieblokken in de theme-editor.",
+      "empty_with_form": "Nog geen beoordelingen — wees de eerste die zijn ervaring hieronder deelt.",
+      "error_generic": "Er is iets misgegaan bij het verzenden. Probeer het opnieuw.",
+      "error_length": "Schrijf minimaal een paar woorden voor je beoordeling.",
+      "error_name": "Vul je naam in.",
+      "error_network": "Netwerkfout. Probeer het later opnieuw.",
+      "error_rating": "Selecteer eerst een aantal sterren.",
+      "field_body": "Jouw beoordeling",
+      "field_name": "Je naam",
+      "field_product_html": "Sieraad <span>(optioneel)</span>",
+      "field_title_html": "Titel <span>(optioneel)</span>",
+      "field_website": "Laat dit veld leeg",
+      "form_lead": "Deel hoe jouw sieraad dagelijks draagt en straalt.",
+      "heading": "Klantbeoordelingen",
+      "next": "Volgende beoordelingen",
+      "no_products": "Geen bijpassende sieraden gevonden.",
+      "none_short": "Nog geen reviews",
+      "none_yet": "Nog geen beoordelingen voor dit sieraad. Deel als eerste je ervaring!",
+      "previous": "Vorige beoordelingen",
+      "rating_aria": {
+        "one": "Beoordeeld met {{ rating }} van de 5 sterren op basis van {{ count }} beoordeling",
+        "other": "Beoordeeld met {{ rating }} van de 5 sterren op basis van {{ count }} beoordelingen"
+      },
+      "search_product": "Zoek sieraad...",
+      "show_more": "Meer beoordelingen tonen",
+      "star_count": {
+        "one": "{{ count }} ster",
+        "other": "{{ count }} sterren"
+      },
+      "submit": "Beoordeling plaatsen",
+      "verified_buyer": "Geverifieerde koper",
+      "write_review": "Schrijf een beoordeling",
+      "your_rating": "Jouw beoordeling"
+    },
+    "wishlist": {
+      "add": "Bewaren in verlanglijst",
+      "added": "Opgeslagen in verlanglijst",
+      "in_wishlist": "In verlanglijst",
+      "removed": "Verwijderd uit verlanglijst"
+    }
+  },
+  "sections": {
+    "announcement": {
+      "fallback_html": "Gratis verzending vanaf <strong>€39</strong> &middot; 2 jaar kleurgarantie"
+    },
+    "collection_split": {
+      "banner_alt": "Redactionele collectiebanner",
+      "showcase_video": "Collectie showcase-video"
+    },
+    "featured_collection": {
+      "next_products": "Volgende producten",
+      "previous_products": "Vorige producten",
+      "showcase_image": "Uitgelichte collectie-afbeelding",
+      "showcase_slides": "Showcase-dia's",
+      "view_product_aria": "Bekijk {{ title }}"
+    },
+    "footer": {
+      "cash_on_delivery": "Betalen bij levering",
+      "payment_method": "Betaalmethode",
+      "social_title": "Volg ons"
+    },
+    "header": {
+      "expand_menu": "Menu uitklappen",
+      "hide_menu": "Menu inklappen",
+      "language_current": "Taal: {{ language }}",
+      "language_label": "Taal",
+      "main_menu": "Hoofdmenu",
+      "open_menu": "Menu openen",
+      "publish_languages_hint": "Voeg talen toe en publiceer ze in Shopify Admin > Instellingen > Talen.",
+      "select_language": "Selecteer taal"
+    },
+    "instagram": {
+      "lifestyle_alt": "Sieraden stylinginspiratie",
+      "post_alt": "Instagram-bericht"
+    },
+    "mosaic": {
+      "banner_fallback": "Collectie uitgelicht"
+    },
+    "size_guide": {
+      "chart_default": "Maattabel",
+      "default_title": "Maattabel voor sieraden",
+      "guide_default": "Hoe op te meten",
+      "no_blocks_hint": "Voeg maattabellen of meetinstructies toe in de theme-editor.",
+      "ring_calc_between": "Tussen twee maten? Kies de grotere maat voor extra comfort.",
+      "ring_calc_circ": "Omtrek (mm)",
+      "ring_calc_diam": "Binnendiameter (mm)",
+      "ring_calc_empty": "Vul hierboven een maat in mm in om je aanbevolen ringmaat te zien.",
+      "ring_calc_inner_diam": "Binnendiameter: {{ mm }} mm",
+      "ring_calc_input_label": "Afmeting in millimeters",
+      "ring_calc_mode_label": "Meetmethode",
+      "ring_calc_placeholder": "bijv. 54 of 17.2",
+      "ring_calc_result_prefix": "Aanbevolen maat:",
+      "ring_calc_title": "Interactieve ringmaatcalculator",
+      "ring_calc_unusual": "Maat valt buiten het standaardbereik — controleer de invoer in millimeters.",
+      "steps_default": "Tips voor pasvorm",
+      "tabs_label": "Categorieën maattabel"
+    },
+    "slideshow": {
+      "next_slide": "Volgende dia",
+      "previous_slide": "Vorige dia",
+      "scroll_next": "Scroll naar beneden"
+    },
+    "subfooter": {
+      "copyright_default": "© {{ year }} {{ shop_name }}. Alle rechten voorbehouden.",
+      "payment_methods_alt": "Geaccepteerde betaalmethoden",
+      "trust_badge_alt": "Keurmerk {{ number }}"
+    },
+    "trust_icons": {
+      "engraving_text": "Personaliseer geselecteerde sieraden in ons atelier",
+      "engraving_title": "Persoonlijke gravure",
+      "icon_alt": "Kwaliteitsicoon",
+      "returns_text": "Eenvoudig ruilen binnen 14 dagen",
+      "returns_title": "14 dagen retourrecht",
+      "shipping_text": "Gratis verzending bij bestellingen vanaf €39",
+      "shipping_title": "Snelle verzending",
+      "waterproof_text": "Douchen & zwemmen met 2 jaar garantie",
+      "waterproof_title": "100% waterproof"
+    }
+  },
+  "shopify": {
+    "checkout": {
+      "local_pickup": {
+        "stock_details": {
+          "in_stock": "Op voorraad"
+        }
+      },
+      "split_delivery": {
+        "delivery_updated_toast": {
+          "shipping_only": "Je levering is bijgewerkt. {{shipping}}",
+          "removal_only": "Je levering is bijgewerkt. {{removal}}",
+          "shipping_and_removal": "Je levering is bijgewerkt. {{shipping}} {{removal}}",
+          "shipping": {
+            "one": "{{count}} artikel is verplaatst naar verzending.",
+            "other": "{{count}} items zijn verplaatst naar verzending."
+          },
+          "removal": {
+            "one": "{{count}} item is verwijderd.",
+            "other": "{{count}} items zijn verwijderd."
+          }
+        }
+      }
+    }
   }
 }

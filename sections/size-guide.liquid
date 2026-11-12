@@ -1,6 +1,7 @@
 <!-- /sections/size-guide.liquid  (Size guide page: tabs per jewelry type, size chart, how-to-measure, ring size calculator) -->
 {%- liquid
-  assign page_heading = section.settings.heading | default: page.title | default: 'Size guide'
+  assign sg_default_title = 'sections.size_guide.default_title' | t
+  assign page_heading = section.settings.heading | default: page.title | default: sg_default_title
 -%}
 
 <div class="sg color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
@@ -161,11 +162,14 @@
     </header>
 
     {%- if section.blocks.size > 0 -%}
-      <div class="sg__tabs" role="tablist" aria-label="Jewelry type" data-sg-tabs>
+      {%- assign sg_guide_default = 'sections.size_guide.guide_default' | t -%}
+      {%- assign sg_chart_default = 'sections.size_guide.chart_default' | t -%}
+      {%- assign sg_steps_default = 'sections.size_guide.steps_default' | t -%}
+      <div class="sg__tabs" role="tablist" aria-label="{{ 'sections.size_guide.tabs_label' | t }}" data-sg-tabs>
         {%- for block in section.blocks -%}
           {%- assign tab_key = block.settings.key | default: block.settings.title | handleize -%}
           <button type="button" class="sg__tab" role="tab" id="sg-tab-{{ block.id }}" aria-controls="sg-panel-{{ block.id }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" tabindex="{% if forloop.first %}0{% else %}-1{% endif %}" data-sg-tab data-key="{{ tab_key | downcase }}" {{ block.shopify_attributes }}>
-            {{ block.settings.title | default: 'Guide' }}
+            {{ block.settings.title | default: sg_guide_default }}
           </button>
         {%- endfor -%}
       </div>
@@ -185,7 +189,7 @@
           <div class="sg__grid">
             <div class="sg__col">
               {%- if block.settings.table_rows != blank -%}
-                <h2 class="sg__h">{{ block.settings.table_title | default: 'Size chart' }}</h2>
+                <h2 class="sg__h">{{ block.settings.table_title | default: sg_chart_default }}</h2>
                 <div class="sg__table-wrap">
                   <table class="sg__table" data-sg-table>
                     {%- if block.settings.table_head != blank -%}
@@ -212,22 +216,22 @@
 
               {%- if block.settings.calculator == 'ring' -%}
                 <div class="sg__calc" data-sg-calc>
-                  <h2 class="sg__h">Find your ring size</h2>
+                  <h2 class="sg__h">{{ 'sections.size_guide.ring_calc_title' | t }}</h2>
                   <div class="sg__calc-row">
-                    <select data-sg-calc-mode aria-label="What did you measure?">
-                      <option value="circ">Finger circumference (mm)</option>
-                      <option value="diam">Ring inner diameter (mm)</option>
+                    <select data-sg-calc-mode aria-label="{{ 'sections.size_guide.ring_calc_mode_label' | t }}">
+                      <option value="circ">{{ 'sections.size_guide.ring_calc_circ' | t }}</option>
+                      <option value="diam">{{ 'sections.size_guide.ring_calc_diam' | t }}</option>
                     </select>
-                    <input type="number" inputmode="decimal" min="30" max="90" step="0.1" placeholder="e.g. 54" data-sg-calc-value aria-label="Measurement in millimetres">
+                    <input type="number" inputmode="decimal" min="30" max="90" step="0.1" placeholder="{{ 'sections.size_guide.ring_calc_placeholder' | t }}" data-sg-calc-value aria-label="{{ 'sections.size_guide.ring_calc_input_label' | t }}">
                   </div>
-                  <p class="sg__calc-result" data-sg-calc-result aria-live="polite">Enter your measurement to see your size.</p>
+                  <p class="sg__calc-result" data-sg-calc-result aria-live="polite">{{ 'sections.size_guide.ring_calc_empty' | t }}</p>
                 </div>
               {%- endif -%}
             </div>
 
             <div class="sg__col">
               {%- if block.settings.steps != blank -%}
-                <h2 class="sg__h">{{ block.settings.steps_title | default: 'How to measure' }}</h2>
+                <h2 class="sg__h">{{ block.settings.steps_title | default: sg_steps_default }}</h2>
                 <ol class="sg__steps">
                   {%- for line in step_lines -%}
                     {%- assign step_clean = line | strip -%}
@@ -259,7 +263,7 @@
         </section>
       {%- endfor -%}
     {%- else -%}
-      <p style="text-align: center;">Add guides (Rings, Bracelets, Necklaces...) in the theme editor.</p>
+      <p style="text-align: center;">{{ 'sections.size_guide.no_blocks_hint' | t }}</p>
     {%- endif -%}
 
     {%- if section.settings.cta_title != blank -%}
@@ -275,12 +279,27 @@
     {%- endif -%}
   </div>
 
+  <script type="application/json" data-sg-i18n>
+    {
+      "empty": {{ 'sections.size_guide.ring_calc_empty' | t | json }},
+      "unusual": {{ 'sections.size_guide.ring_calc_unusual' | t | json }},
+      "yourSizePrefix": {{ 'sections.size_guide.ring_calc_result_prefix' | t | json }},
+      "innerDiam": {{ 'sections.size_guide.ring_calc_inner_diam' | t: mm: '__MM__' | json }},
+      "betweenSizes": {{ 'sections.size_guide.ring_calc_between' | t | json }}
+    }
+  </script>
+
   {% raw %}
   <script>
     (function () {
       var root = document.currentScript.closest('[data-sg-root]');
       if (!root || root.dataset.sgReady) return;
       root.dataset.sgReady = '1';
+      var sgI18n = {};
+      try {
+        var sgI18nEl = root.querySelector('[data-sg-i18n]');
+        if (sgI18nEl) sgI18n = JSON.parse(sgI18nEl.textContent) || {};
+      } catch (e) {}
       var tabs = Array.prototype.slice.call(root.querySelectorAll('[data-sg-tab]'));
       var panels = Array.prototype.slice.call(root.querySelectorAll('[data-sg-panel]'));
 
@@ -331,18 +350,19 @@
         function run() {
           rows.forEach(function (r) { r.classList.remove('is-match'); });
           var v = parseFloat(String(input.value).replace(',', '.'));
-          if (!v || v <= 0) { out.textContent = 'Enter your measurement to see your size.'; return; }
+          if (!v || v <= 0) { out.textContent = sgI18n.empty || ''; return; }
           var d = mode.value === 'circ' ? v / Math.PI : v;
-          if (d < 12 || d > 26) { out.textContent = 'That looks unusual - please measure again (finger circumference is usually 45-70 mm).'; return; }
+          if (d < 12 || d > 26) { out.textContent = sgI18n.unusual || ''; return; }
           var size = Math.round(d);
           var between = Math.abs(d - Math.round(d)) > 0.3;
-          var text = 'Your size: ';
+          var text = sgI18n.yourSizePrefix || '';
           out.innerHTML = '';
           var strong = document.createElement('strong');
           strong.textContent = size;
           out.appendChild(document.createTextNode(text));
           out.appendChild(strong);
-          out.appendChild(document.createTextNode(' (inner diameter ' + d.toFixed(1) + ' mm)' + (between ? ' - you are between sizes, we recommend the larger one.' : '')));
+          var diamText = (sgI18n.innerDiam || '').replace('__MM__', d.toFixed(1));
+          out.appendChild(document.createTextNode(' ' + diamText + (between ? (' ' + (sgI18n.betweenSizes || '')) : '')));
           var target = between ? Math.ceil(d) : size;
           rows.forEach(function (r) {
             var first = r.cells[0] ? parseFloat(r.cells[0].textContent) : NaN;

@@ -1,21 +1,21 @@
 <!-- /sections/main-404.liquid -->
 <div class="color-{{ section.settings.color_scheme | default: 'scheme-1' }}" style="padding: 60px 20px; text-align: center; min-height: 50vh; display: flex; align-items: center; justify-content: center;">
   <div style="max-width: 600px; margin: 0 auto;">
-    <h1 style="font-family: 'Quicksand', sans-serif; font-size: 64px; font-weight: 300; letter-spacing: 0.1em; color: #ccc; margin: 0 0 10px 0;">404</h1>
-    <h2 style="font-family: 'Quicksand', sans-serif; font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text, #000); margin: 0 0 16px 0;">
-      Page Not Found
+    <h1 style="font-family: var(--FONT-STACK-HEADING, sans-serif); font-size: 64px; font-weight: 300; letter-spacing: 0.1em; color: #ccc; margin: 0 0 10px 0;">404</h1>
+    <h2 style="font-family: var(--FONT-STACK-HEADING, sans-serif); font-size: 20px; font-weight: var(--FONT-WEIGHT-HEADING, 600); text-transform: var(--FONT-HEADING-TRANSFORM, uppercase); letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.15em); color: var(--text, #000); margin: 0 0 16px 0;">
+      {{ 'general.404.title' | t }}
     </h2>
-    <p style="font-family: 'Quicksand', sans-serif; font-size: 13px; color: color-mix(in srgb, var(--text, #666) 62%, transparent); line-height: 1.6; margin-bottom: 28px;">
-      The page you are looking for does not exist or has been moved. Discover our luxury collections:
+    <p style="font-family: var(--FONT-STACK-BODY, sans-serif); font-size: 13px; color: color-mix(in srgb, var(--text, #666) 62%, transparent); line-height: 1.6; margin-bottom: 28px;">
+      {{ 'general.404.subtext' | t }}
     </p>
 
     <!-- Quick Collection Links -->
     <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 32px;">
-      <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary btn-sliding-hover" style="padding: 10px 18px; font-family: 'Quicksand', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; text-decoration: none; border-radius: var(--btn-radius, 0px) !important;">
-        All Jewelry
+      <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary btn-sliding-hover" style="padding: 10px 18px; font-family: var(--TYPE-STACK-BUTTON, sans-serif); font-size: 11px; font-weight: var(--TYPE-WEIGHT-BUTTON, 600); text-transform: var(--FONT-BUTTON-TRANSFORM, uppercase); letter-spacing: var(--FONT-BUTTON-LETTER-SPACING, 0.12em); text-decoration: none; border-radius: var(--btn-radius, 0px) !important;">
+        {{ 'general.404.all_jewelry' | t }}
       </a>
-      <a href="{{ routes.root_url }}" class="btn btn--outline btn-sliding-hover" style="padding: 10px 18px; font-family: 'Quicksand', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; text-decoration: none; border-radius: var(--btn-radius, 0px) !important;">
-        Back to Home
+      <a href="{{ routes.root_url }}" class="btn btn--outline btn-sliding-hover" style="padding: 10px 18px; font-family: var(--TYPE-STACK-BUTTON, sans-serif); font-size: 11px; font-weight: var(--TYPE-WEIGHT-BUTTON, 600); text-transform: var(--FONT-BUTTON-TRANSFORM, uppercase); letter-spacing: var(--FONT-BUTTON-LETTER-SPACING, 0.12em); text-decoration: none; border-radius: var(--btn-radius, 0px) !important;">
+        {{ 'general.404.back_to_home' | t }}
       </a>
     </div>
   </div>

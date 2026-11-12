@@ -1,8 +1,13 @@
 <!-- /sections/main-search.liquid -->
 {%- liquid
   assign products_per_page = section.settings.products_per_page | default: 24
-  assign popular_raw = section.settings.popular_terms
+  assign popular_default = 'general.search.popular_terms' | t
+  assign popular_raw = section.settings.popular_terms | default: popular_default
   assign popular_terms = popular_raw | split: ','
+  assign search_title_text = 'general.search.title' | t
+  assign search_eyebrow_default = 'general.search.page_eyebrow' | t
+  assign search_lead_default = 'general.search.page_lead' | t
+  assign search_collections_default = 'general.search.browse_collections' | t
 -%}
 
 <div class="search-page-section color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
@@ -12,15 +17,15 @@
 
   {{ 'product-grid.css' | asset_url | stylesheet_tag }}
   <style>
-    .search-page-section { padding-top: var(--PT); padding-bottom: var(--PB); width: 100%; font-family: 'Quicksand', -apple-system, sans-serif; --sp-line: var(--lv-border); --sp-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62); --sp-soft: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)); }
+    .search-page-section { padding-top: var(--PT); padding-bottom: var(--PB); width: 100%; font-family: var(--FONT-STACK-BODY, sans-serif); --sp-line: var(--lv-border); --sp-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62); --sp-soft: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)); }
     .search-page-container { width: 100%; max-width: none; margin: 0 auto; padding-left: var(--outer, 24px); padding-right: var(--outer, 24px); box-sizing: border-box; }
 
     /* ---------- Hero ---------- */
     .search-header { text-align: center; max-width: 720px; margin: 0 auto 44px; }
     .search-header .lv-crumbs { justify-content: center; }
-    .search-eyebrow { margin: 0 0 10px; font-size: 11px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--sp-muted); }
-    .search-title { margin: 0 0 10px; font-size: clamp(28px, 4vw, 42px); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; line-height: 1.15; color: currentColor; }
-    .search-lead { margin: 0 0 28px; font-size: 14px; color: var(--sp-muted); }
+    .search-eyebrow { margin: 0 0 10px; font-family: var(--TYPE-STACK-KICKER, var(--FONT-STACK-SUBHEADING, sans-serif)); font-size: 11px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--sp-muted); }
+    .search-title { margin: 0 0 10px; font-family: var(--FONT-STACK-HEADING, sans-serif); font-size: calc(clamp(28px, 4vw, 42px) * var(--FONT-ADJUST-HEADING, 1)); font-weight: var(--FONT-WEIGHT-HEADING, 600); letter-spacing: var(--FONT-HEADING-LETTER-SPACING, .14em); text-transform: var(--FONT-HEADING-TRANSFORM, uppercase); line-height: 1.15; color: currentColor; }
+    .search-lead { margin: 0 0 28px; font-family: var(--FONT-STACK-SUBHEADING, var(--FONT-STACK-BODY, sans-serif)); font-size: 14px; color: var(--sp-muted); }
 
     .search-form-wrap { position: relative; display: flex; align-items: stretch; width: 100%; box-shadow: 0 10px 30px -18px rgba(0, 0, 0, .3); border-radius: var(--input-radius, var(--btn-radius, 0px)); }
     .search-input-field {
@@ -85,28 +90,28 @@
   </style>
 
   <div class="search-page-container">
-    {% render 'breadcrumb', current: 'Search' %}
+    {% render 'breadcrumb', current: search_title_text %}
 
     <div class="search-header">
-      <p class="search-eyebrow">{{ section.settings.eyebrow | default: 'Find your piece' }}</p>
-      <h1 class="search-title">Search</h1>
-      <p class="search-lead">{{ section.settings.lead | default: 'Search our collection of rings, necklaces, bracelets and more.' }}</p>
+      <p class="search-eyebrow">{{ section.settings.eyebrow | default: search_eyebrow_default }}</p>
+      <h1 class="search-title">{{ 'general.search.title' | t }}</h1>
+      <p class="search-lead">{{ section.settings.lead | default: search_lead_default }}</p>
       <form action="{{ routes.search_url }}" method="get" role="search" class="search-form-wrap">
         <input type="search"
           name="q"
           value="{{ search.terms | escape }}"
-          placeholder="Search products, collections..."
+          placeholder="{{ 'general.search.page_placeholder' | t }}"
           class="search-input-field"
-          aria-label="Search"
+          aria-label="{{ 'general.search.title' | t }}"
           autocomplete="off">
-        <button type="submit" class="search-submit-btn" aria-label="Search">
+        <button type="submit" class="search-submit-btn" aria-label="{{ 'general.search.title' | t }}">
           {% render 'icon', icon: 'search' %}
         </button>
       </form>
 
       {%- if section.settings.show_popular and popular_raw != blank -%}
         <div class="search-chips">
-          <span class="search-chips__label">Popular</span>
+          <span class="search-chips__label">{{ 'general.search.popular_label' | t }}</span>
           {%- for term in popular_terms -%}
             {%- assign t = term | strip -%}
             {%- if t != blank -%}
@@ -120,9 +125,10 @@
     {%- if search.performed -%}
       {%- paginate search.results by products_per_page -%}
         {%- if search.results_count > 0 -%}
+          {%- assign escaped_search_terms = search.terms | escape -%}
           <div class="search-results-summary">
-            <p style="margin: 0;"><strong>{{ search.results_count }}</strong> {% if search.results_count == 1 %}result{% else %}results{% endif %} for <strong>&ldquo;{{ search.terms | escape }}&rdquo;</strong></p>
-            <a href="{{ routes.search_url }}">Clear search</a>
+            <p style="margin: 0;">{{ 'general.search.results_with_count_html' | t: count: search.results_count, terms: escaped_search_terms }}</p>
+            <a href="{{ routes.search_url }}">{{ 'general.search.clear_search' | t }}</a>
           </div>
 
           <div class="search-products-grid lv-product-grid" style="{% render 'product-grid-vars', settings: section.settings %}">
@@ -142,14 +148,15 @@
             {% render 'pagination', paginate: paginate %}
           {%- endif -%}
         {%- else -%}
+          {%- assign escaped_search_terms = search.terms | escape -%}
           <div class="search-empty-state">
             <div class="search-empty-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M8.5 11h5"/></svg>
             </div>
-            <h2 class="search-empty-title">No results found</h2>
-            <p class="search-empty-desc">We could not find anything for <strong>&ldquo;{{ search.terms | escape }}&rdquo;</strong>. Check the spelling, try a different keyword, or browse our collections below.</p>
+            <h2 class="search-empty-title">{{ 'general.search.empty_title' | t }}</h2>
+            <p class="search-empty-desc">{{ 'general.search.empty_desc_html' | t: terms: escaped_search_terms }}</p>
             <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary search-empty-btn btn-sliding-hover">
-              <span class="btn__text-content">Explore all products</span>
+              <span class="btn__text-content">{{ 'general.search.explore_all' | t }}</span>
             </a>
           </div>
         {%- endif -%}
@@ -164,7 +171,7 @@
     {%- endif -%}
     {%- if show_collections_block -%}
       <div class="search-collections">
-        <h2 class="search-collections__title">{{ section.settings.collections_heading | default: 'Browse collections' }}</h2>
+        <h2 class="search-collections__title">{{ section.settings.collections_heading | default: search_collections_default }}</h2>
         <div class="search-collections__grid">
           {%- assign shown = 0 -%}
           {%- for c in collections -%}
@@ -207,13 +214,13 @@
       "type": "text",
       "id": "eyebrow",
       "label": "Small text above title",
-      "default": "Find your piece"
+      "info": "Leave blank to use the theme translation."
     },
     {
       "type": "text",
       "id": "lead",
       "label": "Intro text",
-      "default": "Search our collection of rings, necklaces, bracelets and more."
+      "info": "Leave blank to use the theme translation."
     },
     {
       "type": "checkbox",
@@ -225,8 +232,7 @@
       "type": "text",
       "id": "popular_terms",
       "label": "Popular searches",
-      "default": "ring, necklace, bracelet, earrings, engraving",
-      "info": "Comma separated.",
+      "info": "Comma separated. Leave blank to use the theme translation.",
       "visible_if": "{{ section.settings.show_popular }}"
     },
     {
@@ -243,7 +249,7 @@
       "type": "text",
       "id": "collections_heading",
       "label": "Heading",
-      "default": "Browse collections",
+      "info": "Leave blank to use the theme translation.",
       "visible_if": "{{ section.settings.show_collections }}"
     },
     {

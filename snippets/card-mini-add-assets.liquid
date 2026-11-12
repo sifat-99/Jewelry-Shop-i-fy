@@ -50,7 +50,7 @@
   @keyframes lv-mini-spin { to { transform: rotate(360deg); } }
 
   /* ---- Shared popup content ---- */
-  .lv-mp { font-family: 'Quicksand', -apple-system, sans-serif; color: var(--text, #111); box-sizing: border-box; }
+  .lv-mp { font-family: var(--FONT-STACK-BODY, sans-serif); color: var(--text, #111); box-sizing: border-box; }
   .lv-mp__head { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--lv-border); }
   .lv-mp__thumb { flex: none; width: 54px; height: 54px; object-fit: cover; border-radius: var(--btn-radius, 0px); background: color-mix(in srgb, var(--text, #111) 6%, var(--bg, #fff)); }
   .lv-mp__meta { flex: 1; min-width: 0; }
@@ -155,13 +155,25 @@
     if (window.lvMiniAddInit) return;
     window.lvMiniAddInit = true;
     var current = null; // { kind, el, btn }
+    var lvMpI18n = {
+      close: {{ 'accessibility.close' | t | json }},
+      selectOption: {{ 'products.product.select_size_or_option' | t | json }},
+      chooseOption: {{ 'products.product.choose_size_or_option' | t | json }},
+      engraving: {{ 'products.engraving.label' | t | json }},
+      required: {{ 'products.engraving.required' | t | json }},
+      optional: {{ 'products.engraving.optional' | t | json }},
+      maxShort: {{ 'products.engraving.max_short' | t: max: '__MAX__' | json }},
+      engraveError: {{ 'products.engraving.error_required' | t | json }},
+      addToCart: {{ 'products.product.add_to_cart' | t | json }}
+    };
+    var cartAddUrl = (window.theme && window.theme.routes && window.theme.routes.cart_add_url) ? (window.theme.routes.cart_add_url + '.js') : {{ routes.cart_add_url | append: '.js' | json }};
 
     function addToCart(id, done, props) {
       if (!id) { done(); return; }
       if (typeof window.addToCartAjax === 'function') { window.addToCartAjax(id, 1, props).then(done, done); return; }
       var body = { id: id, quantity: 1 };
       if (props) body.properties = props;
-      fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      fetch(cartAddUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
         .then(function (r) { return r.json(); })
         .then(function () {
           if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
@@ -183,7 +195,7 @@
       var sel = root.querySelector('.lv-msheet__opt.is-selected .lv-msheet__opt-label');
       var inp = root.querySelector('.lv-mp__eng-input');
       if (!sel || !inp) return;
-      var m = /(\d+)\s*char/i.exec(sel.textContent);
+      var m = /(\d+)\s*(?:char|teken|karakter|caract|zeiche)/i.exec(sel.textContent);
       if (!m) return;
       var n = parseInt(m[1], 10);
       if (!n) return;
@@ -191,8 +203,8 @@
       if (inp.value.length > n) inp.value = inp.value.slice(0, n);
       var cnt = root.querySelector('.lv-mp__eng-count');
       if (cnt) cnt.textContent = inp.value.length + '/' + n;
-      var small = root.querySelector('.lv-mp__eng-label small');
-      if (small) small.innerHTML = small.innerHTML.replace(/max \d+/, 'max ' + n);
+      var maxSpan = root.querySelector('[data-mp-eng-max]');
+      if (maxSpan) maxSpan.textContent = lvMpI18n.maxShort.replace('__MAX__', n);
     }
 
     function content(btn, showClose) {
@@ -204,8 +216,8 @@
         (btn.getAttribute('data-image') ? '<img class="lv-mp__thumb" alt="" src="' + esc(btn.getAttribute('data-image')) + '">' : '') +
         '<div class="lv-mp__meta"><h3 class="lv-mp__title">' + esc(btn.getAttribute('data-title')) + '</h3>' +
         '<p class="lv-mp__price">' + esc(btn.getAttribute('data-price')) + '</p></div>' +
-        (showClose ? '<button type="button" class="lv-mp__close" data-mp-close aria-label="Close">&times;</button>' : '') + '</div>' +
-        '<div data-mp-eng-slot></div><p class="lv-mp__label" data-mp-label>Select size / option</p><div class="lv-mp__opts"></div>';
+        (showClose ? '<button type="button" class="lv-mp__close" data-mp-close aria-label="' + esc(lvMpI18n.close) + '">&times;</button>' : '') + '</div>' +
+        '<div data-mp-eng-slot></div><p class="lv-mp__label" data-mp-label>' + esc(lvMpI18n.selectOption) + '</p><div class="lv-mp__opts"></div>';
       if (tpl) wrap.querySelector('.lv-mp__opts').appendChild(tpl.content.cloneNode(true));
       var single = btn.getAttribute('data-single') === 'true';
       var label = wrap.querySelector('[data-mp-label]');
@@ -219,21 +231,21 @@
         var box = document.createElement('div');
         box.className = 'lv-mp__eng';
         box.innerHTML =
-          '<label class="lv-mp__eng-label"><span>' + esc(btn.getAttribute('data-eng-label') || 'Engraving') + '</span>' +
-          '<small>' + (req ? 'Required' : 'Optional') + ' &middot; max ' + max + '</small></label>' +
+          '<label class="lv-mp__eng-label"><span>' + esc(btn.getAttribute('data-eng-label') || lvMpI18n.engraving) + '</span>' +
+          '<small>' + esc(req ? lvMpI18n.required : lvMpI18n.optional) + ' &middot; <span data-mp-eng-max>' + esc(lvMpI18n.maxShort.replace('__MAX__', max)) + '</span></small></label>' +
           '<div class="lv-mp__eng-field"><input type="text" class="lv-mp__eng-input" maxlength="' + max + '" autocomplete="off" enterkeyhint="done">' +
           '<span class="lv-mp__eng-count">0/' + max + '</span></div>' +
-          '<p class="lv-mp__eng-error" role="alert" hidden>Please add your engraving text.</p>';
+          '<p class="lv-mp__eng-error" role="alert" hidden>' + esc(lvMpI18n.engraveError) + '</p>';
         box.querySelector('input').placeholder = btn.getAttribute('data-eng-placeholder') || '';
         wrap.querySelector('[data-mp-eng-slot]').appendChild(box);
         if (!single) {
-          label.textContent = 'Choose size / option';
+          label.textContent = lvMpI18n.chooseOption;
           wrap.classList.add('lv-mp--select');
           var firstOpt = wrap.querySelector('.lv-msheet__opt:not([disabled])');
           if (firstOpt) firstOpt.classList.add('is-selected');
           var cw = document.createElement('div');
           cw.className = 'lv-mp__cta-wrap';
-          cw.innerHTML = '<button type="button" class="lv-msheet__opt lv-msheet__opt--cta" data-mp-add>Add to cart</button>';
+          cw.innerHTML = '<button type="button" class="lv-msheet__opt lv-msheet__opt--cta" data-mp-add>' + esc(lvMpI18n.addToCart) + '</button>';
           wrap.appendChild(cw);
           syncEngMax(wrap);
           syncPrice(wrap);

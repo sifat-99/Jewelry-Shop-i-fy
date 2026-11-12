@@ -14,5 +14,6 @@
 {%- if bc_parent != blank -%}
   {% render 'breadcrumb', current: product.title, parent_title: bc_parent.title, parent_url: bc_parent.url %}
 {%- else -%}
-  {% render 'breadcrumb', current: product.title, parent_title: 'All products', parent_url: routes.all_products_collection_url %}
+  {%- assign all_products_title = 'breadcrumbs.all_products' | t -%}
+  {% render 'breadcrumb', current: product.title, parent_title: all_products_title, parent_url: routes.all_products_collection_url %}
 {%- endif -%}

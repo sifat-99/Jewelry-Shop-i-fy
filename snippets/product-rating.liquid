@@ -9,10 +9,10 @@
 {%- endcomment -%}
 {%- capture rs -%}{%- render 'product-review-stats', product_id: product.id -%}{%- endcapture -%}
 {%- assign rp = rs | split: '~~' -%}
-<a class="lv-prating" href="#product-reviews" aria-label="{{ rp[1] }} reviews, average {{ rp[0] }} out of 5">
+<a class="lv-prating" href="#product-reviews" aria-label="{{ 'products.reviews.rating_aria' | t: count: rp[1], rating: rp[0] }}">
   {%- render 'rating-stars', rating: rp[0], class_name: 'lv-stars' -%}
   {%- if rp[1] == '0' -%}
-    <span class="lv-prating__text">No reviews yet</span>
+    <span class="lv-prating__text">{{ 'products.reviews.none_short' | t }}</span>
   {%- else -%}
     <strong>{{ rp[0] }}</strong><span class="lv-prating__text">({{ rp[1] }})</span>
   {%- endif -%}

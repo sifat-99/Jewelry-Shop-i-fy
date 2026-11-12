@@ -47,18 +47,18 @@
             {%- render 'rating-stars', rating: avg, class_name: 'cf-stars' -%}
             <span class="cf__summary-score"><strong>{{ avg }}</strong><span>/ 5</span></span>
             <span class="cf__summary-divider" aria-hidden="true"></span>
-            <span class="cf__summary-count">{{ cnt }} {% if cnt == 1 %}review{% else %}reviews{% endif %}</span>
+            <span class="cf__summary-count">{{ 'products.reviews.count' | t: count: cnt }}</span>
           </p>
         {%- endif -%}
       </div>
     {%- endif -%}
 
     {%- if cnt == 0 -%}
-      <p class="cf__empty">{% if form_on %}No reviews yet. Be the first to share your experience.{% else %}No reviews yet. Create "Review" entries under Content &gt; Metaobjects, or add Review blocks to this section.{% endif %}</p>
+      <p class="cf__empty">{% if form_on %}{{ 'products.reviews.empty_with_form' | t }}{% else %}{{ 'products.reviews.empty_admin_hint' | t }}{% endif %}</p>
     {%- else -%}
       <div class="cf__wrap">
         {%- if layout == 'carousel' -%}
-          <button type="button" class="cf__arrow cf__arrow--prev" data-cf-prev aria-label="Previous reviews"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
+          <button type="button" class="cf__arrow cf__arrow--prev" data-cf-prev aria-label="{{ 'products.reviews.previous' | t }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
         {%- endif -%}
         <div class="cf__track" data-cf-track>
           {%- if use_meta -%}
@@ -78,7 +78,7 @@
           {%- endif -%}
         </div>
         {%- if layout == 'carousel' -%}
-          <button type="button" class="cf__arrow cf__arrow--next" data-cf-next aria-label="Next reviews"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+          <button type="button" class="cf__arrow cf__arrow--next" data-cf-next aria-label="{{ 'products.reviews.next' | t }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
         {%- endif -%}
       </div>
     {%- endif -%}
@@ -97,8 +97,8 @@
   {%- endif %}
   #cf-{{ section.id }} { --cf-cols: var(--cf-cols-d); padding: var(--PT) 0 var(--PB); background: var(--bg, #fff); color: var(--text, #111); --cf-accent: var(--lv-accent, #9b7c53); --cf-gap: 20px; --cf-line: var(--lv-border); }
   #cf-{{ section.id }} .cf__head { text-align: center; max-width: 680px; margin: 0 auto clamp(26px, 4vw, 44px); }
-  #cf-{{ section.id }} .cf__title { margin: 0 0 10px; font-size: clamp(22px, 3vw, 32px); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; line-height: 1.2; }
-  #cf-{{ section.id }} .cf__sub { margin: 0 0 14px; font-size: 14.5px; line-height: 1.7; opacity: .75; }
+  #cf-{{ section.id }} .cf__title { margin: 0 0 10px; font-family: var(--FONT-STACK-HEADING, sans-serif); font-size: calc(clamp(22px, 3vw, 32px) * var(--FONT-ADJUST-HEADING, 1)); font-weight: var(--FONT-WEIGHT-HEADING, 600); letter-spacing: var(--FONT-HEADING-LETTER-SPACING, .14em); text-transform: var(--FONT-HEADING-TRANSFORM, uppercase); line-height: 1.2; }
+  #cf-{{ section.id }} .cf__sub { margin: 0 0 14px; font-family: var(--FONT-STACK-SUBHEADING, inherit); font-size: 14.5px; line-height: 1.7; opacity: .75; }
   #cf-{{ section.id }} .cf__summary { margin: 0; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; white-space: nowrap; }
   #cf-{{ section.id }} .cf__summary-score { display: inline-flex; align-items: baseline; gap: 4px; }
   #cf-{{ section.id }} .cf__summary-score strong { font-weight: 700; }

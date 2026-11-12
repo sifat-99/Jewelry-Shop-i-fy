@@ -15,7 +15,7 @@
 
 <div data-search-popdown-wrap>
   <div id="{{ search_id }}" class="{{ search_style }} search__predictive" data-popdown-outer>
-    <predictive-search>
+    <predictive-search data-loading-text="{{ 'general.search.loading' | t }}">
       <form
         action="{{ routes.search_url }}"
         method="get"
@@ -26,8 +26,8 @@
           <div class="wrapper">
             <div class="search__predictive__main">
               <div class="search__predictive__actions">
-                <button class="search__predictive__button" type="submit" aria-label="Search">
-                  <span class="visually-hidden">Search</span>
+                <button class="search__predictive__button" type="submit" aria-label="{{ 'general.search.submit' | t }}">
+                  <span class="visually-hidden">{{ 'general.search.submit' | t }}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-search" viewBox="0 0 24 24"><path stroke-linecap="square" d="M10.1 17.7a7.6 7.6 0 1 0 0-15.2 7.6 7.6 0 0 0 0 15.2Zm11.4 3.8-5.7-5.7"/></svg>
                 </button>
 
@@ -35,21 +35,21 @@
                   data-predictive-search-input="{{ search_id }}-results"
                   name="q"
                   value=""
-                  placeholder="Search our luxury collection..."
-                  aria-label="Search our store"
+                  placeholder="{{ 'general.search.placeholder' | t }}"
+                  aria-label="{{ 'general.search.label' | t }}"
                   aria-controls="predictive-search-results"
                 >
 
                 <div class="search__predictive__clear">
-                  <button type="reset" class="search__predictive__close__inner search-reset is-hidden" aria-label="Reset">
+                  <button type="reset" class="search__predictive__close__inner search-reset is-hidden" aria-label="{{ 'general.search.reset' | t }}">
                     <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                    Clear
+                    {{ 'general.search.clear' | t }}
                   </button>
                 </div>
               </div>
 
               <div class="search__predictive__close">
-                <button type="button" class="search__predictive__close__inner" data-close-popdown aria-label="Close">
+                <button type="button" class="search__predictive__close__inner" data-close-popdown aria-label="{{ 'accessibility.close' | t }}">
                   <svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-linejoin="arcs" aria-hidden="true" class="icon-theme icon-theme-stroke icon-core-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
                 </button>
               </div>

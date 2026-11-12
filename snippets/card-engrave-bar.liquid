@@ -12,8 +12,10 @@
   {%- capture ce_raw -%}{% render 'engraving-info', product: product %}{%- endcapture -%}
   {%- assign ce_parts = ce_raw | strip | split: '~~' -%}
   {%- if ce_parts[0] == 'true' -%}
-    <button type="button" class="lv-card-action-bar lv-card-direct-add-btn lv-card-eng-btn" data-lv-eng-bar aria-label="{{ settings.engraving_card_label | default: 'Personalise' | escape }}: {{ product.title | escape }}">
-      <span class="lv-card-bar-label btn__text-content"><span>{{ settings.engraving_card_label | default: 'Personalise' }}</span></span>
+    {%- assign eng_bar_default = 'products.engraving.personalise' | t -%}
+    {%- assign eng_bar_text = settings.engraving_card_label | default: eng_bar_default -%}
+    <button type="button" class="lv-card-action-bar lv-card-direct-add-btn lv-card-eng-btn" data-lv-eng-bar aria-label="{{ eng_bar_text | escape }}: {{ product.title | escape }}">
+      <span class="lv-card-bar-label btn__text-content"><span>{{ eng_bar_text }}</span></span>
     </button>
   {%- endif -%}
 {%- endif -%}

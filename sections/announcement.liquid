@@ -28,16 +28,31 @@
     color: var(--ann-text, var(--text));
     border-bottom: 1px solid color-mix(in srgb, var(--ann-text, var(--text)) 10%, transparent);
   }
-  .announcement [data-ticker-text],
-  .announcement [data-ticker-text] p,
-  .announcement [data-ticker-text] strong,
-  .announcement [data-ticker-text] a {
-    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  .announcement [data-ticker-text]:not(.announcement__content--html),
+  .announcement [data-ticker-text]:not(.announcement__content--html) p,
+  .announcement [data-ticker-text]:not(.announcement__content--html) strong,
+  .announcement [data-ticker-text]:not(.announcement__content--html) a {
+    font-family: var(--TYPE-STACK-NAV, sans-serif) !important;
     font-size: 12.5px !important;
     font-weight: 600 !important;
     letter-spacing: 0.12em !important;
     color: var(--ann-text, var(--text)) !important;
     text-transform: uppercase !important;
+  }
+  .announcement [data-ticker-text].announcement__content--html {
+    font-family: var(--TYPE-STACK-NAV, sans-serif);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--ann-text, var(--text));
+    text-transform: uppercase;
+    gap: 8px;
+  }
+  .announcement [data-ticker-text].announcement__content--html p {
+    margin: 0;
+  }
+  .announcement [data-ticker-text].announcement__content--html a::after {
+    display: none;
   }
 </style>
 <div
@@ -59,7 +74,23 @@
     x-data="announcementSlider({{ section.settings.speed | default: 5000 }})"
   >
     {%- for block in section.blocks -%}
-      <div 
+      {%- liquid
+        assign has_custom_html = false
+        assign ann_markup = block.settings.text
+        if block.settings.custom_html != blank
+          assign has_custom_html = true
+          assign ann_markup = block.settings.custom_html
+        endif
+        assign wrap_in_link = false
+        if block.settings.link != blank
+          unless ann_markup contains '<a'
+            unless ann_markup contains '<button'
+              assign wrap_in_link = true
+            endunless
+          endunless
+        endif
+      -%}
+      <div
         x-ref="{{ block.id }}"
         class="section-padding items-center flex text-center w-full"
         {{ block.shopify_attributes }}
@@ -73,23 +104,23 @@
             class="inline-flex items-center transition-opacity duration-500 ease-linear ticker--unloaded"
             data-ticker-scale
           >
-            {%- if block.settings.link != blank -%}
-              <a href="{{ block.settings.link }}" class="rte--lock-font rte--lock-size px-r6 flex flex-row items-center accent-size-2 hover:underline" data-ticker-text>
-                {{ block.settings.text }}
+            {%- if wrap_in_link -%}
+              <a href="{{ block.settings.link }}" class="{% unless has_custom_html %}rte--lock-font rte--lock-size {% endunless %}px-r6 flex flex-row items-center accent-size-2 hover:underline{% if has_custom_html %} announcement__content--html{% endif %}" data-ticker-text>
+                {{ ann_markup }}
               </a>
             {%- else -%}
               <div
-                class="rte--lock-font rte--lock-size px-r6 flex flex-row items-center accent-size-2"
+                class="{% unless has_custom_html %}rte--lock-font rte--lock-size {% endunless %}px-r6 flex flex-row items-center accent-size-2{% if has_custom_html %} announcement__content--html{% endif %}"
                 data-ticker-text
               >
-                {{ block.settings.text }}
+                {{ ann_markup }}
               </div>
             {%- endif -%}
           </div>
         </div>
       </div>
     {%- else -%}
-      <div 
+      <div
         class="section-padding items-center flex text-center w-full"
       >
         <div
@@ -105,7 +136,7 @@
               class="rte--lock-font rte--lock-size px-r6 flex flex-row items-center accent-size-2"
               data-ticker-text
             >
-              <p><strong>CYBER MONDAY WEEK SALE 20% OFF ~ CODE: CYBER20</strong></p>
+              <p>{{ 'sections.announcement.fallback_html' | t }}</p>
             </div>
           </div>
         </div>
@@ -177,6 +208,12 @@
           "id": "text",
           "label": "Text",
           "default": "<p><strong>CYBER MONDAY WEEK SALE 20% OFF ~ CODE: CYBER20</strong></p>"
+        },
+        {
+          "type": "html",
+          "id": "custom_html",
+          "label": "Custom HTML",
+          "info": "Optional. Renders raw HTML/CSS for animated or colorful announcements (overrides Text when filled)."
         },
         {
           "type": "url",

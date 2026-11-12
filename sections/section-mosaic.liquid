@@ -20,6 +20,8 @@
   endif
 
   assign mobile_mode = section.settings.mobile_layout | default: 'stacked'
+  assign heading_pos = section.settings.heading_position | default: 'above'
+  assign heading_align = section.settings.heading_align | default: 'center'
 
   assign setting_aspect = section.settings.tile_aspect_ratio | default: '3_2'
   if setting_aspect == 'fixed'
@@ -39,6 +41,8 @@
   endif
 -%}
 
+{{ 'banner.css' | asset_url | stylesheet_tag }}
+
 <style>
   #shopify-section-{{ section.id }} {
     --mosaic-gap: {{ section.settings.grid_gap | default: 14 }}px;
@@ -57,6 +61,56 @@
   #shopify-section-{{ section.id }} .lv-mosaic-wrap {
     width: 100%;
     box-sizing: border-box;
+  }
+
+  #shopify-section-{{ section.id }} .lv-mosaic-header {
+    margin-bottom: 24px;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-header--below {
+    margin-top: 26px;
+    margin-bottom: 0;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-header--left .kicker-flourished {
+    text-align: left;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-header--left .kicker-flourished:after {
+    left: 0;
+    right: auto;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-header--right .kicker-flourished {
+    text-align: right;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-header--right .kicker-flourished:after {
+    left: auto;
+    right: 0;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-header--center .kicker-flourished {
+    text-align: center;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-header--center .kicker-flourished:after {
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-header-sub {
+    font-family: var(--FONT-STACK-SUBHEADING, sans-serif);
+    font-size: calc(13.5px * var(--FONT-ADJUST-ACCENT, 1));
+    font-weight: var(--FONT-WEIGHT-SUBHEADING, 500);
+    color: var(--text, #2b2622);
+    margin: -6px auto 0 auto;
+    letter-spacing: var(--FONT-SUBHEADING-LETTER-SPACING, 0.05em);
+    text-transform: var(--FONT-SUBHEADING-TRANSFORM, none);
+    max-width: 600px;
+    opacity: 1;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-header--left .lv-mosaic-header-sub {
+    margin-left: 0;
+    margin-right: auto;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-header--right .lv-mosaic-header-sub {
+    margin-left: auto;
+    margin-right: 0;
   }
 
   #shopify-section-{{ section.id }} .lv-mosaic-container {
@@ -80,6 +134,19 @@
     #shopify-section-{{ section.id }} .lv-mosaic-tile {
       height: auto !important;
       aspect-ratio: var(--tile-aspect-ratio, 3 / 2) !important;
+    }
+    @media (min-width: 768px) {
+      #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_right,
+      #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_left,
+      #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_4_featured {
+        height: auto !important;
+      }
+      #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_right > .lv-mosaic-tile:nth-child(3),
+      #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_left > .lv-mosaic-tile:nth-child(1),
+      #shopify-section-{{ section.id }} .lv-mosaic-layout--mosaic_4_featured > .lv-mosaic-tile:nth-child(1) {
+        height: 100% !important;
+        aspect-ratio: auto !important;
+      }
     }
     @media (max-width: 767px) {
       #shopify-section-{{ section.id }} .lv-mosaic-tile,
@@ -215,6 +282,7 @@
     overflow: hidden;
   }
 
+  #shopify-section-{{ section.id }} .lv-tile-media .banner-media__img,
   #shopify-section-{{ section.id }} .lv-tile-img {
     width: 100%;
     height: 100%;
@@ -224,25 +292,16 @@
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  #shopify-section-{{ section.id }} .lv-mosaic-tile:hover .lv-tile-media .banner-media__img,
   #shopify-section-{{ section.id }} .lv-mosaic-tile:hover .lv-tile-img {
     transform: scale(1.04);
-  }
-
-  #shopify-section-{{ section.id }} .lv-tile-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--lv-ink, #000000);
-    pointer-events: none;
-    transition: opacity 0.3s ease;
   }
 
   #shopify-section-{{ section.id }} .lv-mosaic-tile--clickable {
     cursor: pointer;
   }
 
+  /* 9-point banner content placement inside tiles */
   #shopify-section-{{ section.id }} .lv-tile-content-wrap {
     position: absolute;
     inset: 0;
@@ -253,32 +312,44 @@
     z-index: 6;
   }
 
-  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-center {
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-bottom_center {
-    align-items: flex-end;
-    justify-content: center;
-    text-align: center;
-    padding-bottom: 28px;
-  }
-  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-bottom_left {
-    align-items: flex-end;
-    justify-content: flex-start;
-    text-align: left;
-    padding-bottom: 28px;
-  }
-  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-middle_left {
-    align-items: center;
-    justify-content: flex-start;
-    text-align: left;
-  }
-  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-top_left {
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-top-left {
     align-items: flex-start;
     justify-content: flex-start;
-    text-align: left;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-top-center {
+    align-items: flex-start;
+    justify-content: center;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-top-right {
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-middle-left {
+    align-items: center;
+    justify-content: flex-start;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-middle-center {
+    align-items: center;
+    justify-content: center;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-middle-right {
+    align-items: center;
+    justify-content: flex-end;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-bottom-left {
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding-bottom: 28px;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-bottom-center {
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 28px;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-bottom-right {
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-bottom: 28px;
   }
 
   #shopify-section-{{ section.id }} .lv-tile-content {
@@ -287,26 +358,39 @@
   }
 
   #shopify-section-{{ section.id }} .lv-tile-subheading {
-    font-family: 'Quicksand', sans-serif !important;
+    font-family: var(--FONT-STACK-SUBHEADING, sans-serif) !important;
     font-size: 11px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.16em !important;
-    text-transform: uppercase !important;
-    color: #ffffff !important;
+    font-weight: var(--FONT-WEIGHT-SUBHEADING, 600) !important;
+    letter-spacing: var(--FONT-SUBHEADING-LETTER-SPACING, 0.16em) !important;
+    text-transform: var(--FONT-SUBHEADING-TRANSFORM, uppercase) !important;
     margin: 0 0 6px 0;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
   }
 
   #shopify-section-{{ section.id }} .lv-tile-title {
-    font-family: 'Quicksand', sans-serif !important;
-    font-size: clamp(16px, 1.8vw, 24px) !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.12em !important;
-    text-transform: uppercase !important;
-    color: #ffffff !important;
+    font-family: var(--FONT-STACK-HEADING, sans-serif) !important;
+    font-size: calc(clamp(16px, 1.8vw, 24px) * var(--FONT-ADJUST-HEADING, 1)) !important;
+    font-weight: var(--FONT-WEIGHT-HEADING, 600) !important;
+    letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.08em) !important;
+    text-transform: var(--FONT-HEADING-TRANSFORM, uppercase) !important;
     margin: 0;
     line-height: 1.25 !important;
+  }
+
+  /* Tile text tone options matching banner presets */
+  #shopify-section-{{ section.id }} .lv-mosaic-tile.lv-tile-tone-light .lv-tile-subheading,
+  #shopify-section-{{ section.id }} .lv-mosaic-tile.lv-tile-tone-light .lv-tile-title {
+    color: #ffffff !important;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-tile.lv-tile-tone-dark .lv-tile-subheading,
+  #shopify-section-{{ section.id }} .lv-mosaic-tile.lv-tile-tone-dark .lv-tile-title {
+    color: #111111 !important;
+    text-shadow: none;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-tile.lv-tile-tone-scheme .lv-tile-subheading,
+  #shopify-section-{{ section.id }} .lv-mosaic-tile.lv-tile-tone-scheme .lv-tile-title {
+    color: rgb(var(--color-foreground)) !important;
+    text-shadow: none;
   }
 
   #shopify-section-{{ section.id }} .lv-tile-btn-wrap {
@@ -314,20 +398,45 @@
     pointer-events: auto;
     position: relative;
     z-index: 7;
-    display: inline-block;
+    display: flex;
+    justify-content: var(--tile-btn-justify, center);
   }
 
   #shopify-section-{{ section.id }} .lv-tile-btn {
     display: inline-flex !important;
     padding: 8px 24px !important;
-    font-family: 'Quicksand', sans-serif !important;
+    font-family: var(--TYPE-STACK-BUTTON, sans-serif) !important;
     font-size: 11px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.15em !important;
-    text-transform: uppercase !important;
+    font-weight: var(--TYPE-WEIGHT-BUTTON, 600) !important;
+    letter-spacing: var(--FONT-BUTTON-LETTER-SPACING, 0.15em) !important;
+    text-transform: var(--FONT-BUTTON-TRANSFORM, uppercase) !important;
     text-decoration: none !important;
     pointer-events: auto;
     cursor: pointer;
+  }
+
+  #shopify-section-{{ section.id }} .lv-tile-btn--link {
+    display: inline-block !important;
+    padding: 0 0 3px 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 1px solid currentColor !important;
+    letter-spacing: 0.08em !important;
+    font-size: 12px !important;
+    text-transform: none !important;
+    transition: opacity 0.22s ease;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-tile.lv-tile-tone-light .lv-tile-btn--link {
+    color: #ffffff !important;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-tile.lv-tile-tone-dark .lv-tile-btn--link {
+    color: #111111 !important;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-tile.lv-tile-tone-scheme .lv-tile-btn--link {
+    color: rgb(var(--color-foreground)) !important;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-btn--link:hover {
+    opacity: 0.72;
   }
 
   #shopify-section-{{ section.id }} .lv-tile-clickable-link {
@@ -346,6 +455,14 @@
   @media (max-width: 767px) {
     #shopify-section-{{ section.id }} .lv-mosaic-container {
       height: auto !important;
+    }
+    #shopify-section-{{ section.id }} .lv-tile-content-wrap {
+      padding: 16px;
+    }
+    #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-bottom-left,
+    #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-bottom-center,
+    #shopify-section-{{ section.id }} .lv-tile-content-wrap.lv-align-bottom-right {
+      padding-bottom: 18px;
     }
 
     /* 1. Stacked Mode (1 tile per row) */
@@ -381,11 +498,14 @@
       grid-column: auto !important;
       grid-row: auto !important;
     }
+    #shopify-section-{{ section.id }} .lv-mobile--grid_2 .lv-tile-content-wrap {
+      padding: 12px;
+    }
     #shopify-section-{{ section.id }} .lv-mobile--grid_2 .lv-tile-title {
       font-size: 13px !important;
       letter-spacing: 0.08em !important;
     }
-    #shopify-section-{{ section.id }} .lv-mobile--grid_2 .lv-tile-btn {
+    #shopify-section-{{ section.id }} .lv-mobile--grid_2 .lv-tile-btn:not(.lv-tile-btn--link) {
       padding: 5px 14px !important;
       font-size: 9.5px !important;
     }
@@ -395,6 +515,9 @@
       grid-template-columns: 1fr 1fr !important;
       grid-template-rows: 140px 140px !important;
       gap: 8px !important;
+    }
+    #shopify-section-{{ section.id }} .lv-mobile--mosaic > .lv-mosaic-tile {
+      aspect-ratio: auto !important;
     }
     #shopify-section-{{ section.id }} .lv-mobile--mosaic > .lv-mosaic-tile:nth-child(1) {
       grid-column: 1 !important;
@@ -411,11 +534,14 @@
       grid-row: 1 / span 2 !important;
       height: 100% !important;
     }
+    #shopify-section-{{ section.id }} .lv-mobile--mosaic .lv-tile-content-wrap {
+      padding: 12px;
+    }
     #shopify-section-{{ section.id }} .lv-mobile--mosaic .lv-tile-title {
       font-size: 13px !important;
       letter-spacing: 0.08em !important;
     }
-    #shopify-section-{{ section.id }} .lv-mobile--mosaic .lv-tile-btn {
+    #shopify-section-{{ section.id }} .lv-mobile--mosaic .lv-tile-btn:not(.lv-tile-btn--link) {
       padding: 5px 14px !important;
       font-size: 9.5px !important;
     }
@@ -442,17 +568,27 @@
   }
 </style>
 
+{%- capture mosaic_section_header -%}
+  {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+    <div class="lv-mosaic-header lv-mosaic-header--{{ heading_align }}{% if heading_pos == 'below' %} lv-mosaic-header--below{% endif %} text-{{ heading_align }}">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="kicker-flourished mb-r11">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subheading != blank -%}
+        <p class="lv-mosaic-header-sub">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+{%- endcapture -%}
+
 <div class="section-mosaic color-{{ section.settings.color_scheme | default: 'scheme-1' }} section-{{ section.id }}"
   data-section-id="{{ section.id }}"
   data-section-type="mosaic"
   style="--PT: {{ section.settings.padding_top | default: 20 }}px; --PB: {{ section.settings.padding_bottom | default: 30 }}px;">
-  
+
   <div class="wrapper--full section-padding">
-    {%- if section.settings.heading != blank -%}
-      <h2 class="kicker-flourished mb-r11">{{ section.settings.heading }}</h2>
-    {%- endif -%}
-    {%- if section.settings.subheading != blank -%}
-      <p style="text-align: center; font-family: 'Quicksand', sans-serif; font-size: 13.5px; font-weight: 500; color: var(--text, #2b2622); margin: -6px auto 26px auto; letter-spacing: 0.05em; max-width: 600px; opacity: 1;">{{ section.settings.subheading }}</p>
+    {%- if heading_pos == 'above' -%}
+      {{ mosaic_section_header }}
     {%- endif -%}
 
     <div class="lv-mosaic-wrap">
@@ -460,13 +596,40 @@
         {%- if section.blocks.size > 0 -%}
           {%- for block in section.blocks -%}
             {%- liquid
-              assign block_index = forloop.index
-              assign fallback_img = 'mosaic_' | append: block_index | append: '.jpg' | asset_url
+              assign fb_num = forloop.index | minus: 1 | modulo: 3 | plus: 1
+              assign fallback_asset = 'mosaic_' | append: fb_num | append: '.jpg'
 
               assign has_content = false
               if block.settings.title != blank or block.settings.subheading != blank or block.settings.button_label != blank
                 assign has_content = true
               endif
+
+              assign raw_pos = block.settings.text_position | default: 'middle-center' | replace: '_', '-'
+              if raw_pos == 'center'
+                assign norm_pos = 'middle-center'
+              else
+                assign norm_pos = raw_pos
+              endif
+
+              assign eff_align = 'center'
+              if norm_pos contains 'left'
+                assign eff_align = 'left'
+              elsif norm_pos contains 'right'
+                assign eff_align = 'right'
+              endif
+              assign text_align_pick = block.settings.text_align | default: 'auto'
+              if text_align_pick != 'auto'
+                assign eff_align = text_align_pick
+              endif
+
+              case eff_align
+                when 'left'
+                  assign btn_justify = 'flex-start'
+                when 'right'
+                  assign btn_justify = 'flex-end'
+                else
+                  assign btn_justify = 'center'
+              endcase
 
               assign overlay_val = block.settings.overlay_opacity
               if overlay_val == blank
@@ -480,6 +643,8 @@
               endif
 
               assign tile_scheme = block.settings.color_scheme | default: section.settings.color_scheme | default: 'scheme-5'
+              assign tile_tone = block.settings.text_tone | default: 'light'
+              assign tile_btn_style = block.settings.button_style | default: 'outline_light'
 
               assign tile_banner_url = block.settings.banner_link
               if tile_banner_url == blank
@@ -494,74 +659,68 @@
                 assign tile_button_url = tile_banner_url
               endif
 
-              assign block_img = block.settings.image
+              assign use_video = false
+              if block.settings.media_type == 'video'
+                if block.settings.video != blank or block.settings.video_mobile != blank
+                  assign use_video = true
+                endif
+              endif
+
               if section_ratio == 'adapt'
-                assign tile_ratio = block_img.aspect_ratio | default: 1.5
+                if use_video
+                  assign tile_ratio = block.settings.video.aspect_ratio | default: block.settings.video_mobile.aspect_ratio | default: 1.5
+                else
+                  assign tile_ratio = block.settings.image.aspect_ratio | default: 1.5
+                endif
               else
                 assign tile_ratio = section_ratio
               endif
 
-              if block.settings.image_mobile != blank and section_ratio == 'adapt'
-                assign tile_ratio_mobile = block.settings.image_mobile.aspect_ratio | default: tile_ratio
+              if section_ratio == 'adapt'
+                if use_video
+                  assign tile_ratio_mobile = block.settings.video_mobile.aspect_ratio | default: block.settings.video.aspect_ratio | default: tile_ratio
+                elsif block.settings.image_mobile != blank
+                  assign tile_ratio_mobile = block.settings.image_mobile.aspect_ratio | default: tile_ratio
+                else
+                  assign tile_ratio_mobile = tile_ratio
+                endif
               else
                 assign tile_ratio_mobile = tile_ratio
               endif
             -%}
 
-            <div class="lv-mosaic-tile lv-tile-{{ block.id }} {% if has_content %}has-content{% else %}image-only{% endif %} color-{{ tile_scheme }}{% if tile_banner_url != blank %} lv-mosaic-tile--clickable{% endif %}"
+            <div class="lv-mosaic-tile lv-tile-{{ block.id }} lv-tile-tone-{{ tile_tone }} {% if has_content %}has-content{% else %}image-only{% endif %} color-{{ tile_scheme }}{% if tile_banner_url != blank %} lv-mosaic-tile--clickable{% endif %}"
               style="--tile-aspect-ratio: {{ tile_ratio }}; --tile-aspect-ratio-mobile: {{ tile_ratio_mobile }};"
               {{ block.shopify_attributes }}>
-              
-              <!-- Tile Image Media -->
+
+              <!-- Tile Media (Image or Video) -->
               <div class="lv-tile-media">
-                {%- if block.settings.image != blank -%}
-                  {%- if block.settings.image_mobile != blank -%}
-                    <picture class="block w-full h-full">
-                      <source media="(max-width: 767px)" srcset="{{ block.settings.image_mobile | image_url: width: 1000 }}">
-                      <img
-                        src="{{ block.settings.image | image_url: width: 1600 }}"
-                        alt="{{ block.settings.title | default: block.settings.image.alt | default: 'Mosaic item' | escape }}"
-                        width="{{ block.settings.image.width | default: 1600 }}"
-                        height="{{ block.settings.image.height | default: 1200 }}"
-                        loading="lazy"
-                        class="lv-tile-img"
-                      >
-                    </picture>
-                  {%- else -%}
-                    <img
-                      src="{{ block.settings.image | image_url: width: 1600 }}"
-                      alt="{{ block.settings.title | default: block.settings.image.alt | default: 'Mosaic item' | escape }}"
-                      width="{{ block.settings.image.width | default: 1600 }}"
-                      height="{{ block.settings.image.height | default: 1200 }}"
-                      loading="lazy"
-                      class="lv-tile-img"
-                    >
-                  {%- endif -%}
-                {%- else -%}
-                  <img
-                    src="{{ fallback_img }}"
-                    alt="{{ block.settings.title | default: 'Mosaic item' | escape }}"
-                    width="1600"
-                    height="1200"
-                    loading="lazy"
-                    class="lv-tile-img"
-                  >
-                {%- endif -%}
+                {%- render 'banner-media',
+                  settings: block.settings,
+                  alt: block.settings.title,
+                  eager: false,
+                  fallback: fallback_asset
+                -%}
 
                 {%- if overlay_val > 0 -%}
-                  <div class="lv-tile-overlay" style="opacity: {{ overlay_val | divided_by: 100.0 }};"></div>
+                  {%- render 'banner-overlay',
+                    opacity: overlay_val,
+                    style: block.settings.overlay_style,
+                    position: norm_pos
+                  -%}
                 {%- endif -%}
               </div>
 
-              <!-- Full Tile Clickable Banner Link -->
+              <!-- Full Tile Clickable Link -->
               {%- if tile_banner_url != blank -%}
-                <a href="{{ tile_banner_url }}" class="lv-tile-clickable-link" aria-label="{{ block.settings.title | default: 'Mosaic banner' | escape }}"></a>
+                {%- assign mosaic_banner_fallback = 'sections.mosaic.banner_fallback' | t -%}
+                <a href="{{ tile_banner_url }}" class="lv-tile-clickable-link" aria-label="{{ block.settings.title | default: mosaic_banner_fallback | escape }}"></a>
               {%- endif -%}
 
-              <!-- Tile Text Content (Only if text or button provided) -->
+              <!-- Tile Text Content (Positioned via dropdown) -->
               {%- if has_content -%}
-                <div class="lv-tile-content-wrap lv-align-{{ block.settings.text_position | default: 'center' }}">
-                  <div class="lv-tile-content">
+                <div class="lv-tile-content-wrap lv-align-{{ norm_pos }}">
+                  <div class="lv-tile-content" style="text-align: {{ eff_align }};">
                     {%- if block.settings.subheading != blank -%}
                       <p class="lv-tile-subheading">{{ block.settings.subheading }}</p>
                     {%- endif -%}
@@ -569,15 +728,29 @@
                       <h3 class="lv-tile-title">{{ block.settings.title }}</h3>
                     {%- endif -%}
                     {%- if block.settings.button_label != blank -%}
-                      <div class="lv-tile-btn-wrap">
-                        {%- if tile_button_url != blank -%}
-                          <a href="{{ tile_button_url }}" class="btn btn--outline btn--white btn-sliding-hover lv-tile-btn">
-                            <span class="btn__text-content">{{ block.settings.button_label }}</span>
-                          </a>
+                      <div class="lv-tile-btn-wrap" style="--tile-btn-justify: {{ btn_justify }};">
+                        {%- if tile_btn_style == 'link' -%}
+                          {%- if tile_button_url != blank -%}
+                            <a href="{{ tile_button_url }}" class="lv-tile-btn lv-tile-btn--link">{{ block.settings.button_label }}</a>
+                          {%- else -%}
+                            <span class="lv-tile-btn lv-tile-btn--link">{{ block.settings.button_label }}</span>
+                          {%- endif -%}
+                        {%- elsif tile_btn_style == 'outline_light' -%}
+                          {%- if tile_button_url != blank -%}
+                            <a href="{{ tile_button_url }}" class="btn btn--outline btn--white btn-sliding-hover lv-tile-btn">
+                              <span class="btn__text-content">{{ block.settings.button_label }}</span>
+                            </a>
+                          {%- else -%}
+                            <span class="btn btn--outline btn--white btn-sliding-hover lv-tile-btn">
+                              <span class="btn__text-content">{{ block.settings.button_label }}</span>
+                            </span>
+                          {%- endif -%}
                         {%- else -%}
-                          <span class="btn btn--outline btn--white btn-sliding-hover lv-tile-btn">
-                            <span class="btn__text-content">{{ block.settings.button_label }}</span>
-                          </span>
+                          {%- if tile_button_url != blank -%}
+                            <a href="{{ tile_button_url }}" class="banner__btn banner__btn--{{ tile_btn_style | replace: '_', '-' }} lv-tile-btn">{{ block.settings.button_label }}</a>
+                          {%- else -%}
+                            <span class="banner__btn banner__btn--{{ tile_btn_style | replace: '_', '-' }} lv-tile-btn">{{ block.settings.button_label }}</span>
+                          {%- endif -%}
                         {%- endif -%}
                       </div>
                     {%- endif -%}
@@ -589,8 +762,14 @@
         {%- endif -%}
       </div>
     </div>
+
+    {%- if heading_pos == 'below' -%}
+      {{ mosaic_section_header }}
+    {%- endif -%}
   </div>
 </div>
+
+<script src="{{ 'banner.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {
@@ -611,6 +790,27 @@
       "type": "text",
       "id": "subheading",
       "label": "Section subheading"
+    },
+    {
+      "type": "select",
+      "id": "heading_position",
+      "label": "Heading & subheading placement",
+      "options": [
+        { "value": "above", "label": "Above grid" },
+        { "value": "below", "label": "Below grid" }
+      ],
+      "default": "above"
+    },
+    {
+      "type": "select",
+      "id": "heading_align",
+      "label": "Heading & subheading alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
     },
     {
       "type": "select",
@@ -637,7 +837,7 @@
         { "value": "small", "label": "Small (420px)" },
         { "value": "medium", "label": "Medium (520px - Recommended)" },
         { "value": "large", "label": "Large (640px)" },
-        { "value": "adapt", "label": "Adapt to images" }
+        { "value": "adapt", "label": "Adapt to media" }
       ],
       "default": "medium"
     },
@@ -647,7 +847,7 @@
       "label": "Aspect ratio (Desktop & Mobile)",
       "options": [
         { "value": "3_2", "label": "Landscape (3:2 - Recommended)" },
-        { "value": "adapt", "label": "Adapt to image (Never crops)" },
+        { "value": "adapt", "label": "Adapt to media (Never crops)" },
         { "value": "16_9", "label": "Widescreen (16:9)" },
         { "value": "1_1", "label": "Square (1:1)" },
         { "value": "4_5", "label": "Portrait (4:5)" },
@@ -655,7 +855,7 @@
         { "value": "fixed", "label": "Fixed height (Legacy)" }
       ],
       "default": "3_2",
-      "info": "Preserves the exact aspect ratio on all desktop and mobile devices so images never crop or distort."
+      "info": "Preserves the exact aspect ratio on all desktop and mobile devices so images and videos never crop or distort."
     },
     {
       "type": "select",
@@ -718,7 +918,7 @@
       "unit": "%",
       "label": "Default dark overlay opacity",
       "default": 0,
-      "info": "Global dark overlay for all tiles (0% = pure bright image). Can also be customized per tile block."
+      "info": "Global dark overlay for all tiles (0% = pure bright media). Can also be customized per tile block."
     }
   ],
   "blocks": [
@@ -733,14 +933,63 @@
           "default": "scheme-5"
         },
         {
+          "type": "header",
+          "content": "Media"
+        },
+        {
+          "type": "select",
+          "id": "media_type",
+          "label": "Media type",
+          "options": [
+            { "value": "image", "label": "Image" },
+            { "value": "video", "label": "Video" }
+          ],
+          "default": "image"
+        },
+        {
           "type": "image_picker",
           "id": "image",
-          "label": "Desktop image"
+          "label": "Desktop image",
+          "visible_if": "{{ block.settings.media_type == 'image' }}"
         },
         {
           "type": "image_picker",
           "id": "image_mobile",
-          "label": "Mobile image (Optional)"
+          "label": "Mobile image (Optional)",
+          "visible_if": "{{ block.settings.media_type == 'image' }}"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Desktop video",
+          "info": "Upload an MP4 (H.264), ideally under 10 MB. Plays muted and looped automatically.",
+          "visible_if": "{{ block.settings.media_type == 'video' }}"
+        },
+        {
+          "type": "video",
+          "id": "video_mobile",
+          "label": "Mobile video (Optional)",
+          "info": "Optional. Falls back to the desktop video.",
+          "visible_if": "{{ block.settings.media_type == 'video' }}"
+        },
+        {
+          "type": "select",
+          "id": "video_focus",
+          "label": "Video focus",
+          "options": [
+            { "value": "center", "label": "Center" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "center",
+          "info": "Which part of the video stays visible when it is cropped to fit the tile.",
+          "visible_if": "{{ block.settings.media_type == 'video' }}"
+        },
+        {
+          "type": "header",
+          "content": "Content"
         },
         {
           "type": "text",
@@ -755,8 +1004,8 @@
         {
           "type": "url",
           "id": "banner_link",
-          "label": "Banner link",
-          "info": "Clicking anywhere on this tile/banner will open this link"
+          "label": "Tile link",
+          "info": "Clicking anywhere on this tile will open this link"
         },
         {
           "type": "text",
@@ -767,7 +1016,7 @@
           "type": "url",
           "id": "button_link",
           "label": "Button link",
-          "info": "Link for button (Optional, defaults to banner link)"
+          "info": "Link for button (Optional, defaults to tile link)"
         },
         {
           "type": "url",
@@ -778,15 +1027,70 @@
         {
           "type": "select",
           "id": "text_position",
-          "label": "Text position",
+          "label": "Heading & subheading position",
           "options": [
-            { "value": "center", "label": "Center" },
-            { "value": "bottom_center", "label": "Bottom Center" },
-            { "value": "bottom_left", "label": "Bottom Left" },
-            { "value": "middle_left", "label": "Middle Left" },
-            { "value": "top_left", "label": "Top Left" }
+            { "value": "top-left", "label": "Top left" },
+            { "value": "top-center", "label": "Top center" },
+            { "value": "top-right", "label": "Top right" },
+            { "value": "middle-left", "label": "Middle left" },
+            { "value": "middle-center", "label": "Middle center" },
+            { "value": "middle-right", "label": "Middle right" },
+            { "value": "bottom-left", "label": "Bottom left" },
+            { "value": "bottom-center", "label": "Bottom center" },
+            { "value": "bottom-right", "label": "Bottom right" }
           ],
-          "default": "center"
+          "default": "middle-center"
+        },
+        {
+          "type": "select",
+          "id": "text_align",
+          "label": "Text alignment",
+          "info": "Auto follows the selected position.",
+          "options": [
+            { "value": "auto", "label": "Auto (follow position)" },
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "auto"
+        },
+        {
+          "type": "select",
+          "id": "text_tone",
+          "label": "Text color",
+          "options": [
+            { "value": "light", "label": "Light text (for dark images / video)" },
+            { "value": "dark", "label": "Dark text" },
+            { "value": "scheme", "label": "Use color scheme text color" }
+          ],
+          "default": "light"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            { "value": "outline_light", "label": "Outline light" },
+            { "value": "outline_dark", "label": "Outline dark" },
+            { "value": "solid_light", "label": "Solid light" },
+            { "value": "solid_dark", "label": "Solid dark" },
+            { "value": "link", "label": "Underlined text link" }
+          ],
+          "default": "outline_light"
+        },
+        {
+          "type": "header",
+          "content": "Overlay"
+        },
+        {
+          "type": "select",
+          "id": "overlay_style",
+          "label": "Overlay style",
+          "options": [
+            { "value": "full", "label": "Full tile" },
+            { "value": "gradient", "label": "Smooth gradient behind text only" }
+          ],
+          "default": "full"
         },
         {
           "type": "range",
@@ -797,7 +1101,7 @@
           "unit": "%",
           "label": "Dark overlay opacity",
           "default": 25,
-          "info": "Automatically 0% (clear image) if title and button are empty"
+          "info": "0% = pure bright media. Gradient fades from the chosen text position."
         }
       ]
     }

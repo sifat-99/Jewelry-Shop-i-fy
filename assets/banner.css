@@ -68,7 +68,7 @@
 }
 .banner__content {
   pointer-events: auto;
-  max-width: 640px;
+  max-width: var(--banner-content-w, 640px);
 }
 .banner__content--center { align-items: center; justify-content: center; text-align: center; }
 .banner__content--left { align-items: center; justify-content: flex-start; text-align: left; }
@@ -81,34 +81,47 @@
 .banner__content--bottom-right { align-items: flex-end; justify-content: flex-end; text-align: right; padding-bottom: clamp(30px, 6vw, 80px); }
 
 .banner__subheading {
-  font-size: clamp(11px, 1.2vw, 14px);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+  font-family: var(--FONT-STACK-SUBHEADING, inherit);
+  font-size: calc(clamp(11px, 1.2vw, 14px) * var(--FONT-ADJUST-ACCENT, 1));
+  letter-spacing: var(--FONT-SUBHEADING-LETTER-SPACING, 0.14em);
+  text-transform: var(--FONT-SUBHEADING-TRANSFORM, uppercase);
   margin: 0 0 12px;
-  font-weight: 600;
+  font-weight: var(--FONT-WEIGHT-SUBHEADING, 600);
 }
 .banner__title {
-  font-size: clamp(22px, 3.5vw, 44px);
-  letter-spacing: 0.08em;
-  line-height: 1.2;
+  font-family: var(--FONT-STACK-HEADING, inherit);
+  font-size: calc(clamp(22px, 3.5vw, 44px) * var(--FONT-ADJUST-HEADING, 1));
+  letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.08em);
+  line-height: 1.15;
   margin: 0 0 12px;
-  font-weight: 600;
-  text-transform: uppercase;
+  font-weight: var(--FONT-WEIGHT-HEADING, 600);
+  text-transform: var(--FONT-HEADING-TRANSFORM, uppercase);
 }
 .banner__text {
+  font-family: var(--FONT-STACK-BODY, inherit);
   font-size: clamp(13px, 1.3vw, 15px);
   line-height: 1.6;
   margin: 0 0 12px;
-  font-weight: 500;
+  font-weight: var(--FONT-WEIGHT-BODY, 500);
 }
+.banner__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  justify-content: var(--banner-btn-justify, flex-start);
+}
+.banner__buttons--stacked { flex-direction: column; align-items: var(--banner-btn-justify, flex-start); }
+.banner__buttons .banner__button { margin-top: 0; }
 .banner__button {
   display: inline-block;
   margin-top: 8px;
   padding: 12px 28px;
+  font-family: var(--TYPE-STACK-BUTTON, inherit);
   font-size: 11px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  font-weight: 600;
+  letter-spacing: var(--FONT-BUTTON-LETTER-SPACING, 0.15em);
+  text-transform: var(--FONT-BUTTON-TRANSFORM, uppercase);
+  font-weight: var(--TYPE-WEIGHT-BUTTON, 600);
 }
 
 /* Text tone. !important is needed because layout/theme.liquid forces heading colours. */
@@ -164,3 +177,29 @@
 @media (prefers-reduced-motion: reduce) {
   .banner__scroll-cue svg { animation: none; }
 }
+
+/* Banner button styles (Button 1 / Button 2 dropdowns). "Theme button" keeps the global Button colors. */
+.banner__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 30px;
+  border: var(--btn-border-thickness, 1px) solid transparent;
+  border-radius: var(--btn-radius, 0px);
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+.banner__btn--solid-dark { background: var(--lv-ink, #1a1a1a); color: var(--lv-ivory, #ffffff); border-color: var(--lv-ink, #1a1a1a); }
+.banner__btn--solid-dark:hover { background: var(--lv-ivory, #ffffff); color: var(--lv-ink, #1a1a1a); border-color: var(--lv-ivory, #ffffff); }
+.banner__btn--solid-light { background: var(--lv-ivory, #ffffff); color: var(--lv-ink, #1a1a1a); border-color: var(--lv-ivory, #ffffff); }
+.banner__btn--solid-light:hover { background: var(--lv-ink, #1a1a1a); color: var(--lv-ivory, #ffffff); border-color: var(--lv-ink, #1a1a1a); }
+.banner__btn--outline-light { background: transparent; color: var(--lv-ivory, #ffffff); border-color: var(--lv-ivory, #ffffff); }
+.banner__btn--outline-light:hover { background: var(--lv-ivory, #ffffff); color: var(--lv-ink, #1a1a1a); }
+.banner__btn--outline-dark { background: transparent; color: var(--lv-ink, #1a1a1a); border-color: var(--lv-ink, #1a1a1a); }
+.banner__btn--outline-dark:hover { background: var(--lv-ink, #1a1a1a); color: var(--lv-ivory, #ffffff); }
+
+/* Optional backdrop behind the banner text (colour + strength come from the slide settings) */
+.banner__content--bd { padding: clamp(18px, 2.4vw, 32px); border-radius: var(--card-radius, 0px); background: var(--banner-bd, rgba(0, 0, 0, 0.35)); }
+.banner__content--bd-glass { -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }

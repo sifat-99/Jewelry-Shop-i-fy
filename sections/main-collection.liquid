@@ -88,7 +88,7 @@
       background: var(--btn-soft-bg);
       border: 1px solid var(--btn-soft-border);
       border-radius: var(--btn-radius, 0px);
-      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-family: var(--TYPE-STACK-BUTTON, sans-serif);
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.12em;
@@ -116,7 +116,7 @@
       line-height: 1;
     }
     .collection-count-text {
-      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-family: var(--FONT-STACK-BODY, sans-serif);
       font-size: 12px;
       color: color-mix(in srgb, var(--text, #666666) 62%, transparent);
       white-space: nowrap;
@@ -137,7 +137,7 @@
       flex-shrink: 0 !important;
       margin: 0 !important;
       padding: 0 !important;
-      font-family: 'Quicksand', -apple-system, sans-serif !important;
+      font-family: var(--FONT-STACK-BODY, sans-serif) !important;
       font-size: 11px !important;
       font-weight: 600 !important;
       text-transform: uppercase !important;
@@ -159,7 +159,7 @@
       border: 1px solid var(--lv-border) !important;
       border-radius: var(--input-radius, var(--btn-radius, 0px)) !important;
       padding: 8px 30px 8px 14px !important;
-      font-family: 'Quicksand', -apple-system, sans-serif !important;
+      font-family: var(--FONT-STACK-BODY, sans-serif) !important;
       font-size: 11px !important;
       font-weight: 600 !important;
       text-transform: uppercase !important;
@@ -203,7 +203,7 @@
     html body .collection-sort-label { line-height: 1 !important; }
 
     /* Per-page bar (bottom of the product area) */
-    .collection-perpage { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "pager" "info"; justify-items: center; align-items: center; gap: 12px; margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--hairline, var(--lv-border)); font-family: 'Quicksand', -apple-system, sans-serif; }
+    .collection-perpage { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "pager" "info"; justify-items: center; align-items: center; gap: 12px; margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--hairline, var(--lv-border)); font-family: var(--FONT-STACK-BODY, sans-serif); }
     .collection-perpage--with-select { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-areas: "info pager select"; justify-items: stretch; gap: 16px; }
     .collection-perpage--with-select .collection-perpage__info { justify-self: start; }
     .collection-toolbar__right > .collection-perpage__select { margin-right: 4px; }
@@ -257,7 +257,7 @@
       display: inline-flex; align-items: center; justify-content: space-between; gap: 14px;
       box-sizing: border-box; height: 40px; min-width: 190px; padding: 0 14px;
       background: var(--bg, #fff); border: 1px solid var(--lv-border); border-radius: var(--input-radius, var(--btn-radius, 0px));
-      font-family: 'Quicksand', -apple-system, sans-serif; font-size: 11px; font-weight: 600;
+      font-family: var(--FONT-STACK-BODY, sans-serif); font-size: 11px; font-weight: 600;
       letter-spacing: .1em; text-transform: uppercase; color: var(--text, #111); cursor: pointer; white-space: nowrap;
       transition: border-color .2s ease;
     }
@@ -273,7 +273,7 @@
     .csd.is-open .csd__menu { opacity: 1; visibility: visible; transform: none; }
     .csd__opt {
       display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0; padding: 10px 16px;
-      font-family: 'Quicksand', -apple-system, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .1em;
+      font-family: var(--FONT-STACK-BODY, sans-serif); font-size: 11px; font-weight: 600; letter-spacing: .1em;
       text-transform: uppercase; color: color-mix(in srgb, var(--text, #333) 88%, transparent); cursor: pointer; white-space: nowrap;
     }
     .csd__opt:hover, .csd__opt.is-active { background: rgba(0,0,0,.05); color: var(--text, #000); }
@@ -423,11 +423,11 @@
       border-bottom: 1px solid var(--lv-border);
     }
     .filter-drawer__title {
-      font-family: 'Quicksand', -apple-system, sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
+      font-family: var(--FONT-STACK-HEADING, sans-serif);
+      font-size: 16px;
+      font-weight: var(--FONT-WEIGHT-HEADING, 600);
+      text-transform: var(--FONT-HEADING-TRANSFORM, uppercase);
+      letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.12em);
       margin: 0;
       display: flex;
       align-items: center;
@@ -475,7 +475,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-family: var(--FONT-STACK-BODY, sans-serif);
       font-size: 13px;
       font-weight: 600;
       text-transform: uppercase;
@@ -510,7 +510,7 @@
       justify-content: space-between;
       width: 100%;
       cursor: pointer;
-      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-family: var(--FONT-STACK-BODY, sans-serif);
       font-size: 13px;
       font-weight: 500;
       letter-spacing: 0.06em;
@@ -557,7 +557,7 @@
       background: none;
       border: none;
       padding: 10px 0 2px 0;
-      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-family: var(--TYPE-STACK-BUTTON, var(--FONT-STACK-BODY, sans-serif));
       font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
@@ -670,7 +670,7 @@
       outline: none !important;
       box-shadow: none !important;
       background: transparent !important;
-      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-family: var(--FONT-STACK-BODY, sans-serif);
       font-size: 14px;
       font-weight: 600;
       line-height: 1.2;
@@ -703,7 +703,7 @@
       color: var(--btn-regular-text, #ffffff);
       border: 1px solid var(--btn-regular-border, #000000);
       border-radius: var(--btn-radius, 0px);
-      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-family: var(--TYPE-STACK-BUTTON, sans-serif);
       font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
@@ -723,7 +723,7 @@
       color: var(--btn-soft-text, #000000);
       border: 1px solid var(--btn-soft-border, var(--lv-border));
       border-radius: var(--btn-radius, 0px);
-      font-family: 'Quicksand', -apple-system, sans-serif;
+      font-family: var(--TYPE-STACK-BUTTON, sans-serif);
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
@@ -876,7 +876,8 @@
         <div class="collection-hero__inner{% unless hero_media %} no-media{% endunless %}">
           <div class="collection-hero__text">
             {% render 'breadcrumb', current: collection.title %}
-            <h1 class="collection-hero__title">{{ collection.title | default: 'Collection' }}</h1>
+            {%- assign col_default_title = 'collections.general.collection_label' | t -%}
+            <h1 class="collection-hero__title">{{ collection.title | default: col_default_title }}</h1>
             {%- if hero_desc != blank -%}
               <div class="rte collection-hero__desc">{{ hero_desc }}</div>
             {%- endif -%}
@@ -895,7 +896,7 @@
     </div>
   </section>
   {%- if hero_links.size > 0 -%}
-    <nav class="collection-hero__pills-wrap wrapper--full section-padding" aria-label="Sub collections">
+    <nav class="collection-hero__pills-wrap wrapper--full section-padding" aria-label="{{ 'collections.general.sub_collections' | t }}">
       <div class="collection-hero__pills">
         {%- for link in hero_links -%}
           <a href="{{ link.url }}" class="collection-hero__pill"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a>
@@ -915,7 +916,7 @@
         <div class="collection-toolbar__left">
           {%- if section.settings.enable_filtering -%}
             <button type="button" class="collection-filter-toggle-btn" id="CollectionFiltersToggle" aria-haspopup="dialog" aria-expanded="false">
-              <span>Filters</span>
+              <span>{{ 'collections.filtering.filters' | t }}</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M21 7H3M18 12H6M15 17H9"/></svg>
               <span class="badge-count"{% if total_active_filters == 0 %} style="display:none"{% endif %}>{{ total_active_filters }}</span>
             </button>
@@ -923,7 +924,7 @@
 
           {%- if section.settings.show_products_count -%}
             <div class="collection-count-text">
-              <strong>{{ collection.products_count }}</strong> items
+              {{ 'collections.general.items_with_count_html' | t: count: collection.products_count }}
             </div>
           {%- endif -%}
         </div>
@@ -931,12 +932,11 @@
         {%- capture pp_select_html -%}
           <label class="collection-perpage__select">
             <span class="collection-perpage__box">
-              <select data-pp-select data-default="{{ pp_default }}" aria-label="Products per page">
+              <select data-pp-select data-default="{{ pp_default }}" aria-label="{{ 'collections.general.products_per_page' | t }}">
                 {%- for ov in pp_valid -%}<option value="{{ ov }}"{% if ov == pp_default %} selected{% endif %}>{{ ov }}</option>{%- endfor -%}
               </select>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
             </span>
-            {% comment %} <span class="collection-perpage__tail">per page</span> {% endcomment %}
           </label>
         {%- endcapture -%}
 
@@ -944,27 +944,27 @@
         <div class="collection-toolbar__right">
           {%- if pp_enabled and pp_position == 'top' -%}{{ pp_select_html }}{%- endif -%}
           {%- if section.settings.enable_view_toggle -%}
-            <div class="collection-view-toggle" role="group" aria-label="Product layout">
-              <button type="button" class="cvt__btn" data-view-btn="grid" aria-pressed="true" aria-label="Grid view" title="Grid view">
+            <div class="collection-view-toggle" role="group" aria-label="{{ 'collections.general.product_layout' | t }}">
+              <button type="button" class="cvt__btn" data-view-btn="grid" aria-pressed="true" aria-label="{{ 'collections.general.grid_view' | t }}" title="{{ 'collections.general.grid_view' | t }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7"/><rect x="13.5" y="3.5" width="7" height="7"/><rect x="3.5" y="13.5" width="7" height="7"/><rect x="13.5" y="13.5" width="7" height="7"/></svg>
               </button>
-              <button type="button" class="cvt__btn" data-view-btn="list" aria-pressed="false" aria-label="List view" title="List view">
+              <button type="button" class="cvt__btn" data-view-btn="list" aria-pressed="false" aria-label="{{ 'collections.general.list_view' | t }}" title="{{ 'collections.general.list_view' | t }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="4.5" height="4.5"/><rect x="3.5" y="15.5" width="4.5" height="4.5"/><path d="M12 6.25h8.5M12 17.75h8.5M12 9.5h5M12 21h5" stroke-width="1.6"/></svg>
               </button>
             </div>
           {%- endif -%}
           {%- if section.settings.enable_sorting -%}
             <div class="collection-sort-container">
-              <label for="CollectionSortBy" class="collection-sort-label">Sort by:</label>
+              <label for="CollectionSortBy" class="collection-sort-label">{{ 'collections.sorting.title' | t }}</label>
               <div class="collection-sort-select-wrapper">
                 <select id="CollectionSortBy" class="collection-sort-select">
-                  <option value="best-selling"{% if current_sort == 'best-selling' %} selected{% endif %}>Best selling</option>
-                  <option value="manual"{% if current_sort == 'manual' %} selected{% endif %}>Featured</option>
-                  <option value="price-ascending"{% if current_sort == 'price-ascending' %} selected{% endif %}>Price: Low to High</option>
-                  <option value="price-descending"{% if current_sort == 'price-descending' %} selected{% endif %}>Price: High to Low</option>
-                  <option value="title-ascending"{% if current_sort == 'title-ascending' %} selected{% endif %}>Alphabetically, A-Z</option>
-                  <option value="title-descending"{% if current_sort == 'title-descending' %} selected{% endif %}>Alphabetically, Z-A</option>
-                  <option value="created-descending"{% if current_sort == 'created-descending' %} selected{% endif %}>Date: New to Old</option>
+                  <option value="best-selling"{% if current_sort == 'best-selling' %} selected{% endif %}>{{ 'collections.sorting.best_selling' | t }}</option>
+                  <option value="manual"{% if current_sort == 'manual' %} selected{% endif %}>{{ 'collections.sorting.featured' | t }}</option>
+                  <option value="price-ascending"{% if current_sort == 'price-ascending' %} selected{% endif %}>{{ 'collections.sorting.price_ascending' | t }}</option>
+                  <option value="price-descending"{% if current_sort == 'price-descending' %} selected{% endif %}>{{ 'collections.sorting.price_descending' | t }}</option>
+                  <option value="title-ascending"{% if current_sort == 'title-ascending' %} selected{% endif %}>{{ 'collections.sorting.az' | t }}</option>
+                  <option value="title-descending"{% if current_sort == 'title-descending' %} selected{% endif %}>{{ 'collections.sorting.za' | t }}</option>
+                  <option value="created-descending"{% if current_sort == 'created-descending' %} selected{% endif %}>{{ 'collections.sorting.date_descending' | t }}</option>
                 </select>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
               </div>
@@ -978,7 +978,7 @@
       <!-- Active Filters Badges Bar -->
       {%- if total_active_filters > 0 -%}
         <div class="active-filters-bar">
-          <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em; color: color-mix(in srgb, var(--text, #777) 62%, transparent);">Active:</span>
+          <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em; color: color-mix(in srgb, var(--text, #777) 62%, transparent);">{{ 'collections.filtering.active' | t }}</span>
           {%- for filter in collection.filters -%}
             {%- for value in filter.active_values -%}
               <a href="{{ value.url_to_remove }}" class="active-filter-pill">
@@ -989,13 +989,13 @@
             {%- if filter.type == 'price_range' -%}
               {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
                 <a href="{{ filter.url_to_remove }}" class="active-filter-pill">
-                  <span>Price: {{ filter.min_value.value | default: 0 | money }} - {{ filter.max_value.value | default: filter.range_max | money }}</span>
+                  <span>{{ 'collections.filtering.price' | t }}: {{ filter.min_value.value | default: 0 | money }} - {{ filter.max_value.value | default: filter.range_max | money }}</span>
                   <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </a>
               {%- endif -%}
             {%- endif -%}
           {%- endfor -%}
-          <a href="{{ collection.url }}?sort_by={{ current_sort }}" class="active-filters-clear-all">Clear all</a>
+          <a href="{{ collection.url }}?sort_by={{ current_sort }}" class="active-filters-clear-all">{{ 'collections.filtering.clear_all' | t }}</a>
         </div>
       {%- endif -%}
 
@@ -1020,14 +1020,14 @@
           </div>
         {%- else -%}
           <div style="text-align: center; padding: 90px 20px;">
-            <p style="font-family: 'Quicksand', sans-serif; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text, #111); margin-bottom: 12px;">
-              No products found
+            <p style="font-family: var(--FONT-STACK-HEADING, sans-serif); font-size: 18px; font-weight: var(--FONT-WEIGHT-HEADING, 600); text-transform: var(--FONT-HEADING-TRANSFORM, uppercase); letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.1em); color: var(--text, #111); margin-bottom: 12px;">
+              {{ 'collections.general.no_matches' | t }}
             </p>
-            <p style="font-family: 'Quicksand', sans-serif; font-size: 13px; color: color-mix(in srgb, var(--text, #777) 62%, transparent); margin-bottom: 28px;">
-              Try adjusting or clearing your filters to see available pieces.
+            <p style="font-family: var(--FONT-STACK-BODY, sans-serif); font-size: 13px; color: color-mix(in srgb, var(--text, #777) 62%, transparent); margin-bottom: 28px;">
+              {{ 'collections.general.no_matches_hint' | t }}
             </p>
             <a href="{{ collection.url }}" class="btn btn--primary" style="display: inline-flex; padding: 12px 32px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em;">
-              <span>Clear All Filters</span>
+              <span>{{ 'collections.filtering.clear_all_filters' | t }}</span>
             </a>
           </div>
         {%- endif -%}
@@ -1052,15 +1052,15 @@
   {%- if section.settings.enable_filtering -%}
     <div class="filter-drawer-underlay" id="CollectionFilterUnderlay" aria-hidden="true"></div>
 
-    <aside class="filter-drawer" id="CollectionFilterDrawer" role="dialog" aria-modal="true" aria-label="Filters" style="--fd-bw: {{ settings.input_border_thickness | default: 1 }}px;">
+    <aside class="filter-drawer" id="CollectionFilterDrawer" role="dialog" aria-modal="true" aria-label="{{ 'collections.filtering.filters' | t }}" style="--fd-bw: {{ settings.input_border_thickness | default: 1 }}px;">
 
       <!-- Drawer Header -->
       <div class="filter-drawer__header">
         <h2 class="filter-drawer__title">
-          <span>Filters</span>
+          <span>{{ 'collections.filtering.filters' | t }}</span>
           <span class="badge-count" style="display:{% if total_active_filters > 0 %}inline-flex{% else %}none{% endif %}; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; border-radius:var(--badge-radius, 9px); background:var(--lv-ink, #000); color:#fff; font-size:10px;">{{ total_active_filters }}</span>
         </h2>
-        <button type="button" class="filter-drawer__close" id="CollectionFilterClose" aria-label="Close filters">
+        <button type="button" class="filter-drawer__close" id="CollectionFilterClose" aria-label="{{ 'collections.filtering.close_filters' | t }}">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
@@ -1117,7 +1117,7 @@
           <!-- 1. PRICE Group (Dual-Range Slider 1:1 Reference Match) -->
           <div class="filter-drawer__group is-open">
             <button type="button" class="filter-drawer__group-header filter-drawer__accordion-trigger" aria-expanded="true">
-              <span>Price</span>
+              <span>{{ 'collections.filtering.price' | t }}</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-drawer__accordion-icon"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <div class="filter-drawer__group-content">
@@ -1125,18 +1125,18 @@
                 <div class="price-slider-track-container">
                   <div class="price-slider-bar"></div>
                   <div class="price-slider-fill" id="PriceSliderFill"></div>
-                  <input type="range" class="price-slider-range" id="PriceRangeMin" min="{{ min_slider_val }}" max="{{ max_slider_val }}" value="{{ current_min_val }}" step="1" aria-label="Minimum price">
-                  <input type="range" class="price-slider-range" id="PriceRangeMax" min="{{ min_slider_val }}" max="{{ max_slider_val }}" value="{{ current_max_val }}" step="1" aria-label="Maximum price">
+                  <input type="range" class="price-slider-range" id="PriceRangeMin" min="{{ min_slider_val }}" max="{{ max_slider_val }}" value="{{ current_min_val }}" step="1" aria-label="{{ 'collections.filtering.min_price_slider' | t }}">
+                  <input type="range" class="price-slider-range" id="PriceRangeMax" min="{{ min_slider_val }}" max="{{ max_slider_val }}" value="{{ current_max_val }}" step="1" aria-label="{{ 'collections.filtering.max_price_slider' | t }}">
                 </div>
                 <div class="filter-price-inputs-row">
                   <div class="price-input-box">
                     <span class="currency-symbol">{{ cart.currency.symbol | default: '€' }}</span>
-                    <input type="number" id="FilterPriceGte" name="{{ price_min_name }}" min="{{ min_slider_val }}" max="{{ max_slider_val }}" value="{{ current_min_val }}" placeholder="{{ min_slider_val }}" aria-label="Min price">
+                    <input type="number" id="FilterPriceGte" name="{{ price_min_name }}" min="{{ min_slider_val }}" max="{{ max_slider_val }}" value="{{ current_min_val }}" placeholder="{{ min_slider_val }}" aria-label="{{ 'collections.filtering.min_price' | t }}">
                   </div>
                   <span class="price-separator">–</span>
                   <div class="price-input-box">
                     <span class="currency-symbol">{{ cart.currency.symbol | default: '€' }}</span>
-                    <input type="number" id="FilterPriceLte" name="{{ price_max_name }}" min="0" max="{{ max_slider_val }}" value="{{ current_max_val }}" placeholder="{{ max_slider_val }}" aria-label="Max price">
+                    <input type="number" id="FilterPriceLte" name="{{ price_max_name }}" min="0" max="{{ max_slider_val }}" value="{{ current_max_val }}" placeholder="{{ max_slider_val }}" aria-label="{{ 'collections.filtering.max_price' | t }}">
                   </div>
                 </div>
               </div>
@@ -1146,87 +1146,87 @@
           <!-- 2. STYLE Group (10 Items with Show More) -->
           <div class="filter-drawer__group is-open">
             <button type="button" class="filter-drawer__group-header filter-drawer__accordion-trigger" aria-expanded="true">
-              <span>Style</span>
+              <span>{{ 'collections.filtering.style' | t }}</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-drawer__accordion-icon"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <div class="filter-drawer__group-content">
               <ul class="filter-drawer__list" id="FilterStyleList">
                 <li class="filter-drawer__item">
                   <label for="FilterStyle-1">
-                    <span class="filter-label-text">Basis Armbanden</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.styles.basic_bracelets' | t }}</span>
                     <input type="checkbox" id="FilterStyle-1" name="filter.p.tag" value="Basis Armbanden" data-filter-type="style">
                   </label>
                 </li>
                 <li class="filter-drawer__item">
                   <label for="FilterStyle-2">
-                    <span class="filter-label-text">Bedel Armbanden</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.styles.charm_bracelets' | t }}</span>
                     <input type="checkbox" id="FilterStyle-2" name="filter.p.tag" value="Bedel Armbanden" data-filter-type="style">
                   </label>
                 </li>
                 <li class="filter-drawer__item">
                   <label for="FilterStyle-3">
-                    <span class="filter-label-text">Bloemetjes Armbanden</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.styles.flower_bracelets' | t }}</span>
                     <input type="checkbox" id="FilterStyle-3" name="filter.p.tag" value="Bloemetjes Armbanden" data-filter-type="style">
                   </label>
                 </li>
                 <li class="filter-drawer__item">
                   <label for="FilterStyle-4">
-                    <span class="filter-label-text">Dubbele Armbanden</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.styles.double_bracelets' | t }}</span>
                     <input type="checkbox" id="FilterStyle-4" name="filter.p.tag" value="Dubbele Armbanden" data-filter-type="style">
                   </label>
                 </li>
                 <li class="filter-drawer__item">
                   <label for="FilterStyle-5">
-                    <span class="filter-label-text">Grove Ringen</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.styles.chunky_rings' | t }}</span>
                     <input type="checkbox" id="FilterStyle-5" name="filter.p.tag" value="Grove Ringen" data-filter-type="style">
                   </label>
                 </li>
                 <li class="filter-drawer__item">
                   <label for="FilterStyle-6">
-                    <span class="filter-label-text">Hangende Oorbellen</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.styles.drop_earrings' | t }}</span>
                     <input type="checkbox" id="FilterStyle-6" name="filter.p.tag" value="Hangende Oorbellen" data-filter-type="style">
                   </label>
                 </li>
                 <li class="filter-drawer__item">
                   <label for="FilterStyle-7">
-                    <span class="filter-label-text">Hanger Kettingen</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.styles.pendant_necklaces' | t }}</span>
                     <input type="checkbox" id="FilterStyle-7" name="filter.p.tag" value="Hanger Kettingen" data-filter-type="style">
                   </label>
                 </li>
                 <li class="filter-drawer__item is-extra-item" style="display: none;">
                   <label for="FilterStyle-8">
-                    <span class="filter-label-text">Schakelarmbanden</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.styles.link_bracelets' | t }}</span>
                     <input type="checkbox" id="FilterStyle-8" name="filter.p.tag" value="Schakelarmbanden" data-filter-type="style">
                   </label>
                 </li>
                 <li class="filter-drawer__item is-extra-item" style="display: none;">
                   <label for="FilterStyle-9">
-                    <span class="filter-label-text">Statement Ringen</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.styles.statement_rings' | t }}</span>
                     <input type="checkbox" id="FilterStyle-9" name="filter.p.tag" value="Statement Ringen" data-filter-type="style">
                   </label>
                 </li>
                 <li class="filter-drawer__item is-extra-item" style="display: none;">
                   <label for="FilterStyle-10">
-                    <span class="filter-label-text">Subtiele Armbanden</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.styles.delicate_bracelets' | t }}</span>
                     <input type="checkbox" id="FilterStyle-10" name="filter.p.tag" value="Subtiele Armbanden" data-filter-type="style">
                   </label>
                 </li>
               </ul>
-              <button type="button" class="filter-drawer__show-more-btn" id="StyleShowMoreBtn">Show More</button>
+              <button type="button" class="filter-drawer__show-more-btn" id="StyleShowMoreBtn">{{ 'collections.filtering.show_more' | t }}</button>
             </div>
           </div>
 
           <!-- 3. MATERIALS Group -->
           <div class="filter-drawer__group is-open">
             <button type="button" class="filter-drawer__group-header filter-drawer__accordion-trigger" aria-expanded="true">
-              <span>Materials</span>
+              <span>{{ 'collections.filtering.materials' | t }}</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-drawer__accordion-icon"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <div class="filter-drawer__group-content">
               <ul class="filter-drawer__list">
                 <li class="filter-drawer__item">
                   <label for="FilterMaterial-1">
-                    <span class="filter-label-text">Stainless Steel</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.materials_list.stainless_steel' | t }}</span>
                     <input type="checkbox" id="FilterMaterial-1" name="filter.p.tag" value="Stainless Steel" data-filter-type="material">
                   </label>
                 </li>
@@ -1237,14 +1237,14 @@
           <!-- 4. TO COLOUR Group -->
           <div class="filter-drawer__group is-open">
             <button type="button" class="filter-drawer__group-header filter-drawer__accordion-trigger" aria-expanded="true">
-              <span>To Colour</span>
+              <span>{{ 'collections.filtering.colour' | t }}</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-drawer__accordion-icon"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <div class="filter-drawer__group-content">
               <ul class="filter-drawer__list">
                 <li class="filter-drawer__item">
                   <label for="FilterColor-1">
-                    <span class="filter-label-text">Goud</span>
+                    <span class="filter-label-text">{{ 'collections.filtering.colours_list.gold' | t }}</span>
                     <input type="checkbox" id="FilterColor-1" name="filter.v.option.color" value="Goud" data-filter-type="color">
                   </label>
                 </li>
@@ -1255,7 +1255,7 @@
           <!-- 5. RING SIZE Group (16, 17, 18) -->
           <div class="filter-drawer__group is-open">
             <button type="button" class="filter-drawer__group-header filter-drawer__accordion-trigger" aria-expanded="true">
-              <span>Ring Size</span>
+              <span>{{ 'collections.filtering.ring_size' | t }}</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-drawer__accordion-icon"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <div class="filter-drawer__group-content">
@@ -1287,11 +1287,12 @@
 
       <!-- Drawer Footer Action Buttons -->
       <div class="filter-drawer__footer">
+        {%- capture filter_count_span -%}<span id="FilterResultCount">{{ collection.products_count }}</span>{%- endcapture -%}
         <button type="button" class="filter-drawer__apply-btn btn btn--primary" id="FilterViewResults">
-          <span>View <span id="FilterResultCount">{{ collection.products_count }}</span> results</span>
+          <span>{{ 'collections.filtering.view_results_html' | t: count: filter_count_span }}</span>
         </button>
         <a href="{{ collection.url }}?sort_by={{ current_sort }}" class="filter-drawer__clear-btn btn--soft" id="FilterResetBtn">
-          <span>Clear</span>
+          <span>{{ 'collections.filtering.clear' | t }}</span>
         </a>
       </div>
 
@@ -1372,6 +1373,10 @@
       });
 
       // 2. Style "Show More" / "Show Less" Toggle
+      var mcI18n = {
+        showMore: {{ 'collections.filtering.show_more' | t | json }},
+        showLess: {{ 'collections.filtering.show_less' | t | json }}
+      };
       var showMoreBtn = document.getElementById('StyleShowMoreBtn');
       if (showMoreBtn) {
         showMoreBtn.onclick = function() {
@@ -1381,7 +1386,7 @@
             item.style.display = isExpanded ? 'none' : 'block';
           });
           showMoreBtn.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
-          showMoreBtn.textContent = isExpanded ? 'Show More' : 'Show Less';
+          showMoreBtn.textContent = isExpanded ? mcI18n.showMore : mcI18n.showLess;
         };
       }
 
@@ -1479,7 +1484,7 @@
           if (extraParent && showMoreBtn) {
             extraParent.style.display = 'block';
             showMoreBtn.setAttribute('data-expanded', 'true');
-            showMoreBtn.textContent = 'Show Less';
+            showMoreBtn.textContent = mcI18n.showLess;
           }
         }
       });
@@ -1796,6 +1801,17 @@
     var KEY = 'lv-collection-perpage';
     var ARROW_L = '<svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>';
     var ARROW_R = '<svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>';
+    var ppI18n = {
+      show: {{ 'collections.general.show_label' | t | json }},
+      paginationLabel: {{ 'general.pagination.label' | t | json }},
+      prev: {{ 'general.pagination.previous' | t | json }},
+      prevAria: {{ 'general.pagination.previous_aria' | t | json }},
+      next: {{ 'general.pagination.next' | t | json }},
+      nextAria: {{ 'general.pagination.next_aria' | t | json }},
+      pageAria: {{ 'general.pagination.page_aria' | t: page: '__PAGE__' | json }},
+      summary: {{ 'general.pagination.summary' | t: current: '__CURRENT__', total: '__TOTAL__', items: '__ITEMS__' | json }}
+    };
+    function escHtml(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
 
     /* Same custom dropdown as "Sort by" (classes .csd*), built from the native select (which stays as the fallback) */
     function buildDropdown(sel) {
@@ -1815,7 +1831,7 @@
       btn.className = 'csd__btn';
       btn.setAttribute('aria-haspopup', 'listbox');
       btn.setAttribute('aria-expanded', 'false');
-      btn.innerHTML = '<span><span class="csd__lead">Show</span><span data-csd-val></span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+      btn.innerHTML = '<span><span class="csd__lead">' + escHtml(ppI18n.show) + '</span><span data-csd-val></span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
       var menu = document.createElement('ul');
       menu.className = 'csd__menu';
       menu.setAttribute('role', 'listbox');
@@ -1924,11 +1940,11 @@
         if (last <= 1) return;
         var nav = document.createElement('nav');
         nav.className = 'lv-pagination-wrapper';
-        nav.setAttribute('aria-label', 'Pagination');
+        nav.setAttribute('aria-label', ppI18n.paginationLabel);
         var ul = document.createElement('ul');
         ul.className = 'lv-pagination';
         ul.setAttribute('role', 'list');
-        ul.appendChild(pageBtn(ARROW_L + '<span class="lv-pagination__arrow-text">Prev</span>', v - 1, 'lv-pagination__arrow lv-pagination__prev', 'Previous page', v === 1));
+        ul.appendChild(pageBtn(ARROW_L + '<span class="lv-pagination__arrow-text">' + escHtml(ppI18n.prev) + '</span>', v - 1, 'lv-pagination__arrow lv-pagination__prev', ppI18n.prevAria, v === 1));
         var list = [];
         for (var i = 1; i <= last; i++) { if (i === 1 || i === last || Math.abs(i - v) <= 1) list.push(i); }
         var prev = 0;
@@ -1945,11 +1961,11 @@
             cur.innerHTML = '<span class="lv-pagination__current" aria-current="page">' + i + '</span>';
             ul.appendChild(cur);
           } else {
-            ul.appendChild(pageBtn(String(i), i, 'lv-pagination__link', 'Page ' + i, false));
+            ul.appendChild(pageBtn(String(i), i, 'lv-pagination__link', ppI18n.pageAria.replace('__PAGE__', i), false));
           }
           prev = i;
         });
-        ul.appendChild(pageBtn('<span class="lv-pagination__arrow-text">Next</span>' + ARROW_R, v + 1, 'lv-pagination__arrow lv-pagination__next', 'Next page', v === last));
+        ul.appendChild(pageBtn('<span class="lv-pagination__arrow-text">' + escHtml(ppI18n.next) + '</span>' + ARROW_R, v + 1, 'lv-pagination__arrow lv-pagination__next', ppI18n.nextAria, v === last));
         nav.appendChild(ul);
         pagerBox.appendChild(nav);
       }
@@ -1957,7 +1973,7 @@
       function render(scroll) {
         var offset = (v - 1) * n - (serverPage - 1) * B;
         cards.forEach(function (c, idx) { c.classList.toggle('is-pp-hidden', idx < offset || idx >= offset + n); });
-        info.textContent = total ? ('Page ' + v + ' of ' + pages() + ' (' + total + ' total)') : '';
+        info.textContent = total ? ppI18n.summary.replace('__CURRENT__', v).replace('__TOTAL__', pages()).replace('__ITEMS__', total) : '';
         buildPager();
         try {
           var u = new URL(window.location.href);
