@@ -8,6 +8,47 @@
     "showcase_video": "Showcase video",
     "skip_to_text": "Skip to content"
   },
+  "blogs": {
+    "article": {
+      "all_articles": "All stories",
+      "back_to_blog": "Back to {{ title }}",
+      "by_author": "By {{ author }}",
+      "comments": {
+        "one": "{{ count }} comment",
+        "other": "{{ count }} comments"
+      },
+      "copied": "Link copied",
+      "email": "Email",
+      "error_heading": "Please check the form below",
+      "featured_badge": "Featured Story",
+      "leave_comment": "Leave a comment",
+      "message": "Comment",
+      "moderated": "Please note, comments need to be approved before they are published.",
+      "name": "Name",
+      "next_article": "Next story",
+      "post": "Post comment",
+      "posted": "Your comment was posted successfully! Thank you!",
+      "posted_moderated": "Your comment was posted successfully. We will publish it after review.",
+      "previous_article": "Previous story",
+      "read_article": "Read article",
+      "read_more": "Read more",
+      "read_time": "{{ minutes }} min read",
+      "related_title": "More from the Journal",
+      "share": "Share",
+      "shop_story_cta": "Shop the collection",
+      "shop_story_title": "Featured Pieces",
+      "tags": "Topics"
+    },
+    "general": {
+      "all_tags": "All",
+      "empty_cta": "Explore jewelry",
+      "empty_text": "We are crafting new stories, styling notes, and material guides for you soon.",
+      "empty_title": "No journal entries yet",
+      "eyebrow": "The Aurelle Journal",
+      "filter_by_tag": "Filter stories by topic",
+      "subtitle": "Material craftsmanship, waterproof jewelry care, and the stories behind our pieces."
+    }
+  },
   "breadcrumbs": {
     "all_products": "All products",
     "home": "Home",
@@ -60,6 +101,13 @@
       }
     },
     "payment_methods": "Accepted payment methods",
+    "remove_confirm": {
+      "cancel": "Keep item",
+      "confirm": "Remove",
+      "message": "Are you sure you want to remove {{ title }} from your cart?",
+      "message_generic": "Are you sure you want to remove this item from your cart?",
+      "title": "Remove item?"
+    },
     "shipping": {
       "no_shipping_available": "No shipping rates available for this destination"
     },
@@ -416,15 +464,19 @@
       "tags": "Tagged \"{{ tags }}\""
     },
     "newsletter_form": {
+      "badge": "10% off your first order",
       "code_html": "Use code <strong>{{ code }}</strong> at checkout.",
       "email_label": "Email address",
       "email_placeholder": "Enter your email address...",
       "email_placeholder_short": "Your email address",
+      "heading": "Join the Aurelle list",
       "invalid_email": "Please enter a valid email address.",
       "join": "Subscribe",
       "newsletter_confirmation": "Thank you for subscribing!",
+      "note": "No spam. Unsubscribe anytime.",
       "submit": "Subscribe",
-      "success": "Welcome to the list — you're subscribed."
+      "success": "Welcome to the list — you're subscribed.",
+      "text": "Be the first to hear about new collections, engraving offers and private sales."
     },
     "pagination": {
       "label": "Pagination",
@@ -450,6 +502,7 @@
       "page_title": "Opening Soon &ndash; {{ shop_name }}"
     },
     "search": {
+      "articles": "Journal",
       "browse_collections": "Browse collections",
       "clear": "Clear",
       "clear_search": "Clear search",
@@ -464,6 +517,7 @@
       "page_eyebrow": "Search our atelier",
       "page_lead": "Find engraved pieces, waterproof staples, necklaces, rings, and gifts.",
       "page_placeholder": "Search rings, necklaces, engraving...",
+      "pages": "Pages",
       "placeholder": "Search our jewelry collection...",
       "popular_label": "Popular:",
       "popular_terms": "Gold Ring, Necklace, Bracelet, Engraving, Earrings",

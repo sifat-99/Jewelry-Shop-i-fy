@@ -1033,6 +1033,20 @@
         "default": true
       },
       {
+        "type": "checkbox",
+        "id": "card_show_quick_add_mobile",
+        "label": "Show Add to Cart button on mobile",
+        "default": true,
+        "info": "Controls globally across all product cards whether the Add to Cart / quick-add button appears on mobile devices (767px and below)."
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_list_add_mobile",
+        "label": "Show Add to Cart button in mobile list view",
+        "default": true,
+        "info": "Shows an Add to Cart button below title and price in collection list view on mobile devices (767px and below)."
+      },
+      {
         "type": "header",
         "content": "Compact add button (phones, 450px and below)"
       },
@@ -1495,6 +1509,13 @@
         "default": true
       },
       {
+        "type": "checkbox",
+        "id": "card_show_discount_badge_mobile",
+        "label": "Show Sale badge on mobile",
+        "default": true,
+        "info": "Controls globally whether the % OFF / SALE badge appears on mobile devices (767px and below)."
+      },
+      {
         "type": "select",
         "id": "sale_badge_type",
         "label": "Sale badge text",
@@ -1529,7 +1550,11 @@
           },
           {
             "value": "minimal_capsule",
-            "label": "Minimal capsule"
+            "label": "Minimal capsule (rounded)"
+          },
+          {
+            "value": "minimal_square",
+            "label": "Minimal square (0px radius)"
           }
         ],
         "default": "classic_ribbon"
@@ -1545,6 +1570,66 @@
         "id": "sale_badge_text",
         "label": "Sale badge text color",
         "default": "#ffffff"
+      },
+      {
+        "type": "range",
+        "id": "sale_badge_font_size",
+        "min": 8,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "label": "Sale badge font size",
+        "default": 11,
+        "info": "Adjust the text size of the sale badge (cards and product page)."
+      },
+      {
+        "type": "paragraph",
+        "content": "Minimal Capsule Badge Options"
+      },
+      {
+        "type": "select",
+        "id": "sale_badge_shape",
+        "label": "Badge corner radius / shape",
+        "options": [
+          {
+            "value": "capsule",
+            "label": "Capsule / Pill (Rounded - as is)"
+          },
+          {
+            "value": "square",
+            "label": "Square (0px - no radius)"
+          }
+        ],
+        "default": "capsule",
+        "info": "Choose between rounded capsule (as is) or sharp square box (no border radius)."
+      },
+      {
+        "type": "color",
+        "id": "sale_badge_capsule_bg",
+        "label": "Capsule background color",
+        "default": "#fffcf6",
+        "info": "Background fill color for the Minimal capsule badge."
+      },
+      {
+        "type": "checkbox",
+        "id": "sale_badge_capsule_transparent",
+        "label": "Make capsule background transparent",
+        "default": false,
+        "info": "When enabled, removes solid fill and makes the capsule background transparent."
+      },
+      {
+        "type": "color",
+        "id": "sale_badge_capsule_text",
+        "label": "Capsule text color",
+        "default": "#8c2b3f",
+        "info": "Text color for Minimal capsule badge."
+      },
+      {
+        "type": "color",
+        "id": "sale_badge_capsule_border",
+        "label": "Capsule border color",
+        "default": "#c5a76a",
+        "info": "Border outline color for Minimal capsule badge."
       },
       {
         "type": "header",

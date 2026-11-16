@@ -18,6 +18,10 @@
     "palette_control": true,
     "palette_preset": "champagne",
     "palette_button_style": "gold",
+    "typo_heading_font": "playfair_display",
+    "nav_font_size": 13,
+    "nav_font_weight": "600",
+    "nav_uppercase": true,
     "page_width": 1600,
     "spacing_sections": 30,
     "grid_horizontal_space": 20,
@@ -43,6 +47,7 @@
     "card_hover_effect": "zoom",
     "show_vendor": false,
     "card_show_quick_add": true,
+    "card_show_quick_add_mobile": false,
     "card_mini_add_popup": "button",
     "card_show_quickview": false,
     "card_show_wishlist": false,
@@ -75,8 +80,8 @@
     "card_price_size": 18,
     "card_show_discount_badge": true,
     "sale_badge_type": "percentage",
-    "sale_badge_design": "fine_jewelry_tag",
-    "sale_badge_bg": "#8c2b3f",
+    "sale_badge_design": "minimal_capsule",
+    "sale_badge_bg": "#8C2B3F",
     "sale_badge_text": "#ffffff",
     "badge_corner_radius": 0,
     "cart_checkout_position": "after_items",
@@ -91,43 +96,11 @@
     "cart_checkout_button_text_size": 14,
     "social_instagram_link": "https://www.instagram.com/",
     "social_tiktok_link": "https://www.tiktok.com/",
-    "nav_font_size": 13,
-    "nav_font_weight": "600",
-    "nav_uppercase": true,
     "color_bg": "#ffffff",
     "color_text": "#000000",
     "color_primary": "#000000",
     "color_accent": "#fbf9f8",
     "content_for_index": [],
-    "blocks": {
-      "15683396631634586217": {
-        "type": "shopify://apps/inbox/blocks/chat/841fc607-4181-4ad1-842d-e24d7f8bad6b",
-        "disabled": false,
-        "settings": {
-          "greeting_message": "",
-          "show_featured_products": true,
-          "featured_products": [
-            "engraved-name-ring-6426536",
-            "custom-child-silhouette-keychain-d9032fa",
-            "black-fingerprint-cast-forever-sealed-memorial-keychain-0f6c0c5"
-          ],
-          "background_color": "#ffffff",
-          "font_color": "#000000",
-          "agent_invert_activator_colors": true,
-          "button_color": "#000000",
-          "launcher_style": "button",
-          "button_icon": "question_mark",
-          "button_text": "help",
-          "button_horizontal_position": "bottom_right",
-          "button_vertical_position": "lowest",
-          "agent_inherit_fonts": true,
-          "agent_font": "system_ui_n4",
-          "agent_font_size": 14,
-          "agent_activator_font_size": 16,
-          "agent_border_radius": 0
-        }
-      }
-    },
     "color_schemes": {
       "scheme-1": {
         "settings": {

@@ -1,0 +1,747 @@
+{% doc %}
+  Section: Sale
+  Promotional sale banner featuring desktop and mobile image upload, customizable left-aligned content (eyebrow, prominent heading, description, call-to-action buttons), soft left gradient overlay for contrast, and mobile-responsive layout options.
+{% enddoc %}
+
+{%- liquid
+  assign sid = section.id
+  assign img_desktop = section.settings.image
+  assign img_mobile = section.settings.image_mobile | default: img_desktop
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign overlay_opacity = section.settings.overlay_opacity | default: 20 | divided_by: 100.0
+  assign overlay_color = section.settings.overlay_color | default: '#000000'
+  assign content_align_h = section.settings.content_align_h | default: 'left'
+  assign content_align_v = section.settings.content_align_v | default: 'center'
+  assign mobile_align_h = section.settings.mobile_align_h | default: 'left'
+  assign mobile_layout = section.settings.mobile_layout | default: 'overlay'
+-%}
+
+<div class="sale-section sale-section--{{ sid }}{% if section.settings.full_width %} sale-section--full{% else %} sale-section--contained page-width{% endif %}"
+     style="--sale-pt: {{ section.settings.padding_top | default: 0 }}px; --sale-pb: {{ section.settings.padding_bottom | default: 0 }}px;">
+
+  <div class="sale-banner sale-banner--mobile-{{ mobile_layout }}">
+    <!-- Background Media Container -->
+    <div class="sale-banner__media">
+      {%- if img_desktop != blank -%}
+        <picture>
+          {%- if section.settings.image_mobile != blank -%}
+            <source media="(max-width: 767px)"
+                    srcset="{{ section.settings.image_mobile | image_url: width: 450 }} 450w,
+                            {{ section.settings.image_mobile | image_url: width: 750 }} 750w,
+                            {{ section.settings.image_mobile | image_url: width: 1100 }} 1100w"
+                    sizes="100vw">
+          {%- endif -%}
+          <img class="sale-banner__img sale-banner__img--desktop"
+               src="{{ img_desktop | image_url: width: 1500 }}"
+               srcset="{{ img_desktop | image_url: width: 750 }} 750w,
+                       {{ img_desktop | image_url: width: 1100 }} 1100w,
+                       {{ img_desktop | image_url: width: 1500 }} 1500w,
+                       {{ img_desktop | image_url: width: 2000 }} 2000w,
+                       {{ img_desktop | image_url: width: 2600 }} 2600w"
+               sizes="{% if section.settings.full_width %}100vw{% else %}(min-width: 1200px) 1200px, 100vw{% endif %}"
+               alt="{{ img_desktop.alt | default: section.settings.heading | escape }}"
+               loading="lazy"
+               width="{{ img_desktop.width }}"
+               height="{{ img_desktop.height }}"
+               style="object-position: {{ section.settings.desktop_focal | default: 'center right' }};">
+        </picture>
+      {%- else -%}
+        <div class="sale-banner__placeholder">
+          {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+      {%- endif -%}
+
+      <!-- Optional Overlay for Text Legibility -->
+      {%- if section.settings.overlay_style != 'none' and overlay_opacity > 0 -%}
+        <div class="sale-banner__overlay sale-banner__overlay--{{ section.settings.overlay_style }}" aria-hidden="true"></div>
+      {%- endif -%}
+    </div>
+
+    <!-- Content Card (Left-aligned by default) -->
+    <div class="sale-banner__content-wrap">
+      <div class="sale-banner__content">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="sale-banner__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.heading != blank -%}
+          <{{ section.settings.heading_tag | default: 'h2' }} class="sale-banner__heading">
+            {{ section.settings.heading | escape | newline_to_br }}
+          </{{ section.settings.heading_tag | default: 'h2' }}>
+        {%- endif -%}
+
+        {%- if section.settings.description != blank -%}
+          <div class="sale-banner__desc">
+            {{ section.settings.description }}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.button_label != blank or section.settings.button_2_label != blank -%}
+          <div class="sale-banner__actions">
+            {%- if section.settings.button_label != blank -%}
+              <a href="{{ section.settings.button_link | default: '#' }}"
+                 class="sale-banner__btn sale-banner__btn--{{ section.settings.button_style | default: 'solid_white' }} sale-banner__btn--1">
+                {{ section.settings.button_label | escape }}
+              </a>
+            {%- endif -%}
+
+            {%- if section.settings.button_2_label != blank -%}
+              <a href="{{ section.settings.button_2_link | default: '#' }}"
+                 class="sale-banner__btn sale-banner__btn--{{ section.settings.button_2_style | default: 'outline' }} sale-banner__btn--2">
+                {{ section.settings.button_2_label | escape }}
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .sale-section--{{ sid }} {
+    padding-top: var(--sale-pt);
+    padding-bottom: var(--sale-pb);
+  }
+  .sale-section--contained {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .sale-section--{{ sid }} .sale-banner {
+    position: relative;
+    width: 100%;
+    min-height: {{ section.settings.desktop_height | default: 460 }}px;
+    display: flex;
+    overflow: hidden;
+    background-color: {{ section.settings.bg_color | default: '#ece6df' }};
+  }
+
+  /* Desktop Media */
+  .sale-section--{{ sid }} .sale-banner__media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .sale-section--{{ sid }} .sale-banner__media picture,
+  .sale-section--{{ sid }} .sale-banner__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .sale-section--{{ sid }} .sale-banner__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e5ded4;
+    color: #9c8e7e;
+  }
+  .sale-section--{{ sid }} .sale-banner__placeholder svg {
+    width: 100%;
+    height: 100%;
+    max-height: 500px;
+  }
+
+  /* Overlays */
+  .sale-section--{{ sid }} .sale-banner__overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .sale-section--{{ sid }} .sale-banner__overlay--gradient_left {
+    background: linear-gradient(
+      to right,
+      {{ overlay_color }} 0%,
+      color-mix(in srgb, {{ overlay_color }} 75%, transparent) 35%,
+      color-mix(in srgb, {{ overlay_color }} 30%, transparent) 60%,
+      transparent 85%
+    );
+    opacity: {{ overlay_opacity | times: 1.5 | at_most: 1.0 }};
+  }
+  .sale-section--{{ sid }} .sale-banner__overlay--full {
+    background-color: {{ overlay_color }};
+    opacity: {{ overlay_opacity }};
+  }
+
+  /* Content Wrapper */
+  .sale-section--{{ sid }} .sale-banner__content-wrap {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    display: flex;
+    box-sizing: border-box;
+    padding: 48px clamp(20px, 5vw, 80px);
+    align-items: {% case content_align_v %}{% when 'top' %}flex-start{% when 'bottom' %}flex-end{% else %}center{% endcase %};
+    justify-content: {% case content_align_h %}{% when 'center' %}center{% when 'right' %}flex-end{% else %}flex-start{% endcase %};
+  }
+
+  .sale-section--{{ sid }} .sale-banner__content {
+    max-width: {{ section.settings.content_max_width | default: 520 }}px;
+    width: 100%;
+    color: {{ text_color }};
+    text-align: {{ content_align_h }};
+  }
+
+  /* Typography */
+  .sale-section--{{ sid }} .sale-banner__eyebrow {
+    margin: 0 0 14px 0;
+    font-size: {{ section.settings.eyebrow_size | default: 12 }}px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: {{ text_color }};
+    opacity: 0.88;
+    line-height: 1.3;
+  }
+
+  .sale-section--{{ sid }} .sale-banner__heading {
+    margin: 0 0 16px 0;
+    font-size: clamp(28px, 4vw, {{ section.settings.heading_size | default: 46 }}px);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: {{ text_color }};
+  }
+
+  .sale-section--{{ sid }} .sale-banner__desc {
+    margin: 0 0 26px 0;
+    font-size: {{ section.settings.desc_size | default: 15 }}px;
+    line-height: 1.55;
+    color: {{ text_color }};
+    opacity: 0.92;
+    max-width: 480px;
+  }
+  .sale-section--{{ sid }} .sale-banner__desc p { margin: 0; }
+
+  /* Actions & Buttons */
+  .sale-section--{{ sid }} .sale-banner__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    justify-content: {% case content_align_h %}{% when 'center' %}center{% when 'right' %}flex-end{% else %}flex-start{% endcase %};
+  }
+
+  .sale-section--{{ sid }} .sale-banner__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 13px 28px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: {{ section.settings.button_radius | default: 0 }}px;
+    transition: transform .2s ease, background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .sale-section--{{ sid }} .sale-banner__btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+  }
+
+  /* Button Styles */
+  .sale-section--{{ sid }} .sale-banner__btn--solid_white {
+    background-color: {{ section.settings.btn_bg | default: '#ffffff' }};
+    color: {{ section.settings.btn_text | default: '#1a1a1a' }};
+    border: 1px solid {{ section.settings.btn_bg | default: '#ffffff' }};
+  }
+  .sale-section--{{ sid }} .sale-banner__btn--solid_white:hover {
+    background-color: color-mix(in srgb, {{ section.settings.btn_bg | default: '#ffffff' }} 90%, #000);
+    color: {{ section.settings.btn_text | default: '#1a1a1a' }};
+  }
+
+  .sale-section--{{ sid }} .sale-banner__btn--solid_accent {
+    background-color: var(--lv-accent-deep, #806745);
+    color: #ffffff;
+    border: 1px solid var(--lv-accent-deep, #806745);
+  }
+  .sale-section--{{ sid }} .sale-banner__btn--solid_accent:hover {
+    background-color: color-mix(in srgb, var(--lv-accent-deep, #806745) 85%, #000);
+  }
+
+  .sale-section--{{ sid }} .sale-banner__btn--outline {
+    background-color: transparent;
+    color: {{ text_color }};
+    border: 1.5px solid {{ text_color }};
+  }
+  .sale-section--{{ sid }} .sale-banner__btn--outline:hover {
+    background-color: {{ text_color }};
+    color: {{ section.settings.btn_text | default: '#1a1a1a' }};
+  }
+
+  .sale-section--{{ sid }} .sale-banner__btn--link {
+    background: transparent;
+    border: none;
+    padding: 8px 0;
+    color: {{ text_color }};
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    box-shadow: none !important;
+  }
+  .sale-section--{{ sid }} .sale-banner__btn--link:hover {
+    transform: none;
+    opacity: 0.8;
+  }
+
+  /* Mobile Responsive Behavior */
+  @media (max-width: 767px) {
+    .sale-section--{{ sid }} .sale-banner {
+      min-height: {{ section.settings.mobile_height | default: 380 }}px;
+    }
+
+    {%- if section.settings.image_mobile != blank -%}
+      .sale-section--{{ sid }} .sale-banner__img {
+        object-position: {{ section.settings.mobile_focal | default: 'center center' }};
+      }
+    {%- endif -%}
+
+    {%- if mobile_layout == 'below' -%}
+      /* Card Below Image Mode */
+      .sale-section--{{ sid }} .sale-banner--mobile-below {
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+      }
+      .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__media {
+        position: relative;
+        height: {{ section.settings.mobile_height | default: 320 }}px;
+      }
+      .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__overlay {
+        display: none;
+      }
+      .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__content-wrap {
+        position: relative;
+        padding: 32px 20px;
+        background-color: {{ section.settings.mobile_card_bg | default: '#ffffff' }};
+        color: {{ section.settings.mobile_card_text | default: '#1a1a1a' }};
+      }
+      .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__content {
+        max-width: 100%;
+        color: {{ section.settings.mobile_card_text | default: '#1a1a1a' }};
+        text-align: {{ mobile_align_h }};
+      }
+      .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__eyebrow,
+      .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__heading,
+      .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__desc {
+        color: {{ section.settings.mobile_card_text | default: '#1a1a1a' }};
+      }
+      .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__actions {
+        justify-content: {% if mobile_align_h == 'center' %}center{% else %}flex-start{% endif %};
+      }
+      .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__btn--outline {
+        color: {{ section.settings.mobile_card_text | default: '#1a1a1a' }};
+        border-color: {{ section.settings.mobile_card_text | default: '#1a1a1a' }};
+      }
+      .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__btn--solid_white {
+        background-color: var(--lv-accent-deep, #806745);
+        color: #ffffff;
+        border-color: var(--lv-accent-deep, #806745);
+      }
+    {%- else -%}
+      /* Overlay Mode on Mobile */
+      .sale-section--{{ sid }} .sale-banner__content-wrap {
+        padding: 36px 20px;
+        justify-content: {% if mobile_align_h == 'center' %}center{% else %}flex-start{% endif %};
+      }
+      .sale-section--{{ sid }} .sale-banner__content {
+        text-align: {{ mobile_align_h }};
+      }
+      .sale-section--{{ sid }} .sale-banner__actions {
+        justify-content: {% if mobile_align_h == 'center' %}center{% else %}flex-start{% endif %};
+      }
+      /* On mobile overlay, enhance backdrop legibility slightly */
+      .sale-section--{{ sid }} .sale-banner__overlay--gradient_left {
+        background: linear-gradient(
+          to top,
+          color-mix(in srgb, {{ overlay_color }} 80%, transparent) 0%,
+          color-mix(in srgb, {{ overlay_color }} 45%, transparent) 60%,
+          transparent 100%
+        );
+        opacity: 0.75;
+      }
+    {%- endif -%}
+
+    .sale-section--{{ sid }} .sale-banner__heading {
+      font-size: clamp(24px, 7vw, 36px);
+      margin-bottom: 12px;
+    }
+    .sale-section--{{ sid }} .sale-banner__desc {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .sale-section--{{ sid }} .sale-banner__btn {
+      padding: 12px 24px;
+      font-size: 11px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Sale",
+  "tag": "section",
+  "class": "sale-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Images (Desktop & Mobile)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Desktop image",
+      "info": "Upload the wide desktop banner image (recommended: 2000x700px or 16:6 aspect ratio)."
+    },
+    {
+      "type": "select",
+      "id": "desktop_focal",
+      "label": "Desktop image focal position",
+      "options": [
+        { "value": "center left", "label": "Left" },
+        { "value": "center center", "label": "Center" },
+        { "value": "center right", "label": "Right (keeps model visible)" }
+      ],
+      "default": "center right"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Mobile image",
+      "info": "Optional. Upload a portrait or square image optimized for mobile devices. If empty, the desktop image will be used."
+    },
+    {
+      "type": "select",
+      "id": "mobile_focal",
+      "label": "Mobile image focal position",
+      "options": [
+        { "value": "top center", "label": "Top" },
+        { "value": "center center", "label": "Center" },
+        { "value": "center right", "label": "Right" },
+        { "value": "center left", "label": "Left" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "header",
+      "content": "Banner Heights"
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "min": 300,
+      "max": 700,
+      "step": 20,
+      "unit": "px",
+      "label": "Desktop banner height",
+      "default": 460
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "min": 260,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "label": "Mobile banner height",
+      "default": 380
+    },
+    {
+      "type": "header",
+      "content": "Left Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Subheading / Eyebrow",
+      "default": "BLACK FRIDAY SALE"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Subheading font size",
+      "default": 12
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "ENJOY 10% OFF!"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading font size",
+      "default": 46
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading HTML tag",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Selected rings, necklaces and earrings while stock lasts.</p>"
+    },
+    {
+      "type": "range",
+      "id": "desc_size",
+      "min": 13,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Description font size",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 320,
+      "max": 750,
+      "step": 10,
+      "unit": "px",
+      "label": "Content max width",
+      "default": 520,
+      "info": "Prevents text from stretching over the model on the right."
+    },
+    {
+      "type": "select",
+      "id": "content_align_h",
+      "label": "Content horizontal alignment",
+      "options": [
+        { "value": "left", "label": "Left (recommended)" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "content_align_v",
+      "label": "Content vertical alignment",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Primary Call to Action Button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "SHOP THE SALE"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link",
+      "default": "/collections/all"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "solid_white", "label": "Solid White (As in reference)" },
+        { "value": "solid_accent", "label": "Solid Theme Gold/Accent" },
+        { "value": "outline", "label": "Outline" },
+        { "value": "link", "label": "Text link" }
+      ],
+      "default": "solid_white"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Button background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_text",
+      "label": "Button text color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Button corner radius",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Secondary Button (Optional)"
+    },
+    {
+      "type": "text",
+      "id": "button_2_label",
+      "label": "Secondary button label"
+    },
+    {
+      "type": "url",
+      "id": "button_2_link",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "select",
+      "id": "button_2_style",
+      "label": "Secondary button style",
+      "options": [
+        { "value": "outline", "label": "Outline" },
+        { "value": "solid_white", "label": "Solid White" },
+        { "value": "solid_accent", "label": "Solid Accent" },
+        { "value": "link", "label": "Text link" }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "header",
+      "content": "Colors & Overlay"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "Image overlay style",
+      "options": [
+        { "value": "gradient_left", "label": "Left vignette gradient (keeps right photo bright)" },
+        { "value": "full", "label": "Full image overlay" },
+        { "value": "none", "label": "No overlay" }
+      ],
+      "default": "gradient_left"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay tint color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fallback background color",
+      "default": "#ece6df"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Settings"
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile content layout",
+      "options": [
+        { "value": "overlay", "label": "Overlay on image" },
+        { "value": "below", "label": "Card below image" }
+      ],
+      "default": "overlay"
+    },
+    {
+      "type": "select",
+      "id": "mobile_align_h",
+      "label": "Mobile text alignment",
+      "options": [
+        { "value": "left", "label": "Left (recommended)" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "color",
+      "id": "mobile_card_bg",
+      "label": "Mobile card background (if below image)",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "mobile_card_text",
+      "label": "Mobile card text (if below image)",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "header",
+      "content": "Section Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full browser width",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sale"
+    }
+  ]
+}
+{% endschema %}

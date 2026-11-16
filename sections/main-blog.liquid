@@ -1,0 +1,722 @@
+<!-- /sections/main-blog.liquid -->
+{%- liquid
+  assign cols_desktop = section.settings.columns_desktop | default: 3
+  assign per_page = section.settings.articles_per_page | default: 9
+  assign img_ratio = section.settings.image_ratio | default: 'auto'
+  assign blog_eyebrow_default = 'blogs.general.eyebrow' | t
+  assign blog_subtitle_default = 'blogs.general.subtitle' | t
+  assign blog_eyebrow = section.settings.eyebrow | default: blog_eyebrow_default
+  assign blog_subtitle = section.settings.subtitle | default: blog_subtitle_default
+  assign active_tag_label = current_tags | join: ', '
+-%}
+
+<div
+  class="lv-blog{% if img_ratio == 'auto' %} lv-blog--natural{% endif %} color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
+  data-section-id="{{ section.id }}"
+  data-section-type="blog"
+  style="--PT: {{ section.settings.padding_top | default: 0 }}px; --PB: {{ section.settings.padding_bottom | default: 72 }}px; --lv-blog-cols: {{ cols_desktop }}; --lv-blog-ratio: {% if img_ratio == 'auto' %}16/9{% else %}{{ img_ratio }}{% endif %};"
+>
+  <style>
+    .lv-blog {
+      padding-top: var(--PT, 0px);
+      padding-bottom: var(--PB, 72px);
+      font-family: var(--FONT-STACK-BODY, sans-serif);
+      --lv-blog-muted: rgba(var(--color-foreground, 26, 26, 26), 0.64);
+      --lv-blog-soft: color-mix(in srgb, var(--text, #1a1a1a) 3.5%, var(--bg, #ffffff));
+    }
+    .lv-blog * { box-sizing: border-box; }
+    .lv-blog__band {
+      padding: clamp(26px, 4vw, 48px) var(--outer, 24px);
+      border-bottom: 1px solid var(--lv-border, #e6e2d8);
+      margin-bottom: clamp(28px, 4vw, 46px);
+    }
+    .lv-blog__band-inner {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .lv-blog__band .lv-crumbs {
+      justify-content: center;
+    }
+    .lv-blog__eyebrow {
+      margin: 0 0 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--lv-accent, #9b7c53);
+    }
+    .lv-blog__title {
+      margin: 0 0 12px;
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: calc(clamp(28px, 4.2vw, 44px) * var(--FONT-ADJUST-HEADING, 1));
+      font-weight: var(--FONT-WEIGHT-HEADING, 600);
+      letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.12em);
+      text-transform: var(--FONT-HEADING-TRANSFORM, uppercase);
+      line-height: 1.14;
+      color: var(--text, #1a1a1a);
+    }
+    .lv-blog__subtitle {
+      margin: 0 auto;
+      max-width: 680px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--lv-blog-muted);
+    }
+    .lv-blog__inner {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      padding: 0 var(--outer, 24px);
+    }
+
+    /* Tag Filters */
+    .lv-blog__tags {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 0 0 clamp(28px, 3.6vw, 42px);
+    }
+    .lv-blog__tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 6px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--text, #1a1a1a);
+      background: var(--bg, #ffffff);
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--btn-radius, 0px);
+      transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+    .lv-blog__tag:hover {
+      border-color: var(--text, #1a1a1a);
+    }
+    .lv-blog__tag.is-active {
+      background: var(--btn-selected-bg, var(--text, #1a1a1a));
+      color: var(--btn-selected-text, var(--bg, #ffffff));
+      border-color: var(--btn-selected-border, var(--text, #1a1a1a));
+    }
+
+    /* Featured Hero Story */
+    .lv-blog-featured {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--card-radius, 0px);
+      background: var(--lv-blog-soft);
+      margin-bottom: clamp(32px, 4.5vw, 52px);
+      overflow: hidden;
+      align-items: stretch;
+    }
+    .lv-blog-featured__media {
+      position: relative;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background: #f7f5f0;
+    }
+    .lv-blog-featured__media img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .lv-blog-featured:hover .lv-blog-featured__media img {
+      transform: scale(1.035);
+    }
+    .lv-blog-featured__body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(24px, 4vw, 48px);
+    }
+    .lv-blog-featured__badge {
+      display: inline-block;
+      align-self: flex-start;
+      margin: 0 0 14px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--lv-accent, #9b7c53);
+    }
+    .lv-blog-featured__title {
+      margin: 0 0 14px;
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: calc(clamp(22px, 2.5vw, 32px) * var(--FONT-ADJUST-HEADING, 1));
+      font-weight: var(--FONT-WEIGHT-HEADING, 600);
+      letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.05em);
+      line-height: 1.24;
+      color: var(--text, #1a1a1a);
+    }
+    .lv-blog-featured__title a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .lv-blog-featured__title a:hover {
+      opacity: 0.78;
+    }
+    .lv-blog-featured__excerpt {
+      margin: 0 0 22px;
+      font-size: 15px;
+      line-height: 1.72;
+      color: var(--lv-blog-muted);
+    }
+    .lv-blog-featured__cta {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 0 24px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: var(--btn-radius, 0px);
+    }
+
+    /* Article Grid */
+    .lv-blog__grid {
+      display: grid;
+      grid-template-columns: repeat(var(--lv-blog-cols, 3), minmax(0, 1fr));
+      gap: clamp(24px, 3vw, 34px) clamp(18px, 2.2vw, 28px);
+    }
+    .lv-blog-card {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--card-radius, 0px);
+      background: var(--bg, #ffffff);
+      overflow: hidden;
+      transition: border-color 0.25s ease, transform 0.25s ease;
+    }
+    .lv-blog-card:hover {
+      border-color: color-mix(in srgb, var(--text, #1a1a1a) 45%, transparent);
+    }
+    .lv-blog-card__media {
+      position: relative;
+      display: block;
+      aspect-ratio: var(--lv-blog-ratio, 4/3);
+      overflow: hidden;
+      background: #f7f5f0;
+      border-bottom: 1px solid var(--lv-border, #e6e2d8);
+    }
+    .lv-blog-card__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .lv-blog--natural .lv-blog-card__media {
+      aspect-ratio: auto;
+    }
+    .lv-blog--natural .lv-blog-card__media img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+    .lv-blog--natural .lv-blog-card__media .lv-blog-placeholder {
+      aspect-ratio: 16 / 9;
+    }
+    .lv-blog-card:hover .lv-blog-card__media img {
+      transform: scale(1.04);
+    }
+    .lv-blog-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(145deg, #faf8f4, #f0ece2);
+      color: var(--lv-accent, #9b7c53);
+      padding: 20px;
+      text-align: center;
+    }
+    .lv-blog-placeholder__mark {
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: 28px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+    .lv-blog-placeholder__sub {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      opacity: 0.72;
+    }
+    .lv-blog-card__body {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      padding: 20px 22px 22px;
+    }
+    .lv-blog-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+      margin: 0 0 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--lv-blog-muted);
+    }
+    .lv-blog-meta__tag {
+      color: var(--lv-accent, #9b7c53);
+      font-weight: 700;
+    }
+    .lv-blog-meta__sep {
+      opacity: 0.45;
+    }
+    .lv-blog-card__title {
+      margin: 0 0 10px;
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: 18px;
+      font-weight: var(--FONT-WEIGHT-HEADING, 600);
+      letter-spacing: 0.03em;
+      line-height: 1.35;
+      color: var(--text, #1a1a1a);
+    }
+    .lv-blog-card__title a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .lv-blog-card__title a:hover {
+      opacity: 0.72;
+    }
+    .lv-blog-card__excerpt {
+      margin: 0 0 18px;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--lv-blog-muted);
+      flex: 1 1 auto;
+    }
+    .lv-blog-card__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      align-self: flex-start;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text, #1a1a1a);
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      padding-bottom: 3px;
+      transition: gap 0.2s ease, opacity 0.2s ease;
+    }
+    .lv-blog-card__link:hover {
+      gap: 12px;
+      opacity: 0.75;
+    }
+
+    /* Empty State */
+    .lv-blog__empty {
+      max-width: 560px;
+      margin: 24px auto 0;
+      padding: 46px 28px;
+      text-align: center;
+      border: 1px solid var(--lv-border, #e6e2d8);
+      background: var(--lv-blog-soft);
+      border-radius: var(--card-radius, 0px);
+    }
+    .lv-blog__empty h2 {
+      margin: 0 0 10px;
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .lv-blog__empty p {
+      margin: 0 0 22px;
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--lv-blog-muted);
+    }
+    .lv-blog__empty-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 26px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    @media (max-width: 980px) {
+      .lv-blog-featured {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .lv-blog__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 640px) {
+      .lv-blog__grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .lv-blog-card__body {
+        padding: 18px;
+      }
+    }
+  </style>
+
+  <header class="lv-blog__band color-{{ section.settings.header_color_scheme | default: 'scheme-2' }}">
+    <div class="lv-blog__band-inner">
+      {%- if active_tag_label != blank -%}
+        {% render 'breadcrumb', current: active_tag_label, parent_title: blog.title, parent_url: blog.url %}
+      {%- else -%}
+        {% render 'breadcrumb', current: blog.title %}
+      {%- endif -%}
+
+      {%- if blog_eyebrow != blank -%}
+        <p class="lv-blog__eyebrow">{{ blog_eyebrow | escape }}</p>
+      {%- endif -%}
+      <h1 class="lv-blog__title">{{ blog.title | escape }}</h1>
+      {%- if blog_subtitle != blank -%}
+        <p class="lv-blog__subtitle">{{ blog_subtitle | escape }}</p>
+      {%- endif -%}
+    </div>
+  </header>
+
+  <div class="lv-blog__inner">
+    {%- if section.settings.show_tags -%}
+      {%- if blog.all_tags.size > 0 -%}
+        <nav class="lv-blog__tags" aria-label="{{ 'blogs.general.filter_by_tag' | t }}">
+          <a
+            href="{{ blog.url }}"
+            class="lv-blog__tag{% if current_tags == blank %} is-active{% endif %}"
+          >
+            {{ 'blogs.general.all_tags' | t }}
+          </a>
+          {%- for tag in blog.all_tags -%}
+            {%- assign is_tag_active = false -%}
+            {%- if current_tags contains tag -%}
+              {%- assign is_tag_active = true -%}
+            {%- endif -%}
+            <a
+              href="{{ blog.url }}/tagged/{{ tag | handle }}"
+              class="lv-blog__tag{% if is_tag_active %} is-active{% endif %}"
+            >
+              {{ tag | escape }}
+            </a>
+          {%- endfor -%}
+        </nav>
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- paginate blog.articles by per_page -%}
+      {%- if blog.articles.size > 0 -%}
+        {%- liquid
+          assign show_featured = false
+          if section.settings.show_featured_first
+            if paginate.current_page == 1
+              if current_tags == blank
+                assign show_featured = true
+              endif
+            endif
+          endif
+          assign start_grid_at_second = false
+          assign has_grid_articles = false
+          if show_featured
+            assign start_grid_at_second = true
+            if blog.articles.size > 1
+              assign has_grid_articles = true
+            endif
+          else
+            if blog.articles.size > 0
+              assign has_grid_articles = true
+            endif
+          endif
+        -%}
+
+        {%- if show_featured -%}
+          {%- assign featured_article = blog.articles.first -%}
+          {%- assign f_words = featured_article.content | strip_html | split: ' ' | size -%}
+          {%- assign f_mins = f_words | divided_by: 190 -%}
+          {%- if f_mins < 1 -%}{%- assign f_mins = 1 -%}{%- endif -%}
+          <article class="lv-blog-featured">
+            <a href="{{ featured_article.url }}" class="lv-blog-featured__media" aria-label="{{ featured_article.title | escape }}">
+              {%- if featured_article.image != blank -%}
+                <img
+                  src="{{ featured_article.image | image_url: width: 1200 }}"
+                  srcset="{{ featured_article.image | image_url: width: 600 }} 600w, {{ featured_article.image | image_url: width: 900 }} 900w, {{ featured_article.image | image_url: width: 1200 }} 1200w"
+                  sizes="(max-width: 980px) 100vw, 55vw"
+                  alt="{{ featured_article.image.alt | default: featured_article.title | escape }}"
+                  width="{{ featured_article.image.width }}"
+                  height="{{ featured_article.image.height }}"
+                  loading="eager"
+                >
+              {%- else -%}
+                <div class="lv-blog-placeholder">
+                  <span class="lv-blog-placeholder__mark">AURELLE</span>
+                  <span class="lv-blog-placeholder__sub">{{ blog.title | escape }}</span>
+                </div>
+              {%- endif -%}
+            </a>
+            <div class="lv-blog-featured__body">
+              <span class="lv-blog-featured__badge">{{ 'blogs.article.featured_badge' | t }}</span>
+              <div class="lv-blog-meta">
+                {%- if featured_article.tags.size > 0 -%}
+                  <span class="lv-blog-meta__tag">{{ featured_article.tags.first | escape }}</span>
+                  <span class="lv-blog-meta__sep" aria-hidden="true">·</span>
+                {%- endif -%}
+                {%- if section.settings.show_date -%}
+                  <time datetime="{{ featured_article.published_at | date: '%Y-%m-%d' }}">
+                    {{ featured_article.published_at | date: format: 'abbreviated_date' }}
+                  </time>
+                {%- endif -%}
+                {%- if section.settings.show_read_time -%}
+                  {%- if section.settings.show_date -%}
+                    <span class="lv-blog-meta__sep" aria-hidden="true">·</span>
+                  {%- endif -%}
+                  <span>{{ 'blogs.article.read_time' | t: minutes: f_mins }}</span>
+                {%- endif -%}
+              </div>
+              <h2 class="lv-blog-featured__title">
+                <a href="{{ featured_article.url }}">{{ featured_article.title | escape }}</a>
+              </h2>
+              {%- if section.settings.show_excerpt -%}
+                <p class="lv-blog-featured__excerpt">
+                  {{ featured_article.excerpt_or_content | strip_html | truncatewords: 32 }}
+                </p>
+              {%- endif -%}
+              <a href="{{ featured_article.url }}" class="btn btn--primary lv-blog-featured__cta btn-sliding-hover">
+                <span class="btn__text-content">{{ 'blogs.article.read_article' | t }}</span>
+              </a>
+            </div>
+          </article>
+        {%- endif -%}
+
+        {%- if has_grid_articles -%}
+          <div class="lv-blog__grid">
+          {%- for article in blog.articles -%}
+            {%- assign skip_article = false -%}
+            {%- if start_grid_at_second -%}
+              {%- if forloop.first -%}
+                {%- assign skip_article = true -%}
+              {%- endif -%}
+            {%- endif -%}
+            {%- unless skip_article -%}
+              {%- assign word_count = article.content | strip_html | split: ' ' | size -%}
+              {%- assign read_mins = word_count | divided_by: 190 -%}
+              {%- if read_mins < 1 -%}{%- assign read_mins = 1 -%}{%- endif -%}
+              <article class="lv-blog-card">
+                <a href="{{ article.url }}" class="lv-blog-card__media" aria-label="{{ article.title | escape }}">
+                  {%- if article.image != blank -%}
+                    <img
+                      src="{{ article.image | image_url: width: 800 }}"
+                      srcset="{{ article.image | image_url: width: 420 }} 420w, {{ article.image | image_url: width: 640 }} 640w, {{ article.image | image_url: width: 800 }} 800w"
+                      sizes="(max-width: 640px) 100vw, (max-width: 980px) 50vw, 33vw"
+                      alt="{{ article.image.alt | default: article.title | escape }}"
+                      width="{{ article.image.width }}"
+                      height="{{ article.image.height }}"
+                      loading="lazy"
+                    >
+                  {%- else -%}
+                    <div class="lv-blog-placeholder">
+                      <span class="lv-blog-placeholder__mark">AURELLE</span>
+                      <span class="lv-blog-placeholder__sub">{{ blog.title | escape }}</span>
+                    </div>
+                  {%- endif -%}
+                </a>
+
+                <div class="lv-blog-card__body">
+                  <div class="lv-blog-meta">
+                    {%- if article.tags.size > 0 -%}
+                      <span class="lv-blog-meta__tag">{{ article.tags.first | escape }}</span>
+                      <span class="lv-blog-meta__sep" aria-hidden="true">·</span>
+                    {%- endif -%}
+                    {%- if section.settings.show_date -%}
+                      <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
+                        {{ article.published_at | date: format: 'abbreviated_date' }}
+                      </time>
+                    {%- endif -%}
+                    {%- if section.settings.show_author -%}
+                      {%- if section.settings.show_date -%}
+                        <span class="lv-blog-meta__sep" aria-hidden="true">·</span>
+                      {%- endif -%}
+                      <span>{{ 'blogs.article.by_author' | t: author: article.author }}</span>
+                    {%- endif -%}
+                    {%- if section.settings.show_read_time -%}
+                      <span class="lv-blog-meta__sep" aria-hidden="true">·</span>
+                      <span>{{ 'blogs.article.read_time' | t: minutes: read_mins }}</span>
+                    {%- endif -%}
+                  </div>
+
+                  <h2 class="lv-blog-card__title">
+                    <a href="{{ article.url }}">{{ article.title | escape }}</a>
+                  </h2>
+
+                  {%- if section.settings.show_excerpt -%}
+                    <p class="lv-blog-card__excerpt">
+                      {{ article.excerpt_or_content | strip_html | truncatewords: 22 }}
+                    </p>
+                  {%- endif -%}
+
+                  <a href="{{ article.url }}" class="lv-blog-card__link">
+                    <span>{{ 'blogs.article.read_more' | t }}</span>
+                    <span aria-hidden="true">&rarr;</span>
+                  </a>
+                </div>
+              </article>
+            {%- endunless -%}
+          {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- render 'pagination', paginate: paginate -%}
+      {%- else -%}
+        <div class="lv-blog__empty">
+          <h2>{{ 'blogs.general.empty_title' | t }}</h2>
+          <p>{{ 'blogs.general.empty_text' | t }}</p>
+          <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary lv-blog__empty-btn btn-sliding-hover">
+            <span class="btn__text-content">{{ 'blogs.general.empty_cta' | t }}</span>
+          </a>
+        </div>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Blog Posts",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Page color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "header_color_scheme",
+      "label": "Header banner color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow label",
+      "info": "Leave empty to use default translated journal label."
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Header subtitle",
+      "info": "Leave empty to use default translated subtitle."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_featured_first",
+      "label": "Highlight latest article as featured story",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tags",
+      "label": "Show topic filter tags",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "Show publish date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "Show author",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_read_time",
+      "label": "Show estimated read time",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "Show article excerpt",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "articles_per_page",
+      "label": "Articles per page",
+      "min": 4,
+      "max": 18,
+      "step": 1,
+      "default": 9
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns on desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Card image aspect ratio",
+      "options": [
+        { "value": "auto", "label": "Natural (no crop)" },
+        { "value": "16/9", "label": "Widescreen (16:9)" },
+        { "value": "16/10", "label": "Wide (16:10)" },
+        { "value": "3/2", "label": "Landscape (3:2)" },
+        { "value": "4/3", "label": "Editorial (4:3)" },
+        { "value": "1/1", "label": "Square (1:1)" }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 20,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    }
+  ]
+}
+{% endschema %}

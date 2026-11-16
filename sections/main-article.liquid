@@ -1,0 +1,1282 @@
+<!-- /sections/main-article.liquid -->
+{%- liquid
+  assign word_count = article.content | strip_html | split: ' ' | size
+  assign read_mins = word_count | divided_by: 190
+  if read_mins < 1
+    assign read_mins = 1
+  endif
+
+  assign show_hero_img = false
+  if section.settings.show_featured_image
+    if article.image != blank
+      assign show_hero_img = true
+    endif
+  endif
+
+  assign sidebar_col = section.settings.featured_collection
+  if sidebar_col == blank
+    for tag in article.tags
+      assign tag_handle = tag | handle
+      if collections[tag_handle] != blank
+        if collections[tag_handle].products_count > 0
+          assign sidebar_col = collections[tag_handle]
+          break
+        endif
+      endif
+    endfor
+  endif
+  if sidebar_col == blank
+    if collections['bestsellers'] != blank
+      if collections['bestsellers'].products_count > 0
+        assign sidebar_col = collections['bestsellers']
+      endif
+    endif
+  endif
+  if sidebar_col == blank
+    for c in collections
+      if c.products_count > 0
+        assign sidebar_col = c
+        break
+      endif
+    endfor
+  endif
+
+  assign has_sidebar_products = false
+  if sidebar_col != blank
+    if sidebar_col.products_count > 0
+      assign has_sidebar_products = true
+    endif
+  endif
+
+  assign has_sidebar_tags = false
+  if section.settings.show_tags
+    if article.tags.size > 0
+      assign has_sidebar_tags = true
+    endif
+  endif
+
+  assign show_sidebar = false
+  if section.settings.show_sidebar
+    if has_sidebar_products
+      assign show_sidebar = true
+    elsif has_sidebar_tags
+      assign show_sidebar = true
+    elsif section.settings.show_share
+      assign show_sidebar = true
+    endif
+  endif
+
+  assign has_prev_next = false
+  if blog.previous_article != blank
+    assign has_prev_next = true
+  elsif blog.next_article != blank
+    assign has_prev_next = true
+  endif
+
+  assign hero_layout = section.settings.hero_layout | default: 'split'
+  assign sidebar_w = section.settings.sidebar_width | default: 360
+-%}
+
+<article
+  class="lv-art color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
+  data-section-id="{{ section.id }}"
+  data-section-type="article"
+  style="--PT: {{ section.settings.padding_top | default: 0 }}px; --PB: {{ section.settings.padding_bottom | default: 72 }}px; --lv-art-side-w: {{ sidebar_w }}px;"
+>
+  <style>
+    .lv-art {
+      padding-top: var(--PT, 0px);
+      padding-bottom: var(--PB, 72px);
+      font-family: var(--FONT-STACK-BODY, sans-serif);
+      --lv-art-muted: rgba(var(--color-foreground, 26, 26, 26), 0.65);
+      --lv-art-soft: color-mix(in srgb, var(--text, #1a1a1a) 3.5%, var(--bg, #ffffff));
+    }
+    .lv-art * { box-sizing: border-box; }
+
+    /* Full-width aligned Header Band (matches .wrapper--full) */
+    .lv-art__band {
+      padding: clamp(24px, 3.2vw, 44px) var(--outer, 24px);
+      border-bottom: 1px solid var(--lv-border, #e6e2d8);
+      margin-bottom: clamp(24px, 3.2vw, 40px);
+    }
+    .lv-art__band-inner {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+    }
+    .lv-art__band-inner--plain {
+      text-align: left;
+    }
+    .lv-art__band-inner--plain .lv-crumbs {
+      justify-content: flex-start;
+    }
+    .lv-art__band-inner--plain .lv-art__kicker,
+    .lv-art__band-inner--plain .lv-art__meta {
+      justify-content: flex-start;
+    }
+    .lv-art__band-inner--plain .lv-art__title,
+    .lv-art__band-inner--plain .lv-art__lead {
+      max-width: 960px;
+    }
+
+    /* Split Editorial Hero */
+    .lv-art__hero-split {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+      gap: clamp(24px, 3.8vw, 56px);
+      align-items: center;
+    }
+    .lv-art__hero-copy {
+      min-width: 0;
+    }
+    .lv-art__hero-copy .lv-crumbs {
+      justify-content: flex-start;
+      margin-bottom: 16px;
+    }
+    .lv-art__kicker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 14px;
+    }
+    .lv-art__kicker-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--lv-accent, #9b7c53);
+      border: 1px solid color-mix(in srgb, var(--lv-accent, #9b7c53) 45%, transparent);
+      background: var(--bg, #ffffff);
+      border-radius: var(--btn-radius, 0px);
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+    .lv-art__kicker-tag:hover {
+      border-color: var(--lv-accent, #9b7c53);
+    }
+    .lv-art__title {
+      margin: 0 0 14px;
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: calc(clamp(26px, 3.2vw, 44px) * var(--FONT-ADJUST-HEADING, 1));
+      font-weight: var(--FONT-WEIGHT-HEADING, 600);
+      letter-spacing: var(--FONT-HEADING-LETTER-SPACING, 0.05em);
+      line-height: 1.15;
+      color: var(--text, #1a1a1a);
+    }
+    .lv-art__lead {
+      margin: 0 0 18px;
+      font-size: 15.5px;
+      line-height: 1.7;
+      color: var(--lv-art-muted);
+    }
+    .lv-art__meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--lv-art-muted);
+    }
+    .lv-art__meta-sep {
+      opacity: 0.45;
+    }
+    .lv-art__hero-media {
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--media-radius, 0px);
+      overflow: hidden;
+      background: #f7f5f0;
+    }
+    .lv-art__hero-media img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .lv-art__hero-banner {
+      width: 100%;
+      margin: 0 0 clamp(24px, 3vw, 36px);
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--media-radius, 0px);
+      overflow: hidden;
+      background: #f7f5f0;
+    }
+    .lv-art__hero-banner img {
+      width: 100%;
+      height: auto;
+      max-height: 600px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Full-width Body Container (matches .wrapper--full) */
+    .lv-art__inner {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      padding: 0 var(--outer, 24px);
+    }
+    .lv-art__layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(24px, 3.2vw, 48px);
+      align-items: start;
+    }
+    .lv-art__layout--with-side {
+      grid-template-columns: minmax(0, 1fr) var(--lv-art-side-w, 360px);
+    }
+    .lv-art__main {
+      min-width: 0;
+      padding: clamp(22px, 3.2vw, 44px) clamp(20px, 3.6vw, 48px);
+      background: var(--bg, #ffffff);
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--card-radius, 0px);
+    }
+
+    /* Editorial Body Typography */
+    .lv-art__content {
+      width: 100%;
+      max-width: none;
+      font-size: 16px;
+      line-height: 1.82;
+      color: var(--text, #1a1a1a);
+    }
+    .lv-art__content > :first-child { margin-top: 0; }
+    .lv-art__content h2 {
+      margin: 2em 0 0.65em;
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+    .lv-art__content h3 {
+      margin: 1.7em 0 0.55em;
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.35;
+    }
+    .lv-art__content p {
+      margin: 0 0 1.2em;
+    }
+    .lv-art__content ul,
+    .lv-art__content ol {
+      margin: 0 0 1.4em;
+      padding-left: 1.35em;
+    }
+    .lv-art__content li {
+      margin: 0 0 0.5em;
+    }
+    .lv-art__content a {
+      color: inherit;
+      text-underline-offset: 3px;
+    }
+    .lv-art__content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: var(--media-radius, 0px);
+    }
+    .lv-art__content blockquote {
+      margin: 1.8em 0;
+      padding: 18px 22px;
+      border-left: 3px solid var(--lv-accent, #9b7c53);
+      background: var(--lv-art-soft);
+      font-style: italic;
+    }
+
+    /* Footer Bar: Tags + Share */
+    .lv-art__foot {
+      margin: 36px 0 0;
+      padding: 20px 0 0;
+      border-top: 1px solid var(--lv-border, #e6e2d8);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .lv-art__topics {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .lv-art__topics-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--lv-art-muted);
+      margin-right: 4px;
+    }
+    .lv-art__topic-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--text, #1a1a1a);
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--btn-radius, 0px);
+      background: var(--bg, #ffffff);
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+    .lv-art__topic-pill:hover {
+      border-color: var(--text, #1a1a1a);
+      background: var(--lv-art-soft);
+    }
+    .lv-art__share {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 0 16px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text, #1a1a1a);
+      background: var(--bg, #ffffff);
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--btn-radius, 0px);
+      cursor: pointer;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+    .lv-art__share:hover {
+      border-color: var(--text, #1a1a1a);
+      background: var(--lv-art-soft);
+    }
+    .lv-art__share svg {
+      width: 14px;
+      height: 14px;
+      flex: none;
+    }
+
+    /* Sticky Right Sidebar */
+    .lv-art__sidebar {
+      display: grid;
+      gap: 20px;
+      position: sticky;
+      top: 96px;
+    }
+    .lv-art-box {
+      padding: 22px;
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--card-radius, 0px);
+      background: var(--lv-art-soft);
+    }
+    .lv-art-box__title {
+      margin: 0 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--lv-border, #e6e2d8);
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text, #1a1a1a);
+    }
+    .lv-art-shop-list {
+      display: grid;
+      gap: 12px;
+      margin: 0 0 18px;
+    }
+    .lv-art-shop-item {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+      padding: 8px;
+      background: var(--bg, #ffffff);
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--card-radius, 0px);
+      text-decoration: none;
+      color: var(--text, #1a1a1a);
+      transition: border-color 0.2s ease;
+    }
+    .lv-art-shop-item:hover {
+      border-color: var(--text, #1a1a1a);
+    }
+    .lv-art-shop-item__img {
+      width: 72px;
+      height: 72px;
+      overflow: hidden;
+      background: #f7f5f0;
+    }
+    .lv-art-shop-item__img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .lv-art-shop-item__info {
+      min-width: 0;
+    }
+    .lv-art-shop-item__title {
+      margin: 0 0 4px;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .lv-art-shop-item__price {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--lv-accent, #9b7c53);
+    }
+    .lv-art-box__cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 44px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: var(--btn-radius, 0px);
+    }
+    .lv-art-side-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 16px;
+    }
+    .lv-art-side-stories {
+      display: grid;
+      gap: 12px;
+    }
+    .lv-art-side-story {
+      display: block;
+      padding: 12px;
+      background: var(--bg, #ffffff);
+      border: 1px solid var(--lv-border, #e6e2d8);
+      text-decoration: none;
+      color: var(--text, #1a1a1a);
+      transition: border-color 0.2s ease;
+    }
+    .lv-art-side-story:hover {
+      border-color: var(--text, #1a1a1a);
+    }
+    .lv-art-side-story__date {
+      display: block;
+      margin: 0 0 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--lv-art-muted);
+    }
+    .lv-art-side-story__title {
+      margin: 0;
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.38;
+    }
+
+    /* Prev / Next Story Nav */
+    .lv-art__nav {
+      margin: 28px 0 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .lv-art__nav-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 18px 20px;
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--card-radius, 0px);
+      background: var(--lv-art-soft);
+      text-decoration: none;
+      color: var(--text, #1a1a1a);
+      transition: border-color 0.2s ease;
+    }
+    .lv-art__nav-item:hover {
+      border-color: var(--text, #1a1a1a);
+    }
+    .lv-art__nav-item--next {
+      text-align: right;
+      grid-column: 2;
+    }
+    .lv-art__nav-dir {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--lv-accent, #9b7c53);
+    }
+    .lv-art__nav-title {
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    /* Comments */
+    .lv-art__comments {
+      margin: 44px 0 0;
+      padding-top: 34px;
+      border-top: 1px solid var(--lv-border, #e6e2d8);
+    }
+    .lv-art__sec-title {
+      margin: 0 0 22px;
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .lv-art__comment-list {
+      display: grid;
+      gap: 14px;
+      margin: 0 0 32px;
+    }
+    .lv-art__comment {
+      padding: 18px 20px;
+      border: 1px solid var(--lv-border, #e6e2d8);
+      background: var(--lv-art-soft);
+      border-radius: var(--card-radius, 0px);
+    }
+    .lv-art__comment-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 0 0 8px;
+      font-size: 12px;
+    }
+    .lv-art__comment-author {
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .lv-art__comment-date {
+      color: var(--lv-art-muted);
+    }
+    .lv-art__comment-body {
+      font-size: 14.5px;
+      line-height: 1.65;
+    }
+    .lv-art__comment-body p { margin: 0; }
+    .lv-art__notice {
+      padding: 14px 18px;
+      margin: 0 0 20px;
+      border: 1px solid var(--lv-accent, #9b7c53);
+      background: #f7f5f0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .lv-art__notice--err {
+      border-color: #b3261e;
+      color: #b3261e;
+      background: color-mix(in srgb, #b3261e 5%, var(--bg, #ffffff));
+    }
+    .lv-art__form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 0 0 16px;
+    }
+    .lv-art__field label {
+      display: block;
+      margin: 0 0 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .lv-art__field input,
+    .lv-art__field textarea {
+      width: 100%;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text, #1a1a1a);
+      background: var(--bg, #ffffff);
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--input-radius, 0px);
+      outline: none;
+    }
+    .lv-art__field input:focus,
+    .lv-art__field textarea:focus {
+      border-color: var(--text, #1a1a1a);
+    }
+    .lv-art__field--full {
+      margin: 0 0 14px;
+    }
+    .lv-art__mod-note {
+      margin: 0 0 18px;
+      font-size: 12.5px;
+      color: var(--lv-art-muted);
+    }
+    .lv-art__submit {
+      min-height: 46px;
+      padding: 0 28px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border-radius: var(--btn-radius, 0px);
+    }
+
+    /* Full-width Related Stories */
+    .lv-art__related {
+      width: 100%;
+      max-width: none;
+      margin: 52px 0 0;
+      padding-top: 40px;
+      border-top: 1px solid var(--lv-border, #e6e2d8);
+    }
+    .lv-art__related-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 26px;
+    }
+    .lv-art__related-all {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text, #1a1a1a);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+    .lv-art__related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+    }
+    .lv-art-rel-card {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--lv-border, #e6e2d8);
+      border-radius: var(--card-radius, 0px);
+      background: var(--bg, #ffffff);
+      overflow: hidden;
+    }
+    .lv-art-rel-card__media {
+      display: block;
+      aspect-ratio: auto;
+      overflow: hidden;
+      background: #f7f5f0;
+      border-bottom: 1px solid var(--lv-border, #e6e2d8);
+    }
+    .lv-art-rel-card__media img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    .lv-art-rel-card:hover .lv-art-rel-card__media img {
+      transform: scale(1.04);
+    }
+    .lv-art-rel-card__ph {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #faf8f4, #f0ece2);
+      color: var(--lv-accent, #9b7c53);
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: 20px;
+      letter-spacing: 0.2em;
+    }
+    .lv-art-rel-card__body {
+      padding: 18px 20px 20px;
+    }
+    .lv-art-rel-card__date {
+      display: block;
+      margin: 0 0 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--lv-art-muted);
+    }
+    .lv-art-rel-card__title {
+      margin: 0;
+      font-family: var(--FONT-STACK-HEADING, serif);
+      font-size: 16.5px;
+      font-weight: 600;
+      line-height: 1.38;
+    }
+    .lv-art-rel-card__title a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .lv-art-rel-card__title a:hover {
+      opacity: 0.72;
+    }
+
+    @media (max-width: 1024px) {
+      .lv-art__hero-split {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+      }
+      .lv-art__layout--with-side {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .lv-art__sidebar {
+        position: static;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+      .lv-art__related-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 640px) {
+      .lv-art__sidebar,
+      .lv-art__nav,
+      .lv-art__form-grid,
+      .lv-art__related-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .lv-art__nav-item--next {
+        grid-column: auto;
+        text-align: left;
+      }
+      .lv-art__main {
+        padding: 20px 16px;
+      }
+    }
+  </style>
+
+  {%- capture article_meta_html -%}
+    <div class="lv-art__meta">
+      {%- if section.settings.show_date -%}
+        <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
+          {{ article.published_at | date: format: 'abbreviated_date' }}
+        </time>
+      {%- endif -%}
+      {%- if section.settings.show_author -%}
+        {%- if section.settings.show_date -%}
+          <span class="lv-art__meta-sep" aria-hidden="true">·</span>
+        {%- endif -%}
+        <span>{{ 'blogs.article.by_author' | t: author: article.author }}</span>
+      {%- endif -%}
+      {%- if section.settings.show_read_time -%}
+        <span class="lv-art__meta-sep" aria-hidden="true">·</span>
+        <span>{{ 'blogs.article.read_time' | t: minutes: read_mins }}</span>
+      {%- endif -%}
+    </div>
+  {%- endcapture -%}
+
+  {%- capture article_tags_kicker_html -%}
+    {%- if section.settings.show_tags -%}
+      {%- if article.tags.size > 0 -%}
+        <div class="lv-art__kicker">
+          {%- for tag in article.tags limit: 3 -%}
+            <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="lv-art__kicker-tag">{{ tag | escape }}</a>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+  {%- endcapture -%}
+
+  <header class="lv-art__band color-{{ section.settings.header_color_scheme | default: 'scheme-2' }}">
+    <div class="lv-art__band-inner{% unless show_hero_img and hero_layout == 'split' %} lv-art__band-inner--plain{% endunless %}">
+      {%- if show_hero_img -%}
+        {%- if hero_layout == 'split' -%}
+          <div class="lv-art__hero-split">
+            <div class="lv-art__hero-copy">
+              {% render 'breadcrumb', current: article.title, parent_title: blog.title, parent_url: blog.url %}
+              {{ article_tags_kicker_html }}
+              <h1 class="lv-art__title">{{ article.title | escape }}</h1>
+              {%- if article.excerpt != blank -%}
+                <p class="lv-art__lead">{{ article.excerpt | strip_html }}</p>
+              {%- endif -%}
+              {{ article_meta_html }}
+            </div>
+            <div class="lv-art__hero-media">
+              <img
+                src="{{ article.image | image_url: width: 1600 }}"
+                srcset="{{ article.image | image_url: width: 700 }} 700w, {{ article.image | image_url: width: 1100 }} 1100w, {{ article.image | image_url: width: 1600 }} 1600w"
+                sizes="(max-width: 1024px) 100vw, 52vw"
+                alt="{{ article.image.alt | default: article.title | escape }}"
+                width="{{ article.image.width }}"
+                height="{{ article.image.height }}"
+                loading="eager"
+              >
+            </div>
+          </div>
+        {%- else -%}
+          {% render 'breadcrumb', current: article.title, parent_title: blog.title, parent_url: blog.url %}
+          {{ article_tags_kicker_html }}
+          <h1 class="lv-art__title">{{ article.title | escape }}</h1>
+          {%- if article.excerpt != blank -%}
+            <p class="lv-art__lead">{{ article.excerpt | strip_html }}</p>
+          {%- endif -%}
+          {{ article_meta_html }}
+        {%- endif -%}
+      {%- else -%}
+        {% render 'breadcrumb', current: article.title, parent_title: blog.title, parent_url: blog.url %}
+        {{ article_tags_kicker_html }}
+        <h1 class="lv-art__title">{{ article.title | escape }}</h1>
+        {%- if article.excerpt != blank -%}
+          <p class="lv-art__lead">{{ article.excerpt | strip_html }}</p>
+        {%- endif -%}
+        {{ article_meta_html }}
+      {%- endif -%}
+    </div>
+  </header>
+
+  <div class="lv-art__inner">
+    {%- if show_hero_img -%}
+      {%- if hero_layout != 'split' -%}
+        <div class="lv-art__hero-banner">
+          <img
+            src="{{ article.image | image_url: width: 2000 }}"
+            srcset="{{ article.image | image_url: width: 900 }} 900w, {{ article.image | image_url: width: 1400 }} 1400w, {{ article.image | image_url: width: 2000 }} 2000w"
+            sizes="100vw"
+            alt="{{ article.image.alt | default: article.title | escape }}"
+            width="{{ article.image.width }}"
+            height="{{ article.image.height }}"
+            loading="eager"
+          >
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+
+    <div class="lv-art__layout{% if show_sidebar %} lv-art__layout--with-side{% endif %}">
+      <div class="lv-art__main">
+        <div class="lv-art__content rte">
+          {{ article.content }}
+        </div>
+
+        {%- liquid
+          assign show_foot = false
+          if section.settings.show_share
+            assign show_foot = true
+          elsif section.settings.show_tags
+            if article.tags.size > 0
+              assign show_foot = true
+            endif
+          endif
+        -%}
+        {%- if show_foot -%}
+          <div class="lv-art__foot">
+            {%- if section.settings.show_tags -%}
+              {%- if article.tags.size > 0 -%}
+                <div class="lv-art__topics">
+                  <span class="lv-art__topics-label">{{ 'blogs.article.tags' | t }}:</span>
+                  {%- for tag in article.tags -%}
+                    <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="lv-art__topic-pill">{{ tag | escape }}</a>
+                  {%- endfor -%}
+                </div>
+              {%- else -%}
+                <div></div>
+              {%- endif -%}
+            {%- else -%}
+              <div></div>
+            {%- endif -%}
+
+            {%- if section.settings.show_share -%}
+              <button
+                type="button"
+                class="lv-art__share"
+                data-lv-share
+                data-share-title="{{ article.title | escape }}"
+                data-share-url="{{ shop.url | append: article.url }}"
+                data-share-label="{{ 'blogs.article.share' | t | escape }}"
+                data-copied-label="{{ 'blogs.article.copied' | t | escape }}"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                  <circle cx="18" cy="5" r="3"/>
+                  <circle cx="6" cy="12" r="3"/>
+                  <circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+                <span data-lv-share-text>{{ 'blogs.article.share' | t }}</span>
+              </button>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if has_prev_next -%}
+          <nav class="lv-art__nav" aria-label="{{ blog.title | escape }}">
+            {%- if blog.previous_article != blank -%}
+              <a href="{{ blog.previous_article.url }}" class="lv-art__nav-item">
+                <span class="lv-art__nav-dir">&larr; {{ 'blogs.article.previous_article' | t }}</span>
+                <span class="lv-art__nav-title">{{ blog.previous_article.title | escape }}</span>
+              </a>
+            {%- endif -%}
+            {%- if blog.next_article != blank -%}
+              <a href="{{ blog.next_article.url }}" class="lv-art__nav-item lv-art__nav-item--next">
+                <span class="lv-art__nav-dir">{{ 'blogs.article.next_article' | t }} &rarr;</span>
+                <span class="lv-art__nav-title">{{ blog.next_article.title | escape }}</span>
+              </a>
+            {%- endif -%}
+          </nav>
+        {%- endif -%}
+
+        {%- if blog.comments_enabled? -%}
+          <section class="lv-art__comments" id="comments">
+            <h2 class="lv-art__sec-title">{{ 'blogs.article.comments' | t: count: article.comments_count }}</h2>
+
+            {%- paginate article.comments by 8 -%}
+              {%- if article.comments_count > 0 -%}
+                <div class="lv-art__comment-list">
+                  {%- for comment in article.comments -%}
+                    <div class="lv-art__comment" id="{{ comment.id }}">
+                      <div class="lv-art__comment-meta">
+                        <span class="lv-art__comment-author">{{ comment.author | escape }}</span>
+                        <time class="lv-art__comment-date" datetime="{{ comment.created_at | date: '%Y-%m-%d' }}">
+                          {{ comment.created_at | date: format: 'abbreviated_date' }}
+                        </time>
+                      </div>
+                      <div class="lv-art__comment-body">{{ comment.content }}</div>
+                    </div>
+                  {%- endfor -%}
+                </div>
+                {%- render 'pagination', paginate: paginate -%}
+              {%- endif -%}
+            {%- endpaginate -%}
+
+            <h3 class="lv-art__sec-title">{{ 'blogs.article.leave_comment' | t }}</h3>
+            {%- form 'new_comment', article -%}
+              {%- if form.posted_successfully? -%}
+                <div class="lv-art__notice" role="status">
+                  {%- if blog.moderated? -%}
+                    {{ 'blogs.article.posted_moderated' | t }}
+                  {%- else -%}
+                    {{ 'blogs.article.posted' | t }}
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+              {%- if form.errors -%}
+                <div class="lv-art__notice lv-art__notice--err" role="alert">
+                  <strong>{{ 'blogs.article.error_heading' | t }}</strong>
+                  {{ form.errors | default_errors }}
+                </div>
+              {%- endif -%}
+
+              <div class="lv-art__form-grid">
+                <div class="lv-art__field">
+                  <label for="CommentForm-author-{{ section.id }}">{{ 'blogs.article.name' | t }}</label>
+                  <input
+                    type="text"
+                    name="comment[author]"
+                    id="CommentForm-author-{{ section.id }}"
+                    value="{{ form.author | escape }}"
+                    autocomplete="name"
+                    required
+                  >
+                </div>
+                <div class="lv-art__field">
+                  <label for="CommentForm-email-{{ section.id }}">{{ 'blogs.article.email' | t }}</label>
+                  <input
+                    type="email"
+                    name="comment[email]"
+                    id="CommentForm-email-{{ section.id }}"
+                    value="{{ form.email | escape }}"
+                    autocomplete="email"
+                    required
+                  >
+                </div>
+              </div>
+
+              <div class="lv-art__field lv-art__field--full">
+                <label for="CommentForm-body-{{ section.id }}">{{ 'blogs.article.message' | t }}</label>
+                <textarea
+                  rows="5"
+                  name="comment[body]"
+                  id="CommentForm-body-{{ section.id }}"
+                  required
+                >{{ form.body }}</textarea>
+              </div>
+
+              {%- if blog.moderated? -%}
+                <p class="lv-art__mod-note">{{ 'blogs.article.moderated' | t }}</p>
+              {%- endif -%}
+
+              <button type="submit" class="btn btn--primary lv-art__submit btn-sliding-hover">
+                <span class="btn__text-content">{{ 'blogs.article.post' | t }}</span>
+              </button>
+            {%- endform -%}
+          </section>
+        {%- endif -%}
+      </div>
+
+      {%- if show_sidebar -%}
+        <aside class="lv-art__sidebar" aria-label="{{ blog.title | escape }}">
+          {%- if has_sidebar_products -%}
+            <div class="lv-art-box">
+              <h2 class="lv-art-box__title">{{ 'blogs.article.shop_story_title' | t }}</h2>
+              <div class="lv-art-shop-list">
+                {%- for prod in sidebar_col.products limit: 4 -%}
+                  <a href="{{ prod.url }}" class="lv-art-shop-item">
+                    <div class="lv-art-shop-item__img">
+                      {%- if prod.featured_image != blank -%}
+                        <img
+                          src="{{ prod.featured_image | image_url: width: 200 }}"
+                          alt="{{ prod.featured_image.alt | default: prod.title | escape }}"
+                          width="{{ prod.featured_image.width }}"
+                          height="{{ prod.featured_image.height }}"
+                          loading="lazy"
+                        >
+                      {%- endif -%}
+                    </div>
+                    <div class="lv-art-shop-item__info">
+                      <p class="lv-art-shop-item__title">{{ prod.title | escape }}</p>
+                      <span class="lv-art-shop-item__price">{{ prod.price | money }}</span>
+                    </div>
+                  </a>
+                {%- endfor -%}
+              </div>
+              <a href="{{ sidebar_col.url | default: routes.all_products_collection_url }}" class="btn btn--primary lv-art-box__cta btn-sliding-hover">
+                <span class="btn__text-content">{{ 'blogs.article.shop_story_cta' | t }}</span>
+              </a>
+            </div>
+          {%- endif -%}
+
+          {%- if has_sidebar_tags -%}
+            <div class="lv-art-box">
+              <h2 class="lv-art-box__title">{{ 'blogs.article.tags' | t }}</h2>
+              <div class="lv-art-side-pills">
+                {%- for tag in article.tags -%}
+                  <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="lv-art__topic-pill">{{ tag | escape }}</a>
+                {%- endfor -%}
+              </div>
+              <a href="{{ blog.url }}" class="lv-art__related-all">{{ 'blogs.article.all_articles' | t }}</a>
+            </div>
+          {%- endif -%}
+
+          {%- if blog.articles_count > 1 -%}
+            <div class="lv-art-box">
+              <h2 class="lv-art-box__title">{{ 'blogs.article.related_title' | t }}</h2>
+              <div class="lv-art-side-stories">
+                {%- assign side_art_count = 0 -%}
+                {%- for side_art in blog.articles -%}
+                  {%- if side_art.id != article.id -%}
+                    {%- if side_art_count < 3 -%}
+                      {%- assign side_art_count = side_art_count | plus: 1 -%}
+                      <a href="{{ side_art.url }}" class="lv-art-side-story">
+                        <time class="lv-art-side-story__date" datetime="{{ side_art.published_at | date: '%Y-%m-%d' }}">
+                          {{ side_art.published_at | date: format: 'abbreviated_date' }}
+                        </time>
+                        <p class="lv-art-side-story__title">{{ side_art.title | escape }}</p>
+                      </a>
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endif -%}
+        </aside>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.show_related -%}
+      {%- if blog.articles_count > 1 -%}
+        <section class="lv-art__related">
+          <div class="lv-art__related-head">
+            <h2 class="lv-art__sec-title">{{ 'blogs.article.related_title' | t }}</h2>
+            <a href="{{ blog.url }}" class="lv-art__related-all">{{ 'blogs.article.all_articles' | t }}</a>
+          </div>
+          <div class="lv-art__related-grid">
+            {%- assign rel_count = 0 -%}
+            {%- for rel in blog.articles -%}
+              {%- if rel.id != article.id -%}
+                {%- if rel_count < 3 -%}
+                  {%- assign rel_count = rel_count | plus: 1 -%}
+                  <article class="lv-art-rel-card">
+                    <a href="{{ rel.url }}" class="lv-art-rel-card__media" aria-label="{{ rel.title | escape }}">
+                      {%- if rel.image != blank -%}
+                        <img
+                          src="{{ rel.image | image_url: width: 720 }}"
+                          alt="{{ rel.image.alt | default: rel.title | escape }}"
+                          width="{{ rel.image.width }}"
+                          height="{{ rel.image.height }}"
+                          loading="lazy"
+                        >
+                      {%- else -%}
+                        <div class="lv-art-rel-card__ph">AURELLE</div>
+                      {%- endif -%}
+                    </a>
+                    <div class="lv-art-rel-card__body">
+                      <time class="lv-art-rel-card__date" datetime="{{ rel.published_at | date: '%Y-%m-%d' }}">
+                        {{ rel.published_at | date: format: 'abbreviated_date' }}
+                      </time>
+                      <h3 class="lv-art-rel-card__title">
+                        <a href="{{ rel.url }}">{{ rel.title | escape }}</a>
+                      </h3>
+                    </div>
+                  </article>
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </section>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+
+  <script>
+    (function() {
+      var shareBtn = document.querySelector('#shopify-section-{{ section.id }} [data-lv-share]');
+      if (!shareBtn) return;
+      shareBtn.addEventListener('click', function() {
+        var url = shareBtn.getAttribute('data-share-url') || window.location.href;
+        var title = shareBtn.getAttribute('data-share-title') || document.title;
+        var textEl = shareBtn.querySelector('[data-lv-share-text]');
+        var origLabel = shareBtn.getAttribute('data-share-label') || 'Share';
+        var copiedLabel = shareBtn.getAttribute('data-copied-label') || 'Copied';
+
+        if (navigator.share) {
+          navigator.share({ title: title, url: url }).catch(function() {});
+          return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function() {
+            if (textEl) textEl.textContent = copiedLabel;
+            setTimeout(function() {
+              if (textEl) textEl.textContent = origLabel;
+            }, 2200);
+          }).catch(function() {});
+        }
+      });
+    })();
+  </script>
+
+  <script type="application/ld+json">
+    {{ article | structured_data }}
+  </script>
+</article>
+
+{% schema %}
+{
+  "name": "Blog Article",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Page color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "header_color_scheme",
+      "label": "Header banner color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "select",
+      "id": "hero_layout",
+      "label": "Hero layout",
+      "options": [
+        { "value": "split", "label": "Split editorial (full width)" },
+        { "value": "banner", "label": "Full-width banner image" }
+      ],
+      "default": "split"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_featured_image",
+      "label": "Show featured image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sidebar",
+      "label": "Show editorial sidebar",
+      "default": true
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Sidebar featured collection"
+    },
+    {
+      "type": "range",
+      "id": "sidebar_width",
+      "label": "Sidebar width",
+      "min": 300,
+      "max": 440,
+      "step": 20,
+      "unit": "px",
+      "default": 360
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "Show publish date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "Show author",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_read_time",
+      "label": "Show estimated read time",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tags",
+      "label": "Show topic tags",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share",
+      "label": "Show share button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_related",
+      "label": "Show related stories",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 20,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    }
+  ]
+}
+{% endschema %}

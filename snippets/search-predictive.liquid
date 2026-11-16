@@ -11,9 +11,212 @@
   else
     assign search_id = 'search-popdown'
   endif
+  assign popular_default = 'general.search.popular_terms' | t
+  assign popular_terms = popular_default | split: ','
 -%}
 
 <div data-search-popdown-wrap>
+  {%- if search_style == 'search-popdown' -%}
+    <style>
+      #search-popdown {
+        box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.16);
+      }
+      #search-popdown .search__predictive__outer {
+        background: var(--bg, #ffffff);
+        border-bottom: 1px solid var(--lv-border, #e6e2d8);
+        padding: 20px var(--outer, 24px) 18px;
+      }
+      #search-popdown .lv-pop-container {
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+      }
+      #search-popdown .search__predictive__main {
+        height: auto !important;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      #search-popdown .search__predictive__actions {
+        flex: 1 1 auto;
+        display: flex;
+        align-items: stretch;
+        justify-content: flex-start;
+        height: 52px;
+        width: auto;
+        margin: 0;
+        background: #faf8f4;
+        border: 1px solid color-mix(in srgb, var(--text, #1a1a1a) 22%, var(--lv-border, #e6e2d8));
+        border-radius: var(--input-radius, 0px);
+        overflow: hidden;
+        transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+      }
+      #search-popdown .search__predictive__actions:focus-within {
+        background: var(--bg, #ffffff);
+        border-color: var(--text, #1a1a1a);
+        box-shadow: 0 8px 22px -14px rgba(0, 0, 0, 0.25);
+      }
+      #search-popdown .search__predictive__actions input[type="search"] {
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 100%;
+        margin: 0 !important;
+        padding: 0 16px;
+        border: 0 !important;
+        background: transparent !important;
+        color: var(--text, #1a1a1a);
+        font-family: var(--FONT-STACK-BODY, sans-serif);
+        font-size: 15px !important;
+        line-height: 1.4;
+        outline: none !important;
+        box-shadow: none !important;
+        order: 1;
+      }
+      #search-popdown .search__predictive__actions input[type="search"]::placeholder {
+        color: rgba(var(--color-foreground, 26, 26, 26), 0.48);
+      }
+      #search-popdown .search__predictive__actions input[type="search"]::-webkit-search-cancel-button,
+      #search-popdown .search__predictive__actions input[type="search"]::-webkit-search-decoration {
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      #search-popdown .search__predictive__clear {
+        order: 2;
+        display: flex;
+        align-items: center;
+        flex: none;
+      }
+      #search-popdown .search__predictive__clear .search-reset {
+        height: 100%;
+        padding: 0 14px;
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(var(--color-foreground, 26, 26, 26), 0.65);
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+        transition: color 0.2s ease;
+      }
+      #search-popdown .search__predictive__clear .search-reset:hover {
+        color: var(--text, #1a1a1a);
+      }
+      #search-popdown .search__predictive__clear .search-reset.is-hidden {
+        display: none !important;
+      }
+      #search-popdown .search__predictive__button {
+        order: 3;
+        flex: none;
+        width: 56px;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--btn-regular-bg, #1a1a1a);
+        color: var(--btn-regular-text, #ffffff);
+        border: 0;
+        cursor: pointer;
+        transition: background-color 0.2s ease, opacity 0.2s ease;
+      }
+      #search-popdown .search__predictive__button:hover {
+        opacity: 0.88;
+      }
+      #search-popdown .search__predictive__button svg {
+        width: 18px;
+        height: 18px;
+      }
+      #search-popdown .search__predictive__close {
+        width: auto;
+        height: auto;
+        flex: none;
+      }
+      #search-popdown .search__predictive__close > .search__predictive__close__inner {
+        width: 52px;
+        height: 52px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #faf8f4;
+        color: var(--text, #1a1a1a);
+        border: 1px solid var(--lv-border, #e6e2d8);
+        border-radius: var(--btn-radius, 0px);
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+      }
+      #search-popdown .search__predictive__close > .search__predictive__close__inner:hover {
+        background: var(--text, #1a1a1a);
+        color: var(--bg, #ffffff);
+        border-color: var(--text, #1a1a1a);
+      }
+      #search-popdown .search__predictive__close > .search__predictive__close__inner svg {
+        width: 18px;
+        height: 18px;
+      }
+      #search-popdown .lv-pop-chips {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin: 12px 0 0;
+      }
+      #search-popdown .lv-pop-chips__label {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(var(--color-foreground, 26, 26, 26), 0.56);
+        margin-right: 4px;
+      }
+      #search-popdown .lv-pop-chip {
+        display: inline-flex;
+        align-items: center;
+        height: 30px;
+        padding: 0 13px;
+        font-family: inherit;
+        font-size: 11.5px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: var(--text, #1a1a1a);
+        background: var(--bg, #ffffff);
+        border: 1px solid var(--lv-border, #e6e2d8);
+        border-radius: 99px;
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      }
+      #search-popdown .lv-pop-chip:hover {
+        background: var(--text, #1a1a1a);
+        color: var(--bg, #ffffff);
+        border-color: var(--text, #1a1a1a);
+      }
+      #search-popdown .header__search__results {
+        background: var(--bg, #ffffff);
+        border-bottom: 1px solid var(--lv-border, #e6e2d8);
+      }
+      @media (max-width: 640px) {
+        #search-popdown .search__predictive__outer {
+          padding: 14px var(--outer, 16px);
+        }
+        #search-popdown .search__predictive__actions {
+          height: 46px;
+        }
+        #search-popdown .search__predictive__button {
+          width: 48px;
+        }
+        #search-popdown .search__predictive__close > .search__predictive__close__inner {
+          width: 46px;
+          height: 46px;
+        }
+      }
+    </style>
+  {%- endif -%}
+
   <div id="{{ search_id }}" class="{{ search_style }} search__predictive" data-popdown-outer>
     <predictive-search data-loading-text="{{ 'general.search.loading' | t }}">
       <form
@@ -23,7 +226,7 @@
 
         <div class="item--loadbar" data-loading-indicator style="display: none;"></div>
         <div class="search__predictive__outer">
-          <div class="wrapper">
+          <div class="{% if search_style == 'search-popdown' %}lv-pop-container{% else %}wrapper{% endif %}">
             <div class="search__predictive__main">
               <div class="search__predictive__actions">
                 <button class="search__predictive__button" type="submit" aria-label="{{ 'general.search.submit' | t }}">
@@ -38,6 +241,7 @@
                   placeholder="{{ 'general.search.placeholder' | t }}"
                   aria-label="{{ 'general.search.label' | t }}"
                   aria-controls="predictive-search-results"
+                  autocomplete="off"
                 >
 
                 <div class="search__predictive__clear">
@@ -54,6 +258,22 @@
                 </button>
               </div>
             </div>
+
+            {%- if search_style == 'search-popdown' -%}
+              {%- if popular_default != blank -%}
+                <div class="lv-pop-chips">
+                  <span class="lv-pop-chips__label">{{ 'general.search.popular_label' | t }}</span>
+                  {%- for term in popular_terms -%}
+                    {%- assign chip_term = term | strip -%}
+                    {%- if chip_term != blank -%}
+                      <button type="button" class="lv-pop-chip" data-lv-pop-chip="{{ chip_term | escape }}">
+                        {{ chip_term | escape }}
+                      </button>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+            {%- endif -%}
           </div>
         </div>
         <div class="header__search__results" tabindex="-1" data-predictive-search-results></div>
@@ -68,6 +288,22 @@
       <span class="drawer__underlay__fill"></span>
       <span class="drawer__underlay__blur"></span>
     </span>
+    <script>
+      (function() {
+        var wrap = document.getElementById('search-popdown');
+        if (!wrap || wrap.dataset.lvChipsBound) return;
+        wrap.dataset.lvChipsBound = '1';
+        wrap.addEventListener('click', function(e) {
+          var chip = e.target.closest('[data-lv-pop-chip]');
+          if (!chip) return;
+          var input = wrap.querySelector('[data-predictive-search-input]');
+          if (!input) return;
+          input.value = chip.getAttribute('data-lv-pop-chip') || '';
+          input.focus();
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+      })();
+    </script>
   {%- endif -%}
 
   {% raw %}<script data-predictive-search-aria-template type="text/x-template">

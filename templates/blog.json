@@ -1,0 +1,27 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-blog",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "header_color_scheme": "scheme-2",
+        "eyebrow": "",
+        "subtitle": "",
+        "show_featured_first": true,
+        "show_tags": true,
+        "show_date": true,
+        "show_author": false,
+        "show_read_time": true,
+        "show_excerpt": true,
+        "articles_per_page": 9,
+        "columns_desktop": 3,
+        "image_ratio": "auto",
+        "padding_top": 0,
+        "padding_bottom": 72
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

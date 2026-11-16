@@ -17,7 +17,13 @@
   assign overlay_bg = ''
   assign strength = opacity | default: 0 | times: 1
   assign ov_color = color | default: '#000000'
-  assign ov_rgb = ov_color | color_extract: 'red' | append: ',' | append: ov_color | color_extract: 'green' | append: ',' | append: ov_color | color_extract: 'blue'
+  if ov_color == blank
+    assign ov_color = '#000000'
+  endif
+  assign ov_r = ov_color | color_extract: 'red' | default: 0
+  assign ov_g = ov_color | color_extract: 'green' | default: 0
+  assign ov_b = ov_color | color_extract: 'blue' | default: 0
+  assign ov_rgb = ov_r | append: ',' | append: ov_g | append: ',' | append: ov_b
   if strength > 0
     assign a = strength | divided_by: 100.0
     if style == 'gradient'
@@ -55,5 +61,5 @@
   endif
 -%}
 {%- if overlay_bg != blank -%}
-  <div class="banner__overlay" style="background: {{ overlay_bg }};"></div>
+  <div class="banner__overlay" aria-hidden="true" style="display: block; background: {{ overlay_bg }};"></div>
 {%- endif -%}

@@ -624,26 +624,84 @@
     .pv-eng-card__head { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; padding-bottom: 14px; border-bottom: 1px solid var(--pv-line); font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
     .pv-eng-card__head svg { width: 18px; height: 18px; flex: none; }
     .pv-eng-card:not(.pv-eng-card--plain) .pv-opt { margin: 0 0 18px; }
-    .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; }
-    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__pill { flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 58px; padding: 9px 6px; text-align: center; line-height: 1.25; font-size: 13px; }
-    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__badge { background: transparent !important; padding: 0; font-size: 11.5px; font-weight: 600; letter-spacing: 0.02em; opacity: 0.75; color: inherit !important; }
-    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__input:checked + .pv-opt__pill .pv-opt__badge { opacity: 0.9; }
-    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt:not(.pv-opt--color) .pv-opt__input:checked + .pv-opt__pill::before { display: none; }
-    /* minimal choose buttons: hairline box, selected = dark border + faint tint (no heavy black fill) */
-    .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__row { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; }
-    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__pill { min-height: 48px; padding: 7px 4px !important; font-size: 12.5px; font-weight: 500; border-width: 1px; border-radius: 0; border-color: var(--eng-border) !important; background: transparent !important; color: var(--text, #111) !important; box-shadow: none !important; }
-    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__pill > span:first-child { white-space: normal; overflow-wrap: normal; word-break: normal; hyphens: none; }
-    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__pill:hover { border-color: var(--text, #111) !important; background: transparent !important; }
-    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__input:checked + .pv-opt__pill { border-color: var(--text, #111) !important; background: var(--bg, #fff) !important; color: var(--text, #111) !important; box-shadow: 0 0 0 1px var(--text, #111) inset !important; font-weight: 700; }
-    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__input:checked + .pv-opt__pill .pv-opt__badge { color: inherit !important; opacity: .9; }
+    .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
+    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__pill {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 58px;
+      padding: 9px 6px !important;
+      text-align: center;
+      line-height: 1.25;
+      font-size: 13px;
+      font-weight: 500;
+      border-width: 1px;
+      border-radius: var(--btn-radius, 0px);
+      border-color: var(--eng-border, #d9d2c5) !important;
+      background: var(--bg, #fff) !important;
+      color: var(--text, #111) !important;
+      box-shadow: none !important;
+      transition: all 0.2s ease !important;
+    }
+    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__pill > span:first-child {
+      white-space: normal;
+      overflow-wrap: normal;
+      word-break: normal;
+      hyphens: none;
+    }
+    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__pill:hover {
+      border-color: var(--lv-accent-deep, #806745) !important;
+      background: color-mix(in srgb, var(--lv-accent-deep, #806745) 5%, var(--bg, #fff)) !important;
+    }
+    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__input:checked + .pv-opt__pill {
+      border-color: var(--lv-accent-deep, #806745) !important;
+      background: var(--bg, #fff) !important;
+      color: var(--text, #111) !important;
+      box-shadow: 0 0 0 1.5px var(--lv-accent-deep, #806745) inset !important;
+      font-weight: 700;
+    }
+    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt:not(.pv-opt--color) .pv-opt__input:checked + .pv-opt__pill::before {
+      display: none;
+    }
+
+    /* Highlighted price badge on buttons */
+    html body .pv-eng-card .pv-opt__badge {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.02em !important;
+      line-height: 1.1 !important;
+      padding: 3px 8px !important;
+      border-radius: 999px !important;
+      background: color-mix(in srgb, var(--lv-accent-deep, #806745) 12%, var(--bg, #fff)) !important;
+      color: var(--lv-accent-deep, #806745) !important;
+      border: 1px solid color-mix(in srgb, var(--lv-accent-deep, #806745) 30%, transparent) !important;
+      opacity: 1 !important;
+      margin-top: 3px !important;
+      transition: all 0.2s ease !important;
+    }
+    html body .pv-eng-card .pv-opt__pill:hover .pv-opt__badge {
+      background: color-mix(in srgb, var(--lv-accent-deep, #806745) 20%, var(--bg, #fff)) !important;
+      border-color: var(--lv-accent-deep, #806745) !important;
+    }
+    html body .pv-eng-card .pv-opt__input:checked + .pv-opt__pill .pv-opt__badge {
+      background: var(--lv-accent-deep, #806745) !important;
+      color: #ffffff !important;
+      border-color: var(--lv-accent-deep, #806745) !important;
+      box-shadow: 0 2px 6px rgba(128, 103, 69, 0.3) !important;
+      opacity: 1 !important;
+    }
+
     /* card background = announcement bar color */
     /* card colors come from the color scheme chosen in the section settings (class color-scheme-N on the card) */
-    .pv-eng-card { background: var(--bg, #fff); color: var(--text, #111); --pv-line: var(--eng-border); --eng-border: var(--btn-base-border, var(--btn-regular-border, #111)); --pv-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62); }
+    .pv-eng-card { background: var(--bg, #fff); color: var(--text, #111); --pv-line: var(--eng-border); --eng-border: var(--btn-base-border, var(--btn-regular-border, #d9d2c5)); --pv-muted: rgba(var(--color-foreground, 17, 17, 17), 0.62); }
     .pv-eng-card__head { border-bottom-color: var(--lv-border); }
     .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input { border-radius: 0; border: var(--btn-border-thickness, 1px) solid var(--eng-border); }
-    .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input:focus { border-color: var(--text, #111); }
-    .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input, .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input:focus { background: color-mix(in srgb, var(--text, #111) 5%, var(--bg, #fff)); color: var(--text, #111); }
-    html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__badge, html body .pv-eng-card:not(.pv-eng-card--plain) .pv-opt__input:checked + .pv-opt__pill .pv-opt__badge { background: transparent !important; color: inherit !important; }
+    .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input:focus { border-color: var(--lv-accent-deep, #806745); }
+    .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input, .pv-eng-card:not(.pv-eng-card--plain) .pv-engrave__input:focus { background: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)); color: var(--text, #111); }
     .pv-eng-card .pv-engrave { margin: 0; padding: 0; background: transparent; border: 0; border-radius: 0; }
     .pv-eng-card .pv-engrave__label, .pv-eng-card .pv-engrave__label .pv-optional { font-size: 12px; }
     .pv-eng-card .pv-engrave__label { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; margin: 0 0 8px; }
@@ -1053,7 +1111,7 @@
               <fieldset class="pv-opt{% if is_color %} pv-opt--color{% endif %}{% if wide %} pv-opt--wide{% endif %}{% if is_initial_letter %} pv-opt--letter{% endif %}" data-pv-option data-option-index="{{ opt_idx }}">
                 <legend class="pv-opt__label">
                   <span>{{ option.name }}:</span>
-                  <span class="pv-opt__selected" data-pv-selected>{{ option.selected_value }}{{ selected_extra }}</span>
+                  <span class="pv-opt__selected" data-pv-selected>{{ option.selected_value }}{% if selected_extra != blank %} <span class="pv-opt__extra-price" style="color: var(--lv-accent-deep, #806745); font-weight: 700;">{{ selected_extra | strip }}</span>{% endif %}</span>
                   {%- if is_sizeish and section.settings.size_guide_page != blank -%}
                     {%- assign pv_sg_default = 'products.product.size_guide' | t -%}
                     <a class="pv-opt__guide" href="{{ section.settings.size_guide_page.url }}{% render 'product-size-guide-anchor', product: product %}" target="_blank" rel="noopener">{{ section.settings.size_guide_label | default: pv_sg_default }}</a>
@@ -1591,13 +1649,17 @@
             var optLegend = g.querySelector('.pv-opt__label > span');
             var isEng = optLegend && (optLegend.textContent.toLowerCase().indexOf('engrav') > -1 || optLegend.textContent.toLowerCase().indexOf('char') > -1);
             if (isEng && val) {
-              if (val.indexOf('3') > -1) extra = ' (+€0)';
-              else if (val.indexOf('5') > -1) extra = ' (+€2)';
-              else if (val.indexOf('7') > -1) extra = ' (+€4)';
-              else if (val.indexOf('10') > -1) extra = ' (+€7)';
-              else if (val.indexOf('12') > -1) extra = ' (+€10)';
+              if (val.indexOf('3') > -1) extra = '(+€0)';
+              else if (val.indexOf('5') > -1) extra = '(+€2)';
+              else if (val.indexOf('7') > -1) extra = '(+€4)';
+              else if (val.indexOf('10') > -1) extra = '(+€7)';
+              else if (val.indexOf('12') > -1) extra = '(+€10)';
             }
-            lab.textContent = (val || '') + extra;
+            if (extra) {
+              lab.innerHTML = (val || '') + ' <span class="pv-opt__extra-price" style="color: var(--lv-accent-deep, #806745); font-weight: 700;">' + extra + '</span>';
+            } else {
+              lab.textContent = (val || '');
+            }
           }
         });
         updateAvailability(vals);
@@ -1615,7 +1677,11 @@
           saleBadge.hidden = !v.save;
           var sbText = saleBadge.querySelector('[data-lv-sale-text]');
           if (sbText && saleBadge.dataset.type !== 'text' && v.save) {
-            sbText.textContent = (i18n.percentOff || '__PERCENT__% OFF').replace('__PERCENT__', v.save);
+            if (saleBadge.dataset.design === 'minimal_capsule' || saleBadge.dataset.design === 'minimal_square') {
+              sbText.textContent = '-' + v.save + '%';
+            } else {
+              sbText.textContent = (i18n.percentOff || '__PERCENT__% OFF').replace('__PERCENT__', v.save);
+            }
           }
         }
         if (saveEl) { saveEl.textContent = v.save ? '-' + v.save + '%' : ''; saveEl.hidden = !v.save; }

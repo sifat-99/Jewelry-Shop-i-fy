@@ -1,10 +1,31 @@
 {% doc %}
   Snippet "sale-badge-css" used by the theme sections.
+  Controls sale ribbon / tag / seal / minimal capsule styles.
+  Configurable via Theme settings > Price & Badges / Sale badge.
 {% enddoc %}
 <style>
   :root {
     --lv-badge-bg: {{ settings.sale_badge_bg | default: '#8c2b3f' }};
     --lv-badge-text: {{ settings.sale_badge_text | default: '#ffffff' }};
+    --lv-badge-font-size: {{ settings.sale_badge_font_size | default: 11 }}px;
+    {%- assign badge_shape = settings.sale_badge_shape | default: 'capsule' -%}
+    {%- if settings.sale_badge_design == 'minimal_square' or badge_shape == 'square' -%}
+      --lv-badge-capsule-radius: 0px;
+    {%- else -%}
+      --lv-badge-capsule-radius: 999px;
+    {%- endif -%}
+    {%- if settings.sale_badge_capsule_transparent -%}
+      --lv-badge-capsule-bg: transparent;
+      --lv-badge-capsule-shadow: none;
+    {%- elsif settings.sale_badge_capsule_bg != blank -%}
+      --lv-badge-capsule-bg: {{ settings.sale_badge_capsule_bg }};
+      --lv-badge-capsule-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    {%- else -%}
+      --lv-badge-capsule-bg: rgba(255, 252, 246, 0.96);
+      --lv-badge-capsule-shadow: inset 0 1px 0 #fff;
+    {%- endif -%}
+    --lv-badge-capsule-text: {{ settings.sale_badge_capsule_text | default: settings.sale_badge_bg | default: '#8c2b3f' }};
+    --lv-badge-capsule-border: {{ settings.sale_badge_capsule_border | default: 'rgba(197, 167, 106, 0.72)' }};
   }
   .lv-sale-badge {
     position: absolute; top: 10px; left: 0; z-index: 15; pointer-events: none;
@@ -13,9 +34,9 @@
   }
   .lv-sale-badge[hidden] { display: none; }
   .lv-sale-badge__inner {
-    display: block; position: relative;
+    display: inline-block; position: relative;
     padding: 6px 15px 6px 11px;
-    font-size: 11px; font-weight: 700; line-height: 1.2; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+    font-size: var(--lv-badge-font-size, 11px); font-weight: 700; line-height: 1.2; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
     color: var(--lv-badge-text);
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
     background:
@@ -49,7 +70,7 @@
     padding: 5px;
     border: 1px solid #d7bd80;
     border-radius: 50%;
-    font-size: 9px;
+    font-size: calc(var(--lv-badge-font-size, 11px) * 0.82);
     line-height: 1.2;
     letter-spacing: 0.04em;
     text-align: center;
@@ -57,27 +78,65 @@
     clip-path: none;
     background: radial-gradient(circle at 35% 25%, #a34b5c 0%, var(--lv-badge-bg) 58%, #64202f 100%);
   }
-  .lv-sale-badge[data-design="minimal_capsule"] { filter: drop-shadow(0 2px 4px rgba(48, 36, 25, 0.12)); }
-  .lv-sale-badge[data-design="minimal_capsule"] .lv-sale-badge__inner {
-    padding: 6px 12px;
-    color: var(--lv-badge-bg);
+  .lv-sale-badge[data-design="minimal_capsule"],
+  .lv-sale-badge[data-design="minimal_square"] {
+    left: 10px;
+    top: 10px;
+    {%- if settings.sale_badge_capsule_transparent -%}
+    filter: none;
+    {%- else -%}
+    filter: drop-shadow(0 2px 4px rgba(48, 36, 25, 0.12));
+    {%- endif -%}
+  }
+  .lv-sale-badge[data-design="minimal_capsule"] .lv-sale-badge__inner,
+  .lv-sale-badge[data-design="minimal_square"] .lv-sale-badge__inner {
+    padding: 0.42em 0.85em;
+    font-size: var(--lv-badge-font-size, 11px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.06em;
+    color: var(--lv-badge-capsule-text);
     text-shadow: none;
-    background: rgba(255, 252, 246, 0.96);
-    border: 1px solid rgba(197, 167, 106, 0.72);
-    border-radius: 999px;
-    box-shadow: inset 0 1px 0 #fff;
+    background: var(--lv-badge-capsule-bg);
+    border: 1px solid var(--lv-badge-capsule-border);
+    border-radius: var(--lv-badge-capsule-radius, 999px);
+    box-shadow: var(--lv-badge-capsule-shadow);
     clip-path: none;
   }
   .lv-sale-badge--lg { top: 14px; }
-  .lv-sale-badge--lg .lv-sale-badge__inner { font-size: 12.5px; padding: 8px 18px 8px 14px; }
+  .lv-sale-badge--lg .lv-sale-badge__inner { font-size: calc(var(--lv-badge-font-size, 11px) * 1.15); padding: 8px 18px 8px 14px; }
+  .lv-sale-badge--lg[data-design="minimal_capsule"],
+  .lv-sale-badge--lg[data-design="minimal_square"] { left: 14px; top: 14px; }
+  .lv-sale-badge--lg[data-design="minimal_capsule"] .lv-sale-badge__inner,
+  .lv-sale-badge--lg[data-design="minimal_square"] .lv-sale-badge__inner {
+    padding: 0.48em 0.95em;
+    font-size: calc(var(--lv-badge-font-size, 11px) * 1.15);
+  }
   @media (max-width: 640px) {
     .lv-sale-badge { top: 8px; }
-    .lv-sale-badge__inner { font-size: 10px; padding: 4px 11px 4px 8px; }
+    .lv-sale-badge__inner { font-size: calc(var(--lv-badge-font-size, 11px) * 0.9); padding: 4px 11px 4px 8px; }
     .lv-sale-badge[data-design="fine_jewelry_tag"] .lv-sale-badge__inner { padding: 4px 9px; }
     .lv-sale-badge[data-design="heritage_seal"] { width: 54px; height: 54px; }
-    .lv-sale-badge[data-design="heritage_seal"] .lv-sale-badge__inner { padding: 4px; font-size: 8px; }
-    .lv-sale-badge[data-design="minimal_capsule"] .lv-sale-badge__inner { padding: 4px 10px; }
+    .lv-sale-badge[data-design="heritage_seal"] .lv-sale-badge__inner { padding: 4px; font-size: calc(var(--lv-badge-font-size, 11px) * 0.72); }
+    .lv-sale-badge[data-design="minimal_capsule"],
+    .lv-sale-badge[data-design="minimal_square"] { left: 8px; top: 8px; }
+    .lv-sale-badge[data-design="minimal_capsule"] .lv-sale-badge__inner,
+    .lv-sale-badge[data-design="minimal_square"] .lv-sale-badge__inner {
+      padding: 0.38em 0.8em;
+      font-size: calc(var(--lv-badge-font-size, 11px) * 0.9);
+    }
     .lv-sale-badge--lg { top: 10px; }
-    .lv-sale-badge--lg .lv-sale-badge__inner { font-size: 11px; padding: 6px 14px 6px 10px; }
+    .lv-sale-badge--lg .lv-sale-badge__inner { font-size: var(--lv-badge-font-size, 11px); padding: 6px 14px 6px 10px; }
+    .lv-sale-badge--lg[data-design="minimal_capsule"],
+    .lv-sale-badge--lg[data-design="minimal_square"] { left: 10px; top: 10px; }
   }
+  {%- assign show_discount_badge_mobile = settings.card_show_discount_badge_mobile -%}
+  {%- if show_discount_badge_mobile == nil -%}{%- assign show_discount_badge_mobile = true -%}{%- endif -%}
+  {%- unless show_discount_badge_mobile -%}
+    @media (max-width: 767px) {
+      .lv-sale-badge {
+        display: none !important;
+      }
+    }
+  {%- endunless -%}
 </style>

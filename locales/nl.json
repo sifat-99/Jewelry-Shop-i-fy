@@ -17,6 +17,47 @@
     "showcase_video": "Showcase-video",
     "skip_to_text": "Ga naar inhoud"
   },
+  "blogs": {
+    "article": {
+      "all_articles": "Alle verhalen",
+      "back_to_blog": "Terug naar {{ title }}",
+      "by_author": "Door {{ author }}",
+      "comments": {
+        "one": "{{ count }} reactie",
+        "other": "{{ count }} reacties"
+      },
+      "copied": "Link gekopieerd",
+      "email": "E-mailadres",
+      "error_heading": "Controleer het onderstaande formulier",
+      "featured_badge": "Uitgelicht verhaal",
+      "leave_comment": "Plaats een reactie",
+      "message": "Reactie",
+      "moderated": "Let op: reacties worden eerst goedgekeurd voordat ze worden gepubliceerd.",
+      "name": "Naam",
+      "next_article": "Volgend verhaal",
+      "post": "Reactie plaatsen",
+      "posted": "Je reactie is succesvol geplaatst! Bedankt!",
+      "posted_moderated": "Je reactie is succesvol geplaatst en wordt na beoordeling gepubliceerd.",
+      "previous_article": "Vorig verhaal",
+      "read_article": "Lees artikel",
+      "read_more": "Lees meer",
+      "read_time": "{{ minutes }} min leestijd",
+      "related_title": "Meer uit het Journal",
+      "share": "Delen",
+      "shop_story_cta": "Bekijk de collectie",
+      "shop_story_title": "Uitgelichte sieraden",
+      "tags": "Onderwerpen"
+    },
+    "general": {
+      "all_tags": "Alles",
+      "empty_cta": "Bekijk sieraden",
+      "empty_text": "We werken binnenkort aan nieuwe verhalen, stylingtips en materiaalgidsen voor je.",
+      "empty_title": "Nog geen artikelen",
+      "eyebrow": "Het Aurelle Journal",
+      "filter_by_tag": "Filter artikelen op onderwerp",
+      "subtitle": "Vakmanschap, verzorging van waterproof sieraden en de verhalen achter onze collectie."
+    }
+  },
   "breadcrumbs": {
     "all_products": "Alle producten",
     "home": "Home",
@@ -69,6 +110,13 @@
       }
     },
     "payment_methods": "Geaccepteerde betaalmethoden",
+    "remove_confirm": {
+      "cancel": "Behouden",
+      "confirm": "Verwijderen",
+      "message": "Weet je zeker dat je {{ title }} uit je winkelwagen wilt verwijderen?",
+      "message_generic": "Weet je zeker dat je dit artikel uit je winkelwagen wilt verwijderen?",
+      "title": "Artikel verwijderen?"
+    },
     "shipping": {
       "no_shipping_available": "Geen verzendtarieven beschikbaar voor deze bestemming"
     },
@@ -425,15 +473,19 @@
       "tags": "Getagd \"{{ tags }}\""
     },
     "newsletter_form": {
+      "badge": "10% korting op je eerste bestelling",
       "code_html": "Gebruik code <strong>{{ code }}</strong> bij het afrekenen.",
       "email_label": "E-mailadres",
       "email_placeholder": "Vul je e-mailadres in...",
       "email_placeholder_short": "Je e-mailadres",
+      "heading": "Word lid van de Aurelle-lijst",
       "invalid_email": "Vul een geldig e-mailadres in.",
       "join": "Inschrijven",
       "newsletter_confirmation": "Bedankt voor je inschrijving!",
+      "note": "Geen spam. Altijd uitschrijven mogelijk.",
       "submit": "Inschrijven",
-      "success": "Welkom bij de lijst — je bent ingeschreven."
+      "success": "Welkom bij de lijst — je bent ingeschreven.",
+      "text": "Blijf als eerste op de hoogte van nieuwe collecties, graveeraanbiedingen en exclusieve acties."
     },
     "pagination": {
       "label": "Paginering",
@@ -459,6 +511,7 @@
       "page_title": "Binnenkort geopend &ndash; {{ shop_name }}"
     },
     "search": {
+      "articles": "Journal",
       "browse_collections": "Bekijk collecties",
       "clear": "Wissen",
       "clear_search": "Zoekopdracht wissen",
@@ -473,6 +526,7 @@
       "page_eyebrow": "Doorzoek ons atelier",
       "page_lead": "Vind gegraveerde sieraden, waterdichte basics, kettingen, ringen en cadeaus.",
       "page_placeholder": "Zoek ringen, kettingen, gravures...",
+      "pages": "Pagina's",
       "placeholder": "Doorzoek onze sieradencollectie...",
       "popular_label": "Populair:",
       "popular_terms": "Gouden ring, Ketting, Armband, Gravure, Oorbellen",

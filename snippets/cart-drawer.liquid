@@ -10,14 +10,40 @@
   data-section-id="cart-drawer"
   data-section-type="cart-drawer"
 >
+  {%- liquid
+    assign cart_btn_bg = settings.cart_checkout_button_bg
+    if cart_btn_bg == blank
+      assign cart_btn_bg = 'var(--btn-regular-bg, var(--lv-accent-deep, #806745))'
+    endif
+    assign cart_btn_text = settings.cart_checkout_button_text
+    if cart_btn_text == blank
+      assign cart_btn_text = 'var(--btn-regular-text, #ffffff)'
+    endif
+    assign cart_btn_border = settings.cart_checkout_button_border
+    if cart_btn_border == blank
+      assign cart_btn_border = 'var(--btn-regular-border, var(--lv-accent-deep, #806745))'
+    endif
+    assign cart_btn_hover_bg = settings.cart_checkout_button_hover_bg
+    if cart_btn_hover_bg == blank
+      assign cart_btn_hover_bg = 'var(--btn-regular-hover-bg, #1a1a1a)'
+    endif
+    assign cart_btn_hover_text = settings.cart_checkout_button_hover_text
+    if cart_btn_hover_text == blank
+      assign cart_btn_hover_text = 'var(--btn-regular-hover-text, #ffffff)'
+    endif
+    assign cart_btn_hover_border = settings.cart_checkout_button_hover_border
+    if cart_btn_hover_border == blank
+      assign cart_btn_hover_border = 'var(--btn-regular-hover-border, #1a1a1a)'
+    endif
+  -%}
   <style>
     :root {
-      --cart-checkout-btn-bg: {{ settings.cart_checkout_button_bg | default: 'var(--btn-regular-bg)' }};
-      --cart-checkout-btn-text: {{ settings.cart_checkout_button_text | default: 'var(--btn-regular-text)' }};
-      --cart-checkout-btn-border: {{ settings.cart_checkout_button_border | default: 'var(--btn-regular-border)' }};
-      --cart-checkout-btn-hover-bg: {{ settings.cart_checkout_button_hover_bg | default: 'var(--btn-regular-hover-bg)' }};
-      --cart-checkout-btn-hover-text: {{ settings.cart_checkout_button_hover_text | default: 'var(--btn-regular-hover-text)' }};
-      --cart-checkout-btn-hover-border: {{ settings.cart_checkout_button_hover_border | default: 'var(--btn-regular-hover-border)' }};
+      --cart-checkout-btn-bg: {{ cart_btn_bg }};
+      --cart-checkout-btn-text: {{ cart_btn_text }};
+      --cart-checkout-btn-border: {{ cart_btn_border }};
+      --cart-checkout-btn-hover-bg: {{ cart_btn_hover_bg }};
+      --cart-checkout-btn-hover-text: {{ cart_btn_hover_text }};
+      --cart-checkout-btn-hover-border: {{ cart_btn_hover_border }};
     }
 
     #drawer-cart .checkout__button {
@@ -28,12 +54,15 @@
       font-size: {{ settings.cart_checkout_button_text_size | default: 14 }}px !important;
       font-weight: 700 !important;
       line-height: 1.3 !important;
-      letter-spacing: 0.1em !important;
+      letter-spacing: 0.12em !important;
+      text-transform: uppercase !important;
       text-align: center !important;
       text-decoration: none !important;
+      border-radius: var(--btn-radius, 0px) !important;
       color: var(--cart-checkout-btn-text) !important;
       background-color: var(--cart-checkout-btn-bg) !important;
-      border-color: var(--cart-checkout-btn-border) !important;
+      border: var(--btn-border-thickness, 1px) solid var(--cart-checkout-btn-border) !important;
+      transition: background-color var(--btn-animation-duration, 300ms) ease, border-color var(--btn-animation-duration, 300ms) ease, color var(--btn-animation-duration, 300ms) ease !important;
     }
     #drawer-cart .checkout__button::before {
       background-color: var(--cart-checkout-btn-hover-bg) !important;
@@ -42,16 +71,10 @@
       background-color: var(--bg, #ffffff) !important;
       color: var(--cart-checkout-btn-border) !important;
     }
-    #drawer-cart .checkout__button[data-button-style="champagne"] {
-      --cart-checkout-btn-bg: #c5a76a;
-      --cart-checkout-btn-text: #2f2518;
-      --cart-checkout-btn-border: #b6904f;
-      --cart-checkout-btn-hover-bg: #a98243;
-      --cart-checkout-btn-hover-text: #ffffff;
-      --cart-checkout-btn-hover-border: #a98243;
-    }
     #drawer-cart .checkout__button:hover {
       border-color: var(--cart-checkout-btn-hover-border) !important;
+      background-color: var(--cart-checkout-btn-hover-bg) !important;
+      color: var(--cart-checkout-btn-hover-text) !important;
     }
     #drawer-cart .checkout__button:hover span {
       color: var(--cart-checkout-btn-hover-text) !important;
@@ -108,7 +131,26 @@
       overflow: visible !important;
       pointer-events: auto !important;
       padding: 15px var(--gutter, 20px) !important;
-      border-bottom: 1px solid var(--border, #eee) !important;
+      background-color: var(--lv-cream, #f7f5f0) !important;
+      border-bottom: 1px solid var(--lv-line, #e6e2d8) !important;
+      color: var(--text, var(--lv-ink, #1a1a1a)) !important;
+    }
+    #drawer-cart [data-left-to-spend] {
+      color: var(--lv-accent-deep, #806745) !important;
+      font-weight: 700 !important;
+    }
+    #drawer-cart .cart__graph-progress {
+      stroke: var(--lv-accent-deep, #806745) !important;
+    }
+    #drawer-cart .cart__graph circle:first-child {
+      stroke: rgba(128, 103, 69, 0.22) !important;
+    }
+    #drawer-cart .cart__message.is-success {
+      background-color: color-mix(in srgb, #2e7d32 9%, var(--lv-cream, #f7f5f0)) !important;
+      color: #1b5e20 !important;
+    }
+    #drawer-cart .cart__message.is-success .cart__graph-progress {
+      stroke: #2e7d32 !important;
     }
     .cart--hidden,
     .cart__drawer .cart--hidden,
@@ -159,9 +201,161 @@
     .cart__items__remove a:active {
       transform: scale(0.95);
     }
+
+    /* Item title, quantity hover */
+    #drawer-cart .cart__items__title a {
+      color: var(--text, var(--lv-ink, #1a1a1a)) !important;
+      transition: color 0.2s ease;
+    }
+    #drawer-cart .cart__items__title a:hover {
+      color: var(--lv-accent-deep, #806745) !important;
+    }
+    #drawer-cart .cart__items__quantity .quantity__button:hover {
+      color: var(--lv-accent-deep, #806745) !important;
+    }
+
+    /* Empty State Synced with Global Aurelle Luxury Palette */
+    #drawer-cart .cart__empty {
+      background: transparent !important;
+    }
+    #drawer-cart .cart__empty p {
+      font-family: var(--FONT-STACK-HEADING, 'Playfair Display', serif) !important;
+      font-size: 21px !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.03em !important;
+      color: var(--text, var(--lv-ink, #1a1a1a)) !important;
+    }
+    #drawer-cart .cart__circle {
+      background-color: var(--lv-cream, #f7f5f0) !important;
+      border: 1px solid var(--lv-line, #e6e2d8) !important;
+      color: var(--lv-accent-deep, #806745) !important;
+      box-shadow: 0 4px 18px rgba(128, 103, 69, 0.1) !important;
+      transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease !important;
+    }
+    #drawer-cart .cart__circle svg {
+      stroke: var(--lv-accent-deep, #806745) !important;
+      color: var(--lv-accent-deep, #806745) !important;
+      opacity: 0.82 !important;
+      transition: opacity 0.35s ease, transform 0.35s ease !important;
+    }
+    #drawer-cart .cart__circle__wrapper:hover .cart__circle {
+      border-color: var(--lv-accent-deep, #806745) !important;
+      box-shadow: 0 8px 26px rgba(128, 103, 69, 0.24) !important;
+      transform: translateY(-2px);
+    }
+    #drawer-cart .cart__circle__wrapper:hover svg {
+      opacity: 1 !important;
+      transform: scale(1.06);
+    }
+    #drawer-cart .cart__continue__link {
+      color: var(--lv-accent-deep, #806745) !important;
+      font-family: var(--FONT-STACK-ACCENT, var(--FONT-STACK-BODY, sans-serif)) !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.12em !important;
+      text-transform: uppercase !important;
+      transition: color 0.3s ease !important;
+    }
+    #drawer-cart .cart__continue__link::after {
+      background: var(--lv-accent-deep, #806745) !important;
+      height: 1.5px !important;
+    }
+    #drawer-cart .cart__circle__wrapper:hover .cart__continue__link {
+      color: var(--text, #111111) !important;
+    }
+    #drawer-cart .cart__circle__wrapper:hover .cart__continue__link::after {
+      background: var(--text, #111111) !important;
+    }
+
+    /* Remove confirmation modal inside drawer */
+    #drawer-cart .cart-confirm[hidden] {
+      display: none !important;
+    }
+    #drawer-cart .cart-confirm {
+      position: absolute;
+      inset: 0;
+      z-index: 600;
+      background: rgba(17, 15, 13, 0.45);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #drawer-cart .cart-confirm__card {
+      width: 100%;
+      max-width: 340px;
+      background: var(--bg, #ffffff) !important;
+      border: 1px solid var(--lv-line, #e6e2d8) !important;
+      border-radius: var(--btn-radius, 0px) !important;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+      padding: 26px 22px 22px;
+      text-align: center;
+    }
+    #drawer-cart .cart-confirm__badge {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      background: var(--lv-cream, #f7f5f0) !important;
+      border: 1px solid var(--lv-line, #e6e2d8) !important;
+      color: var(--lv-accent-deep, #806745) !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #drawer-cart .cart-confirm__title {
+      margin: 0 0 8px;
+      font-family: var(--FONT-STACK-HEADING, serif) !important;
+      font-size: 19px;
+      font-weight: 500;
+      color: var(--text, var(--lv-ink, #1a1a1a)) !important;
+    }
+    #drawer-cart .cart-confirm__message {
+      margin: 0 0 20px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-light, #5c5349) !important;
+      word-break: break-word;
+    }
+    #drawer-cart .cart-confirm__actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    #drawer-cart .cart-confirm__btn {
+      min-height: 42px;
+      padding: 0 14px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-radius: var(--btn-radius, 0px) !important;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+    #drawer-cart .cart-confirm__btn--cancel {
+      background: var(--bg, #ffffff) !important;
+      color: var(--text, var(--lv-ink, #1a1a1a)) !important;
+      border: 1px solid var(--lv-line, #d6cec0) !important;
+    }
+    #drawer-cart .cart-confirm__btn--cancel:hover {
+      background: var(--lv-cream, #f7f4ee) !important;
+      border-color: var(--lv-accent-deep, #806745) !important;
+    }
+    #drawer-cart .cart-confirm__btn--remove {
+      background: var(--btn-regular-bg, var(--lv-accent-deep, #806745)) !important;
+      color: var(--btn-regular-text, #ffffff) !important;
+      border: 1px solid var(--btn-regular-border, var(--lv-accent-deep, #806745)) !important;
+    }
+    #drawer-cart .cart-confirm__btn--remove:hover {
+      background: #a93226 !important;
+      border-color: #a93226 !important;
+      color: #ffffff !important;
+    }
   </style>
 
-  <div class="drawer cart__drawer drawer--right palette--light bg--neutral"
+  <div class="drawer cart__drawer drawer--right palette--light bg--neutral color-scheme-1"
     data-cart-message-container
     data-drawer="drawer-cart"
     id="drawer-cart">
@@ -241,14 +435,14 @@
         </div>
 
         <!-- Cart Items Loading & Form -->
-        <div data-cart-form data-cart-loading class="{% if cart.item_count == 0 %}cart--hidden{% endif %}" style="{% if cart.item_count == 0 %}display: none;{% endif %}">
+        <div data-cart-form data-cart-loading class="{% if cart.item_count == 0 %}cart--hidden{% endif %}">
           <div data-line-items>
             {% render 'cart-line-items' %}
           </div>
         </div>
 
         {%- capture drawer_checkout_html -%}
-        <div class="drawer__bottom drawer__bottom--checkout {% if cart.item_count == 0 %}cart--hidden{% endif %}" data-cart-bottom data-accordion-group style="{% if cart.item_count == 0 %}display: none;{% endif %}">
+        <div class="drawer__bottom drawer__bottom--checkout {% if cart.item_count == 0 %}cart--hidden{% endif %}" data-cart-bottom data-accordion-group>
           <p class="drawer__bottom__meta body-size-3"><em></em></p>
 
           <div class="drawer__footer__subtotal" data-cart-subtotal style="display: none;">
@@ -268,7 +462,7 @@
 
         {%- capture drawer_notes_html -%}
         <!-- Free shipping notice + payment icons: always at the bottom of the drawer -->
-        <div class="drawer__bottom drawer__bottom--notes {% if cart.item_count == 0 %}cart--hidden{% endif %}" data-cart-bottom style="{% if cart.item_count == 0 %}display: none;{% endif %}">
+        <div class="drawer__bottom drawer__bottom--notes {% if cart.item_count == 0 %}cart--hidden{% endif %}" data-cart-bottom>
           <center>
             <div style="font-weight: bold; text-transform: uppercase; margin: 10px 0; font-size: 13px; letter-spacing: 0.05em;">
               {{ 'cart.shipping_bar.notice' | t: amount: free_shipping_threshold_money }}
@@ -286,6 +480,20 @@
 
       {%- unless checkout_after_items -%}{{ drawer_checkout_html }}{%- endunless -%}
       {{ drawer_notes_html }}
+
+      <div class="cart-confirm" id="cart-remove-confirm" role="dialog" aria-modal="true" aria-labelledby="cart-remove-confirm-title" aria-hidden="true" hidden>
+        <div class="cart-confirm__card">
+          <div class="cart-confirm__badge" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m19.5 4-1.072 18H5.571L4.5 4M10 9v8m4-8v8M3 4h18M9 4V2h6v2"/></svg>
+          </div>
+          <p class="cart-confirm__title" id="cart-remove-confirm-title">{{ 'cart.remove_confirm.title' | t }}</p>
+          <p class="cart-confirm__message" data-cart-confirm-message>{{ 'cart.remove_confirm.message_generic' | t }}</p>
+          <div class="cart-confirm__actions">
+            <button type="button" class="cart-confirm__btn cart-confirm__btn--cancel" data-cart-confirm-cancel>{{ 'cart.remove_confirm.cancel' | t }}</button>
+            <button type="button" class="cart-confirm__btn cart-confirm__btn--remove" data-cart-confirm-ok>{{ 'cart.remove_confirm.confirm' | t }}</button>
+          </div>
+        </div>
+      </div>
 
     </div>
 
@@ -311,15 +519,16 @@
     // Unified UI Synchronization Engine
     function syncCartDrawerUI(cart) {
       if (!cart) return;
-      var emptyEl = document.querySelector('[data-cart-empty]');
-      var formEl = document.querySelector('[data-cart-form]');
-      var bottomEls = document.querySelectorAll('[data-cart-bottom]');
-      var finalPriceEls = document.querySelectorAll('[data-cart-final]');
+      var drawerRoot = document.getElementById('drawer-cart') || document;
+      var emptyEl = drawerRoot.querySelector('[data-cart-empty]');
+      var formEl = drawerRoot.querySelector('[data-cart-form]');
+      var bottomEls = drawerRoot.querySelectorAll('[data-cart-bottom]');
+      var finalPriceEls = drawerRoot.querySelectorAll('[data-cart-final]');
       var headerPriceEls = document.querySelectorAll('[data-header-cart-price]');
       var headerCountEls = document.querySelectorAll('[data-header-cart-count]');
-      var leftToSpendEl = document.querySelector('[data-left-to-spend]');
-      var cartMsgEl = document.querySelector('[data-cart-message]');
-      var progressEl = document.querySelector('[data-cart-progress]');
+      var leftToSpendEl = drawerRoot.querySelector('[data-left-to-spend]');
+      var cartMsgEl = drawerRoot.querySelector('[data-cart-message]');
+      var progressEl = drawerRoot.querySelector('[data-cart-progress]');
 
       var formattedTotal = fmtMoney(cart.total_price);
 
@@ -344,11 +553,12 @@
         }
         if (formEl) {
           formEl.classList.remove('cart--hidden');
-          formEl.style.display = 'block';
+          formEl.classList.remove('cart--loading');
+          formEl.style.display = '';
         }
         bottomEls.forEach(function(el) {
           el.classList.remove('cart--hidden');
-          el.style.display = 'block';
+          el.style.display = '';
         });
       } else {
         if (emptyEl) {
@@ -357,6 +567,7 @@
         }
         if (formEl) {
           formEl.classList.add('cart--hidden');
+          formEl.classList.remove('cart--loading');
           formEl.style.display = 'none';
         }
         bottomEls.forEach(function(el) {
@@ -392,10 +603,89 @@
     var cartAddJsonUrl = (routesObj.cart_add_url || {{ routes.cart_add_url | json }}) + '.js';
     var addingText = (typeof theme !== 'undefined' && theme.i18n && theme.i18n.adding) ? theme.i18n.adding : {{ 'products.product.adding' | t | json }};
 
+    var fallbackClosersBound = false;
+    var fallbackOpenTimer = null;
+
+    function bindFallbackClosers(drawer) {
+      if (fallbackClosersBound || !drawer) return;
+      fallbackClosersBound = true;
+
+      drawer.querySelectorAll('[data-drawer-toggle="drawer-cart"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          if (drawer.dataset.drawerFallback === '1') {
+            e.preventDefault();
+            window.closeCartDrawer();
+          }
+        });
+      });
+
+      var underlay = drawer.querySelector('[data-drawer-underlay]');
+      if (underlay) {
+        underlay.addEventListener('click', function() {
+          if (drawer.dataset.drawerFallback === '1') {
+            window.closeCartDrawer();
+          }
+        });
+      }
+
+      document.addEventListener('keydown', function(e) {
+        if ((e.key === 'Escape' || e.keyCode === 27) && drawer.dataset.drawerFallback === '1' && drawer.classList.contains('drawer--visible')) {
+          window.closeCartDrawer();
+        }
+      });
+    }
+
+    function forceOpenDrawer(drawer) {
+      if (!drawer) return;
+      bindFallbackClosers(drawer);
+      drawer.dataset.drawerFallback = '1';
+      drawer.classList.remove('display-none');
+      void drawer.offsetWidth;
+      drawer.classList.add('drawer--visible');
+      document.querySelectorAll('[data-drawer-toggle="drawer-cart"]').forEach(function(el) {
+        el.setAttribute('aria-expanded', 'true');
+      });
+      if (!document.documentElement.hasAttribute('data-scroll-locked')) {
+        document.documentElement.style.overflow = 'hidden';
+        drawer.dataset.fallbackScrollLocked = '1';
+      }
+      if (window.theme && window.theme.state) {
+        window.theme.state.cartOpen = true;
+      }
+    }
+
+    function forceCloseDrawer(drawer) {
+      if (!drawer) return;
+      delete drawer.dataset.drawerFallback;
+      drawer.classList.remove('drawer--visible');
+      document.querySelectorAll('[data-drawer-toggle="drawer-cart"]').forEach(function(el) {
+        el.setAttribute('aria-expanded', 'false');
+      });
+      if (drawer.dataset.fallbackScrollLocked === '1') {
+        document.documentElement.style.overflow = '';
+        delete drawer.dataset.fallbackScrollLocked;
+      }
+      if (window.theme && window.theme.state) {
+        window.theme.state.cartOpen = false;
+      }
+      setTimeout(function() {
+        if (!drawer.classList.contains('drawer--visible')) {
+          drawer.classList.add('display-none');
+        }
+      }, 350);
+    }
+
     window.openCartDrawer = function() {
       var drawer = document.getElementById('drawer-cart');
       if (drawer) {
+        delete drawer.dataset.drawerFallback;
         drawer.dispatchEvent(new CustomEvent('theme:drawer:open', { bubbles: false }));
+        if (fallbackOpenTimer) clearTimeout(fallbackOpenTimer);
+        fallbackOpenTimer = setTimeout(function() {
+          if (!drawer.classList.contains('drawer--visible')) {
+            forceOpenDrawer(drawer);
+          }
+        }, 40);
       }
       document.dispatchEvent(new CustomEvent('theme:cart:reload', { bubbles: true }));
       // Direct live cart fetch and UI sync
@@ -410,7 +700,20 @@
     window.closeCartDrawer = function() {
       var drawer = document.getElementById('drawer-cart');
       if (drawer) {
+        if (fallbackOpenTimer) {
+          clearTimeout(fallbackOpenTimer);
+          fallbackOpenTimer = null;
+        }
+        if (drawer.dataset.drawerFallback === '1') {
+          forceCloseDrawer(drawer);
+          return;
+        }
         drawer.dispatchEvent(new CustomEvent('theme:drawer:close', { bubbles: false }));
+        setTimeout(function() {
+          if (drawer.classList.contains('drawer--visible')) {
+            forceCloseDrawer(drawer);
+          }
+        }, 40);
       }
     };
 
@@ -470,6 +773,134 @@
         syncCartDrawerUI(e.detail.cart);
       }
     });
+
+    // Confirmation before removing the last unit of an item (qty 1 -> 0) in Cart Drawer
+    var drawerRootEl = document.getElementById('drawer-cart');
+    var confirmModal = document.getElementById('cart-remove-confirm');
+    var confirmMsgEl = confirmModal ? confirmModal.querySelector('[data-cart-confirm-message]') : null;
+    var confirmCancelBtn = confirmModal ? confirmModal.querySelector('[data-cart-confirm-cancel]') : null;
+    var confirmOkBtn = confirmModal ? confirmModal.querySelector('[data-cart-confirm-ok]') : null;
+    var confirmMsgTpl = {{ 'cart.remove_confirm.message' | t: title: '__TITLE__' | json }};
+    var confirmMsgGeneric = {{ 'cart.remove_confirm.message_generic' | t | json }};
+    var cartChangeJsonUrl = (routesObj.cart_change_url || {{ routes.cart_change_url | json }}) + '.js';
+    var pendingRemoveTarget = null;
+
+    function closeRemoveConfirm(restoreValue) {
+      if (restoreValue && pendingRemoveTarget && pendingRemoveTarget.input) {
+        pendingRemoveTarget.input.value = pendingRemoveTarget.prevQty || '1';
+      }
+      pendingRemoveTarget = null;
+      if (!confirmModal) return;
+      confirmModal.hidden = true;
+      confirmModal.setAttribute('aria-hidden', 'true');
+    }
+
+    function openRemoveConfirm(input, prevQty) {
+      if (!confirmModal || !input) return;
+      var row = input.closest('[data-cart-item]');
+      var titleEl = row ? row.querySelector('.cart__items__title a') : null;
+      var titleText = titleEl ? titleEl.textContent.trim() : '';
+      pendingRemoveTarget = { input: input, row: row, prevQty: prevQty || '1' };
+      if (confirmMsgEl) {
+        confirmMsgEl.textContent = titleText ? confirmMsgTpl.replace('__TITLE__', titleText) : confirmMsgGeneric;
+      }
+      confirmModal.hidden = false;
+      confirmModal.setAttribute('aria-hidden', 'false');
+      if (confirmCancelBtn) confirmCancelBtn.focus();
+    }
+
+    if (drawerRootEl && confirmModal) {
+      drawerRootEl.addEventListener('focusin', function(e) {
+        var inp = e.target && e.target.matches && e.target.matches('[data-quantity-input]') ? e.target : null;
+        if (inp) inp.dataset.prevQty = inp.value || '1';
+      }, true);
+
+      drawerRootEl.addEventListener('click', function(e) {
+        var decBtn = e.target.closest ? e.target.closest('[data-decrease-quantity]') : null;
+        if (!decBtn) return;
+        var wrap = decBtn.closest('[data-quantity-selector]');
+        var input = wrap ? wrap.querySelector('[data-quantity-input]') : null;
+        if (!input) return;
+        var cur = parseInt(input.value, 10);
+        if (!isNaN(cur) && cur <= 1) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          openRemoveConfirm(input, String(Math.max(1, cur)));
+        }
+      }, true);
+
+      drawerRootEl.addEventListener('change', function(e) {
+        var input = e.target && e.target.matches && e.target.matches('[data-quantity-input]') ? e.target : null;
+        if (!input) return;
+        if (input.dataset.confirmedRemove === '1') {
+          delete input.dataset.confirmedRemove;
+          return;
+        }
+        var nextVal = parseInt(input.value, 10);
+        if (!isNaN(nextVal) && nextVal <= 0) {
+          var prevQty = input.dataset.prevQty || '1';
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          input.value = prevQty;
+          openRemoveConfirm(input, prevQty);
+        } else if (!isNaN(nextVal) && nextVal > 0) {
+          input.dataset.prevQty = String(nextVal);
+        }
+      }, true);
+
+      if (confirmCancelBtn) {
+        confirmCancelBtn.addEventListener('click', function() {
+          closeRemoveConfirm(true);
+        });
+      }
+
+      if (confirmOkBtn) {
+        confirmOkBtn.addEventListener('click', function() {
+          var target = pendingRemoveTarget;
+          closeRemoveConfirm(false);
+          if (!target || !target.input) return;
+          var input = target.input;
+          var key = input.getAttribute('data-update-cart');
+          var formEl = drawerRootEl.querySelector('[data-cart-form]');
+          if (formEl) formEl.classList.remove('cart--loading');
+          input.dataset.confirmedRemove = '1';
+          input.value = '0';
+          input.dispatchEvent(new Event('change'));
+          var handledByTheme = formEl && formEl.classList.contains('cart--loading');
+          if (!handledByTheme && key) {
+            fetch(cartChangeJsonUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: key, quantity: 0 })
+            })
+              .then(function(res) { return res.json(); })
+              .then(function(cart) {
+                if (target.row && target.row.parentNode) target.row.remove();
+                syncCartDrawerUI(cart);
+                document.dispatchEvent(new CustomEvent('theme:cart:change', { detail: { cart: cart }, bubbles: true }));
+              })
+              .catch(function(err) { console.error(err); });
+          }
+        });
+      }
+
+      confirmModal.addEventListener('click', function(e) {
+        if (e.target === confirmModal) closeRemoveConfirm(true);
+      });
+
+      function handleConfirmEscape(e) {
+        if ((e.key === 'Escape' || e.keyCode === 27) && !confirmModal.hidden) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          closeRemoveConfirm(true);
+        }
+      }
+      drawerRootEl.addEventListener('keydown', handleConfirmEscape, true);
+      drawerRootEl.addEventListener('keyup', handleConfirmEscape, true);
+    }
 
     // Run on initial page load to ensure state consistency
     document.addEventListener('DOMContentLoaded', function() {

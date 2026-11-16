@@ -24,7 +24,7 @@
       padding: 0 var(--outer, 24px);
       box-sizing: border-box;
     }
-    .sg__head { text-align: center; max-width: 720px; margin: 0 auto 32px; }
+    .sg__head { text-align: left; max-width: 760px; margin: 0 0 28px; }
     .sg__title {
       margin: 0 0 12px;
       font-size: clamp(26px, 3.4vw, 42px);
@@ -38,10 +38,10 @@
     /* Tabs: same border / radius / hover colors as the universal buttons */
     .sg__tabs {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 10px;
-      margin: 0 0 32px;
-      padding: 2px;
+      margin: 0 0 28px;
+      padding: 2px 0;
       overflow-x: auto;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
@@ -72,7 +72,7 @@
 
     /* Panel */
     .sg__panel[hidden] { display: none; }
-    .sg__panel-intro { max-width: 720px; margin: 0 auto 28px; text-align: center; font-size: 14.5px; line-height: 1.7; color: var(--sg-muted); }
+    .sg__panel-intro { max-width: 760px; margin: 0 0 28px; text-align: left; font-size: 14.5px; line-height: 1.7; color: var(--sg-muted); }
     .sg__grid {
       display: grid;
       grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
@@ -244,7 +244,14 @@
                 <ul class="sg__tips">
                   {%- for line in tip_lines -%}
                     {%- assign tip_clean = line | strip -%}
-                    {%- if tip_clean != blank -%}<li>{{ tip_clean }}</li>{%- endif -%}
+                    {%- if tip_clean != blank -%}
+                      {%- assign tip_first = tip_clean | slice: 0, 1 -%}
+                      {%- case tip_first -%}
+                        {%- when '✦', '✧', '•', '★', '☆' -%}
+                          {%- assign tip_clean = tip_clean | remove_first: tip_first | strip -%}
+                      {%- endcase -%}
+                      {%- if tip_clean != blank -%}<li>{{ tip_clean }}</li>{%- endif -%}
+                    {%- endif -%}
                   {%- endfor -%}
                 </ul>
               {%- endif -%}
@@ -369,6 +376,9 @@
             if (first === target) r.classList.add('is-match');
           });
         }
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-') e.preventDefault();
+        });
         input.addEventListener('input', run);
         mode.addEventListener('change', run);
       });

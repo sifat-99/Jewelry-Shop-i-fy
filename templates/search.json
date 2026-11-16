@@ -11,7 +11,25 @@
   "sections": {
     "main": {
       "type": "main-search",
-      "settings": {}
+      "settings": {
+        "color_scheme": "",
+        "eyebrow": "",
+        "lead": "",
+        "show_popular": true,
+        "popular_terms": "",
+        "show_collections": true,
+        "collections_heading": "",
+        "products_per_page": 24,
+        "grid_columns_desktop": 4,
+        "grid_columns_1024": 3,
+        "grid_columns_960": 3,
+        "grid_columns_768": 2,
+        "grid_columns_650": "2",
+        "grid_columns_mobile": "2",
+        "card_border_radius": 0,
+        "padding_top": 30,
+        "padding_bottom": 60
+      }
     }
   },
   "order": [

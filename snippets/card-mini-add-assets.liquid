@@ -2,7 +2,21 @@
   Global CSS + JS for the compact card add button and its variant popup (bottom sheet / side drawer / above button / over product). Rendered once from layout/theme.liquid.
 {% enddoc %}
 {%- comment -%} Global CSS + JS for the compact card add button and its variant popup (bottom sheet / side drawer / above button / over product). Rendered once from layout/theme.liquid. {%- endcomment -%}
+{%- liquid
+  assign show_quick_add_mobile = settings.card_show_quick_add_mobile
+  if show_quick_add_mobile == nil
+    assign show_quick_add_mobile = true
+  endif
+-%}
 <style>
+  {%- unless show_quick_add_mobile -%}
+    @media (max-width: 767px) {
+      .lv-mini-add,
+      .lv-card-quick-add-wrap {
+        display: none !important;
+      }
+    }
+  {%- endunless -%}
   /* Smooth colour change on hover: the hover colour fades in (same speed as the main buttons, --btn-animation-duration). */
   .lv-mini-add, .lv-msheet__opt:not(.is-selected), .search-chip, .ct-social a, .sl-cta__btn {
     position: relative; overflow: hidden; isolation: isolate;
@@ -30,6 +44,7 @@
   /* Engravable products: the hover bar shows one text button instead of size pills */
   .lv-card-quick-add-wrap:has(.lv-card-eng-btn) > .lv-card-action-bar:not(.lv-card-eng-btn) { display: none !important; }
   .lv-mini-add { display: none; }
+  .lv-list-add-wrap { display: none; }
   @media (max-width: 450px) {
     .lv-card-media-wrap:has(.lv-mini-add) .lv-card-quick-add-wrap { display: none !important; }
     .lv-mini-add {
@@ -208,7 +223,8 @@
     }
 
     function content(btn, showClose) {
-      var tpl = btn.parentNode.querySelector('template[data-lv-mini-variants]');
+      var card = btn.closest('product-grid-item');
+      var tpl = btn.parentNode.querySelector('template[data-lv-mini-variants]') || (card && card.querySelector('template[data-lv-mini-variants]'));
       var wrap = document.createElement('div');
       wrap.className = 'lv-mp';
       wrap.innerHTML =
@@ -278,7 +294,8 @@
         document.body.appendChild(el);
         document.body.classList.add('lv-msheet-lock');
       } else if (mode === 'product') {
-        var media = btn.closest('.lv-card-media-wrap');
+        var card = btn.closest('product-grid-item');
+        var media = btn.closest('.lv-card-media-wrap') || (card && card.querySelector('.lv-card-media-wrap'));
         if (!media) { btn.setAttribute('data-popup', 'bottom'); return open(btn); }
         el = document.createElement('div');
         el.className = 'lv-mover';
@@ -291,7 +308,7 @@
         el.appendChild(content(btn, false));
         document.body.appendChild(el);
         var r = (anchor || btn).getBoundingClientRect(), pr = el.getBoundingClientRect();
-        var left = anchor ? r.left + r.width / 2 - pr.width / 2 : (btn.classList.contains('lv-mini-add--left') ? r.left : r.right - pr.width);
+        var left = (anchor || btn.classList.contains('lv-list-add-btn')) ? r.left + r.width / 2 - pr.width / 2 : (btn.classList.contains('lv-mini-add--left') ? r.left : r.right - pr.width);
         left = Math.max(8, Math.min(left, window.innerWidth - pr.width - 8));
         var top = r.top - pr.height - 8;
         if (top < 8) top = Math.min(r.bottom + 8, window.innerHeight - pr.height - 8);
@@ -368,8 +385,17 @@
       if (btn.getAttribute('data-eng') === 'true' && btn.getAttribute('data-eng-action') === 'page' && btn.getAttribute('data-url')) { window.location.href = btn.getAttribute('data-url'); return; }
       if (btn.getAttribute('data-multi') === 'true') { open(btn); return; }
       var spin = btn.querySelector('.lv-mini-add__spin');
-      btn.classList.add('is-busy'); if (spin) spin.hidden = false;
-      addToCart(btn.getAttribute('data-variant-id'), function () { btn.classList.remove('is-busy'); if (spin) spin.hidden = true; });
+      var label = btn.querySelector('.lv-list-add-btn__label');
+      var origLabel = label ? label.textContent : '';
+      var addingLabel = {{ 'products.product.adding' | t | default: 'Adding...' | json }};
+      btn.classList.add('is-busy');
+      if (spin) spin.hidden = false;
+      if (label) label.textContent = addingLabel;
+      addToCart(btn.getAttribute('data-variant-id'), function () {
+        btn.classList.remove('is-busy');
+        if (spin) spin.hidden = true;
+        if (label) label.textContent = origLabel;
+      });
     }, true);
 
     document.addEventListener('input', function (e) {

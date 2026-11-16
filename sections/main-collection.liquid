@@ -261,6 +261,13 @@
       letter-spacing: .1em; text-transform: uppercase; color: var(--text, #111); cursor: pointer; white-space: nowrap;
       transition: border-color .2s ease;
     }
+    .csd__btn > span {
+      display: inline-block;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
     .csd__btn:hover, .csd.is-open .csd__btn { border-color: var(--text, #000); }
     .csd__btn svg { width: 10px; height: 10px; flex: none; transition: transform .2s ease; }
     .csd.is-open .csd__btn svg { transform: rotate(180deg); }
@@ -290,41 +297,101 @@
 
     /* Mobile toolbar:  [Show 12 v]  [N items]  [grid|list]
                         [   Filter   ] [   Sort by   ]      */
-    @media (max-width: 640px) {
+    @media (max-width: 767px) {
       html body .collection-toolbar {
         display: grid !important;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        grid-template-areas: "p p c t" "f f s s";
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-areas: "p p c c t t" "f f f s s s";
         align-items: center;
         gap: 12px 10px;
         padding: 14px 0;
         margin-bottom: 18px;
       }
-      html body .collection-toolbar:not(:has(.csd--pp)) { grid-template-areas: "c c c t" "f f s s"; }
+      html body .collection-toolbar:not(:has(.csd--pp)) { grid-template-areas: "c c c c t t" "f f f s s s"; }
+      html body .collection-toolbar:not(:has(.collection-count-text)) { grid-template-areas: "p p p t t t" "f f f s s s"; }
+      html body .collection-toolbar:not(:has(.collection-view-toggle)) { grid-template-areas: "p p p c c c" "f f f s s s"; }
+      html body .collection-toolbar:not(:has(.csd--pp)):not(:has(.collection-view-toggle)) { grid-template-areas: "c c c c c c" "f f f s s s"; }
       html body .collection-toolbar__left,
       html body .collection-toolbar__right { display: contents !important; }
-      html body .collection-count-text { grid-area: c; text-align: right; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: color-mix(in srgb, var(--text, #555) 62%, transparent); white-space: nowrap; }
+      html body .collection-count-text { grid-area: c; justify-self: center; text-align: center; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: color-mix(in srgb, var(--text, #555) 62%, transparent); white-space: nowrap; }
+      html body .collection-toolbar:not(:has(.csd--pp)) .collection-count-text,
+      html body .collection-toolbar:not(:has(.csd--pp)):not(:has(.collection-view-toggle)) .collection-count-text { justify-self: start; text-align: left; }
+      html body .collection-toolbar:not(:has(.collection-view-toggle)) .collection-count-text { justify-self: end; text-align: right; }
       html body .collection-count-text .cct__lead { display: none; }
       html body .collection-view-toggle { grid-area: t; justify-self: end; }
       .cvt__btn { width: 38px; height: 38px; }
-      html body .csd--pp { grid-area: p; justify-self: start; margin: 0; }
-      html body .csd--pp .csd__btn { height: 40px; min-width: 96px; }
+      html body .csd--pp { grid-area: p; justify-self: start; margin: 0; max-width: 100%; }
+      html body .csd--pp .csd__btn { height: 38px; min-width: 0; padding: 0 11px; gap: 6px; }
       html body .collection-filter-toggle-btn {
-        grid-area: f; width: 100%; justify-content: center; flex-direction: row-reverse; gap: 10px;
-        height: 44px !important; min-height: 44px !important;
+        grid-area: f; width: 100%; min-width: 0; max-width: 100%; justify-content: center; flex-direction: row-reverse; gap: 8px;
+        height: 44px !important; min-height: 44px !important; padding: 0 10px !important;
+        font-size: 10.5px !important; letter-spacing: .06em !important;
       }
-      html body .collection-sort-container { grid-area: s; width: 100%; gap: 0 !important; }
+      html body .collection-toolbar:not(:has(.collection-sort-container)) .collection-filter-toggle-btn { grid-column: 1 / -1; }
+      html body .collection-sort-container { grid-area: s; width: 100%; min-width: 0; max-width: 100%; gap: 0 !important; }
+      html body .collection-toolbar:not(:has(.collection-filter-toggle-btn)) .collection-sort-container { grid-column: 1 / -1; }
       html body .collection-sort-label { display: none !important; }
-      html body .csd:not(.csd--pp) { display: block; width: 100%; }
-      html body .csd:not(.csd--pp) .csd__btn { width: 100%; max-width: 100%; min-width: 0; height: 44px; justify-content: center; gap: 10px; }
+      html body .csd:not(.csd--pp) { display: block; width: 100%; min-width: 0; max-width: 100%; }
+      html body .csd:not(.csd--pp) .csd__btn {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        height: 44px;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 8px;
+        font-size: 10.5px;
+        letter-spacing: .04em;
+        overflow: hidden;
+      }
       html body .csd:not(.csd--pp) .csd__btn svg { display: none; }
       html body .csd:not(.csd--pp) .csd__btn::before {
-        content: ""; width: 14px; height: 14px; flex: none;
+        content: ""; width: 13px; height: 13px; flex: none;
         background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 4v16M3 8l4-4 4 4M17 20V4M13 16l4 4 4-4'/%3E%3C/svg%3E");
+      }
+      html body .csd:not(.csd--pp) .csd__btn > span {
+        display: block;
+        min-width: 0;
+        max-width: calc(100% - 20px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: center;
       }
       .csd__menu { max-width: calc(100vw - 32px); }
       html body .csd:not(.csd--pp) .csd__menu { right: 0; left: auto; }
-      html body .collection-sort-select { min-width: 0 !important; }
+      html body .collection-sort-select {
+        min-width: 0 !important;
+        font-size: 10.5px !important;
+        letter-spacing: .04em !important;
+        padding-right: 24px !important;
+        text-overflow: ellipsis;
+      }
+    }
+    @media (max-width: 380px) {
+      html body .collection-toolbar { gap: 10px 6px; }
+      html body .collection-count-text { font-size: 10px; letter-spacing: .05em; }
+      html body .csd--pp .csd__btn { height: 36px; padding: 0 8px; gap: 4px; font-size: 10px; }
+      html body .csd--pp .csd__lead { margin-right: 3px; }
+      .cvt__btn { width: 36px; height: 36px; }
+      html body .collection-filter-toggle-btn {
+        height: 40px !important; min-height: 40px !important;
+        font-size: 10px !important; letter-spacing: .04em !important;
+        padding: 0 8px !important; gap: 6px !important;
+      }
+      html body .csd:not(.csd--pp) .csd__btn {
+        height: 40px;
+        font-size: 9.5px;
+        letter-spacing: .02em;
+        padding: 0 6px;
+        gap: 4px;
+      }
+      html body .csd:not(.csd--pp) .csd__btn::before {
+        width: 12px; height: 12px;
+      }
+      html body .csd:not(.csd--pp) .csd__btn > span {
+        max-width: calc(100% - 17px);
+      }
     }
 
     /* === Active Filters Badges Bar === */
@@ -683,9 +750,32 @@
     .price-input-box input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .price-separator { color: color-mix(in srgb, var(--text, #999) 62%, transparent); font-size: 14px; }
 
-    /* Live (auto-apply) filtering state */
-    #CollectionResults { transition: opacity .2s ease; }
-    #CollectionResults.is-loading { opacity: .45; pointer-events: none; }
+    /* Live (auto-apply) filtering and sorting loading state with blur and custom brand loader */
+    #CollectionResults {
+      position: relative;
+      transition: opacity .25s ease;
+      min-height: 260px;
+    }
+    #CollectionResults.is-loading > *:not(.collection-results-loader) {
+      opacity: .45;
+      filter: blur(2.5px);
+      pointer-events: none;
+      transition: opacity .25s ease, filter .25s ease;
+    }
+    .collection-results-loader {
+      position: absolute;
+      top: 160px;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    #CollectionResults.is-loading > .collection-results-loader {
+      display: flex;
+    }
     .filter-drawer__apply-btn[disabled] { opacity: .7; }
 
     .filter-drawer__footer {
@@ -737,25 +827,8 @@
       transition: border-color 350ms ease-in-out, box-shadow 350ms ease-in-out !important;
     }
 
-    /* === Responsive Behavior for Mobile Toolbar === */
-    @media (max-width: 640px) {
-      .collection-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-      }
-      .collection-toolbar__row-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-      }
-      .collection-toolbar__row-bottom {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        width: 100%;
-      }
+    /* Fallback select sizing on mobile */
+    @media (max-width: 767px) {
       .collection-sort-select {
         min-width: 120px !important;
         padding-right: 26px !important;
@@ -869,7 +942,6 @@
     assign hero_links = section.settings.collection_links_menu.links
   -%}
   <section class="collection-hero collection-hero--{{ header_style }} collection-hero--size-{{ title_size }} palette--light{% if header_style == 'band' %} color-{{ section.settings.header_color_scheme | default: 'scheme-3' }}{% else %} bg--neutral{% endif %}"
-    data-section-type="hero"
     style="{% if section.settings.header_text_color != blank %}--hero-fg: {{ section.settings.header_text_color }};{% endif %}">
     <div style="--PT: {{ section.settings.padding_top | default: 20 }}px; --PB: 10px;">
       <div class="collection__text-content wrapper--full section-padding">
@@ -975,6 +1047,9 @@
       </div>
 
       <div id="CollectionResults" aria-live="polite" data-view="{{ section.settings.default_view | default: 'grid' }}" data-default-view="{{ section.settings.default_view | default: 'grid' }}" data-list-desc="{{ list_desc }}" style="--lv-list-cols: {{ list_cols }}; --lv-list-img: {{ list_img }}px;">
+        <div class="collection-results-loader" aria-hidden="true">
+          {% render 'lv-loader' %}
+        </div>
       <!-- Active Filters Badges Bar -->
       {%- if total_active_filters > 0 -%}
         <div class="active-filters-bar">
@@ -1080,7 +1155,7 @@
 
           {%- liquid
             assign min_slider_val = 0
-            assign max_slider_val = 65
+            assign max_slider_val = 100
             assign price_min_name = 'filter.v.price.gte'
             assign price_max_name = 'filter.v.price.lte'
             if price_filter
@@ -1089,13 +1164,6 @@
               assign range_max_val = price_filter.range_max | divided_by: 100.0 | ceil
               if range_max_val > 0
                 assign max_slider_val = range_max_val
-              endif
-            endif
-            if collection.products.size > 0
-              assign page_prices = collection.products | map: 'price' | sort
-              assign page_min_val = page_prices.first | divided_by: 100.0 | floor
-              if page_min_val < max_slider_val
-                assign min_slider_val = page_min_val
               endif
             endif
             assign current_min_val = min_slider_val
@@ -1287,7 +1355,7 @@
 
       <!-- Drawer Footer Action Buttons -->
       <div class="filter-drawer__footer">
-        {%- capture filter_count_span -%}<span id="FilterResultCount">{{ collection.products_count }}</span>{%- endcapture -%}
+        {%- capture filter_count_span -%}{%- endcapture -%}
         <button type="button" class="filter-drawer__apply-btn btn btn--primary" id="FilterViewResults">
           <span>{{ 'collections.filtering.view_results_html' | t: count: filter_count_span }}</span>
         </button>
@@ -1428,6 +1496,19 @@
         rangeMin.addEventListener('change', function () { scheduleApply(120); });
         rangeMax.addEventListener('change', function () { scheduleApply(120); });
 
+        [inputMin, inputMax].forEach(function(inp) {
+          if (!inp) return;
+          inp.addEventListener('keydown', function(e) {
+            if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-') {
+              e.preventDefault();
+            }
+          });
+          inp.addEventListener('input', function() {
+            var cleaned = this.value.replace(/[^\d.]/g, '');
+            if (cleaned !== this.value) this.value = cleaned;
+          });
+        });
+
         if (inputMin) {
           inputMin.addEventListener('change', function() {
             var val = Math.min(Math.max(parseFloat(this.value) || sliderMin, sliderMin), sliderMax);
@@ -1450,146 +1531,7 @@
 
       }
 
-      // 4. URL State Synchronization & Active Badges
-      var urlParams = new URLSearchParams(window.location.search);
-      var activeFilterCount = 0;
-
-      // Price filter from URL
-      var pMin = urlParams.get('filter.v.price.gte');
-      var pMax = urlParams.get('filter.v.price.lte');
-      if (pMin && rangeMin && inputMin) {
-        rangeMin.value = pMin;
-        inputMin.value = pMin;
-        activeFilterCount++;
-      }
-      if (pMax && rangeMax && inputMax) {
-        rangeMax.value = pMax;
-        inputMax.value = pMax;
-        activeFilterCount++;
-      }
-      if (trackFill && (pMin || pMax)) {
-        updatePriceSlider();
-      }
-
-      // Checkboxes from URL
-      var allCheckboxes = document.querySelectorAll('.filter-drawer__item input[type="checkbox"]');
-      allCheckboxes.forEach(function(cb) {
-        var name = cb.getAttribute('name');
-        var val = cb.getAttribute('value');
-        if (urlParams.getAll(name).includes(val)) {
-          cb.checked = true;
-          activeFilterCount++;
-          // If in extra items, expand Show More automatically
-          var extraParent = cb.closest('.is-extra-item');
-          if (extraParent && showMoreBtn) {
-            extraParent.style.display = 'block';
-            showMoreBtn.setAttribute('data-expanded', 'true');
-            showMoreBtn.textContent = mcI18n.showLess;
-          }
-        }
-      });
-
-      // Update badge counts
-      if (activeFilterCount > 0) {
-        var toggleBadge = document.querySelector('.collection-filter-toggle-btn .badge-count');
-        var drawerBadge = document.querySelector('.filter-drawer__title .badge-count');
-        if (toggleBadge) {
-          toggleBadge.textContent = activeFilterCount;
-          toggleBadge.style.display = 'inline-flex';
-        }
-        if (drawerBadge) {
-          drawerBadge.textContent = activeFilterCount;
-          drawerBadge.style.display = 'inline-flex';
-        }
-      }
-
-      // 5. Client-Side Instant Product Filtering Matching (Zero False Empty Grids!)
-      function applyClientSideFiltering() {
-        var checkedStyles = [];
-        var checkedMaterials = [];
-        var checkedColors = [];
-        var checkedSizes = [];
-
-        document.querySelectorAll('input[data-filter-type="style"]:checked').forEach(function(c) {
-          checkedStyles.push(c.value.toLowerCase().trim());
-        });
-        document.querySelectorAll('input[data-filter-type="material"]:checked').forEach(function(c) {
-          checkedMaterials.push(c.value.toLowerCase().trim());
-        });
-        document.querySelectorAll('input[data-filter-type="color"]:checked').forEach(function(c) {
-          checkedColors.push(c.value.toLowerCase().trim());
-        });
-        document.querySelectorAll('input[data-filter-type="size"]:checked').forEach(function(c) {
-          checkedSizes.push(c.value.toLowerCase().trim());
-        });
-
-        var minPrice = inputMin ? (parseFloat(inputMin.value) || 0) : 0;
-        var maxPrice = inputMax ? (parseFloat(inputMax.value) || 999999) : 999999;
-
-        var hasAnyActiveFilter = checkedStyles.length > 0 || checkedMaterials.length > 0 || checkedColors.length > 0 || checkedSizes.length > 0 || (pMin || pMax);
-
-        if (!hasAnyActiveFilter) return;
-
-        var cards = document.querySelectorAll('.collection-products-grid product-grid-item');
-        var visibleCount = 0;
-
-        cards.forEach(function(card) {
-          var price = parseFloat(card.getAttribute('data-price') || '0');
-          var title = (card.getAttribute('data-title') || '').toLowerCase();
-          var tags = (card.getAttribute('data-tags') || '').toLowerCase();
-          var type = (card.getAttribute('data-type') || '').toLowerCase();
-          var options = (card.getAttribute('data-options') || '').toLowerCase();
-          var variants = (card.getAttribute('data-variants') || '').toLowerCase();
-
-          var allText = title + ' ' + tags + ' ' + type + ' ' + options + ' ' + variants;
-
-          // Price match
-          var priceMatch = price >= minPrice && price <= maxPrice;
-
-          // Style match
-          var styleMatch = checkedStyles.length === 0;
-          if (!styleMatch) {
-            styleMatch = checkedStyles.some(function(s) {
-              return allText.indexOf(s) > -1 || tags.indexOf(s) > -1;
-            });
-          }
-
-          // Material match
-          var materialMatch = checkedMaterials.length === 0;
-          if (!materialMatch) {
-            materialMatch = checkedMaterials.some(function(m) {
-              return allText.indexOf(m) > -1 || allText.indexOf('stainless') > -1 || allText.indexOf('steel') > -1;
-            });
-          }
-
-          // Color match
-          var colorMatch = checkedColors.length === 0;
-          if (!colorMatch) {
-            colorMatch = checkedColors.some(function(col) {
-              return allText.indexOf(col) > -1 || allText.indexOf('gold') > -1;
-            });
-          }
-
-          // Size match
-          var sizeMatch = checkedSizes.length === 0;
-          if (!sizeMatch) {
-            sizeMatch = checkedSizes.some(function(sz) {
-              return options.indexOf(sz) > -1 || variants.indexOf(sz) > -1 || allText.indexOf(sz) > -1;
-            });
-          }
-
-          if (priceMatch && styleMatch && materialMatch && colorMatch && sizeMatch) {
-            card.style.display = '';
-            visibleCount++;
-          } else {
-            card.style.display = 'none';
-          }
-        });
-      }
-
-      applyClientSideFiltering();
-
-      // ---- Live filtering: any change updates the products behind the open drawer (no Apply click) ----
+      // 4. URL State Synchronization & Drawer State (Server-Authoritative)
       var resultsEl = document.getElementById('CollectionResults');
       var viewBtn = document.getElementById('FilterViewResults');
       var applyTimer = null;
@@ -1597,7 +1539,11 @@
 
       function priceUntouched() {
         if (!rangeMin || !inputMin || !inputMax) return true;
-        return parseFloat(inputMin.value) <= parseFloat(rangeMin.getAttribute('min')) && parseFloat(inputMax.value) >= parseFloat(rangeMax.getAttribute('max'));
+        var rMin = parseFloat(rangeMin.getAttribute('min')) || 0;
+        var rMax = parseFloat(rangeMax.getAttribute('max')) || 100;
+        var iMin = parseFloat(inputMin.value) || 0;
+        var iMax = parseFloat(inputMax.value) || rMax;
+        return iMin <= rMin && iMax >= rMax;
       }
 
       function buildFilterUrl() {
@@ -1625,19 +1571,84 @@
         });
       }
 
-      function applyFilters() {
-        if (!filterForm || !resultsEl || !window.fetch) { if (filterForm) filterForm.submit(); return; }
-        var url = buildFilterUrl();
+      function syncDrawerFromUrl(targetUrl) {
+        var params = targetUrl ? new URL(targetUrl, window.location.origin).searchParams : new URLSearchParams(window.location.search);
+
+        // Price filter from URL
+        var pMin = params.get('filter.v.price.gte');
+        var pMax = params.get('filter.v.price.lte');
+        var sliderMin = rangeMin ? (parseFloat(rangeMin.getAttribute('min')) || 0) : 0;
+        var sliderMax = rangeMax ? (parseFloat(rangeMax.getAttribute('max')) || 100) : 100;
+
+        if (rangeMin && inputMin) {
+          var valMin = (pMin !== null && pMin !== '') ? Math.max(sliderMin, parseFloat(pMin) || sliderMin) : sliderMin;
+          rangeMin.value = valMin;
+          inputMin.value = Math.round(valMin);
+        }
+        if (rangeMax && inputMax) {
+          var valMax = (pMax !== null && pMax !== '') ? Math.min(sliderMax, parseFloat(pMax) || sliderMax) : sliderMax;
+          rangeMax.value = valMax;
+          inputMax.value = Math.round(valMax);
+        }
+        if (trackFill && typeof updatePriceSlider === 'function') {
+          updatePriceSlider();
+        }
+
+        // Checkboxes from URL
+        var allCheckboxes = document.querySelectorAll('.filter-drawer__item input[type="checkbox"]');
+        allCheckboxes.forEach(function(cb) {
+          var name = cb.getAttribute('name');
+          var val = cb.getAttribute('value');
+          var isChecked = !!(name && val && params.getAll(name).includes(val));
+          cb.checked = isChecked;
+          if (isChecked) {
+            var extraParent = cb.closest('.is-extra-item');
+            if (extraParent && showMoreBtn) {
+              extraParent.style.display = 'block';
+              showMoreBtn.setAttribute('data-expanded', 'true');
+              showMoreBtn.textContent = mcI18n.showLess;
+            }
+          }
+        });
+
+        // Ensure all cards are clean of any leftover inline display:none
+        var cards = document.querySelectorAll('.collection-products-grid product-grid-item');
+        cards.forEach(function(card) {
+          if (card.style.display === 'none') {
+            card.style.display = '';
+          }
+        });
+
+        // Update badge counts
+        updateBadges();
+      }
+
+      // Initial sync on page load/reload
+      syncDrawerFromUrl();
+
+      // ---- Live filtering: any change updates the products behind the open drawer (no Apply click) ----
+
+      function loadCollectionAjax(url, pushHistory) {
+        if (!resultsEl || !window.fetch) {
+          window.location.href = url;
+          return;
+        }
         if (applyCtrl) applyCtrl.abort();
         applyCtrl = window.AbortController ? new AbortController() : null;
         resultsEl.classList.add('is-loading');
+
         fetch(url, { credentials: 'same-origin', signal: applyCtrl ? applyCtrl.signal : undefined })
-          .then(function (r) { if (!r.ok) throw new Error('bad'); return r.text(); })
+          .then(function (r) { if (!r.ok) throw new Error('bad response'); return r.text(); })
           .then(function (html) {
             var doc = new DOMParser().parseFromString(html, 'text/html');
             var fresh = doc.getElementById('CollectionResults');
             if (!fresh) throw new Error('no results');
+
+            var curView = resultsEl.getAttribute('data-view');
+            if (curView) fresh.setAttribute('data-view', curView);
+
             resultsEl.innerHTML = fresh.innerHTML;
+
             var oldCount = document.querySelector('.collection-count-text');
             var newCount = doc.querySelector('.collection-count-text');
             if (oldCount && newCount) oldCount.innerHTML = newCount.innerHTML;
@@ -1645,15 +1656,34 @@
             var total = strong ? strong.textContent.trim() : null;
             var rc = document.getElementById('FilterResultCount');
             if (rc && total !== null) rc.textContent = total;
-            history.replaceState(null, '', url);
-            updateBadges();
+
+            if (pushHistory) {
+              history.pushState(null, '', url);
+            } else {
+              history.replaceState(null, '', url);
+            }
+
+            syncDrawerFromUrl(url);
             if (window.lvInitPerPage) window.lvInitPerPage();
+
+            if (resultsEl.getBoundingClientRect().top < -60) {
+              var topPos = resultsEl.getBoundingClientRect().top + window.pageYOffset - 120;
+              window.scrollTo({ top: Math.max(0, topPos), behavior: 'smooth' });
+            }
           })
           .catch(function (err) {
             if (err && err.name === 'AbortError') return;
             window.location.href = url;
           })
-          .then(function () { resultsEl.classList.remove('is-loading'); });
+          .then(function () {
+            resultsEl.classList.remove('is-loading');
+          });
+      }
+
+      function applyFilters() {
+        if (!filterForm || !resultsEl || !window.fetch) { if (filterForm) filterForm.submit(); return; }
+        var url = buildFilterUrl();
+        loadCollectionAjax(url, false);
       }
 
       function scheduleApply(delay) {
@@ -1688,13 +1718,53 @@
         });
       }
 
+      // Active filter pill click handling without reload
+      if (resultsEl) {
+        resultsEl.addEventListener('click', function(e) {
+          var pill = e.target.closest ? e.target.closest('.active-filter-pill, .active-filters-clear-all') : null;
+          if (pill && pill.getAttribute('href')) {
+            e.preventDefault();
+            loadCollectionAjax(pill.getAttribute('href'), true);
+          }
+        });
+      }
+
       // 6. Sort by Dropdown
       var sortSelect = document.getElementById('CollectionSortBy');
+      var sortLabel = null;
+      var sortOpts = [];
+
+      var syncSortUI = function(value) {
+        if (sortSelect) sortSelect.value = value;
+        if (filterForm) {
+          var sortInput = filterForm.querySelector('input[name="sort_by"]');
+          if (sortInput) sortInput.value = value;
+        }
+        sortOpts.forEach(function(o) {
+          var isMatch = o.getAttribute('data-value') === value;
+          o.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+          if (isMatch && sortLabel) {
+            sortLabel.textContent = o.textContent;
+            if (sortLabel.parentElement) sortLabel.parentElement.setAttribute('title', o.textContent);
+          }
+        });
+      };
+
       if (sortSelect) {
         var goSort = function(value) {
-          var url = new URL(window.location.href);
+          syncSortUI(value);
+
+          var url;
+          if (filterForm) {
+            url = new URL(buildFilterUrl(), window.location.origin);
+          } else {
+            url = new URL(window.location.href);
+          }
           url.searchParams.set('sort_by', value);
-          window.location.href = url.href;
+          url.searchParams.delete('page');
+          url.searchParams.delete('pg');
+
+          loadCollectionAjax(url.href, true);
         };
         sortSelect.onchange = function() { goSort(this.value); };
 
@@ -1712,6 +1782,7 @@
           btn.setAttribute('aria-haspopup', 'listbox');
           btn.setAttribute('aria-expanded', 'false');
           var label = document.createElement('span');
+          sortLabel = label;
           btn.appendChild(label);
           btn.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
 
@@ -1720,7 +1791,7 @@
           menu.setAttribute('role', 'listbox');
           menu.setAttribute('aria-labelledby', 'CollectionSortBy');
 
-          var opts = [];
+          sortOpts = [];
           Array.prototype.forEach.call(sortSelect.options, function(o) {
             var li = document.createElement('li');
             li.className = 'csd__opt';
@@ -1728,9 +1799,12 @@
             li.setAttribute('data-value', o.value);
             li.setAttribute('aria-selected', o.selected ? 'true' : 'false');
             li.textContent = o.text;
-            if (o.selected) label.textContent = o.text;
+            if (o.selected) {
+              label.textContent = o.text;
+              btn.setAttribute('title', o.text);
+            }
             menu.appendChild(li);
-            opts.push(li);
+            sortOpts.push(li);
           });
 
           box.appendChild(btn);
@@ -1744,11 +1818,11 @@
             btn.setAttribute('aria-expanded', open ? 'true' : 'false');
           };
           var move = function(dir) {
-            var cur = opts.findIndex(function(o) { return o.classList.contains('is-active'); });
-            if (cur < 0) cur = opts.findIndex(function(o) { return o.getAttribute('aria-selected') === 'true'; });
-            var next = Math.max(0, Math.min(opts.length - 1, cur + dir));
-            opts.forEach(function(o) { o.classList.remove('is-active'); });
-            opts[next].classList.add('is-active');
+            var cur = sortOpts.findIndex(function(o) { return o.classList.contains('is-active'); });
+            if (cur < 0) cur = sortOpts.findIndex(function(o) { return o.getAttribute('aria-selected') === 'true'; });
+            var next = Math.max(0, Math.min(sortOpts.length - 1, cur + dir));
+            sortOpts.forEach(function(o) { o.classList.remove('is-active'); });
+            sortOpts[next].classList.add('is-active');
           };
 
           btn.addEventListener('click', function(e) { e.stopPropagation(); setOpen(!box.classList.contains('is-open')); });
@@ -1770,6 +1844,19 @@
           });
         }
       }
+
+      // Browser back/forward navigation support
+      window.addEventListener('popstate', function () {
+        var params = new URLSearchParams(window.location.search);
+        var curSort = params.get('sort_by');
+        if (curSort && typeof syncSortUI === 'function') {
+          syncSortUI(curSort);
+        }
+        if (typeof syncDrawerFromUrl === 'function') {
+          syncDrawerFromUrl(window.location.href);
+        }
+        loadCollectionAjax(window.location.href, false);
+      });
     }
 
     if (document.readyState === 'loading') {

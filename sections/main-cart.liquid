@@ -182,7 +182,10 @@
 
                 <div class="cp-item__qty">
                   <div class="cp-qty">
-                    <a href="{{ routes.cart_change_url }}?line={{ forloop.index }}&quantity={{ item.quantity | minus: 1 }}" class="cp-qty__btn" aria-label="{{ 'products.product.decrease_quantity' | t }}">
+                    <a href="{{ routes.cart_change_url }}?line={{ forloop.index }}&quantity={{ item.quantity | minus: 1 }}"
+                      class="cp-qty__btn"
+                      {% if item.quantity <= 1 %}data-cp-qty-remove-confirm data-item-title="{{ item.product.title | escape }}"{% endif %}
+                      aria-label="{{ 'products.product.decrease_quantity' | t }}">
                       <svg width="10" height="2" viewBox="0 0 10 2" fill="none" aria-hidden="true"><path d="M0.75 1H9.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                     </a>
                     <span class="cp-qty__val">{{ item.quantity }}</span>
@@ -273,6 +276,140 @@
 
   </div>
 </div>
+
+<style>
+  .cp-confirm[hidden] { display: none !important; }
+  .cp-confirm {
+    position: fixed;
+    inset: 0;
+    z-index: 20500;
+    background: rgba(17, 15, 13, 0.48);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .cp-confirm__card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--bg, #ffffff);
+    border: 1px solid var(--lv-line, #e7dfd1);
+    border-radius: var(--btn-radius, 0px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    padding: 28px 24px 24px;
+    text-align: center;
+  }
+  .cp-confirm__title {
+    margin: 0 0 8px;
+    font-family: var(--FONT-STACK-HEADING, serif);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text, var(--lv-ink, #1a1714));
+  }
+  .cp-confirm__message {
+    margin: 0 0 22px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--text-light, #5c5349);
+  }
+  .cp-confirm__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .cp-confirm__btn {
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-radius: var(--btn-radius, 0px);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .cp-confirm__btn--cancel {
+    background: var(--bg, #ffffff);
+    color: var(--text, var(--lv-ink, #1a1714));
+    border: 1px solid var(--lv-line, #d6cec0);
+  }
+  .cp-confirm__btn--cancel:hover {
+    background: var(--lv-cream, #f7f4ee);
+    border-color: var(--lv-accent-deep, #806745);
+  }
+  .cp-confirm__btn--remove {
+    background: var(--btn-regular-bg, var(--lv-accent-deep, #806745));
+    color: var(--btn-regular-text, #ffffff);
+    border: 1px solid var(--btn-regular-border, var(--lv-accent-deep, #806745));
+  }
+  .cp-confirm__btn--remove:hover {
+    background: #a93226;
+    border-color: #a93226;
+    color: #ffffff;
+  }
+</style>
+
+<div class="cp-confirm" id="cp-remove-confirm" role="dialog" aria-modal="true" aria-labelledby="cp-remove-confirm-title" aria-hidden="true" hidden>
+  <div class="cp-confirm__card">
+    <p class="cp-confirm__title" id="cp-remove-confirm-title">{{ 'cart.remove_confirm.title' | t }}</p>
+    <p class="cp-confirm__message" data-cp-confirm-msg>{{ 'cart.remove_confirm.message_generic' | t }}</p>
+    <div class="cp-confirm__actions">
+      <button type="button" class="cp-confirm__btn cp-confirm__btn--cancel" data-cp-confirm-cancel>{{ 'cart.remove_confirm.cancel' | t }}</button>
+      <button type="button" class="cp-confirm__btn cp-confirm__btn--remove" data-cp-confirm-ok>{{ 'cart.remove_confirm.confirm' | t }}</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var modal = document.getElementById('cp-remove-confirm');
+    if (!modal) return;
+    var msgEl = modal.querySelector('[data-cp-confirm-msg]');
+    var cancelBtn = modal.querySelector('[data-cp-confirm-cancel]');
+    var okBtn = modal.querySelector('[data-cp-confirm-ok]');
+    var msgTpl = {{ 'cart.remove_confirm.message' | t: title: '__TITLE__' | json }};
+    var msgGeneric = {{ 'cart.remove_confirm.message_generic' | t | json }};
+    var pendingHref = null;
+
+    function closeConfirm() {
+      pendingHref = null;
+      modal.hidden = true;
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    document.addEventListener('click', function(e) {
+      var trigger = e.target.closest ? e.target.closest('[data-cp-qty-remove-confirm]') : null;
+      if (!trigger) return;
+      e.preventDefault();
+      pendingHref = trigger.getAttribute('href');
+      var title = trigger.getAttribute('data-item-title') || '';
+      if (msgEl) {
+        msgEl.textContent = title ? msgTpl.replace('__TITLE__', title) : msgGeneric;
+      }
+      modal.hidden = false;
+      modal.setAttribute('aria-hidden', 'false');
+      if (cancelBtn) cancelBtn.focus();
+    });
+
+    if (cancelBtn) cancelBtn.addEventListener('click', closeConfirm);
+    if (okBtn) {
+      okBtn.addEventListener('click', function() {
+        var href = pendingHref;
+        closeConfirm();
+        if (href) window.location.href = href;
+      });
+    }
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) closeConfirm();
+    });
+    document.addEventListener('keydown', function(e) {
+      if ((e.key === 'Escape' || e.keyCode === 27) && !modal.hidden) {
+        closeConfirm();
+      }
+    });
+  })();
+</script>
 
 {% schema %}
 {

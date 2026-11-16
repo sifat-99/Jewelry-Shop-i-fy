@@ -9,14 +9,26 @@
   Settings: Footer section > Newsletter.
   Accepts: s (section.settings)
 {%- endcomment -%}
-{%- assign nl_code = s.newsletter_discount_code | strip -%}
+{%- liquid
+  assign nl_code = s.newsletter_discount_code | strip
+  assign nl_badge_default = 'general.newsletter_form.badge' | t
+  assign nl_heading_default = 'general.newsletter_form.heading' | t
+  assign nl_text_default = 'general.newsletter_form.text' | t
+  assign nl_note_default = 'general.newsletter_form.note' | t
+  assign nl_badge = s.newsletter_discount_badge | default: nl_badge_default
+  assign nl_heading = s.newsletter_heading | default: nl_heading_default
+  assign nl_text = s.newsletter_text | default: nl_text_default
+  assign nl_note = s.newsletter_note | default: nl_note_default
+-%}
 <div class="fnl">
   <div class="fnl__copy">
-    {%- if s.newsletter_show_discount and s.newsletter_discount_badge != blank -%}
-      <span class="fnl__badge">{{ s.newsletter_discount_badge | escape }}</span>
+    {%- if s.newsletter_show_discount -%}
+      {%- if nl_badge != blank -%}
+        <span class="fnl__badge">{{ nl_badge | escape }}</span>
+      {%- endif -%}
     {%- endif -%}
-    {%- if s.newsletter_heading != blank -%}<h3 class="fnl__title">{{ s.newsletter_heading | escape }}</h3>{%- endif -%}
-    {%- if s.newsletter_text != blank -%}<p class="fnl__text">{{ s.newsletter_text | escape }}</p>{%- endif -%}
+    {%- if nl_heading != blank -%}<h3 class="fnl__title">{{ nl_heading | escape }}</h3>{%- endif -%}
+    {%- if nl_text != blank -%}<p class="fnl__text">{{ nl_text | escape }}</p>{%- endif -%}
   </div>
   <div class="fnl__box">
     {%- form 'customer', id: 'footer-newsletter', class: 'fnl__form' -%}
@@ -24,15 +36,17 @@
         <div class="fnl__ok" role="status">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
           <div>
-            {%- assign nl_success_default = 'general.newsletter_form.success' | t -%}
+            {%- assign nl_success_default = 'general.newsletter_form.newsletter_confirmation' | t -%}
             <p class="fnl__ok-title">{{ s.newsletter_success | default: nl_success_default | escape }}</p>
-            {%- if s.newsletter_show_discount and nl_code != blank -%}
-              <p class="fnl__ok-code">{{ 'general.newsletter_form.code_html' | t: code: nl_code }}</p>
+            {%- if s.newsletter_show_discount -%}
+              {%- if nl_code != blank -%}
+                <p class="fnl__ok-code">{{ 'general.newsletter_form.code_html' | t: code: nl_code }}</p>
+              {%- endif -%}
             {%- endif -%}
           </div>
         </div>
       {%- else -%}
-        {%- assign nl_placeholder_default = 'general.newsletter_form.email_placeholder' | t -%}
+        {%- assign nl_placeholder_default = 'general.newsletter_form.email_placeholder_short' | t -%}
         {%- assign nl_submit_default = 'general.newsletter_form.submit' | t -%}
         {%- assign nl_error_default = 'general.newsletter_form.invalid_email' | t -%}
         <input type="hidden" name="contact[tags]" value="newsletter">
@@ -44,7 +58,7 @@
         {%- if form.errors -%}
           <p class="fnl__err" role="alert">{{ form.errors.messages['email'] | default: nl_error_default }}</p>
         {%- endif -%}
-        {%- if s.newsletter_note != blank -%}<p class="fnl__note">{{ s.newsletter_note | escape }}</p>{%- endif -%}
+        {%- if nl_note != blank -%}<p class="fnl__note">{{ nl_note | escape }}</p>{%- endif -%}
       {%- endif -%}
     {%- endform -%}
   </div>

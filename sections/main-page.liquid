@@ -116,7 +116,17 @@
   .ct-field input { height: 50px; }
   .ct-field textarea { min-height: 150px; padding: 14px; resize: vertical; line-height: 1.6; }
   .ct-field input:focus, .ct-field textarea:focus { background: var(--bg, #fff); border-color: var(--text, #111); box-shadow: 0 0 0 3px color-mix(in srgb, var(--text, #111) 8%, transparent); }
-  .ct-field.has-error input, .ct-field.has-error textarea { border-color: #b3261e; }
+  .ct-phone-group { display: flex; align-items: stretch; width: 100%; height: 50px; background: var(--pp-soft); border: 1px solid var(--pp-line); border-radius: var(--input-radius, var(--btn-radius, 0px)); overflow: hidden; transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease; box-sizing: border-box; }
+  .ct-phone-group:focus-within { background: var(--bg, #fff); border-color: var(--text, #111); box-shadow: 0 0 0 3px color-mix(in srgb, var(--text, #111) 8%, transparent); }
+  .ct-phone-prefix { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 100%; padding: 0 12px; border-right: 1px solid var(--pp-line); background: color-mix(in srgb, var(--pp-soft) 70%, var(--pp-line)); color: var(--text, #111); font-size: 13.5px; font-weight: 600; white-space: nowrap; flex-shrink: 0; cursor: pointer; user-select: none; }
+  .ct-phone-dial-label { pointer-events: none; }
+  .ct-phone-dial-select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; margin: 0; padding: 0; border: 0; cursor: pointer; font-size: 14px; }
+  .ct-field .ct-phone-group input[type="tel"] { flex: 1 1 auto; min-width: 0; height: 100%; border: 0 !important; background: transparent !important; box-shadow: none !important; border-radius: 0 !important; }
+  .ct-field.has-error input, .ct-field.has-error textarea, .ct-field.has-error .ct-phone-group { border-color: #b3261e; background: #fff9f9; }
+  .ct-field__hint { display: block; margin-top: 5px; font-size: 11.5px; color: var(--pp-muted); }
+  .ct-field__hint[hidden] { display: none; }
+  .ct-field__err { display: block; margin-top: 6px; font-size: 12px; font-weight: 500; color: #b3261e; line-height: 1.35; }
+  .ct-field__err[hidden] { display: none; }
   .ct-btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: var(--ctl-h-lg, 52px); }
   .ct-alert { margin: 0 0 20px; padding: 14px 16px; font-size: 14px; line-height: 1.5; border-radius: var(--ct-radius, 4px); }
   .ct-alert--ok { background: #eaf5ea; color: #1e5a22; border: 1px solid #b9dbb9; }
@@ -246,9 +256,17 @@
                 <input type="email" id="ContactForm-email" name="contact[email]" autocomplete="email" value="{{ form.email | escape }}" required>
               </div>
             </div>
-            <div class="ct-field">
+            <div class="ct-field{% if form.errors contains 'phone' %} has-error{% endif %}">
               <label for="ContactForm-phone">{{ 'pages.contact.form_phone' | t }} <small>({{ 'pages.contact.optional' | t }})</small></label>
-              <input type="tel" id="ContactForm-phone" name="contact[phone]" autocomplete="tel" value="{{ form.phone | escape }}">
+              <div class="ct-phone-group">
+                <div class="ct-phone-prefix">
+                  <span class="ct-phone-dial-label" data-ct-dial-label>🇳🇱 +31</span>
+                  <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" width="10" height="10" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
+                  <select class="ct-phone-dial-select" data-ct-dial aria-label="{{ 'pages.contact.form_phone' | t }}"></select>
+                </div>
+                <input type="tel" inputmode="numeric" id="ContactForm-phone" name="contact[phone]" autocomplete="tel-national" value="{{ form.phone | escape }}" maxlength="20">
+              </div>
+              <span class="ct-field__hint" data-ct-phone-hint hidden></span>
             </div>
             <div class="ct-field{% if form.errors contains 'body' %} has-error{% endif %}">
               <label for="ContactForm-body">{{ 'pages.contact.form_message' | t }}</label>
@@ -287,6 +305,265 @@
     root.innerHTML = '';
     intro.forEach(function (el) { root.appendChild(el); });
     root.appendChild(out);
+  })();
+</script>
+{%- endif -%}
+
+{%- if is_contact -%}
+<script>
+  (function () {
+    var form = document.getElementById('ContactForm');
+    if (!form) return;
+    form.noValidate = true;
+
+    var isNl = {% if request.locale.iso_code == 'nl' %}true{% else %}false{% endif %};
+    var defaultIso = {{ localization.country.iso_code | default: 'NL' | upcase | json }};
+    var txt = isNl ? {
+      nameReq: 'Naam is verplicht.',
+      nameAlpha: 'Voer een geldige naam in.',
+      emailReq: 'E-mailadres is verplicht.',
+      emailInvalid: 'Voer een geldig e-mailadres in.',
+      phoneDigits: 'Voer alleen cijfers in.',
+      phoneInvalid: 'Voer een geldig telefoonnummer in (6–15 cijfers).',
+      msgReq: 'Bericht is verplicht (minimaal 5 tekens).',
+      hintPrefix: 'Wordt verzonden als:'
+    } : {
+      nameReq: 'Name is required.',
+      nameAlpha: 'Enter a valid name (letters required).',
+      emailReq: 'Email address is required.',
+      emailInvalid: 'Enter a valid email address.',
+      phoneDigits: 'Enter numbers only.',
+      phoneInvalid: 'Enter a valid phone number (6–15 digits).',
+      msgReq: 'Please enter a message (at least 5 characters).',
+      hintPrefix: 'Will be sent as:'
+    };
+
+    var DIALS = [
+      ['NL', 'Netherlands', '31', '🇳🇱', true, '6 12345678'],
+      ['BE', 'Belgium', '32', '🇧🇪', true, '470 12 34 56'],
+      ['DE', 'Germany', '49', '🇩🇪', true, '151 23456789'],
+      ['FR', 'France', '33', '🇫🇷', true, '6 12 34 56 78'],
+      ['GB', 'United Kingdom', '44', '🇬🇧', true, '7400 123456'],
+      ['US', 'United States', '1', '🇺🇸', false, '201 555 0123'],
+      ['CA', 'Canada', '1', '🇨🇦', false, '613 555 0123'],
+      ['BD', 'Bangladesh', '880', '🇧🇩', true, '1712 345678'],
+      ['IN', 'India', '91', '🇮🇳', true, '98765 43210'],
+      ['PK', 'Pakistan', '92', '🇵🇰', true, '300 1234567'],
+      ['AU', 'Australia', '61', '🇦🇺', true, '412 345 678'],
+      ['CH', 'Switzerland', '41', '🇨🇭', true, '79 123 45 67'],
+      ['AT', 'Austria', '43', '🇦🇹', true, '664 1234567'],
+      ['ES', 'Spain', '34', '🇪🇸', false, '612 34 56 78'],
+      ['IT', 'Italy', '39', '🇮🇹', false, '312 345 6789'],
+      ['PT', 'Portugal', '351', '🇵🇹', false, '912 345 678'],
+      ['IE', 'Ireland', '353', '🇮🇪', true, '85 123 4567'],
+      ['DK', 'Denmark', '45', '🇩🇰', false, '20 12 34 56'],
+      ['SE', 'Sweden', '46', '🇸🇪', true, '70 123 45 67'],
+      ['NO', 'Norway', '47', '🇳🇴', false, '412 34 567'],
+      ['PL', 'Poland', '48', '🇵🇱', false, '501 234 567'],
+      ['AE', 'United Arab Emirates', '971', '🇦🇪', true, '50 123 4567'],
+      ['SA', 'Saudi Arabia', '966', '🇸🇦', true, '50 123 4567'],
+      ['SG', 'Singapore', '65', '🇸🇬', false, '8123 4567'],
+      ['MY', 'Malaysia', '60', '🇲🇾', true, '12 345 6789'],
+      ['TR', 'Turkey', '90', '🇹🇷', true, '532 123 4567'],
+      ['JP', 'Japan', '81', '🇯🇵', true, '90 1234 5678']
+    ];
+    var SORTED = DIALS.slice().sort(function (a, b) { return b[2].length - a[2].length; });
+
+    var nameEl = document.getElementById('ContactForm-name');
+    var emailEl = document.getElementById('ContactForm-email');
+    var phoneEl = document.getElementById('ContactForm-phone');
+    var bodyEl = document.getElementById('ContactForm-body');
+    var dialSelect = form.querySelector('[data-ct-dial]');
+    var dialLabel = form.querySelector('[data-ct-dial-label]');
+    var phoneHint = form.querySelector('[data-ct-phone-hint]');
+
+    if (dialSelect) {
+      DIALS.forEach(function (d) {
+        var opt = document.createElement('option');
+        opt.value = d[0];
+        opt.setAttribute('data-dial', d[2]);
+        opt.setAttribute('data-flag', d[3]);
+        opt.setAttribute('data-trunk', d[4] ? '1' : '0');
+        opt.setAttribute('data-ex', d[5]);
+        opt.textContent = d[3] + ' ' + d[1] + ' (+' + d[2] + ')';
+        dialSelect.appendChild(opt);
+      });
+    }
+
+    function selectDialByIso(iso) {
+      if (!dialSelect) return;
+      var matched = false;
+      for (var i = 0; i < dialSelect.options.length; i++) {
+        if (dialSelect.options[i].value === iso) {
+          dialSelect.selectedIndex = i;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched && dialSelect.options.length) dialSelect.selectedIndex = 0;
+      var opt = dialSelect.options[dialSelect.selectedIndex];
+      if (opt) {
+        if (dialLabel) dialLabel.textContent = (opt.getAttribute('data-flag') || '🌐') + ' +' + (opt.getAttribute('data-dial') || '31');
+        if (phoneEl && opt.getAttribute('data-ex')) phoneEl.placeholder = opt.getAttribute('data-ex');
+      }
+    }
+
+    function detectIntl(raw) {
+      var trimmed = (raw || '').trim();
+      if (!trimmed || (trimmed.charAt(0) !== '+' && trimmed.indexOf('00') !== 0)) return null;
+      var digits = trimmed.replace(/^(\+|00)/, '').replace(/\D/g, '');
+      for (var i = 0; i < SORTED.length; i++) {
+        var d = SORTED[i];
+        if (digits.indexOf(d[2]) === 0 && digits.length > d[2].length + 3) {
+          return { iso: d[0], national: digits.slice(d[2].length) };
+        }
+      }
+      return null;
+    }
+
+    function combinePhone(raw) {
+      var digits = (raw || '').replace(/\D/g, '');
+      if (!digits) return '';
+      if (!dialSelect || dialSelect.selectedIndex < 0) return digits;
+      var opt = dialSelect.options[dialSelect.selectedIndex];
+      var code = opt.getAttribute('data-dial') || '31';
+      var trunk = opt.getAttribute('data-trunk') === '1';
+      if (trunk && digits.charAt(0) === '0') digits = digits.slice(1);
+      if (digits.indexOf(code) === 0 && digits.length >= code.length + 7) return '+' + digits;
+      return '+' + code + digits;
+    }
+
+    function updateHint() {
+      if (!phoneHint || !phoneEl) return;
+      var d = phoneEl.value.replace(/\D/g, '');
+      if (!d) {
+        phoneHint.textContent = '';
+        phoneHint.hidden = true;
+        return;
+      }
+      phoneHint.textContent = txt.hintPrefix + ' ' + combinePhone(phoneEl.value);
+      phoneHint.hidden = false;
+    }
+
+    function setErr(el, msg) {
+      var field = el ? el.closest('.ct-field') : null;
+      if (!field) return;
+      field.classList.add('has-error');
+      el.setAttribute('aria-invalid', 'true');
+      var err = field.querySelector('[data-ct-err]');
+      if (!err) {
+        err = document.createElement('span');
+        err.className = 'ct-field__err';
+        err.setAttribute('data-ct-err', '');
+        field.appendChild(err);
+      }
+      err.textContent = msg;
+      err.hidden = false;
+    }
+
+    function clearErr(el) {
+      var field = el ? el.closest('.ct-field') : null;
+      if (!field) return;
+      field.classList.remove('has-error');
+      el.removeAttribute('aria-invalid');
+      var err = field.querySelector('[data-ct-err]');
+      if (err) {
+        err.textContent = '';
+        err.hidden = true;
+      }
+    }
+
+    selectDialByIso(defaultIso);
+    if (phoneEl && phoneEl.value) {
+      var initMatch = detectIntl(phoneEl.value);
+      if (initMatch) {
+        selectDialByIso(initMatch.iso);
+        phoneEl.value = initMatch.national;
+      } else {
+        phoneEl.value = phoneEl.value.replace(/[^\d\s]/g, '');
+      }
+    }
+    updateHint();
+
+    if (dialSelect) {
+      dialSelect.addEventListener('change', function () {
+        selectDialByIso(dialSelect.value);
+        updateHint();
+        clearErr(phoneEl);
+      });
+    }
+
+    if (phoneEl) {
+      phoneEl.addEventListener('input', function () {
+        var intl = detectIntl(phoneEl.value);
+        if (intl) {
+          selectDialByIso(intl.iso);
+          phoneEl.value = intl.national;
+        } else {
+          var clean = phoneEl.value.replace(/[^\d\s]/g, '').replace(/\s{2,}/g, ' ');
+          if (clean !== phoneEl.value) phoneEl.value = clean;
+        }
+        updateHint();
+        clearErr(phoneEl);
+      });
+    }
+
+    [nameEl, emailEl, bodyEl].forEach(function (el) {
+      if (el) el.addEventListener('input', function () { clearErr(el); });
+    });
+
+    form.addEventListener('submit', function (e) {
+      var firstBad = null;
+      function fail(el, msg) {
+        setErr(el, msg);
+        if (!firstBad) firstBad = el;
+      }
+
+      var hasLetter = /[A-Za-z\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u0980-\u09FF\u4E00-\u9FFF]/;
+      var onlyNums = /^[\d\s\-+.()]+$/;
+
+      [nameEl, emailEl, bodyEl].forEach(function (el) {
+        if (el) {
+          clearErr(el);
+          el.value = el.value.trim();
+        }
+      });
+      if (phoneEl) clearErr(phoneEl);
+
+      if (nameEl) {
+        if (!nameEl.value) fail(nameEl, txt.nameReq);
+        else if (onlyNums.test(nameEl.value) || !hasLetter.test(nameEl.value)) fail(nameEl, txt.nameAlpha);
+      }
+      if (emailEl) {
+        if (!emailEl.value) fail(emailEl, txt.emailReq);
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailEl.value)) fail(emailEl, txt.emailInvalid);
+      }
+      if (phoneEl && phoneEl.value.trim()) {
+        var raw = phoneEl.value.trim();
+        if (/[A-Za-z]/.test(raw)) {
+          fail(phoneEl, txt.phoneDigits);
+        } else {
+          var nat = raw.replace(/\D/g, '');
+          var full = combinePhone(raw);
+          var totalDigits = full.replace(/\D/g, '');
+          if (nat.length < 5 || totalDigits.length < 7 || totalDigits.length > 15 || /^(\d)\1{5,}$/.test(nat)) {
+            fail(phoneEl, txt.phoneInvalid);
+          }
+        }
+      }
+      if (bodyEl && bodyEl.value.length < 5) {
+        fail(bodyEl, txt.msgReq);
+      }
+
+      if (firstBad) {
+        e.preventDefault();
+        if (typeof firstBad.focus === 'function') firstBad.focus();
+        return;
+      }
+      if (phoneEl && phoneEl.value.trim()) {
+        phoneEl.value = combinePhone(phoneEl.value);
+      }
+    });
   })();
 </script>
 {%- endif -%}

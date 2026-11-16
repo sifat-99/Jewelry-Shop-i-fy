@@ -1,16 +1,21 @@
 {% doc %}
-  Compact "add" button for product cards at <=450px (see card-mini-add-assets.liquid). Accepts: product (blank = demo card) Setting: Theme settings > Product Card > Compact add...
+  Compact "add" button for product cards at <=450px (see card-mini-add-assets.liquid) or mobile list-view Add to Cart button. Accepts: product (blank = demo card) Setting: Theme settings > Product Card > Compact add...
 
   @param {product} [product] - Optional product passed by the parent file
   @param [demo_title] - Optional demo title passed by the parent file
   @param [demo_price] - Optional demo price passed by the parent file
+  @param {string} [mode] - Optional display mode: 'mini' (default icon) or 'list' (mobile list-view Add to Cart button)
 {% enddoc %}
 {%- comment -%}
-  Compact "add" button for product cards at <=450px (see card-mini-add-assets.liquid).
+  Compact "add" button for product cards at <=450px (see card-mini-add-assets.liquid) or mobile list-view button.
   Accepts: product (blank = demo card)
   Setting: Theme settings > Product Card > Compact add button (position, size).
 {%- endcomment -%}
 {%- liquid
+  assign is_list_mode = false
+  if mode == 'list'
+    assign is_list_mode = true
+  endif
   assign mi_side = settings.card_mini_add_position | default: 'right'
   assign mi_size = settings.card_mini_add_size | default: 38
   assign mi_popup = settings.card_mini_add_popup | default: 'bottom'
@@ -34,8 +39,8 @@
 -%}
 <button
   type="button"
-  class="lv-mini-add lv-mini-add--{{ mi_side }}"
-  style="--mini-size: {{ mi_size }}px;"
+  class="{% if is_list_mode %}lv-list-add-btn{% else %}lv-mini-add lv-mini-add--{{ mi_side }}{% endif %}"
+  {% unless is_list_mode %}style="--mini-size: {{ mi_size }}px;"{% endunless %}
   data-lv-mini-add
   data-popup="{{ mi_popup }}"
   {%- if mi_eng == 'true' %}
@@ -57,7 +62,11 @@
   aria-label="{{ 'products.product.add_to_cart' | t }}"
   aria-haspopup="dialog"
 >
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+  {%- if is_list_mode -%}
+    <span class="lv-list-add-btn__label">{{ 'products.product.add_to_cart' | t }}</span>
+  {%- else -%}
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+  {%- endif -%}
   <span class="lv-mini-add__spin" hidden>
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
   </span>

@@ -48,6 +48,16 @@
     assign show_quick_add = true
   endif
 
+  assign show_quick_add_mobile = settings.card_show_quick_add_mobile
+  if show_quick_add_mobile == nil
+    assign show_quick_add_mobile = true
+  endif
+
+  assign show_list_add_mobile = settings.card_show_list_add_mobile
+  if show_list_add_mobile == nil
+    assign show_list_add_mobile = true
+  endif
+
   assign show_wishlist = settings.card_show_wishlist
   if show_wishlist == nil
     assign show_wishlist = true
@@ -702,14 +712,63 @@
       pointer-events: none !important;
     }
 
-    /* Spinner Animation */
+    /* Spinner & Adding State */
     @keyframes lv-card-spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    .lv-card-size-spinner {
+      position: relative !important;
+      z-index: 3 !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: inherit;
+    }
     .lv-card-size-spinner svg {
-      animation: lv-card-spin 0.8s linear infinite;
+      animation: lv-card-spin 0.75s linear infinite;
       display: block;
+      stroke: currentColor;
+    }
+
+    /* Direct Add to Cart Adding State */
+    .lv-card-adding-state {
+      position: relative !important;
+      z-index: 3 !important;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      height: 100%;
+      color: var(--btn-regular-text, #ffffff) !important;
+      font-family: var(--TYPE-STACK-BUTTON, sans-serif);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .lv-card-adding-state svg {
+      animation: lv-card-spin 0.75s linear infinite;
+      display: block;
+      flex-shrink: 0;
+      stroke: currentColor !important;
+    }
+    .lv-card-direct-add-btn:hover .lv-card-adding-state,
+    .lv-card-direct-add-btn.is-loading .lv-card-adding-state {
+      color: var(--btn-regular-hover-text, #ffffff) !important;
+    }
+    .lv-card-direct-add-btn.is-loading {
+      pointer-events: none !important;
+      cursor: wait !important;
+    }
+    .lv-card-direct-add-btn.is-loading .lv-card-bar-label {
+      display: none !important;
+    }
+    .lv-card-direct-add-btn.is-loading .lv-card-adding-state {
+      display: inline-flex !important;
     }
 
     /* Direct Add to Cart Hover Fill */
@@ -959,7 +1018,9 @@
 
     <!-- 5. Floating White Bar Quick Add & Size Variant Selector -->
     {%- if show_quick_add -%}
-      {%- if product.available != false -%}{% render 'card-mini-add', product: product, demo_title: demo_title, demo_price: demo_price %}{%- endif -%}
+      {%- if show_quick_add_mobile -%}
+        {%- if product.available != false -%}{% render 'card-mini-add', product: product, demo_title: demo_title, demo_price: demo_price %}{%- endif -%}
+      {%- endif -%}
       <div class="lv-card-quick-add-wrap {% if has_size_variants %}has-sizes{% endif %}">
         {% render 'card-engrave-bar', product: product %}
         {%- if product.available != false -%}
@@ -1025,8 +1086,9 @@
               <span class="lv-card-bar-label btn__text-content">
                 <span>{{ 'products.product.add_to_cart' | t }}</span>
               </span>
-              <span class="lv-card-size-spinner" style="display: none;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+              <span class="lv-card-adding-state">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor"/></svg>
+                <span class="lv-card-adding-text">{{ 'products.product.adding' | t | default: 'Adding...' }}</span>
               </span>
             </button>
           {%- endif -%}
@@ -1078,6 +1140,17 @@
         <p class="lv-card-desc">{{ product.description | strip_html | strip_newlines | truncate: 170 }}</p>
       {%- endif -%}
     </a>
+    {%- if show_quick_add -%}
+      <div class="lv-list-add-wrap">
+        {%- if product.available != false -%}
+          {% render 'card-mini-add', product: product, demo_title: demo_title, demo_price: demo_price, mode: 'list' %}
+        {%- else -%}
+          <button type="button" class="lv-list-add-btn is-sold-out" disabled aria-disabled="true">
+            <span class="lv-list-add-btn__label">{{ 'products.product.sold_out' | t }}</span>
+          </button>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
   </div>
 </product-grid-item>
 
@@ -1088,17 +1161,17 @@
     // Helper to add variant to cart via AJAX & open drawer
     function lvAddToCart(variantId, callback) {
       if (!variantId) {
-        if (callback) callback();
+        if (callback) callback(false);
         return;
       }
       if (typeof window.addToCartAjax === 'function') {
         window.addToCartAjax(variantId, 1)
           .then(function() {
-            if (callback) callback();
+            if (callback) callback(true);
           })
           .catch(function(err) {
             console.error('AJAX add error:', err);
-            if (callback) callback();
+            if (callback) callback(false);
           });
       } else {
         var cartAddUrl = (window.theme && window.theme.routes && window.theme.routes.cart_add_url ? window.theme.routes.cart_add_url : {{ routes.cart_add_url | json }}) + '.js';
@@ -1107,17 +1180,20 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: variantId, quantity: 1 })
         })
-        .then(function(res) { return res.json(); })
+        .then(function(res) {
+          if (!res.ok) throw new Error('Add to cart failed');
+          return res.json();
+        })
         .then(function(item) {
           if (typeof window.openCartDrawer === 'function') {
             window.openCartDrawer();
           }
           document.dispatchEvent(new CustomEvent('theme:cart:reload', { bubbles: true }));
-          if (callback) callback();
+          if (callback) callback(true);
         })
         .catch(function(err) {
           console.error('Direct add error:', err);
-          if (callback) callback();
+          if (callback) callback(false);
         });
       }
     }
@@ -1293,15 +1369,24 @@
       if (directBtn) {
         e.preventDefault();
         e.stopPropagation();
-        var variantId = directBtn.getAttribute('data-variant-id');
-        var spinner = directBtn.querySelector('.lv-card-size-spinner');
-        var label = directBtn.querySelector('.lv-card-bar-label');
-        if (spinner) spinner.style.display = 'inline-flex';
-        if (label) label.style.display = 'none';
+        if (directBtn.classList.contains('is-loading')) return;
 
-        lvAddToCart(variantId, function() {
-          if (spinner) spinner.style.display = 'none';
-          if (label) label.style.display = 'flex';
+        var variantId = directBtn.getAttribute('data-variant-id');
+        var addingTextEl = directBtn.querySelector('.lv-card-adding-text');
+        var defaultAddingText = {{ 'products.product.adding' | t | default: 'Adding...' | json }};
+        var addedText = {{ 'products.product.added' | t | default: 'Added ✓' | json }};
+
+        directBtn.classList.add('is-loading');
+        if (addingTextEl) addingTextEl.textContent = defaultAddingText;
+
+        lvAddToCart(variantId, function(success) {
+          if (success !== false && addingTextEl) {
+            addingTextEl.textContent = addedText;
+          }
+          setTimeout(function() {
+            directBtn.classList.remove('is-loading');
+            if (addingTextEl) addingTextEl.textContent = defaultAddingText;
+          }, 900);
         });
         return;
       }

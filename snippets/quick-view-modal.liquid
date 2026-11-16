@@ -16,11 +16,17 @@
     <div class="qv-modal__content" id="QuickViewContent">
       <!-- Loading State -->
       <div class="qv-loading">
-        <div class="qv-spinner"></div>
+        {% render 'lv-loader' %}
       </div>
     </div>
   </div>
 </div>
+
+<template id="QvLoaderTemplate">
+  <div class="qv-loading">
+    {% render 'lv-loader' %}
+  </div>
+</template>
 
 <!-- Wishlist Toast Notification -->
 <div id="WishlistToast" class="wishlist-toast" aria-live="polite">
@@ -665,23 +671,12 @@
     transform: translateX(3px);
   }
 
-  /* Loading Spinner */
+  /* Loading */
   .qv-loading {
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 380px;
-  }
-  .qv-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--lv-border);
-    border-top-color: var(--text, #000000);
-    border-radius: 50%;
-    animation: qvSpin 0.8s linear infinite;
-  }
-  @keyframes qvSpin {
-    100% { transform: rotate(360deg); }
   }
 
   /* Wishlist Toast Notification */
@@ -941,7 +936,8 @@
       underlay.classList.add('is-open');
       document.body.style.overflow = 'hidden';
 
-      contentEl.innerHTML = '<div class="qv-loading"><div class="qv-spinner"></div></div>';
+      var loaderTpl = document.getElementById('QvLoaderTemplate');
+      contentEl.innerHTML = loaderTpl ? loaderTpl.innerHTML : '<div class="qv-loading"></div>';
 
       var rootUrl = (window.theme && window.theme.routes && window.theme.routes.root_url) ? window.theme.routes.root_url : {{ routes.root_url | json }};
       if (rootUrl.slice(-1) !== '/') rootUrl += '/';
@@ -1035,10 +1031,13 @@
       html += '  <h2 class="qv-title">' + escapeHtml(product.title) + '</h2>';
 
       // Price Row
+      var qvDesign = {{ settings.sale_badge_design | json }};
+      var isMinimal = (qvDesign === 'minimal_capsule' || qvDesign === 'minimal_square');
+      var qvBadgeText = isMinimal ? ('-' + discountPercent + '%') : i18n.percentOff.replace('__PERCENT__', discountPercent);
       html += '  <div class="qv-price-row">';
       html += '    <span class="qv-price" id="QvPrice">' + formatMoney(currentVariant.price) + '</span>';
       html += '    <span class="qv-compare-price" id="QvComparePrice" style="' + (hasDiscount ? '' : 'display:none;') + '">' + formatMoney(currentVariant.compare_at_price) + '</span>';
-      html += '    <span class="qv-discount-badge" id="QvDiscountBadge" style="' + (hasDiscount && discountPercent > 0 ? '' : 'display:none;') + '">' + escapeHtml(i18n.percentOff.replace('__PERCENT__', discountPercent)) + '</span>';
+      html += '    <span class="qv-discount-badge" id="QvDiscountBadge" style="' + (hasDiscount && discountPercent > 0 ? '' : 'display:none;') + '">' + escapeHtml(qvBadgeText) + '</span>';
       html += '  </div>';
       html += '  <div class="qv-tax-note">' + escapeHtml(i18n.taxNote) + '</div>';
 
@@ -1232,7 +1231,9 @@
             if (discBadge) {
               if (isSale) {
                 var pct = Math.round(((matchedVariant.compare_at_price - matchedVariant.price) / matchedVariant.compare_at_price) * 100);
-                discBadge.textContent = i18n.percentOff.replace('__PERCENT__', pct);
+                var qvDesign = {{ settings.sale_badge_design | json }};
+                var isMinimal = (qvDesign === 'minimal_capsule' || qvDesign === 'minimal_square');
+                discBadge.textContent = isMinimal ? ('-' + pct + '%') : i18n.percentOff.replace('__PERCENT__', pct);
                 discBadge.style.display = '';
               } else {
                 discBadge.style.display = 'none';

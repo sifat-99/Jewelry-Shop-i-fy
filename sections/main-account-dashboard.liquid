@@ -283,7 +283,7 @@
   .lv-acct-quick__sub { font-size: 12.5px; color: var(--lv-acct-muted); line-height: 1.5; margin-top: -4px; }
 
   /* ---------- Orders ---------- */
-  .lv-acct-order { display: grid; grid-template-columns: minmax(0, 1.4fr) auto auto; gap: 14px clamp(16px, 3vw, 36px); align-items: center; padding: clamp(14px, 2vw, 22px) var(--lv-acct-edge-x); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--bg); margin-bottom: 14px; transition: border-color .25s; }
+  .lv-acct-order { display: grid; grid-template-columns: minmax(0, 1fr) clamp(176px, 17vw, 196px) minmax(var(--lv-acct-cta-w), auto); gap: 14px clamp(16px, 3vw, 36px); align-items: center; padding: clamp(14px, 2vw, 22px) var(--lv-acct-edge-x); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--bg); margin-bottom: 14px; transition: border-color .25s; }
   .lv-acct-order:last-child { margin-bottom: 0; }
   .lv-acct-order:hover { border-color: color-mix(in srgb, var(--text) 40%, transparent); }
   .lv-acct-order__id { min-width: 0; }
@@ -294,10 +294,11 @@
   .lv-acct-order__thumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .lv-acct-order__thumb { width: 52px; height: 52px; object-fit: cover; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-media-r); background: var(--lv-acct-surface); }
   .lv-acct-order__more { font-size: 12px; font-weight: 600; color: var(--lv-acct-muted); }
-  .lv-acct-order__status { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .lv-acct-order__status { display: flex; flex-direction: column; align-items: stretch; gap: 6px; width: 100%; }
   .lv-acct-order__buy { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; text-align: right; }
   .lv-acct-order__total { font-size: 16px; font-weight: 700; letter-spacing: .04em; }
-  .lv-acct-pill { display: inline-block; padding: 3px 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-badge-r); background: var(--lv-acct-surface); color: var(--text); white-space: nowrap; }
+  .lv-acct-pill { display: inline-flex; align-items: center; justify-content: center; padding: 4px 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; line-height: 1.25; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-badge-r); background: var(--lv-acct-surface); color: var(--text); white-space: nowrap; box-sizing: border-box; }
+  .lv-acct-order__status .lv-acct-pill { width: 100%; text-align: center; }
   .lv-acct-pill--paid, .lv-acct-pill--fulfilled { color: #2d6a4f; border-color: color-mix(in srgb, #2d6a4f 35%, transparent); background: color-mix(in srgb, #2d6a4f 9%, transparent); }
   .lv-acct-pill--pending, .lv-acct-pill--partially_paid, .lv-acct-pill--partial, .lv-acct-pill--partially_fulfilled, .lv-acct-pill--authorized, .lv-acct-pill--in_progress, .lv-acct-pill--scheduled, .lv-acct-pill--on_hold { color: #a16207; border-color: color-mix(in srgb, #b45309 38%, transparent); background: color-mix(in srgb, #d97706 11%, transparent); }
   .lv-acct-pill--unfulfilled { color: var(--lv-acct-muted); border-color: var(--lv-acct-line); background: var(--lv-acct-surface); }
@@ -517,6 +518,91 @@
   .lv-acct-field input:focus, .lv-acct-field select:focus {
     border-color: var(--text);
   }
+  .lv-acct-phone-group {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    height: 44px;
+    background: var(--lv-acct-surface);
+    border: 1px solid var(--lv-acct-line);
+    border-radius: var(--lv-acct-radius);
+    overflow: hidden;
+    transition: border-color .2s;
+    box-sizing: border-box;
+  }
+  .lv-acct-phone-group:focus-within {
+    border-color: var(--text);
+  }
+  .lv-acct-phone-prefix {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 100%;
+    padding: 0 10px 0 11px;
+    border-right: 1px solid var(--lv-acct-line);
+    background: var(--lv-acct-bg);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .lv-acct-phone-prefix:hover {
+    background: color-mix(in srgb, var(--lv-acct-line) 45%, var(--lv-acct-bg));
+  }
+  .lv-acct-phone-dial-label {
+    pointer-events: none;
+  }
+  .lv-acct-phone-dial-select {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0;
+    margin: 0;
+    padding: 0 !important;
+    border: 0 !important;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .lv-acct-field .lv-acct-phone-group input[type="tel"] {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    border: 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 0 12px;
+  }
+  .lv-acct-field.has-error input,
+  .lv-acct-field.has-error select,
+  .lv-acct-field.has-error .lv-acct-phone-group {
+    border-color: #b3261e;
+    background: #fff9f9;
+  }
+  .lv-acct-field__hint {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--lv-acct-muted);
+    line-height: 1.35;
+  }
+  .lv-acct-field__hint[hidden] { display: none; }
+  .lv-acct-field__err {
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #b3261e;
+    line-height: 1.35;
+  }
+  .lv-acct-field__err[hidden] { display: none; }
   .lv-acct-check {
     display: flex;
     align-items: center;
@@ -558,6 +644,26 @@
     opacity: 1;
     transform: translateY(0);
   }
+  .lv-acct-toast--success {
+    background: #1b4332;
+    color: #ffffff;
+  }
+  .lv-acct-toast--error {
+    background: #8c1d18;
+    color: #ffffff;
+  }
+  .lv-acct-form-error {
+    padding: 10px 14px;
+    border: 1px solid #f1b8b4;
+    background: #fdf2f2;
+    color: #8c1d18;
+    font-size: 12.5px;
+    line-height: 1.5;
+    border-radius: var(--lv-acct-radius);
+    text-align: left;
+  }
+  .lv-acct-form-error[hidden] { display: none; }
+  .lv-acct-form-error ul { margin: 0; padding-left: 18px; }
 
   /* ---------- Guest ---------- */
   .lv-acct-guest { max-width: 680px; margin: 0 auto; text-align: center; background: var(--lv-acct-surface); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); padding: clamp(32px, 6vw, 56px) clamp(18px, 4vw, 40px); position: relative; }
@@ -572,8 +678,8 @@
   /* ================= Tablet ================= */
   @media (max-width: 1024px) {
     .lv-acct-quick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .lv-acct-order { grid-template-columns: minmax(0, 1fr) auto; }
-    .lv-acct-order__status { grid-column: 2; grid-row: 1; align-items: flex-end; }
+    .lv-acct-order { grid-template-columns: minmax(0, 1fr) 176px; }
+    .lv-acct-order__status { grid-column: 2; grid-row: 1; align-items: stretch; }
     .lv-acct-order__buy { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; border-top: 1px solid var(--lv-acct-line); padding-top: 14px; text-align: left; }
   }
 
@@ -729,7 +835,8 @@
     .lv-acct-quick__item { padding: 14px; }
     .lv-acct-quick__sub { display: none; }
     .lv-acct-order { grid-template-columns: minmax(0, 1fr); }
-    .lv-acct-order__status { grid-column: auto; grid-row: auto; flex-direction: row; flex-wrap: wrap; align-items: center; }
+    .lv-acct-order__status { grid-column: auto; grid-row: auto; flex-direction: row; flex-wrap: wrap; align-items: center; width: auto; }
+    .lv-acct-order__status .lv-acct-pill { width: auto; }
     .lv-acct-order__buy { flex-direction: column; align-items: stretch; gap: 12px; text-align: center; }
     .lv-acct-order__buy .btn { width: 100%; }
     .lv-acct-order__thumb { width: 46px; height: 46px; }
@@ -827,7 +934,7 @@
               <button type="button" class="lv-acct-nav__btn" data-tab-target="addresses" role="tab" aria-selected="false">
                 <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                 <span class="lv-acct-nav__label">{{ 'customer.account.nav_addresses' | t }}</span>
-                <span class="lv-acct-nav__pill">{{ customer.addresses_count }}</span>
+                <span class="lv-acct-nav__pill" data-lv-acct-addresses-pill>{{ customer.addresses_count }}</span>
               </button>
               {% if section.settings.show_wishlist %}
                 <button type="button" class="lv-acct-nav__btn" data-tab-target="wishlist" role="tab" aria-selected="false">
@@ -913,15 +1020,17 @@
                 <h3 class="lv-acct-card__title"><svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ 'customer.account.delivery_address' | t }}</h3>
                 <a href="#addresses" class="lv-acct-link" data-switch-to="addresses">{{ 'customer.account.manage' | t }}</a>
               </div>
-              {% if customer.default_address %}
-                <div class="lv-acct-tile lv-acct-tile--default">
-                  <div class="lv-acct-tile__top"><strong>{{ customer.default_address.name }}</strong><span class="lv-acct-badge">{{ 'customer.addresses.default_pill' | t }}</span></div>
-                  <address>{{ customer.default_address | format_address }}</address>
-                </div>
-              {% else %}
-                <p class="lv-acct-muted-text">{{ 'customer.addresses.none_default' | t }}</p>
-                <button type="button" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm" data-lv-acct-open-modal="LvAcctAddAddressModal">{{ 'customer.addresses.add_new' | t }}</button>
-              {% endif %}
+              <div data-lv-acct-overview-address>
+                {% if customer.default_address %}
+                  <div class="lv-acct-tile lv-acct-tile--default">
+                    <div class="lv-acct-tile__top"><strong>{{ customer.default_address.name }}</strong><span class="lv-acct-badge">{{ 'customer.addresses.default_pill' | t }}</span></div>
+                    <address>{{ customer.default_address | format_address }}</address>
+                  </div>
+                {% else %}
+                  <p class="lv-acct-muted-text">{{ 'customer.addresses.none_default' | t }}</p>
+                  <button type="button" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm" data-lv-acct-open-modal="LvAcctAddAddressModal">{{ 'customer.addresses.add_new' | t }}</button>
+                {% endif %}
+              </div>
             </div>
 
             <div class="lv-acct-perks">
@@ -982,7 +1091,13 @@
             {% if customer.addresses.size > 0 %}
               <div class="lv-acct-grid lv-acct-grid--addresses" data-lv-acct-addresses-grid data-view="grid">
                 {% for addr in customer.addresses %}
-                  <div class="lv-acct-tile{% if addr == customer.default_address %} lv-acct-tile--default{% endif %}">
+                  {%- assign addr_delete_action = root_prefix | append: 'account/addresses/' | append: addr.id -%}
+                  {%- unless routes.account_addresses_url contains 'http' -%}
+                    {%- unless routes.account_addresses_url contains 'profile' -%}
+                      {%- assign addr_delete_action = routes.account_addresses_url | append: '/' | append: addr.id -%}
+                    {%- endunless -%}
+                  {%- endunless -%}
+                  <div class="lv-acct-tile{% if addr == customer.default_address %} lv-acct-tile--default{% endif %}" data-lv-addr-id="{{ addr.id }}">
                     <div class="lv-acct-tile__main">
                       <div class="lv-acct-tile__top">
                         <strong>{{ addr.name }}</strong>
@@ -993,7 +1108,7 @@
                     </div>
                     <div class="lv-acct-tile__actions">
                       <button type="button" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm" data-lv-acct-open-modal="LvAcctEditAddressModal-{{ addr.id }}">{{ 'customer.addresses.edit' | t }}</button>
-                      <form method="post" action="{{ routes.account_addresses_url }}/{{ addr.id }}" data-lv-acct-delete-form style="margin: 0; display: inline;">
+                      <form method="post" action="{{ addr_delete_action }}" data-lv-acct-delete-form data-lv-addr-id="{{ addr.id }}" style="margin: 0; display: inline;">
                         <input type="hidden" name="_method" value="delete">
                         <button type="submit" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--sm lv-acct-btn--ghost">{{ 'customer.addresses.delete' | t }}</button>
                       </form>
@@ -1063,6 +1178,7 @@
             <button type="button" class="lv-acct-modal__close" data-lv-acct-close-modal aria-label="{{ 'accessibility.close_modal' | t }}">&times;</button>
           </div>
           {% form 'customer_address', customer.new_address, class: 'lv-acct-modal__form', data-lv-acct-address-form: '' %}
+            <div class="lv-acct-form-error" data-lv-acct-form-error role="alert" hidden></div>
             <div class="lv-acct-field-row">
               <div class="lv-acct-field">
                 <label for="AddressFirstNameNew">{{ 'customer.addresses.first_name' | t }}</label>
@@ -1092,7 +1208,8 @@
               </div>
               <div class="lv-acct-field">
                 <label for="AddressZipNew">{{ 'customer.addresses.zip' | t }}</label>
-                <input type="text" id="AddressZipNew" name="address[zip]" value="{{ form.zip | escape }}" autocomplete="postal-code" required>
+                <input type="text" id="AddressZipNew" name="address[zip]" value="{{ form.zip | escape }}" autocomplete="postal-code" data-lv-acct-zip required>
+                <span class="lv-acct-field__hint" data-lv-acct-zip-hint hidden></span>
               </div>
             </div>
             <div class="lv-acct-field-row">
@@ -1110,7 +1227,14 @@
             </div>
             <div class="lv-acct-field">
               <label for="AddressPhoneNew">{{ 'customer.addresses.phone_optional' | t }}</label>
-              <input type="tel" id="AddressPhoneNew" name="address[phone]" value="{{ form.phone | escape }}" autocomplete="tel">
+              <div class="lv-acct-phone-group">
+                <div class="lv-acct-phone-prefix">
+                  <span class="lv-acct-phone-dial-label" data-lv-acct-dial-label>🇳🇱 +31</span>
+                  <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" width="10" height="10" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
+                  <select class="lv-acct-phone-dial-select" data-lv-acct-dial aria-label="{{ 'customer.addresses.country' | t }}"></select>
+                </div>
+                <input type="tel" inputmode="numeric" id="AddressPhoneNew" name="address[phone]" value="{{ form.phone | escape }}" autocomplete="tel-national" data-lv-acct-phone maxlength="20">
+              </div>
             </div>
             <label class="lv-acct-check" for="address_default_address_new">
               <input type="checkbox" id="address_default_address_new" name="address[default]" value="1">
@@ -1124,6 +1248,7 @@
         </div>
       </dialog>
 
+      <div data-lv-acct-edit-modals>
       {% for addr in customer.addresses %}
         <dialog id="LvAcctEditAddressModal-{{ addr.id }}" class="lv-acct-modal">
           <div class="lv-acct-modal__inner">
@@ -1132,6 +1257,7 @@
               <button type="button" class="lv-acct-modal__close" data-lv-acct-close-modal aria-label="{{ 'accessibility.close_modal' | t }}">&times;</button>
             </div>
             {% form 'customer_address', addr, class: 'lv-acct-modal__form', data-lv-acct-address-form: '' %}
+              <div class="lv-acct-form-error" data-lv-acct-form-error role="alert" hidden></div>
               <div class="lv-acct-field-row">
                 <div class="lv-acct-field">
                   <label for="AddressFirstName_{{ addr.id }}">{{ 'customer.addresses.first_name' | t }}</label>
@@ -1161,7 +1287,8 @@
                 </div>
                 <div class="lv-acct-field">
                   <label for="AddressZip_{{ addr.id }}">{{ 'customer.addresses.zip' | t }}</label>
-                  <input type="text" id="AddressZip_{{ addr.id }}" name="address[zip]" value="{{ form.zip | escape }}" autocomplete="postal-code" required>
+                  <input type="text" id="AddressZip_{{ addr.id }}" name="address[zip]" value="{{ form.zip | escape }}" autocomplete="postal-code" data-lv-acct-zip required>
+                  <span class="lv-acct-field__hint" data-lv-acct-zip-hint hidden></span>
                 </div>
               </div>
               <div class="lv-acct-field-row">
@@ -1179,7 +1306,14 @@
               </div>
               <div class="lv-acct-field">
                 <label for="AddressPhone_{{ addr.id }}">{{ 'customer.addresses.phone_optional' | t }}</label>
-                <input type="tel" id="AddressPhone_{{ addr.id }}" name="address[phone]" value="{{ form.phone | escape }}" autocomplete="tel">
+                <div class="lv-acct-phone-group">
+                  <div class="lv-acct-phone-prefix">
+                    <span class="lv-acct-phone-dial-label" data-lv-acct-dial-label>🇳🇱 +31</span>
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" width="10" height="10" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
+                    <select class="lv-acct-phone-dial-select" data-lv-acct-dial aria-label="{{ 'customer.addresses.country' | t }}"></select>
+                  </div>
+                  <input type="tel" inputmode="numeric" id="AddressPhone_{{ addr.id }}" name="address[phone]" value="{{ form.phone | escape }}" autocomplete="tel-national" data-lv-acct-phone maxlength="20">
+                </div>
               </div>
               <label class="lv-acct-check" for="address_default_address_{{ addr.id }}">
                 <input type="checkbox" id="address_default_address_{{ addr.id }}" name="address[default]" value="1"{% if addr == customer.default_address %} checked{% endif %}>
@@ -1193,6 +1327,7 @@
           </div>
         </dialog>
       {% endfor %}
+      </div>
 
       <div data-lv-acct-order-modals>
         {% if customer.orders.size > 0 %}
@@ -1325,12 +1460,17 @@
       }
     }
 
-    function showToast(message) {
+    var toastTimer = null;
+    function showToast(message, tone) {
       var toast = document.getElementById('LvAcctToast');
       if (!toast) return;
+      if (toastTimer) clearTimeout(toastTimer);
+      toast.classList.remove('lv-acct-toast--success', 'lv-acct-toast--error');
+      if (tone === 'success') toast.classList.add('lv-acct-toast--success');
+      if (tone === 'error') toast.classList.add('lv-acct-toast--error');
       toast.textContent = message;
       toast.classList.add('is-visible');
-      setTimeout(function() {
+      toastTimer = setTimeout(function() {
         toast.classList.remove('is-visible');
       }, 3500);
     }
@@ -1344,6 +1484,33 @@
       if (nextEl && currEl) {
         currEl.innerHTML = nextEl.innerHTML;
       }
+    }
+
+    function fetchDashboardDoc() {
+      var wrap = document.querySelector('.lv-acct-wrap[data-section-id]');
+      if (!wrap) return Promise.resolve(null);
+      var sectionId = wrap.getAttribute('data-section-id');
+      if (!sectionId) return Promise.resolve(null);
+
+      var fetchUrl = new URL(window.location.href);
+      fetchUrl.hash = '';
+      fetchUrl.searchParams.set('section_id', sectionId);
+      fetchUrl.searchParams.set('_ts', String(Date.now()));
+
+      return fetch(fetchUrl.toString(), {
+        cache: 'no-store',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'text/html'
+        }
+      })
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function(html) {
+        return new DOMParser().parseFromString(html, 'text/html');
+      });
     }
 
     function refreshOrderStatuses(isManual) {
@@ -1367,25 +1534,9 @@
         refreshBtn.classList.add('is-loading');
       }
 
-      var fetchUrl = new URL(window.location.href);
-      fetchUrl.searchParams.set('section_id', sectionId);
-      fetchUrl.searchParams.set('_ts', String(now));
-
-      ordersRefreshInFlight = fetch(fetchUrl.toString(), {
-        cache: 'no-store',
-        credentials: 'same-origin',
-        headers: {
-          'Accept': 'text/html'
-        }
-      })
-      .then(function(res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.text();
-      })
-      .then(function(html) {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(html, 'text/html');
-        if (!doc.querySelector('[data-lv-acct-orders-list]')) {
+      ordersRefreshInFlight = fetchDashboardDoc()
+      .then(function(doc) {
+        if (!doc || !doc.querySelector('[data-lv-acct-orders-list]')) {
           return false;
         }
         syncElementHtml(doc, '[data-lv-acct-latest-order]');
@@ -1443,6 +1594,49 @@
       }
     }
 
+      // Checkout-style country & validation configuration shared by modals + forms
+      var LV_STORE_ISO = {{ localization.country.iso_code | default: 'NL' | upcase | json }};
+      var LV_IS_NL = {% if request.locale.iso_code == 'nl' %}true{% else %}false{% endif %};
+      var LV_VAL_TXT = LV_IS_NL ? {
+        firstReq: 'Voornaam is verplicht.',
+        firstAlpha: 'Voer een geldige voornaam in (geen cijfers alleen).',
+        lastReq: 'Achternaam is verplicht.',
+        lastAlpha: 'Voer een geldige achternaam in (geen cijfers alleen).',
+        addrReq: 'Adres is verplicht.',
+        addrShort: 'Voer een volledig straat- en huisnummer in.',
+        cityReq: 'Plaats is verplicht.',
+        cityAlpha: 'Voer een geldige plaatsnaam in (alleen tekst).',
+        countryReq: 'Selecteer een geldig land / regio.',
+        provReq: 'Selecteer een provincie / staat.',
+        zipReq: 'Postcode is verplicht.',
+        zipDigitsOnly: 'Voor dit land zijn alleen cijfers toegestaan in de postcode.',
+        zipFormat: 'Voer een geldige postcode in',
+        zipOptional: 'Optioneel voor dit land',
+        phoneDigitsOnly: 'Voer alleen cijfers in.',
+        phoneInvalid: 'Voer een geldig telefoonnummer in (6–15 cijfers).',
+        phoneHintPrefix: 'Wordt opgeslagen als:',
+        checkFields: 'Controleer de gemarkeerde velden en probeer het opnieuw.'
+      } : {
+        firstReq: 'First name is required.',
+        firstAlpha: 'Enter a valid first name (letters required).',
+        lastReq: 'Last name is required.',
+        lastAlpha: 'Enter a valid last name (letters required).',
+        addrReq: 'Address is required.',
+        addrShort: 'Enter a complete street address.',
+        cityReq: 'City is required.',
+        cityAlpha: 'Enter a valid city name (text required, not numbers only).',
+        countryReq: 'Please select a valid country / region.',
+        provReq: 'Please select a province / state.',
+        zipReq: 'Postal / ZIP code is required.',
+        zipDigitsOnly: 'Only numbers are allowed in the postal code for this country.',
+        zipFormat: 'Enter a valid postal / ZIP code',
+        zipOptional: 'Optional for this country',
+        phoneDigitsOnly: 'Enter numbers only.',
+        phoneInvalid: 'Enter a valid phone number (6–15 digits).',
+        phoneHintPrefix: 'Will be saved as:',
+        checkFields: 'Please review the highlighted fields and try again.'
+      };
+
     function initAddressModals() {
       if (!document.documentElement.dataset.lvAcctModalsBound) {
         document.documentElement.dataset.lvAcctModalsBound = '1';
@@ -1453,6 +1647,10 @@
             var modalId = openTrigger.getAttribute('data-lv-acct-open-modal');
             var modal = modalId ? document.getElementById(modalId) : null;
             if (modal && typeof modal.showModal === 'function') {
+              var openErr = modal.querySelector('[data-lv-acct-form-error]');
+              if (openErr) { openErr.textContent = ''; openErr.hidden = true; }
+              modal.querySelectorAll('.lv-acct-field.has-error').forEach(function(f) { f.classList.remove('has-error'); });
+              modal.querySelectorAll('[data-lv-acct-field-err]').forEach(function(err) { err.textContent = ''; err.hidden = true; });
               modal.showModal();
               var countrySelect = modal.querySelector('[data-lv-acct-country]');
               if (countrySelect) {
@@ -1484,19 +1682,363 @@
         });
       }
 
-      // Country & Province synchronization
+      // [iso, countryName, dial, flag, trunkZero, zipMode ('nl'|'num'|'num-dash'|'alnum'|'none'), zipMin, zipMax, zipEx, zipRegexStr, phoneEx]
+      var LV_COUNTRY_LIST = [
+        ['NL', 'Netherlands', '31', '🇳🇱', true, 'nl', 6, 7, '1012 AB', '^\\d{4}\\s?[A-Z]{2}$', '6 12345678'],
+        ['BE', 'Belgium', '32', '🇧🇪', true, 'num', 4, 4, '1000', '^\\d{4}$', '470 12 34 56'],
+        ['DE', 'Germany', '49', '🇩🇪', true, 'num', 5, 5, '10115', '^\\d{5}$', '151 23456789'],
+        ['FR', 'France', '33', '🇫🇷', true, 'num', 5, 5, '75001', '^\\d{5}$', '6 12 34 56 78'],
+        ['GB', 'United Kingdom', '44', '🇬🇧', true, 'alnum', 5, 8, 'SW1A 1AA', '^[A-Z]{1,2}\\d[A-Z\\d]?\\s?\\d[A-Z]{2}$', '7400 123456'],
+        ['US', 'United States', '1', '🇺🇸', false, 'num-dash', 5, 10, '10001', '^\\d{5}(-\\d{4})?$', '201 555 0123'],
+        ['CA', 'Canada', '1', '🇨🇦', false, 'alnum', 6, 7, 'K1A 0B1', '^[A-Z]\\d[A-Z]\\s?\\d[A-Z]\\d$', '613 555 0123'],
+        ['BD', 'Bangladesh', '880', '🇧🇩', true, 'num', 4, 4, '1212', '^\\d{4}$', '1712 345678'],
+        ['IN', 'India', '91', '🇮🇳', true, 'num', 6, 6, '110001', '^\\d{6}$', '98765 43210'],
+        ['PK', 'Pakistan', '92', '🇵🇰', true, 'num', 5, 5, '44000', '^\\d{5}$', '300 1234567'],
+        ['AU', 'Australia', '61', '🇦🇺', true, 'num', 4, 4, '2000', '^\\d{4}$', '412 345 678'],
+        ['NZ', 'New Zealand', '64', '🇳🇿', true, 'num', 4, 4, '6011', '^\\d{4}$', '21 123 4567'],
+        ['CH', 'Switzerland', '41', '🇨🇭', true, 'num', 4, 4, '8001', '^\\d{4}$', '79 123 45 67'],
+        ['AT', 'Austria', '43', '🇦🇹', true, 'num', 4, 4, '1010', '^\\d{4}$', '664 1234567'],
+        ['LU', 'Luxembourg', '352', '🇱🇺', false, 'num', 4, 4, '1009', '^\\d{4}$', '621 123 456'],
+        ['ES', 'Spain', '34', '🇪🇸', false, 'num', 5, 5, '28001', '^\\d{5}$', '612 34 56 78'],
+        ['IT', 'Italy', '39', '🇮🇹', false, 'num', 5, 5, '00118', '^\\d{5}$', '312 345 6789'],
+        ['PT', 'Portugal', '351', '🇵🇹', false, 'num-dash', 4, 8, '1000-001', '^\\d{4}(-\\d{3})?$', '912 345 678'],
+        ['IE', 'Ireland', '353', '🇮🇪', true, 'alnum', 7, 8, 'D02 AF30', '^[A-Z\\d]{3}\\s?[A-Z\\d]{4}$', '85 123 4567'],
+        ['DK', 'Denmark', '45', '🇩🇰', false, 'num', 4, 4, '1050', '^\\d{4}$', '20 12 34 56'],
+        ['SE', 'Sweden', '46', '🇸🇪', true, 'num', 5, 5, '11122', '^\\d{5}$', '70 123 45 67'],
+        ['NO', 'Norway', '47', '🇳🇴', false, 'num', 4, 4, '0001', '^\\d{4}$', '412 34 567'],
+        ['FI', 'Finland', '358', '🇫🇮', true, 'num', 5, 5, '00100', '^\\d{5}$', '40 123 4567'],
+        ['PL', 'Poland', '48', '🇵🇱', false, 'num-dash', 5, 6, '00-001', '^\\d{2}-?\\d{3}$', '501 234 567'],
+        ['CZ', 'Czechia', '420', '🇨🇿', false, 'num', 5, 5, '11000', '^\\d{5}$', '601 123 456'],
+        ['GR', 'Greece', '30', '🇬🇷', false, 'num', 5, 5, '10431', '^\\d{5}$', '691 234 5678'],
+        ['HU', 'Hungary', '36', '🇭🇺', true, 'num', 4, 4, '1011', '^\\d{4}$', '20 123 4567'],
+        ['RO', 'Romania', '40', '🇷🇴', true, 'num', 6, 6, '010011', '^\\d{6}$', '712 345 678'],
+        ['BG', 'Bulgaria', '359', '🇧🇬', true, 'num', 4, 4, '1000', '^\\d{4}$', '88 123 4567'],
+        ['HR', 'Croatia', '385', '🇭🇷', true, 'num', 5, 5, '10000', '^\\d{5}$', '91 234 5678'],
+        ['SK', 'Slovakia', '421', '🇸🇰', true, 'num', 5, 5, '81101', '^\\d{5}$', '912 123 456'],
+        ['SI', 'Slovenia', '386', '🇸🇮', true, 'num', 4, 4, '1000', '^\\d{4}$', '31 234 567'],
+        ['EE', 'Estonia', '372', '🇪🇪', false, 'num', 5, 5, '10111', '^\\d{5}$', '5123 4567'],
+        ['LV', 'Latvia', '371', '🇱🇻', false, 'num', 4, 4, '1010', '^\\d{4}$', '21 234 567'],
+        ['LT', 'Lithuania', '370', '🇱🇹', true, 'num', 5, 5, '01100', '^\\d{5}$', '612 34567'],
+        ['CY', 'Cyprus', '357', '🇨🇾', false, 'num', 4, 4, '1010', '^\\d{4}$', '96 123456'],
+        ['MT', 'Malta', '356', '🇲🇹', false, 'alnum', 7, 8, 'VLT 1017', '^[A-Z]{3}\\s?\\d{4}$', '7912 3456'],
+        ['IS', 'Iceland', '354', '🇮🇸', false, 'num', 3, 3, '101', '^\\d{3}$', '610 1234'],
+        ['JP', 'Japan', '81', '🇯🇵', true, 'num-dash', 7, 8, '100-0001', '^\\d{3}-?\\d{4}$', '90 1234 5678'],
+        ['KR', 'South Korea', '82', '🇰🇷', true, 'num', 5, 5, '04524', '^\\d{5}$', '10 1234 5678'],
+        ['CN', 'China', '86', '🇨🇳', true, 'num', 6, 6, '100000', '^\\d{6}$', '138 0013 8000'],
+        ['TW', 'Taiwan', '886', '🇹🇼', true, 'num', 3, 6, '100', '^\\d{3,6}$', '912 345 678'],
+        ['HK', 'Hong Kong', '852', '🇭🇰', false, 'none', 0, 10, '', '', '9123 4567'],
+        ['SG', 'Singapore', '65', '🇸🇬', false, 'num', 6, 6, '018956', '^\\d{6}$', '8123 4567'],
+        ['MY', 'Malaysia', '60', '🇲🇾', true, 'num', 5, 5, '50000', '^\\d{5}$', '12 345 6789'],
+        ['TH', 'Thailand', '66', '🇹🇭', true, 'num', 5, 5, '10100', '^\\d{5}$', '81 234 5678'],
+        ['VN', 'Vietnam', '84', '🇻🇳', true, 'num', 5, 6, '100000', '^\\d{5,6}$', '91 234 56 78'],
+        ['PH', 'Philippines', '63', '🇵🇭', true, 'num', 4, 4, '1000', '^\\d{4}$', '917 123 4567'],
+        ['ID', 'Indonesia', '62', '🇮🇩', true, 'num', 5, 5, '10110', '^\\d{5}$', '812 345 678'],
+        ['AE', 'United Arab Emirates', '971', '🇦🇪', true, 'none', 0, 10, '', '', '50 123 4567'],
+        ['SA', 'Saudi Arabia', '966', '🇸🇦', true, 'num', 5, 5, '11564', '^\\d{5}$', '50 123 4567'],
+        ['QA', 'Qatar', '974', '🇶🇦', false, 'none', 0, 10, '', '', '3312 3456'],
+        ['KW', 'Kuwait', '965', '🇰🇼', false, 'num', 5, 5, '13001', '^\\d{5}$', '500 12345'],
+        ['BH', 'Bahrain', '973', '🇧🇭', false, 'num', 3, 4, '317', '^\\d{3,4}$', '3600 1234'],
+        ['OM', 'Oman', '968', '🇴🇲', false, 'num', 3, 3, '111', '^\\d{3}$', '9212 3456'],
+        ['TR', 'Turkey', '90', '🇹🇷', true, 'num', 5, 5, '34000', '^\\d{5}$', '532 123 4567'],
+        ['IL', 'Israel', '972', '🇮🇱', true, 'num', 5, 7, '6100000', '^\\d{5,7}$', '50 123 4567'],
+        ['EG', 'Egypt', '20', '🇪🇬', true, 'num', 5, 5, '11511', '^\\d{5}$', '100 123 4567'],
+        ['MA', 'Morocco', '212', '🇲🇦', true, 'num', 5, 5, '10000', '^\\d{5}$', '612 345678'],
+        ['ZA', 'South Africa', '27', '🇿🇦', true, 'num', 4, 4, '2000', '^\\d{4}$', '82 123 4567'],
+        ['NG', 'Nigeria', '234', '🇳🇬', true, 'num', 6, 6, '100001', '^\\d{6}$', '802 123 4567'],
+        ['KE', 'Kenya', '254', '🇰🇪', true, 'num', 5, 5, '00100', '^\\d{5}$', '712 345678'],
+        ['BR', 'Brazil', '55', '🇧🇷', true, 'num-dash', 8, 9, '01310-100', '^\\d{5}-?\\d{3}$', '11 91234 5678'],
+        ['MX', 'Mexico', '52', '🇲🇽', false, 'num', 5, 5, '01000', '^\\d{5}$', '55 1234 5678'],
+        ['AR', 'Argentina', '54', '🇦🇷', true, 'alnum', 4, 8, '1000', '^[A-Z]?\\d{4}([A-Z]{3})?$', '11 1234 5678'],
+        ['CL', 'Chile', '56', '🇨🇱', false, 'num', 7, 7, '8320000', '^\\d{7}$', '9 1234 5678'],
+        ['CO', 'Colombia', '57', '🇨🇴', false, 'num', 6, 6, '110111', '^\\d{6}$', '300 1234567'],
+        ['PE', 'Peru', '51', '🇵🇪', false, 'num', 5, 5, '15001', '^\\d{5}$', '912 345 678']
+      ];
+
+      var LV_COUNTRY_ALIASES = {
+        'nederland': 'Netherlands',
+        'holland': 'Netherlands',
+        'the netherlands': 'Netherlands',
+        'belgie': 'Belgium',
+        'belgië': 'Belgium',
+        'deutschland': 'Germany',
+        'verenigde staten': 'United States',
+        'usa': 'United States',
+        'united states of america': 'United States',
+        'uk': 'United Kingdom',
+        'verenigd koninkrijk': 'United Kingdom',
+        'great britain': 'United Kingdom',
+        'czech republic': 'Czechia',
+        'türkiye': 'Turkey',
+        'turkiye': 'Turkey',
+        'hong kong sar': 'Hong Kong'
+      };
+
+      function normalizeCountryKey(str) {
+        return (str || '').toLowerCase().trim().replace(/\s+/g, ' ');
+      }
+
+      function findCountryMeta(nameOrIso) {
+        var key = normalizeCountryKey(nameOrIso);
+        if (LV_COUNTRY_ALIASES[key]) key = normalizeCountryKey(LV_COUNTRY_ALIASES[key]);
+        for (var i = 0; i < LV_COUNTRY_LIST.length; i++) {
+          var c = LV_COUNTRY_LIST[i];
+          if (c[0].toLowerCase() === key || normalizeCountryKey(c[1]) === key) {
+            return {
+              iso: c[0], name: c[1], dial: c[2], flag: c[3], trunkZero: c[4],
+              zipMode: c[5], zipMin: c[6], zipMax: c[7], zipEx: c[8], zipRegexStr: c[9], phoneEx: c[10]
+            };
+          }
+        }
+        return {
+          iso: 'INT', name: nameOrIso || 'International', dial: '31', flag: '🌐', trunkZero: true,
+          zipMode: 'alnum', zipMin: 3, zipMax: 12, zipEx: '', zipRegexStr: '', phoneEx: '6 12345678'
+        };
+      }
+
+      var LV_SORTED_BY_DIAL = LV_COUNTRY_LIST.slice().sort(function(a, b) {
+        return b[2].length - a[2].length;
+      });
+
+      function detectDialFromInternational(raw) {
+        var cleaned = (raw || '').trim();
+        if (!cleaned) return null;
+        var hasIntl = cleaned.charAt(0) === '+' || cleaned.indexOf('00') === 0;
+        if (!hasIntl) return null;
+        var digits = cleaned.replace(/^(\+|00)/, '').replace(/\D/g, '');
+        if (!digits) return null;
+        for (var i = 0; i < LV_SORTED_BY_DIAL.length; i++) {
+          var entry = LV_SORTED_BY_DIAL[i];
+          var dial = entry[2];
+          if (digits.indexOf(dial) === 0 && digits.length > dial.length + 3) {
+            return {
+              meta: {
+                iso: entry[0], name: entry[1], dial: entry[2], flag: entry[3], trunkZero: entry[4],
+                zipMode: entry[5], zipMin: entry[6], zipMax: entry[7], zipEx: entry[8], zipRegexStr: entry[9], phoneEx: entry[10]
+              },
+              national: digits.slice(dial.length)
+            };
+          }
+        }
+        return null;
+      }
+
+      function populateDialOptions(dialSelect) {
+        if (!dialSelect || dialSelect.options.length > 0) return;
+        LV_COUNTRY_LIST.forEach(function(c) {
+          var opt = document.createElement('option');
+          opt.value = c[0];
+          opt.setAttribute('data-dial', c[2]);
+          opt.setAttribute('data-flag', c[3]);
+          opt.setAttribute('data-trunk-zero', c[4] ? '1' : '0');
+          opt.setAttribute('data-phone-ex', c[10]);
+          opt.textContent = c[3] + ' ' + c[1] + ' (+' + c[2] + ')';
+          dialSelect.appendChild(opt);
+        });
+      }
+
+      function getSelectedDialInfo(dialSelect) {
+        if (!dialSelect || dialSelect.selectedIndex < 0) {
+          return { iso: 'NL', dial: '31', flag: '🇳🇱', trunkZero: true, phoneEx: '6 12345678' };
+        }
+        var opt = dialSelect.options[dialSelect.selectedIndex];
+        return {
+          iso: opt.value,
+          dial: opt.getAttribute('data-dial') || '31',
+          flag: opt.getAttribute('data-flag') || '🌐',
+          trunkZero: opt.getAttribute('data-trunk-zero') === '1',
+          phoneEx: opt.getAttribute('data-phone-ex') || ''
+        };
+      }
+
+      function setDialByIso(dialSelect, labelEl, phoneInput, iso) {
+        if (!dialSelect) return;
+        for (var i = 0; i < dialSelect.options.length; i++) {
+          if (dialSelect.options[i].value === iso) {
+            dialSelect.selectedIndex = i;
+            break;
+          }
+        }
+        var info = getSelectedDialInfo(dialSelect);
+        if (labelEl) labelEl.textContent = info.flag + ' +' + info.dial;
+        if (phoneInput && info.phoneEx) phoneInput.placeholder = info.phoneEx;
+      }
+
+      function buildE164Phone(rawInput, dialInfo) {
+        var digits = (rawInput || '').replace(/\D/g, '');
+        if (!digits) return '';
+        if (dialInfo.trunkZero && digits.charAt(0) === '0') {
+          digits = digits.slice(1);
+        }
+        if (digits.indexOf(dialInfo.dial) === 0 && digits.length >= dialInfo.dial.length + 7) {
+          return '+' + digits;
+        }
+        return '+' + dialInfo.dial + digits;
+      }
+
+      function getFieldContainer(inputEl) {
+        return inputEl ? inputEl.closest('.lv-acct-field') : null;
+      }
+
+      function setFieldError(inputEl, message) {
+        var field = getFieldContainer(inputEl);
+        if (!field) return;
+        field.classList.add('has-error');
+        if (inputEl) inputEl.setAttribute('aria-invalid', 'true');
+        var errEl = field.querySelector('[data-lv-acct-field-err]');
+        if (!errEl) {
+          errEl = document.createElement('span');
+          errEl.className = 'lv-acct-field__err';
+          errEl.setAttribute('data-lv-acct-field-err', '');
+          field.appendChild(errEl);
+        }
+        errEl.textContent = message;
+        errEl.hidden = false;
+      }
+
+      function clearFieldError(inputEl) {
+        var field = getFieldContainer(inputEl);
+        if (!field) return;
+        field.classList.remove('has-error');
+        if (inputEl) inputEl.removeAttribute('aria-invalid');
+        var errEl = field.querySelector('[data-lv-acct-field-err]');
+        if (errEl) {
+          errEl.textContent = '';
+          errEl.hidden = true;
+        }
+      }
+
+      function containsLetters(val) {
+        return /[A-Za-z\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u0980-\u09FF\u4E00-\u9FFF]/.test(val);
+      }
+
+      function isDigitsOnly(val) {
+        return /^[\d\s\-+.()]+$/.test(val);
+      }
+
+      function updatePhoneLiveHint(form, phoneInput, dialSelect) {
+        if (!phoneInput || !dialSelect) return;
+        var field = getFieldContainer(phoneInput);
+        if (!field) return;
+        var hintEl = field.querySelector('[data-lv-acct-phone-hint]');
+        if (!hintEl) {
+          hintEl = document.createElement('span');
+          hintEl.className = 'lv-acct-field__hint';
+          hintEl.setAttribute('data-lv-acct-phone-hint', '');
+          field.appendChild(hintEl);
+        }
+        var digits = phoneInput.value.replace(/\D/g, '');
+        if (!digits) {
+          hintEl.textContent = '';
+          hintEl.hidden = true;
+          return;
+        }
+        var info = getSelectedDialInfo(dialSelect);
+        var full = buildE164Phone(phoneInput.value, info);
+        hintEl.textContent = LV_VAL_TXT.phoneHintPrefix + ' ' + full;
+        hintEl.hidden = false;
+      }
+
+      // Country, Province, Postal & Phone synchronization
       document.querySelectorAll('[data-lv-acct-country]').forEach(function(countrySelect) {
+        if (countrySelect.dataset.lvCountryBound) return;
+        countrySelect.dataset.lvCountryBound = '1';
         var form = countrySelect.closest('form');
         if (!form) return;
+        form.noValidate = true;
+
         var provSelect = form.querySelector('[data-lv-acct-province]');
         var provContainer = provSelect ? provSelect.closest('.lv-acct-field') : null;
+        var zipInput = form.querySelector('[data-lv-acct-zip]');
+        var zipHint = form.querySelector('[data-lv-acct-zip-hint]');
+        var phoneInput = form.querySelector('[data-lv-acct-phone]');
+        var dialSelect = form.querySelector('[data-lv-acct-dial]');
+        var dialLabel = form.querySelector('[data-lv-acct-dial-label]');
+
+        if (dialSelect) {
+          populateDialOptions(dialSelect);
+        }
 
         var defaultCountry = countrySelect.getAttribute('data-default');
+        var matchedDefault = false;
         if (defaultCountry) {
           for (var i = 0; i < countrySelect.options.length; i++) {
             if (countrySelect.options[i].value === defaultCountry) {
               countrySelect.selectedIndex = i;
+              matchedDefault = true;
               break;
+            }
+          }
+        }
+        if (!matchedDefault && (!countrySelect.value || countrySelect.value === '---')) {
+          var fallbackMeta = findCountryMeta(LV_STORE_ISO);
+          for (var j = 0; j < countrySelect.options.length; j++) {
+            var optVal = countrySelect.options[j].value;
+            if (optVal && optVal !== '---' && normalizeCountryKey(optVal) === normalizeCountryKey(fallbackMeta.name)) {
+              countrySelect.selectedIndex = j;
+              break;
+            }
+          }
+          if (!countrySelect.value || countrySelect.value === '---') {
+            for (var k = 0; k < countrySelect.options.length; k++) {
+              if (countrySelect.options[k].value && countrySelect.options[k].value !== '---') {
+                countrySelect.selectedIndex = k;
+                break;
+              }
+            }
+          }
+        }
+
+        // Parse initial E.164 value in Edit modal so prefix and local number stay clean
+        var initialPhoneDetected = null;
+        if (phoneInput && phoneInput.value) {
+          initialPhoneDetected = detectDialFromInternational(phoneInput.value);
+          if (initialPhoneDetected) {
+            phoneInput.value = initialPhoneDetected.national;
+            if (dialSelect) {
+              dialSelect.dataset.lvManual = '1';
+              setDialByIso(dialSelect, dialLabel, phoneInput, initialPhoneDetected.meta.iso);
+            }
+          } else {
+            phoneInput.value = phoneInput.value.replace(/[^\d\s]/g, '');
+          }
+        }
+
+        function updateZipRule() {
+          if (!zipInput) return;
+          var meta = findCountryMeta(countrySelect.value);
+          zipInput.dataset.lvZipMode = meta.zipMode;
+          zipInput.dataset.lvZipRe = meta.zipRegexStr || '';
+          zipInput.dataset.lvZipEx = meta.zipEx || '';
+          if (meta.zipMode === 'none') {
+            zipInput.required = false;
+            zipInput.inputMode = 'text';
+            zipInput.removeAttribute('maxlength');
+            if (zipHint) {
+              zipHint.textContent = LV_VAL_TXT.zipOptional;
+              zipHint.hidden = false;
+            }
+            clearFieldError(zipInput);
+          } else {
+            zipInput.required = true;
+            zipInput.maxLength = meta.zipMax || 12;
+            if (meta.zipMode === 'num' || meta.zipMode === 'num-dash') {
+              zipInput.inputMode = 'numeric';
+              zipInput.value = meta.zipMode === 'num' ? zipInput.value.replace(/\D/g, '') : zipInput.value.replace(/[^\d-]/g, '');
+            } else {
+              zipInput.inputMode = 'text';
+              zipInput.autocapitalize = 'characters';
+              zipInput.value = zipInput.value.toUpperCase().replace(/[^A-Z0-9\s-]/g, '');
+            }
+            if (zipHint) {
+              if (meta.zipEx) {
+                zipHint.textContent = meta.zipMode === 'num'
+                  ? (LV_IS_NL ? 'Bijv. ' : 'e.g. ') + meta.zipEx + (LV_IS_NL ? ' (alleen cijfers)' : ' (digits only)')
+                  : (LV_IS_NL ? 'Bijv. ' : 'e.g. ') + meta.zipEx;
+                zipHint.hidden = false;
+              } else {
+                zipHint.textContent = '';
+                zipHint.hidden = true;
+              }
             }
           }
         }
@@ -1529,11 +2071,94 @@
             provContainer.style.display = 'flex';
           } else {
             provContainer.style.display = 'none';
+            clearFieldError(provSelect);
           }
         }
 
-        countrySelect.addEventListener('change', updateProvinces);
+        function syncPhoneDialWithCountry(force) {
+          if (!dialSelect) return;
+          if (!force && dialSelect.dataset.lvManual === '1') return;
+          var meta = findCountryMeta(countrySelect.value);
+          var iso = meta.iso === 'INT' ? LV_STORE_ISO : meta.iso;
+          setDialByIso(dialSelect, dialLabel, phoneInput, iso);
+          updatePhoneLiveHint(form, phoneInput, dialSelect);
+        }
+
+        countrySelect.addEventListener('change', function(ev) {
+          clearFieldError(countrySelect);
+          updateProvinces();
+          updateZipRule();
+          if (ev && ev.isTrusted && dialSelect) {
+            delete dialSelect.dataset.lvManual;
+          }
+          syncPhoneDialWithCountry(false);
+        });
+
+        if (dialSelect) {
+          dialSelect.addEventListener('change', function() {
+            dialSelect.dataset.lvManual = '1';
+            var info = getSelectedDialInfo(dialSelect);
+            if (dialLabel) dialLabel.textContent = info.flag + ' +' + info.dial;
+            if (phoneInput && info.phoneEx) phoneInput.placeholder = info.phoneEx;
+            updatePhoneLiveHint(form, phoneInput, dialSelect);
+            clearFieldError(phoneInput);
+          });
+        }
+
+        if (phoneInput) {
+          phoneInput.addEventListener('input', function() {
+            var val = phoneInput.value;
+            var detected = detectDialFromInternational(val);
+            if (detected && dialSelect) {
+              dialSelect.dataset.lvManual = '1';
+              setDialByIso(dialSelect, dialLabel, phoneInput, detected.meta.iso);
+              phoneInput.value = detected.national;
+            } else {
+              var clean = val.replace(/[^\d\s]/g, '').replace(/\s{2,}/g, ' ');
+              if (clean !== val) phoneInput.value = clean;
+            }
+            updatePhoneLiveHint(form, phoneInput, dialSelect);
+            clearFieldError(phoneInput);
+          });
+        }
+
+        if (zipInput) {
+          zipInput.addEventListener('input', function() {
+            var mode = zipInput.dataset.lvZipMode || 'alnum';
+            var v = zipInput.value;
+            if (mode === 'num') {
+              zipInput.value = v.replace(/\D/g, '');
+            } else if (mode === 'num-dash') {
+              zipInput.value = v.replace(/[^\d-]/g, '').replace(/-{2,}/g, '-');
+            } else if (mode === 'nl' || mode === 'alnum') {
+              zipInput.value = v.toUpperCase().replace(/[^A-Z0-9\s-]/g, '').replace(/\s{2,}/g, ' ');
+            }
+            clearFieldError(zipInput);
+          });
+          zipInput.addEventListener('blur', function() {
+            if (zipInput.dataset.lvZipMode === 'nl') {
+              var m = zipInput.value.trim().toUpperCase().replace(/\s+/g, '');
+              if (/^\d{4}[A-Z]{2}$/.test(m)) {
+                zipInput.value = m.slice(0, 4) + ' ' + m.slice(4);
+              }
+            }
+          });
+        }
+
+        // Clear inline error as soon as user edits any text/select field
+        form.querySelectorAll('input:not([type="checkbox"]):not([type="hidden"]), select').forEach(function(inp) {
+          if (inp === dialSelect || inp === zipInput || inp === phoneInput) return;
+          inp.addEventListener('input', function() { clearFieldError(inp); });
+          inp.addEventListener('change', function() { clearFieldError(inp); });
+        });
+
         updateProvinces();
+        updateZipRule();
+        if (!initialPhoneDetected) {
+          syncPhoneDialWithCountry(true);
+        } else {
+          updatePhoneLiveHint(form, phoneInput, dialSelect);
+        }
       });
     }
 
@@ -1547,53 +2172,294 @@
       var txtDeleted = acctI18n.addressDeleted || {{ 'customer.addresses.deleted' | t | json }};
       var txtDeleteErr = acctI18n.addressDeleteError || {{ 'customer.addresses.delete_error' | t | json }};
 
+      function clearFormError(form) {
+        var box = form.querySelector('[data-lv-acct-form-error]');
+        if (box) {
+          box.textContent = '';
+          box.hidden = true;
+        }
+      }
+
+      function clearAllFieldErrors(form) {
+        form.querySelectorAll('.lv-acct-field.has-error').forEach(function(f) {
+          f.classList.remove('has-error');
+        });
+        form.querySelectorAll('[data-lv-acct-field-err]').forEach(function(e) {
+          e.textContent = '';
+          e.hidden = true;
+        });
+        form.querySelectorAll('[aria-invalid]').forEach(function(el) {
+          el.removeAttribute('aria-invalid');
+        });
+      }
+
+      function setInlineErr(inputEl, message) {
+        var field = inputEl ? inputEl.closest('.lv-acct-field') : null;
+        if (!field) return;
+        field.classList.add('has-error');
+        inputEl.setAttribute('aria-invalid', 'true');
+        var errEl = field.querySelector('[data-lv-acct-field-err]');
+        if (!errEl) {
+          errEl = document.createElement('span');
+          errEl.className = 'lv-acct-field__err';
+          errEl.setAttribute('data-lv-acct-field-err', '');
+          field.appendChild(errEl);
+        }
+        errEl.textContent = message;
+        errEl.hidden = false;
+      }
+
+      function validateAddressForm(form) {
+        clearFormError(form);
+        clearAllFieldErrors(form);
+        var firstInvalid = null;
+        function fail(el, msg) {
+          setInlineErr(el, msg);
+          if (!firstInvalid) firstInvalid = el;
+        }
+
+        var fn = form.querySelector('[name="address[first_name]"]');
+        var ln = form.querySelector('[name="address[last_name]"]');
+        var a1 = form.querySelector('[name="address[address1]"]');
+        var city = form.querySelector('[name="address[city]"]');
+        var country = form.querySelector('[name="address[country]"]');
+        var prov = form.querySelector('[name="address[province]"]');
+        var zip = form.querySelector('[name="address[zip]"]');
+        var phone = form.querySelector('[name="address[phone]"]');
+        var dial = form.querySelector('[data-lv-acct-dial]');
+
+        [fn, ln, a1, city, zip].forEach(function(inp) {
+          if (inp) inp.value = inp.value.trim();
+        });
+
+        var hasLetter = /[A-Za-z\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u0980-\u09FF\u4E00-\u9FFF]/;
+        var onlyNums = /^[\d\s\-+.()]+$/;
+
+        if (fn) {
+          if (!fn.value) fail(fn, LV_VAL_TXT.firstReq);
+          else if (onlyNums.test(fn.value) || !hasLetter.test(fn.value)) fail(fn, LV_VAL_TXT.firstAlpha);
+        }
+        if (ln) {
+          if (!ln.value) fail(ln, LV_VAL_TXT.lastReq);
+          else if (onlyNums.test(ln.value) || !hasLetter.test(ln.value)) fail(ln, LV_VAL_TXT.lastAlpha);
+        }
+        if (a1) {
+          if (!a1.value) fail(a1, LV_VAL_TXT.addrReq);
+          else if (a1.value.length < 3) fail(a1, LV_VAL_TXT.addrShort);
+        }
+        if (city) {
+          if (!city.value) fail(city, LV_VAL_TXT.cityReq);
+          else if (onlyNums.test(city.value) || !hasLetter.test(city.value)) fail(city, LV_VAL_TXT.cityAlpha);
+        }
+        if (country) {
+          if (!country.value || country.value === '---') fail(country, LV_VAL_TXT.countryReq);
+        }
+        if (prov) {
+          var provField = prov.closest('.lv-acct-field');
+          if (provField && provField.style.display !== 'none' && prov.options.length > 0 && !prov.value) {
+            fail(prov, LV_VAL_TXT.provReq);
+          }
+        }
+        if (zip) {
+          var zMode = zip.dataset.lvZipMode || 'alnum';
+          var zReStr = zip.dataset.lvZipRe || '';
+          var zEx = zip.dataset.lvZipEx || '';
+          if (zMode !== 'none') {
+            if (!zip.value) {
+              fail(zip, LV_VAL_TXT.zipReq);
+            } else if ((zMode === 'num' || zMode === 'num-dash') && /[A-Za-z]/.test(zip.value)) {
+              fail(zip, LV_VAL_TXT.zipDigitsOnly);
+            } else if (zReStr) {
+              try {
+                var re = new RegExp(zReStr);
+                if (!re.test(zip.value.toUpperCase())) {
+                  fail(zip, LV_VAL_TXT.zipFormat + (zEx ? ' (' + zEx + ')' : '') + '.');
+                }
+              } catch (err) {}
+            } else if (zip.value.length < 2) {
+              fail(zip, LV_VAL_TXT.zipFormat + '.');
+            }
+          }
+        }
+
+        var formattedPhone = '';
+        if (phone && phone.value.trim()) {
+          var rawPhone = phone.value.trim();
+          if (/[A-Za-z]/.test(rawPhone)) {
+            fail(phone, LV_VAL_TXT.phoneDigitsOnly);
+          } else {
+            var nationalDigits = rawPhone.replace(/\D/g, '');
+            if (!nationalDigits || nationalDigits.length < 5 || nationalDigits.length > 15 || /^(\d)\1{5,}$/.test(nationalDigits)) {
+              fail(phone, LV_VAL_TXT.phoneInvalid);
+            } else if (dial && dial.selectedIndex >= 0) {
+              var opt = dial.options[dial.selectedIndex];
+              var dCode = opt.getAttribute('data-dial') || '31';
+              var trunk = opt.getAttribute('data-trunk-zero') === '1';
+              var nat = nationalDigits;
+              if (trunk && nat.charAt(0) === '0') nat = nat.slice(1);
+              if (nat.indexOf(dCode) === 0 && nat.length >= dCode.length + 7) {
+                formattedPhone = '+' + nat;
+              } else {
+                formattedPhone = '+' + dCode + nat;
+              }
+              var totalDigits = formattedPhone.replace(/\D/g, '');
+              if (totalDigits.length < 7 || totalDigits.length > 15) {
+                fail(phone, LV_VAL_TXT.phoneInvalid);
+              }
+            } else {
+              formattedPhone = nationalDigits;
+            }
+          }
+        }
+
+        if (firstInvalid) {
+          showFormError(form, LV_VAL_TXT.checkFields);
+          if (typeof firstInvalid.focus === 'function') firstInvalid.focus();
+          return { valid: false, phone: formattedPhone };
+        }
+        return { valid: true, phone: formattedPhone };
+      }
+
+      function showFormError(form, message) {
+        var box = form.querySelector('[data-lv-acct-form-error]');
+        if (box) {
+          box.textContent = message;
+          box.hidden = false;
+        } else {
+          showToast(message, 'error');
+        }
+      }
+
+      function extractHtmlError(html) {
+        if (!html) return '';
+        try {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+          var errEl = doc.querySelector('.errors, .form__message[role="alert"], [data-form-status], .note.form-error');
+          return errEl ? errEl.textContent.replace(/\s+/g, ' ').trim() : '';
+        } catch (err) {
+          return '';
+        }
+      }
+
+      function postUrlEncoded(actionUrl, formData) {
+        var encoded = new URLSearchParams(formData).toString();
+        return fetch(actionUrl, {
+          method: 'POST',
+          body: encoded,
+          credentials: 'same-origin',
+          redirect: 'manual',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          }
+        });
+      }
+
+      function syncAddressesFromDoc(doc) {
+        syncElementHtml(doc, '[data-tab-panel="addresses"]');
+        syncElementHtml(doc, '[data-lv-acct-addresses-pill]');
+        syncElementHtml(doc, '[data-lv-acct-overview-address]');
+        if (!document.querySelector('dialog.lv-acct-modal[open]')) {
+          syncElementHtml(doc, '[data-lv-acct-edit-modals]');
+        }
+        var root = document.querySelector('[data-lv-acct-dashboard]');
+        var activeNav = root ? root.querySelector('.lv-acct-nav__btn.is-active') : null;
+        var mobileCurrentEl = root ? root.querySelector('[data-lv-acct-mobile-current]') : null;
+        if (mobileCurrentEl && activeNav) {
+          var labelEl = activeNav.querySelector('.lv-acct-nav__label');
+          var pillEl = activeNav.querySelector('.lv-acct-nav__pill');
+          var txt = labelEl ? labelEl.textContent.trim() : '';
+          if (pillEl && pillEl.textContent.trim()) txt += ' (' + pillEl.textContent.trim() + ')';
+          mobileCurrentEl.textContent = txt;
+        }
+        initAddressViewToggle();
+        initAddressModals();
+        initAddressForms();
+      }
+
       document.querySelectorAll('form[data-lv-acct-address-form]').forEach(function(form) {
+        if (form.dataset.lvFormBound) return;
+        form.dataset.lvFormBound = '1';
         form.addEventListener('submit', function(e) {
           e.preventDefault();
+          var check = validateAddressForm(form);
+          if (!check.valid) return;
+
           var submitBtn = form.querySelector('button[type="submit"]');
-          var origBtnText = '';
+          var origBtnHtml = submitBtn ? submitBtn.innerHTML : '';
           if (submitBtn) {
             submitBtn.disabled = true;
-            origBtnText = submitBtn.innerHTML;
             var sp = document.createElement('span');
             sp.textContent = txtSaving;
             submitBtn.innerHTML = '';
             submitBtn.appendChild(sp);
           }
 
-          var formData = new FormData(form);
-
-          fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          var restoreBtn = function() {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = origBtnHtml;
             }
+          };
+
+          var formData = new FormData(form);
+          formData.set('address[phone]', check.phone || '');
+          var actionUrl = form.getAttribute('action') || form.action;
+
+          postUrlEncoded(actionUrl, formData)
+          .then(function(res) {
+            if (res.type === 'opaqueredirect') {
+              return { ok: true };
+            }
+            if (!res.ok) {
+              return res.text().then(function(html) {
+                return { ok: false, errMsg: extractHtmlError(html) || txtSaveErr };
+              });
+            }
+            return res.text().then(function(html) {
+              var errMsg = extractHtmlError(html);
+              if (errMsg) return { ok: false, errMsg: errMsg };
+              return { ok: true };
+            });
           })
-          .then(function() {
-            var modal = form.closest('dialog');
-            if (modal) modal.close();
-            showToast(txtSaved);
-            setTimeout(function() {
-              if (window.location.hash !== '#addresses') {
-                window.location.hash = 'addresses';
-              }
+          .then(function(result) {
+            if (!result.ok) {
+              restoreBtn();
+              showFormError(form, result.errMsg || txtSaveErr);
+              return null;
+            }
+            return fetchDashboardDoc();
+          })
+          .then(function(doc) {
+            if (!doc) return;
+            if (!doc.querySelector('[data-lv-acct-addresses-pill]')) {
+              window.location.hash = 'addresses';
               window.location.reload();
-            }, 600);
+              return;
+            }
+            var modal = form.closest('dialog');
+            if (modal && typeof modal.close === 'function') {
+              modal.close();
+            }
+            if (modal && modal.id === 'LvAcctAddAddressModal') {
+              form.reset();
+            }
+            restoreBtn();
+            syncAddressesFromDoc(doc);
+            showToast(txtSaved, 'success');
           })
           .catch(function(err) {
             console.error('Address form submit error:', err);
-            if (submitBtn) {
-              submitBtn.disabled = false;
-              submitBtn.innerHTML = origBtnText;
-            }
-            showToast(txtSaveErr);
+            restoreBtn();
+            showFormError(form, txtSaveErr);
           });
         });
       });
 
       // AJAX Address Delete
       document.querySelectorAll('form[data-lv-acct-delete-form]').forEach(function(delForm) {
+        if (delForm.dataset.lvFormBound) return;
+        delForm.dataset.lvFormBound = '1';
         delForm.addEventListener('submit', function(e) {
           e.preventDefault();
           if (!confirm(txtConfirmDelete)) {
@@ -1602,28 +2468,46 @@
           var submitBtn = delForm.querySelector('button[type="submit"]');
           if (submitBtn) submitBtn.disabled = true;
 
+          var addrId = delForm.getAttribute('data-lv-addr-id') || '';
+          var actionUrl = delForm.getAttribute('action') || delForm.action;
+          if (addrId) {
+            var editDialogForm = document.querySelector('#LvAcctEditAddressModal-' + addrId + ' form[data-lv-acct-address-form]');
+            if (editDialogForm) {
+              var editAction = editDialogForm.getAttribute('action');
+              if (editAction && editAction.charAt(0) === '/') {
+                actionUrl = editAction;
+              }
+            }
+          }
+
           var formData = new FormData(delForm);
 
-          fetch(delForm.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          postUrlEncoded(actionUrl, formData)
+          .then(function(res) {
+            if (res.type !== 'opaqueredirect' && !res.ok) {
+              throw new Error('HTTP ' + res.status);
             }
+            return fetchDashboardDoc();
           })
-          .then(function() {
-            showToast(txtDeleted);
-            setTimeout(function() {
-              if (window.location.hash !== '#addresses') {
-                window.location.hash = 'addresses';
-              }
+          .then(function(doc) {
+            if (!doc) return;
+            if (!doc.querySelector('[data-lv-acct-addresses-pill]')) {
+              window.location.hash = 'addresses';
               window.location.reload();
-            }, 600);
+              return;
+            }
+            if (addrId && doc.querySelector('[data-lv-addr-id="' + addrId + '"]')) {
+              if (submitBtn) submitBtn.disabled = false;
+              showToast(txtDeleteErr, 'error');
+              return;
+            }
+            syncAddressesFromDoc(doc);
+            showToast(txtDeleted, 'success');
           })
           .catch(function(err) {
             console.error('Address delete error:', err);
             if (submitBtn) submitBtn.disabled = false;
-            showToast(txtDeleteErr);
+            showToast(txtDeleteErr, 'error');
           });
         });
       });

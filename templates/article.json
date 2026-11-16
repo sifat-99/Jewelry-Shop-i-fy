@@ -1,0 +1,26 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-article",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "header_color_scheme": "scheme-2",
+        "hero_layout": "split",
+        "show_featured_image": true,
+        "show_sidebar": true,
+        "sidebar_width": 360,
+        "show_date": true,
+        "show_author": true,
+        "show_read_time": true,
+        "show_tags": true,
+        "show_share": true,
+        "show_related": true,
+        "padding_top": 0,
+        "padding_bottom": 72
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
