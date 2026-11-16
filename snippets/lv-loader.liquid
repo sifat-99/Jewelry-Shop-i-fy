@@ -5,7 +5,7 @@
   @param {boolean} [overlay] - Optional overlay wrapper for image containers
   @param {string} [extra_class] - Optional additional CSS classes
 {% enddoc %}
-{%- if overlay and settings.enable_product_loader == false -%}{%- else -%}
+{%- if overlay and settings.enable_product_loader == false and extra_class == blank -%}{%- else -%}
 {%- if overlay -%}<div class="lv-loader-overlay lv-skel-fill" aria-hidden="true">{%- endif -%}
 <div class="lv-loader-badge{% if extra_class %} {{ extra_class }}{% endif %}" role="status" aria-label="{{ 'accessibility.loading' | t | default: 'Loading' }}">
   <svg class="lv-loader" viewBox="0 0 150 60" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" focusable="false">

@@ -965,6 +965,9 @@
     <!-- 4. Product Image Slider Container -->
     {%- assign fallback_shop_label = 'products.product.vendor_fallback' | t -%}
     <a href="{{ product.url | default: routes.all_products_collection_url }}" class="lv-card-img-link" aria-label="{{ product.title | default: demo_title | default: fallback_shop_label | escape }}">
+      {%- if card_media.size > 0 or product.featured_media -%}
+        {% render 'lv-loader', overlay: true, extra_class: 'lv-loader-badge--card' %}
+      {%- endif -%}
       <div class="card-media-slider" data-current-index="0" data-total-slides="{{ card_media.size | default: 1 }}">
         {%- if card_media.size > 0 -%}
           {%- for item in card_media limit: 2 -%}
@@ -977,6 +980,7 @@
               height="{{ item.height | default: 600 }}"
               loading="{% if forloop.first and fallback_index <= 2 and lazy_load != true %}eager{% else %}lazy{% endif %}"
               decoding="async"
+              onload="if(this.complete && this.naturalWidth > 0){var w=this.closest('.lv-card-media-wrap');if(w){w.classList.add('lv-ready');var o=w.querySelector('.lv-loader-overlay');if(o)o.classList.add('is-done');}}"
               class="card-media-slide {% if forloop.first %}is-active{% endif %}"
               data-slide-index="{{ forloop.index0 }}"
             >
@@ -991,6 +995,7 @@
             height="{{ product.featured_media.height | default: 600 }}"
             loading="lazy"
             decoding="async"
+            onload="if(this.complete && this.naturalWidth > 0){var w=this.closest('.lv-card-media-wrap');if(w){w.classList.add('lv-ready');var o=w.querySelector('.lv-loader-overlay');if(o)o.classList.add('is-done');}}"
             class="card-media-slide is-active"
             data-slide-index="0"
           >

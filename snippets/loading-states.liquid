@@ -135,21 +135,76 @@
   }
   .lv-loader-overlay.is-done { opacity: 0; visibility: hidden; }
   {%- endif %}
+
+  /* Card loader overlay & badge sizing */
+  .lv-card-media-wrap .lv-loader-overlay {
+    position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center;
+    border-radius: inherit; pointer-events: none;
+    transition: opacity .35s ease, visibility .35s ease;
+  }
+  .lv-card-media-wrap.lv-ready .lv-loader-overlay {
+    opacity: 0 !important; visibility: hidden !important; pointer-events: none !important;
+  }
+  .lv-loader-badge--card {
+    width: 110px !important;
+    height: 44px !important;
+    border-radius: 22px !important;
+    box-shadow: 0 6px 20px rgba(128, 103, 69, 0.16) !important;
+  }
+  .lv-loader-badge--card .lv-loader {
+    width: 98px !important;
+    height: 39px !important;
+  }
+  @media (max-width: 767px) {
+    .lv-loader-badge--card {
+      width: 88px !important;
+      height: 36px !important;
+      border-radius: 18px !important;
+    }
+    .lv-loader-badge--card .lv-loader {
+      width: 78px !important;
+      height: 31px !important;
+    }
+  }
+
+  /* Keep images hidden before fully loaded to eliminate partial/clipped rendering */
+  .lv-card-media-wrap:not(.lv-ready) .card-media-slide {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+  .lv-card-media-wrap.lv-ready .card-media-slide.is-active {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .lv-card-media-wrap::before, .lv-skel-fill, .lv-loader-stream-track, .lv-sparkle, .lv-facet-hi, .lv-marquise-core { animation: none !important; }
   }
 </style>
-<noscript><style>.lv-card-media-wrap::before, .lv-loader-overlay { display: none !important; }</style></noscript>
+<noscript><style>.lv-card-media-wrap::before, .lv-loader-overlay { display: none !important; } .lv-card-media-wrap .card-media-slide { opacity: 1 !important; visibility: visible !important; }</style></noscript>
 <script>
   (function () {
     var raf = null;
+    function loaderDone(o) { if (o) o.classList.add('is-done'); }
     function cardReady(w) {
       if (w.classList.contains('lv-ready')) return;
       var img = w.querySelector('.card-media-slide.is-active') || w.querySelector('.card-media-slide');
-      if (!img || img.tagName !== 'IMG' || (img.complete && img.naturalWidth > 0)) w.classList.add('lv-ready');
+      if (!img || img.tagName !== 'IMG' || (img.complete && img.naturalWidth > 0)) {
+        w.classList.add('lv-ready');
+        var o = w.querySelector('.lv-loader-overlay');
+        if (o) loaderDone(o);
+      }
     }
-    function loaderDone(o) { if (o) o.classList.add('is-done'); }
     function loaderCheck(o) {
+      var wrap = o.closest('.lv-card-media-wrap');
+      if (wrap) {
+        var cardImg = wrap.querySelector('.card-media-slide.is-active') || wrap.querySelector('.card-media-slide');
+        if (!cardImg || cardImg.tagName !== 'IMG' || (cardImg.complete && cardImg.naturalWidth > 0)) {
+          wrap.classList.add('lv-ready');
+          loaderDone(o);
+        }
+        return;
+      }
       var g = o.closest('[data-pg]') || o.parentNode;
       var img = g && g.querySelector('img.pg__img');
       if (!img || (img.complete && img.naturalWidth > 0)) loaderDone(o);
@@ -164,9 +219,13 @@
       var t = e.target;
       if (!t || t.tagName !== 'IMG') return;
       var w = t.closest && t.closest('.lv-card-media-wrap');
-      if (w) cardReady(w);
-      var o = t.closest && t.closest('[data-pg]');
-      if (o) loaderDone(o.querySelector('.lv-loader-overlay'));
+      if (w) {
+        cardReady(w);
+        var o = w.querySelector('.lv-loader-overlay');
+        if (o) loaderDone(o);
+      }
+      var o2 = t.closest && t.closest('[data-pg]');
+      if (o2) loaderDone(o2.querySelector('.lv-loader-overlay'));
     }
     document.addEventListener('load', onImg, true);
     document.addEventListener('error', onImg, true);
@@ -182,7 +241,7 @@
     setTimeout(function () {
       document.querySelectorAll('.lv-card-media-wrap').forEach(function (w) { w.classList.add('lv-ready'); });
       document.querySelectorAll('.lv-loader-overlay').forEach(loaderDone);
-    }, 10000);
+    }, 5000);
   })();
 </script>
 {%- endif -%}
