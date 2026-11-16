@@ -193,8 +193,10 @@
   #dp-{{ section.id }} .dp__col--b {
     animation: dpMarqueeDown 36s linear infinite;
   }
-  #dp-{{ section.id }} .dp__clip:hover .dp__col {
-    animation-play-state: paused;
+  #dp-{{ section.id }} .dp__clip:hover .dp__col,
+  #dp-{{ section.id }} .dp__clip:focus-within .dp__col,
+  #dp-{{ section.id }}.dp--paused .dp__col {
+    animation-play-state: paused !important;
   }
 
   /* Center media & text */
@@ -291,8 +293,10 @@
     }
 
     #dp-{{ section.id }} .dp__mobile-track-wrap:hover .dp__mobile-track,
-    #dp-{{ section.id }} .dp__mobile-track-wrap:active .dp__mobile-track {
-      animation-play-state: paused;
+    #dp-{{ section.id }} .dp__mobile-track-wrap:active .dp__mobile-track,
+    #dp-{{ section.id }} .dp__mobile-track.is-paused,
+    #dp-{{ section.id }}.dp--paused .dp__mobile-track {
+      animation-play-state: paused !important;
     }
 
     #dp-{{ section.id }} .dp__mobile-group {
@@ -514,29 +518,201 @@
     var root = document.getElementById('dp-{{ section.id }}');
     if (!root) return;
 
-    var anims = root.querySelectorAll('.dp__col, .dp__mobile-track');
-    if ('IntersectionObserver' in window && anims.length > 0) {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var autoOn = root.dataset.auto !== 'false';
+    var speed = Math.max(10, parseFloat(root.dataset.speed) || 35);
+    var dir = root.dataset.dir || 'up_down';
+    var dirSign = dir === 'down_up' ? -1 : 1;
+    var pauseOn = root.dataset.pause !== 'false';
+    var wheelOn = root.dataset.wheel !== 'false';
+    var wheelK = (parseFloat(root.dataset.wheelspeed) || 3) * 0.4;
+
+    var colA = root.querySelector('.dp__col--a');
+    var colB = root.querySelector('.dp__col--b');
+    var clips = root.querySelectorAll('.dp__clip');
+    var mTracks = root.querySelectorAll('.dp__mobile-track');
+
+    /* 1. Viewport Visibility Tracking */
+    var isVisible = true;
+    if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (entries) {
-        var isVisible = entries[0].isIntersecting;
-        anims.forEach(function (el) {
-          el.style.animationPlayState = isVisible ? 'running' : 'paused';
-        });
+        isVisible = entries[0].isIntersecting;
+        if (!isVisible) {
+          root.classList.add('dp--paused');
+        } else {
+          root.classList.remove('dp--paused');
+          if (isDesktop() && !rafId) {
+            lastTime = 0;
+            rafId = requestAnimationFrame(loop);
+          }
+        }
       }, { threshold: 0.05 }).observe(root);
     }
 
-    var mTracks = root.querySelectorAll('.dp__mobile-track');
+    /* 2. Desktop Vertical Dual-Column Interactive Controller */
+    var offA = 0;
+    var offB = 0;
+    var boostA = 0;
+    var boostB = 0;
+    var isHovered = false;
+    var rafId = null;
+    var lastTime = 0;
+    var hA = 0;
+    var hB = 0;
+
+    function isDesktop() {
+      return window.innerWidth > 1024;
+    }
+
+    function updateHeights() {
+      if (colA) {
+        var tA = colA.querySelector('.dp__col-track');
+        if (tA && tA.offsetHeight > 0) hA = tA.offsetHeight;
+      }
+      if (colB) {
+        var tB = colB.querySelector('.dp__col-track');
+        if (tB && tB.offsetHeight > 0) hB = tB.offsetHeight;
+      }
+    }
+
+    function wrapOffset(val, h) {
+      if (h <= 0) return 0;
+      return ((val % h) - h) % h;
+    }
+
+    function loop(now) {
+      rafId = null;
+      if (!isDesktop() || reduce || !isVisible) {
+        lastTime = 0;
+        return;
+      }
+
+      var dt = lastTime ? Math.min(0.05, (now - lastTime) / 1000) : 0.016;
+      lastTime = now;
+
+      if (hA <= 0 || hB <= 0) {
+        updateHeights();
+      }
+
+      // Continuous auto-scroll when not paused by hover
+      if (autoOn && !isHovered) {
+        offA -= speed * dt * dirSign;
+        offB += speed * dt * dirSign;
+      }
+
+      // Add mouse-wheel momentum
+      if (Math.abs(boostA) > 0.05) {
+        offA += boostA;
+        boostA *= Math.exp(-9 * dt);
+      } else {
+        boostA = 0;
+      }
+
+      if (Math.abs(boostB) > 0.05) {
+        offB += boostB;
+        boostB *= Math.exp(-9 * dt);
+      } else {
+        boostB = 0;
+      }
+
+      if (colA && hA > 0) {
+        var wrappedA = wrapOffset(offA, hA);
+        colA.style.transform = 'translate3d(0, ' + wrappedA.toFixed(2) + 'px, 0)';
+      }
+      if (colB && hB > 0) {
+        var wrappedB = wrapOffset(offB, hB);
+        colB.style.transform = 'translate3d(0, ' + wrappedB.toFixed(2) + 'px, 0)';
+      }
+
+      rafId = requestAnimationFrame(loop);
+    }
+
+    function initDesktop() {
+      if (!isDesktop() || !colA || !colB) return;
+
+      // Remove CSS animations on desktop so JS rAF has unified 60fps control
+      colA.style.animation = 'none';
+      colB.style.animation = 'none';
+
+      updateHeights();
+
+      // Start Column B offset halfway so both columns start staggered
+      if (hB > 0 && offB === 0) {
+        offB = -hB * 0.5;
+      }
+
+      // Update heights when product images load
+      root.querySelectorAll('.dp__col img').forEach(function (img) {
+        if (!img.complete) {
+          img.addEventListener('load', updateHeights, { once: true });
+        }
+      });
+
+      if (!rafId && isVisible && !reduce) {
+        lastTime = 0;
+        rafId = requestAnimationFrame(loop);
+      }
+    }
+
+    /* 3. Hover and Wheel Event Listeners on Column Clips */
+    clips.forEach(function (clip) {
+      clip.addEventListener('pointerenter', function () {
+        if (pauseOn) isHovered = true;
+      });
+
+      clip.addEventListener('pointerleave', function () {
+        if (pauseOn) isHovered = false;
+      });
+
+      clip.addEventListener('wheel', function (e) {
+        if (!isDesktop() || reduce || !wheelOn) return;
+
+        // Prevent window scroll while mouse is over product column
+        e.preventDefault();
+
+        // Delta calculation: scrolling wheel moves Column A and B in opposite directions
+        var delta = e.deltaY * wheelK;
+        boostA -= delta * dirSign;
+        boostB += delta * dirSign;
+
+        // Wake up loop immediately if not running
+        if (!rafId && isVisible) {
+          lastTime = 0;
+          rafId = requestAnimationFrame(loop);
+        }
+      }, { passive: false });
+    });
+
+    /* 4. Touch Handlers for Mobile Marquee Rows */
     mTracks.forEach(function (track) {
       var resumeTimer = null;
       track.addEventListener('touchstart', function () {
         clearTimeout(resumeTimer);
-        track.style.animationPlayState = 'paused';
+        track.classList.add('is-paused');
       }, { passive: true });
       track.addEventListener('touchend', function () {
         resumeTimer = setTimeout(function () {
-          track.style.animationPlayState = 'running';
+          track.classList.remove('is-paused');
         }, 1200);
       }, { passive: true });
     });
+
+    /* 5. Responsive Resize Handling */
+    window.addEventListener('resize', function () {
+      updateHeights();
+      if (isDesktop()) {
+        initDesktop();
+      } else {
+        if (colA) { colA.style.transform = ''; colA.style.animation = ''; }
+        if (colB) { colB.style.transform = ''; colB.style.animation = ''; }
+      }
+    });
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initDesktop);
+    } else {
+      initDesktop();
+    }
   })();
 </script>
 
