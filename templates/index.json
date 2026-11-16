@@ -575,7 +575,7 @@
         "content_align_h": "left",
         "content_align_v": "center",
         "button_label": "SHOP THE SALE",
-        "button_link": "shopify://collections/all",
+        "button_link": "shopify://collections/sale-collection",
         "button_style": "theme",
         "btn_bg": "#ffffff",
         "btn_text": "#1a1a1a",
