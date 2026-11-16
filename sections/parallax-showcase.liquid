@@ -100,9 +100,11 @@
     #dp-{{ section.id }} { --dp-stage-h: min(calc(100svh - 120px), var(--dp-max-h, 780px)); }
   }
   #dp-{{ section.id }} .dp__inner {
-    max-width: var(--page-width, 1440px);
+    width: 100%;
+    max-width: none;
     margin: 0 auto;
-    padding: 0 20px;
+    padding-left: var(--outer, 24px);
+    padding-right: var(--outer, 24px);
     box-sizing: border-box;
   }
   #dp-{{ section.id }} .dp__head { text-align: center; max-width: 560px; margin: 0 auto 22px; }
@@ -156,8 +158,6 @@
     will-change: transform;
     transform: translateZ(0);
     width: 100%;
-    max-width: 320px;
-    margin: 0 auto;
   }
   #dp-{{ section.id }} .dp__col-track {
     display: flex;
@@ -166,13 +166,10 @@
     padding-bottom: var(--dp-gap);
     flex-shrink: 0;
     width: 100%;
-    max-width: 320px;
   }
   #dp-{{ section.id }} .dp-pg,
   #dp-{{ section.id }} product-grid-item.dp-pg {
     width: 100% !important;
-    max-width: 320px !important;
-    margin: 0 auto !important;
     box-sizing: border-box !important;
   }
 
@@ -255,16 +252,16 @@
       <div class="dp__pin">
       <div class="dp__grid" style="display: grid; grid-template-columns: {{ grid_cols }}; gap: {{ gap }}px; height: var(--dp-stage-h, {{ stage_h }}px); overflow: hidden;">
 
-        <div class="dp__clip" data-dp-clip style="height: 100%; overflow: hidden !important; width: 100%; max-width: 340px;">
-          <div class="dp__col dp__col--a" data-dp-col="a" style="display: flex; flex-direction: column; width: 100%; max-width: 320px; margin: 0 auto;">
-            <div class="dp__col-track" style="display: flex; flex-direction: column; gap: {{ gap }}px; width: 100%; max-width: 320px;">
+        <div class="dp__clip" data-dp-clip style="height: 100%; overflow: hidden !important; width: 100%;">
+          <div class="dp__col dp__col--a" data-dp-col="a" style="display: flex; flex-direction: column; width: 100%;">
+            <div class="dp__col-track" style="display: flex; flex-direction: column; gap: {{ gap }}px; width: 100%;">
               {%- if cards_a != blank -%}
                 {{ cards_a }}
               {%- else -%}
                 {%- for i in (1..2) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
               {%- endif -%}
             </div>
-            <div class="dp__col-track" aria-hidden="true" style="display: flex; flex-direction: column; gap: {{ gap }}px; width: 100%; max-width: 320px;">
+            <div class="dp__col-track" aria-hidden="true" style="display: flex; flex-direction: column; gap: {{ gap }}px; width: 100%;">
               {%- if cards_a != blank -%}
                 {{ cards_a }}
               {%- else -%}
@@ -306,16 +303,16 @@
           </div>
         </div>
 
-        <div class="dp__clip" data-dp-clip style="height: 100%; overflow: hidden !important; width: 100%; max-width: 340px;">
-          <div class="dp__col dp__col--b" data-dp-col="b" style="display: flex; flex-direction: column; width: 100%; max-width: 320px; margin: 0 auto;">
-            <div class="dp__col-track" style="display: flex; flex-direction: column; gap: var(--dp-gap); width: 100%; max-width: 320px;">
+        <div class="dp__clip" data-dp-clip style="height: 100%; overflow: hidden !important; width: 100%;">
+          <div class="dp__col dp__col--b" data-dp-col="b" style="display: flex; flex-direction: column; width: 100%;">
+            <div class="dp__col-track" style="display: flex; flex-direction: column; gap: var(--dp-gap); width: 100%;">
               {%- if cards_b != blank -%}
                 {{ cards_b }}
               {%- else -%}
                 {%- for i in (3..4) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
               {%- endif -%}
             </div>
-            <div class="dp__col-track" aria-hidden="true" style="display: flex; flex-direction: column; gap: var(--dp-gap); width: 100%; max-width: 320px;">
+            <div class="dp__col-track" aria-hidden="true" style="display: flex; flex-direction: column; gap: var(--dp-gap); width: 100%;">
               {%- if cards_b != blank -%}
                 {{ cards_b }}
               {%- else -%}

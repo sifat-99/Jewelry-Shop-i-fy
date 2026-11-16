@@ -151,7 +151,7 @@
   class="product-grid-item lv-product-card{% if extra_class != blank %} {{ extra_class }}{% endif %}"
   data-hover="{{ settings.card_hover_effect | default: 'zoom_lift' }}"
   data-second-image="{{ show_second_image }}"
-  style="--card-radius: {{ card_radius }}px;{% if extra_class contains 'dp-pg' %} max-width: 320px !important; width: 100% !important; margin: 0 auto !important;{% endif %}"
+  style="--card-radius: {{ card_radius }}px;{% if extra_class contains 'dp-pg' %} width: 100% !important;{% endif %}"
   data-item-id="{{ product.id | default: fallback_index }}"
   data-price="{{ product.price | divided_by: 100.0 | default: 0 }}"
   data-title="{{ product.title | default: demo_title | downcase | escape }}"
@@ -168,9 +168,7 @@
       font-family: var(--FONT-STACK-BODY, sans-serif);
     }
     .dp-pg, product-grid-item.dp-pg {
-      max-width: 320px !important;
       width: 100% !important;
-      margin: 0 auto !important;
       box-sizing: border-box !important;
     }
     .lv-card-media-wrap {

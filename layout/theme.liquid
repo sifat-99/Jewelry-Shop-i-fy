@@ -60,13 +60,13 @@
     .lv-rating-stars__star { display: inline-block; color: transparent; font-size: 1em; font-weight: 700; line-height: 1; background: linear-gradient(90deg, var(--lv-rating-star-gold) 0 var(--lv-star-fill), var(--lv-rating-star-empty) var(--lv-star-fill) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 1px 0 var(--lv-rating-star-shadow)); }
 
     /* Critical Pre-Hydration Layout Constraints (Prevents FOUC Card Explosion on Reload) */
-    .dp { overflow: hidden !important; }
+    .dp { overflow: hidden !important; width: 100%; }
     .dp__stage, .dp__track, .dp__pin { position: relative; width: 100%; }
-    .dp__grid { display: grid !important; overflow: hidden !important; }
-    .dp__clip { overflow: hidden !important; height: 100% !important; max-width: 340px !important; }
-    .dp__col { max-width: 320px !important; width: 100% !important; margin: 0 auto !important; }
-    .dp__col-track { max-width: 320px !important; width: 100% !important; margin: 0 auto !important; }
-    .dp-pg, product-grid-item.dp-pg { width: 100% !important; max-width: 320px !important; margin: 0 auto !important; box-sizing: border-box !important; }
+    .dp__grid { display: grid !important; grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr) minmax(0, .8fr) !important; overflow: hidden !important; width: 100% !important; }
+    .dp__clip { overflow: hidden !important; height: 100% !important; width: 100% !important; }
+    .dp__col { width: 100% !important; }
+    .dp__col-track { width: 100% !important; }
+    .dp-pg, product-grid-item.dp-pg { width: 100% !important; box-sizing: border-box !important; }
 
     /* Global Product Grid Fallback Constraints before JS/Hydration */
     .lv-product-grid {
