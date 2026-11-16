@@ -7,7 +7,22 @@
   assign sid = section.id
   assign img_desktop = section.settings.image
   assign img_mobile = section.settings.image_mobile | default: img_desktop
-  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign text_tone = section.settings.text_tone | default: 'scheme'
+  assign card_bg = section.settings.mobile_card_bg | default: '#ffffff'
+  assign card_text = section.settings.mobile_card_text | default: '#1a1a1a'
+  case text_tone
+    when 'light'
+      assign text_color = '#ffffff'
+    when 'custom'
+      assign text_color = section.settings.text_color | default: '#ffffff'
+    else
+      comment
+        Theme color scheme: text follows the scheme's text color (same as the banner "Use color scheme text color")
+      endcomment
+      assign text_color = 'rgb(var(--color-foreground))'
+      assign card_bg = 'rgb(var(--color-background))'
+      assign card_text = 'rgb(var(--color-foreground))'
+  endcase
   assign overlay_opacity = section.settings.overlay_opacity | default: 20 | divided_by: 100.0
   assign overlay_color = section.settings.overlay_color | default: '#000000'
   assign content_align_h = section.settings.content_align_h | default: 'left'
@@ -79,16 +94,18 @@
         {%- if section.settings.button_label != blank or section.settings.button_2_label != blank -%}
           <div class="sale-banner__actions">
             {%- if section.settings.button_label != blank -%}
+              {%- assign btn1_style = section.settings.button_style | default: 'theme' -%}
               <a href="{{ section.settings.button_link | default: '#' }}"
-                 class="sale-banner__btn sale-banner__btn--{{ section.settings.button_style | default: 'solid_white' }} sale-banner__btn--1">
-                {{ section.settings.button_label | escape }}
+                 class="sale-banner__btn sale-banner__btn--{{ btn1_style }} sale-banner__btn--1{% if btn1_style == 'theme' %} btn--soft btn--hero btn-sliding-hover{% endif %}">
+                {%- if btn1_style == 'theme' -%}<span class="btn__text-content">{{ section.settings.button_label | escape }}</span>{%- else -%}{{ section.settings.button_label | escape }}{%- endif -%}
               </a>
             {%- endif -%}
 
             {%- if section.settings.button_2_label != blank -%}
+              {%- assign btn2_style = section.settings.button_2_style | default: 'outline' -%}
               <a href="{{ section.settings.button_2_link | default: '#' }}"
-                 class="sale-banner__btn sale-banner__btn--{{ section.settings.button_2_style | default: 'outline' }} sale-banner__btn--2">
-                {{ section.settings.button_2_label | escape }}
+                 class="sale-banner__btn sale-banner__btn--{{ btn2_style }} sale-banner__btn--2{% if btn2_style == 'theme' %} btn--soft btn--hero btn-sliding-hover{% endif %}">
+                {%- if btn2_style == 'theme' -%}<span class="btn__text-content">{{ section.settings.button_2_label | escape }}</span>{%- else -%}{{ section.settings.button_2_label | escape }}{%- endif -%}
               </a>
             {%- endif -%}
           </div>
@@ -196,7 +213,7 @@
     font-weight: 600;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: {{ text_color }};
+    color: {{ text_color }} !important; /* !important: layout/theme.liquid forces heading/paragraph colours */
     opacity: 0.88;
     line-height: 1.3;
   }
@@ -208,18 +225,18 @@
     line-height: 1.12;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: {{ text_color }};
+    color: {{ text_color }} !important;
   }
 
   .sale-section--{{ sid }} .sale-banner__desc {
     margin: 0 0 26px 0;
     font-size: {{ section.settings.desc_size | default: 15 }}px;
     line-height: 1.55;
-    color: {{ text_color }};
+    color: {{ text_color }} !important;
     opacity: 0.92;
     max-width: 480px;
   }
-  .sale-section--{{ sid }} .sale-banner__desc p { margin: 0; }
+  .sale-section--{{ sid }} .sale-banner__desc p { margin: 0; color: inherit !important; }
 
   /* Actions & Buttons */
   .sale-section--{{ sid }} .sale-banner__actions {
@@ -251,6 +268,13 @@
   }
 
   /* Button Styles */
+  /* Theme button: colours, radius and the left-to-right fill hover come from the theme's Button colors
+     (--btn-base-* / --btn-regular-hover-*), exactly like the homepage banner. */
+  .sale-section--{{ sid }} .sale-banner__btn--theme:hover {
+    transform: none !important;
+    box-shadow: none;
+  }
+
   .sale-section--{{ sid }} .sale-banner__btn--solid_white {
     background-color: {{ section.settings.btn_bg | default: '#ffffff' }};
     color: {{ section.settings.btn_text | default: '#1a1a1a' }};
@@ -323,25 +347,25 @@
       .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__content-wrap {
         position: relative;
         padding: 32px 20px;
-        background-color: {{ section.settings.mobile_card_bg | default: '#ffffff' }};
-        color: {{ section.settings.mobile_card_text | default: '#1a1a1a' }};
+        background-color: {{ card_bg }};
+        color: {{ card_text }};
       }
       .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__content {
         max-width: 100%;
-        color: {{ section.settings.mobile_card_text | default: '#1a1a1a' }};
+        color: {{ card_text }};
         text-align: {{ mobile_align_h }};
       }
       .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__eyebrow,
       .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__heading,
       .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__desc {
-        color: {{ section.settings.mobile_card_text | default: '#1a1a1a' }};
+        color: {{ card_text }} !important;
       }
       .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__actions {
         justify-content: {% if mobile_align_h == 'center' %}center{% else %}flex-start{% endif %};
       }
       .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__btn--outline {
-        color: {{ section.settings.mobile_card_text | default: '#1a1a1a' }};
-        border-color: {{ section.settings.mobile_card_text | default: '#1a1a1a' }};
+        color: {{ card_text }};
+        border-color: {{ card_text }};
       }
       .sale-section--{{ sid }} .sale-banner--mobile-below .sale-banner__btn--solid_white {
         background-color: var(--lv-accent-deep, #806745);
@@ -408,11 +432,15 @@
       "id": "desktop_focal",
       "label": "Desktop image focal position",
       "options": [
+        { "value": "top left", "label": "Top left" },
+        { "value": "top center", "label": "Top center" },
+        { "value": "top right", "label": "Top right (keeps the model's head visible)" },
         { "value": "center left", "label": "Left" },
         { "value": "center center", "label": "Center" },
-        { "value": "center right", "label": "Right (keeps model visible)" }
+        { "value": "center right", "label": "Right" }
       ],
-      "default": "center right"
+      "default": "top right",
+      "info": "On wide screens the image is cropped top and bottom to fit the banner height. Use a Top option to keep the head from being cut off."
     },
     {
       "type": "image_picker",
@@ -573,23 +601,27 @@
       "id": "button_style",
       "label": "Button style",
       "options": [
-        { "value": "solid_white", "label": "Solid White (As in reference)" },
+        { "value": "theme", "label": "Theme button (Button colors)" },
+        { "value": "solid_white", "label": "Solid White" },
         { "value": "solid_accent", "label": "Solid Theme Gold/Accent" },
         { "value": "outline", "label": "Outline" },
         { "value": "link", "label": "Text link" }
       ],
-      "default": "solid_white"
+      "default": "theme",
+      "info": "Theme button follows Theme settings > Button colors (same as the homepage banner)."
     },
     {
       "type": "color",
       "id": "btn_bg",
       "label": "Button background color",
+      "info": "Used by the Solid White style only.",
       "default": "#ffffff"
     },
     {
       "type": "color",
       "id": "btn_text",
       "label": "Button text color",
+      "info": "Used by the Solid White style only.",
       "default": "#1a1a1a"
     },
     {
@@ -622,6 +654,7 @@
       "label": "Secondary button style",
       "options": [
         { "value": "outline", "label": "Outline" },
+        { "value": "theme", "label": "Theme button (Button colors)" },
         { "value": "solid_white", "label": "Solid White" },
         { "value": "solid_accent", "label": "Solid Accent" },
         { "value": "link", "label": "Text link" }
@@ -633,10 +666,22 @@
       "content": "Colors & Overlay"
     },
     {
+      "type": "select",
+      "id": "text_tone",
+      "label": "Text colors",
+      "options": [
+        { "value": "scheme", "label": "Use color scheme text color" },
+        { "value": "light", "label": "Light text (for dark images)" },
+        { "value": "custom", "label": "Custom color" }
+      ],
+      "default": "scheme"
+    },
+    {
       "type": "color",
       "id": "text_color",
       "label": "Text color",
-      "default": "#ffffff"
+      "default": "#ffffff",
+      "visible_if": "{{ section.settings.text_tone == 'custom' }}"
     },
     {
       "type": "select",

@@ -32,19 +32,23 @@
       >
     {%- endif -%}
 
-    {{
-      video
-      | video_tag:
-        image_size: '1600x',
-        autoplay: true,
-        loop: true,
-        muted: true,
-        controls: false,
-        playsinline: true,
-        preload: 'metadata',
-        class: 'showcase__video-media',
-        aria-label: accessible_label
-    }}
+    {%- capture showcase_video_html -%}
+      {{
+        video
+        | video_tag:
+          image_size: '1600x',
+          autoplay: true,
+          loop: true,
+          muted: true,
+          controls: false,
+          playsinline: true,
+          preload: 'metadata',
+          class: 'showcase__video-media',
+          aria-label: accessible_label
+      }}
+    {%- endcapture -%}
+    {%- capture showcase_video_alt_tag -%}<img alt="{{ accessible_label | escape }}" {% endcapture -%}
+    {{ showcase_video_html | replace: '<img ', showcase_video_alt_tag }}
 
     {%- if link != blank -%}
       </a>

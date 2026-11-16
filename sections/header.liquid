@@ -368,6 +368,43 @@
     opacity: 1 !important;
     color: var(--text, #000000) !important;
   }
+  /* Top-level menu underline: slides in left -> right on hover (same as the cart "Continue shopping" link).
+     Replaces the theme's JS-driven .hover__bar. */
+  .header__menu__inner .hover__bar {
+    display: none !important;
+  }
+  .header__menu__inner .menu__item .navlink--toplevel .navtext {
+    position: relative;
+  }
+  .header__menu__inner .menu__item .navlink--toplevel .navtext::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -14px;
+    width: 0;
+    height: 2px;
+    background: var(--underline, currentColor);
+    transition: width 0.25s ease;
+    pointer-events: none;
+  }
+  /* hovered / dropdown open / keyboard focus */
+  .header__menu__inner .menu__item:hover .navlink--toplevel .navtext::after,
+  .header__menu__inner .menu__item[aria-expanded="true"] .navlink--toplevel .navtext::after,
+  .header__menu__inner .menu__item .navlink--toplevel:focus-visible .navtext::after {
+    width: 100%;
+  }
+  /* current page keeps its underline, unless another item is being hovered */
+  .header__menu__inner .menu__item.main-menu--active .navlink--toplevel .navtext::after {
+    width: 100%;
+  }
+  .header__menu__inner:hover .menu__item.main-menu--active:not(:hover):not([aria-expanded="true"]) .navlink--toplevel .navtext::after {
+    width: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .header__menu__inner .menu__item .navlink--toplevel .navtext::after {
+      transition: none;
+    }
+  }
   .header__desktop__button .navlink,
   .header__mobile__button {
     color: var(--text, #111111) !important;
@@ -379,8 +416,9 @@
     padding: 0 !important;
     margin: 0 !important;
     box-sizing: border-box !important;
-    min-width: 44px !important;
-    height: 44px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    height: 48px !important;
     display: inline-flex !important;
     align-items: center !important;
     cursor: pointer;
@@ -399,7 +437,7 @@
     stroke: var(--text, #111111) !important;
   }
 
-  /* Icon buttons (account / search / cart): the link itself is a 44px circle, so the hover background can never be clipped */
+  /* Icon buttons (account / search / cart): the link itself is a 48px circle, so the hover background can never be clipped */
   .header__desktop__buttons--icons .header__desktop__button {
     display: flex;
     align-items: center;
@@ -408,8 +446,8 @@
   .header__desktop__buttons--icons .header__desktop__button .navlink {
     position: relative;
     box-sizing: border-box;
-    min-width: 44px;
-    height: 44px !important;
+    min-width: 48px;
+    height: 48px !important;
     padding: 0 !important;
     margin: 0 2px;
     display: inline-flex !important;
@@ -579,6 +617,42 @@
     padding: 4px 0 !important;
     font-size: var(--lv-dd-link-size, 12px) !important;
     font-weight: 500 !important;
+  }
+
+  /* Cursor: the menu item has role="button" (theme.css sets [role=button] { cursor: pointer }),
+     so the whole dropdown inherited a pointer. Only real links/buttons should show it. */
+  .header__dropdown {
+    cursor: default;
+  }
+  .header__dropdown a[href]:not([href="#"]),
+  .header__dropdown button,
+  .header__dropdown [role="button"] {
+    cursor: pointer;
+  }
+
+  /* Hover underline animation on collection cards (same slide-in as "Continue shopping" in the cart drawer) */
+  .header__dropdown .dropdown__family--grandchild .navlink--child {
+    position: relative !important;
+  }
+  .header__dropdown .dropdown__family--grandchild .navlink--child::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 0;
+    height: 2px;
+    background: var(--lv-dd-global-hover, var(--lv-dd-text, #111111));
+    transition: width 0.25s ease;
+    pointer-events: none;
+  }
+  .header__dropdown .dropdown__family--grandchild:hover .navlink--child::after,
+  .header__dropdown .dropdown__family--grandchild .navlink--child:focus-visible::after {
+    width: 100%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .header__dropdown .dropdown__family--grandchild .navlink--child::after {
+      transition: none;
+    }
   }
   .menu__item.parent .header__dropdown {
     width: auto !important;
@@ -1559,8 +1633,9 @@ data-header-cart-full="false"
 
     <div class="header__mobile__right">
       <a class="header__mobile__button"
-       data-drawer-toggle="drawer-cart"
-        href="{{ routes.cart_url }}">
+        data-drawer-toggle="drawer-cart"
+        href="{{ routes.cart_url }}"
+        aria-label="{{ 'cart.title' | t | default: 'Shopping Cart' }}">
         <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-theme icon-theme-stroke icon-set-mod-bag" viewBox="0 0 24 24"><path class="icon-cart-full" d="M7 11h10v8H7z"/><path d="M4 6h16v16H4z"/><path d="M9 9V2h6v7"/></svg>
         <span class="visually-hidden">{{ 'cart.title' | t }}</span>
 
@@ -1753,24 +1828,35 @@ data-header-cart-full="false"
 
 <script type="application/ld+json">
 {
-  "@context": "http://schema.org",
+  "@context": "https://schema.org",
   "@type": "Organization",
   "name": {{ shop.name | json }},
   {%- assign schema_logo = settings.logo | default: shop.brand.logo | default: section.settings.logo -%}
   {%- if schema_logo != blank -%}
     "logo": {{ schema_logo | image_url: width: 500 | prepend: "https:" | json }},
   {%- endif -%}
-  "sameAs": [
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    ""
-  ],
+  {%- liquid
+    assign social_links = ''
+    if settings.social_instagram_link != blank
+      assign social_links = social_links | append: settings.social_instagram_link | append: ','
+    endif
+    if settings.social_facebook_link != blank
+      assign social_links = social_links | append: settings.social_facebook_link | append: ','
+    endif
+    if settings.social_pinterest_link != blank
+      assign social_links = social_links | append: settings.social_pinterest_link | append: ','
+    endif
+    if settings.social_tiktok_link != blank
+      assign social_links = social_links | append: settings.social_tiktok_link | append: ','
+    endif
+    if settings.social_youtube_link != blank
+      assign social_links = social_links | append: settings.social_youtube_link | append: ','
+    endif
+    assign social_array = social_links | split: ',' | compact
+  -%}
+  {%- if social_array.size > 0 -%}
+    "sameAs": {{ social_array | json }},
+  {%- endif -%}
   "url": {{ shop.url | json }}
 }
 </script>

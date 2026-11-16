@@ -23,8 +23,12 @@
     {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
   </title>
 
-  {%- if page_description -%}
-    <meta name="description" content="{{ page_description | escape }}">
+  {%- assign seo_description = page_description | default: shop.description -%}
+  {%- if seo_description == blank and template.name == 'index' -%}
+    {%- assign seo_description = 'Discover Aurelle Fine Jewelry. Exclusive handcrafted, waterproof, and hypoallergenic luxury jewelry designed for timeless radiance.' -%}
+  {%- endif -%}
+  {%- if seo_description != blank -%}
+    <meta name="description" content="{{ seo_description | escape }}">
   {%- endif -%}
 
   {% render 'social-meta-tags' %}
@@ -64,6 +68,44 @@
     a {
       text-decoration: none;
       color: inherit;
+    }
+
+    /* Mobile Tap Target Accessibility & SEO Enhancement */
+    @media (max-width: 768px) {
+      .flickity-page-dots {
+        min-height: 48px;
+        {% comment %} display: flex !important; {% endcomment %}
+        align-items: center;
+        justify-content: center;
+        display: none;
+      }
+      .flickity-page-dots .flickity-page-dot {
+        position: relative;
+        min-width: 12px;
+        min-height: 12px;
+        margin: 0 10px !important;
+      }
+      .flickity-page-dots .flickity-page-dot::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: 48px;
+        min-height: 48px;
+      }
+      .flickity-prev-next-button {
+        min-width: 48px !important;
+        min-height: 48px !important;
+      }
+      .custom-prev-next-button {
+        min-width: 48px !important;
+        min-height: 48px !important;
+      }
+      .header__mobile__button {
+        min-width: 48px !important;
+        min-height: 48px !important;
+      }
     }
 
     /* === Dynamic Online Store 2.0 Color Schemes === */
@@ -824,6 +866,7 @@
 
   <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'banner.js' | asset_url }}" defer="defer"></script>
   {%- if smooth_scroll_on -%}
     <script src="{{ 'smooth-page-scroll.js' | asset_url }}" defer="defer"></script>
   {%- endif -%}

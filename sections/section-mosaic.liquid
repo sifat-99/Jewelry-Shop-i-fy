@@ -395,7 +395,7 @@
 
   #shopify-section-{{ section.id }} .lv-tile-btn-wrap {
     margin-top: 14px;
-    pointer-events: auto;
+    pointer-events: none;
     position: relative;
     z-index: 7;
     display: flex;
@@ -411,7 +411,7 @@
     letter-spacing: var(--FONT-BUTTON-LETTER-SPACING, 0.15em) !important;
     text-transform: var(--FONT-BUTTON-TRANSFORM, uppercase) !important;
     text-decoration: none !important;
-    pointer-events: auto;
+    pointer-events: none;
     cursor: pointer;
   }
 
@@ -435,8 +435,14 @@
   #shopify-section-{{ section.id }} .lv-mosaic-tile.lv-tile-tone-scheme .lv-tile-btn--link {
     color: rgb(var(--color-foreground)) !important;
   }
-  #shopify-section-{{ section.id }} .lv-tile-btn--link:hover {
+  #shopify-section-{{ section.id }} .lv-mosaic-tile:hover .lv-tile-btn--link,
+  #shopify-section-{{ section.id }} .lv-tile-clickable-link:focus-visible ~ * .lv-tile-btn--link {
     opacity: 0.72;
+  }
+  #shopify-section-{{ section.id }} .lv-mosaic-tile:hover .btn--outline.lv-tile-btn,
+  #shopify-section-{{ section.id }} .lv-tile-clickable-link:focus-visible ~ * .btn--outline.lv-tile-btn {
+    background: #ffffff !important;
+    color: #111111 !important;
   }
 
   #shopify-section-{{ section.id }} .lv-tile-clickable-link {
@@ -444,9 +450,13 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    z-index: 5;
+    z-index: 10;
     display: block;
     cursor: pointer;
+  }
+  #shopify-section-{{ section.id }} .lv-tile-clickable-link:focus-visible {
+    outline: 2px solid var(--lv-accent, #9b7c53);
+    outline-offset: -2px;
   }
 
   /* -------------------------------------------------------------
@@ -714,7 +724,21 @@
               <!-- Full Tile Clickable Link -->
               {%- if tile_banner_url != blank -%}
                 {%- assign mosaic_banner_fallback = 'sections.mosaic.banner_fallback' | t -%}
-                <a href="{{ tile_banner_url }}" class="lv-tile-clickable-link" aria-label="{{ block.settings.title | default: mosaic_banner_fallback | escape }}"></a>
+                {%- capture mosaic_link_label -%}
+                  {%- if block.settings.title != blank and block.settings.button_label != blank -%}
+                    {{ block.settings.button_label | escape }}: {{ block.settings.title | escape }}
+                  {%- elsif block.settings.title != blank -%}
+                    {{ block.settings.title | escape }}
+                  {%- elsif block.settings.button_label != blank -%}
+                    {{ block.settings.button_label | escape }}
+                  {%- elsif block.settings.subheading != blank -%}
+                    {{ block.settings.subheading | escape }}
+                  {%- else -%}
+                    {{ mosaic_banner_fallback }} {{ forloop.index }}
+                  {%- endif -%}
+                {%- endcapture -%}
+                {%- assign mosaic_link_label = mosaic_link_label | strip -%}
+                <a href="{{ tile_banner_url }}" class="lv-tile-clickable-link" aria-label="{{ mosaic_link_label }}"></a>
               {%- endif -%}
 
               <!-- Tile Text Content (Positioned via dropdown) -->
@@ -730,27 +754,13 @@
                     {%- if block.settings.button_label != blank -%}
                       <div class="lv-tile-btn-wrap" style="--tile-btn-justify: {{ btn_justify }};">
                         {%- if tile_btn_style == 'link' -%}
-                          {%- if tile_button_url != blank -%}
-                            <a href="{{ tile_button_url }}" class="lv-tile-btn lv-tile-btn--link">{{ block.settings.button_label }}</a>
-                          {%- else -%}
-                            <span class="lv-tile-btn lv-tile-btn--link">{{ block.settings.button_label }}</span>
-                          {%- endif -%}
+                          <span class="lv-tile-btn lv-tile-btn--link">{{ block.settings.button_label }}</span>
                         {%- elsif tile_btn_style == 'outline_light' -%}
-                          {%- if tile_button_url != blank -%}
-                            <a href="{{ tile_button_url }}" class="btn btn--outline btn--white btn-sliding-hover lv-tile-btn">
-                              <span class="btn__text-content">{{ block.settings.button_label }}</span>
-                            </a>
-                          {%- else -%}
-                            <span class="btn btn--outline btn--white btn-sliding-hover lv-tile-btn">
-                              <span class="btn__text-content">{{ block.settings.button_label }}</span>
-                            </span>
-                          {%- endif -%}
+                          <span class="btn btn--outline btn--white btn-sliding-hover lv-tile-btn">
+                            <span class="btn__text-content">{{ block.settings.button_label }}</span>
+                          </span>
                         {%- else -%}
-                          {%- if tile_button_url != blank -%}
-                            <a href="{{ tile_button_url }}" class="banner__btn banner__btn--{{ tile_btn_style | replace: '_', '-' }} lv-tile-btn">{{ block.settings.button_label }}</a>
-                          {%- else -%}
-                            <span class="banner__btn banner__btn--{{ tile_btn_style | replace: '_', '-' }} lv-tile-btn">{{ block.settings.button_label }}</span>
-                          {%- endif -%}
+                          <span class="banner__btn banner__btn--{{ tile_btn_style | replace: '_', '-' }} lv-tile-btn">{{ block.settings.button_label }}</span>
                         {%- endif -%}
                       </div>
                     {%- endif -%}
@@ -768,8 +778,6 @@
     {%- endif -%}
   </div>
 </div>
-
-<script src="{{ 'banner.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {

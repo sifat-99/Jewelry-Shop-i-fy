@@ -292,6 +292,7 @@
     .pg__arrow--next { right: 12px; }
     .pg__stage:hover .pg__arrow, .pg__arrow:focus-visible { opacity: 1; }
     @media (hover: none) { .pg__arrow { opacity: 1; width: 36px; height: 36px; } }
+    .pg__track.is-wrapping { scroll-snap-type: none; scroll-behavior: auto; }
     .pg__track.is-dragging { scroll-snap-type: none; cursor: grabbing; user-select: none; }
     .pg__track.is-dragging .pg__slide { pointer-events: none; }
     .pg__thumbs::-webkit-scrollbar { display: none; }
@@ -1363,11 +1364,57 @@
         if (counter) counter.textContent = (i + 1) + ' / ' + slides.length;
       }
 
-      function goTo(i) {
+      /* While we move the gallery ourselves, ignore the observer so the active thumbnail/counter
+         doesn't flicker through every slide we pass on the way. */
+      var lockUntil = 0;
+      function lockObserver(ms) { lockUntil = Date.now() + ms; }
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* last -> first (or first -> last): slide in the same direction instead of scrolling back through every image */
+      function wrapTo(i, dir) {
+        var cur = slides[activeIndex], tgt = slides[i];
+        if (!cur || !tgt || !cur.animate || reduceMotion) {
+          lockObserver(100);
+          track.classList.add('is-wrapping');
+          track.scrollLeft = tgt.offsetLeft;
+          track.classList.remove('is-wrapping');
+          setActive(i);
+          return;
+        }
+        var dur = 450;
+        lockObserver(dur + 150);
+        track.classList.add('is-wrapping');
+        var w = track.clientWidth;
+        var rel = tgt.offsetLeft - cur.offsetLeft; /* brings the old slide back into view after the jump */
+        track.scrollLeft = tgt.offsetLeft;
+        var opts = { duration: dur, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' };
+        cur.animate([
+          { transform: 'translateX(' + rel + 'px)' },
+          { transform: 'translateX(' + (rel - dir * w) + 'px)' }
+        ], opts);
+        var anim = tgt.animate([
+          { transform: 'translateX(' + (dir * w) + 'px)' },
+          { transform: 'translateX(0)' }
+        ], opts);
+        var done = function () {
+          track.classList.remove('is-wrapping');
+          track.scrollLeft = tgt.offsetLeft;
+        };
+        anim.onfinish = done;
+        anim.oncancel = done;
+        setActive(i);
+      }
+
+      function goTo(i, wrapDir) {
         var slide = slides[i];
         if (!slide || !track) return;
         var scrollable = track.scrollWidth > track.clientWidth + 2;
+        if (scrollable && wrapDir && i !== activeIndex) {
+          wrapTo(i, wrapDir);
+          return;
+        }
         if (scrollable) {
+          lockObserver(800);
           track.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' });
         } else if (slide.scrollIntoView) {
           slide.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1379,8 +1426,14 @@
         t.addEventListener('click', function () { goTo(parseInt(t.dataset.index, 10)); });
       });
       var prevBtn = $('[data-pg-prev]'), nextBtn = $('[data-pg-next]');
-      if (prevBtn) prevBtn.addEventListener('click', function () { goTo((activeIndex - 1 + slides.length) % slides.length); });
-      if (nextBtn) nextBtn.addEventListener('click', function () { goTo((activeIndex + 1) % slides.length); });
+      if (prevBtn) prevBtn.addEventListener('click', function () {
+        var n = slides.length;
+        goTo((activeIndex - 1 + n) % n, activeIndex === 0 && n > 2 ? -1 : 0);
+      });
+      if (nextBtn) nextBtn.addEventListener('click', function () {
+        var n = slides.length;
+        goTo((activeIndex + 1) % n, activeIndex === n - 1 && n > 2 ? 1 : 0);
+      });
 
       /* ---- Thumbnail strip: arrows + drag, contained inside the gallery ---- */
       var thumbBox = $('[data-pg-thumbs]');
@@ -1453,6 +1506,7 @@
       if ('IntersectionObserver' in window && track && slides.length > 1) {
         var io = new IntersectionObserver(function (entries) {
           entries.forEach(function (en) {
+            if (Date.now() < lockUntil) return;
             if (en.isIntersecting && en.intersectionRatio >= 0.6) setActive(parseInt(en.target.dataset.index, 10));
           });
         }, { root: track, threshold: [0.6] });

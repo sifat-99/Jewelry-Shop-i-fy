@@ -55,6 +55,7 @@
     "label": "Breadcrumb"
   },
   "cart": {
+    "title": "Cart",
     "checkout": "Checkout",
     "continue_shopping": "Continue shopping",
     "empty": "Your cart is empty",
@@ -101,6 +102,14 @@
       }
     },
     "payment_methods": "Accepted payment methods",
+    "clear_all": {
+      "button": "Clear all",
+      "aria": "Remove all items from your cart",
+      "cancel": "Keep items",
+      "confirm": "Clear all",
+      "message": "Are you sure you want to remove all items from your cart?",
+      "title": "Clear cart?"
+    },
     "remove_confirm": {
       "cancel": "Keep item",
       "confirm": "Remove",
@@ -116,8 +125,7 @@
       "remaining_html": "Spend {{ amount }} more for free shipping",
       "unlocked": "You have unlocked free shipping!"
     },
-    "subtotal": "Subtotal",
-    "title": "Cart"
+    "subtotal": "Subtotal"
   },
   "collections": {
     "filtering": {

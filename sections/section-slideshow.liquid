@@ -67,6 +67,7 @@
       bottom: 20px;
       right: 24px;
       z-index: 10;
+      display: none;
     }
     @media (max-width: 767px) {
       .section-slideshow-{{ section_id }} .flickity-page-dots {
@@ -252,7 +253,11 @@
                       <p class="banner__subheading">{{ block.settings.subheading }}</p>
                     {%- endif -%}
                     {%- if block.settings.heading != blank -%}
-                      <h2 class="banner__title">{{ block.settings.heading }}</h2>
+                      {%- if template.name == 'index' and forloop.first -%}
+                        <h1 class="banner__title">{{ block.settings.heading }}</h1>
+                      {%- else -%}
+                        <h2 class="banner__title">{{ block.settings.heading }}</h2>
+                      {%- endif -%}
                     {%- endif -%}
                     {%- if block.settings.button_label != blank or block.settings.button_label_2 != blank -%}
                       <div class="banner__buttons{% if block.settings.buttons_layout == 'stacked' %} banner__buttons--stacked{% endif %}" style="--banner-btn-justify: {{ btn_justify }};">
@@ -317,8 +322,6 @@
     </script>
   {%- endif -%}
 </div>
-
-<script src="{{ 'banner.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {

@@ -64,6 +64,7 @@
     "label": "Kruimelpad"
   },
   "cart": {
+    "title": "Winkelwagen",
     "checkout": "Doorgaan naar de kassa",
     "continue_shopping": "Verder winkelen",
     "empty": "Je winkelwagen is leeg",
@@ -110,6 +111,14 @@
       }
     },
     "payment_methods": "Geaccepteerde betaalmethoden",
+    "clear_all": {
+      "button": "Alles wissen",
+      "aria": "Alle artikelen uit je winkelwagen verwijderen",
+      "cancel": "Artikelen behouden",
+      "confirm": "Alles wissen",
+      "message": "Weet je zeker dat je alle artikelen uit je winkelwagen wilt verwijderen?",
+      "title": "Winkelwagen legen?"
+    },
     "remove_confirm": {
       "cancel": "Behouden",
       "confirm": "Verwijderen",
@@ -125,8 +134,7 @@
       "remaining_html": "Besteed nog {{ amount }} voor gratis verzending",
       "unlocked": "Gratis verzending ontgrendeld!"
     },
-    "subtotal": "Subtotaal",
-    "title": "Winkelwagen"
+    "subtotal": "Subtotaal"
   },
   "collections": {
     "filtering": {

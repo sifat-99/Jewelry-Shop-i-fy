@@ -163,6 +163,48 @@
       pointer-events: none !important;
     }
 
+    /* Lighter background blur behind the cart drawer (theme default is 10px) */
+    @media only screen and (min-width: 480px) {
+      #drawer-cart .drawer__underlay .drawer__underlay__blur {
+        -webkit-backdrop-filter: blur(2px) !important;
+        backdrop-filter: blur(2px) !important;
+      }
+    }
+
+    /* Clear all: underline text button in the top bar */
+    #drawer-cart .drawer__top__left {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+    #drawer-cart .cart__clear-all {
+      appearance: none;
+      background: transparent !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      margin: 0;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: none;
+      color: color-mix(in srgb, var(--text, #111111) 70%, transparent) !important;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    #drawer-cart .cart__clear-all:hover,
+    #drawer-cart .cart__clear-all:focus-visible {
+      color: var(--lv-accent-deep, #806745) !important;
+    }
+    #drawer-cart .cart__clear-all[disabled] {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
     /* Lock buttons and animate line item while updating to prevent race conditions */
     .cart--loading .quantity__button,
     .cart--loading [data-remove-key],
@@ -174,6 +216,19 @@
     .cart--loading .cart__items__row {
       opacity: 0.7;
       transition: opacity 0.2s ease;
+    }
+
+    /* Keep the quantity number and +/- icons visible while loading.
+       theme.css sets --text/--color to transparent on .quantity__wrapper during loading,
+       which made the whole quantity box look empty. */
+    html .cart--loading .quantity__wrapper {
+      --text: inherit;
+      --color: inherit;
+    }
+    html .cart--loading .quantity__input {
+      opacity: 1 !important;
+      color: var(--text, #111111) !important;
+      -webkit-text-fill-color: currentColor !important;
     }
 
     /* Checkout button placed right after the last product (setting: Cart & Drawer > Checkout button position) */
@@ -259,6 +314,8 @@
     #drawer-cart .cart__continue__link::after {
       background: var(--lv-accent-deep, #806745) !important;
       height: 1.5px !important;
+      /* theme default is width .9s, which felt too slow */
+      transition: width 0.25s ease, background-color 0.2s ease !important;
     }
     #drawer-cart .cart__circle__wrapper:hover .cart__continue__link {
       color: var(--text, #111111) !important;
@@ -360,11 +417,16 @@
     data-drawer="drawer-cart"
     id="drawer-cart">
     <div class="drawer__content" aria-label="{{ 'cart.title' | t }}">
-      
+
       <!-- Top Bar: Title & Close 'X' Button -->
       <div class="drawer__top">
         <div class="drawer__top__left">
           <p class="cart__drawer__title">{{ 'cart.title' | t }}</p>
+          <button type="button"
+            class="cart__clear-all {% if cart.item_count == 0 %}cart--hidden{% endif %}"
+            data-cart-clear-all
+            data-cart-bottom
+            aria-label="{{ 'cart.clear_all.aria' | t }}">{{ 'cart.clear_all.button' | t }}</button>
         </div>
 
         <button class="drawer__button drawer__close"
@@ -508,12 +570,48 @@
 <script>
   (function() {
     // Money Formatter Helper
+    // Mirrors Shopify's money format types so the live-updated price looks identical to the server-rendered one
     function fmtMoney(cents) {
       var moneyFormat = (typeof theme !== 'undefined' && theme.moneyFormat) ? theme.moneyFormat : {{ shop.money_format | json }};
-      var num = (cents / 100.0).toFixed(2);
-      var parts = num.split('.');
-      var dollars = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
-      return moneyFormat.replace(/\{\{\s*(\w+)\s*\}\}/, dollars + '.' + parts[1]);
+      var match = moneyFormat.match(/\{\{\s*(\w+)\s*\}\}/);
+      var type = match ? match[1] : 'amount';
+      var value = (cents / 100.0).toFixed(2);
+
+      function group(str, thousands, decimal) {
+        var p = str.split('.');
+        var whole = p[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands);
+        return p[1] === undefined ? whole : whole + decimal + p[1];
+      }
+
+      var formatted;
+      switch (type) {
+        case 'amount_no_decimals':
+          formatted = group(Math.round(cents / 100).toString(), ',', '.'); break;
+        case 'amount_with_comma_separator':
+          formatted = group(value, '.', ','); break;
+        case 'amount_no_decimals_with_comma_separator':
+          formatted = group(Math.round(cents / 100).toString(), '.', ','); break;
+        case 'amount_no_decimals_with_space_separator':
+          formatted = group(Math.round(cents / 100).toString(), ' ', '.'); break;
+        case 'amount_with_space_separator':
+          formatted = group(value, ' ', ','); break;
+        case 'amount_with_apostrophe_separator':
+          formatted = group(value, "'", '.'); break;
+        case 'amount_with_period_and_space_separator':
+          formatted = group(value, ' ', '.'); break;
+        default:
+          formatted = group(value, ',', '.');
+      }
+      return match ? moneyFormat.replace(match[0], formatted) : formatted;
+    }
+
+    // Same as theme: append the currency code (e.g. "EUR") when the setting is enabled
+    function fmtMoneyWithCode(cents) {
+      var out = fmtMoney(cents);
+      if (typeof theme !== 'undefined' && theme.settings && theme.settings.currency_code_enable && theme.currencyCode && out.indexOf(theme.currencyCode) === -1) {
+        out += ' ' + theme.currencyCode;
+      }
+      return out;
     }
 
     // Unified UI Synchronization Engine
@@ -533,8 +631,9 @@
       var formattedTotal = fmtMoney(cart.total_price);
 
       // 1. Update final price on checkout buttons
+      var formattedTotalWithCode = fmtMoneyWithCode(cart.total_price);
       finalPriceEls.forEach(function(el) {
-        el.textContent = formattedTotal;
+        el.textContent = formattedTotalWithCode;
       });
 
       // 2. Update header prices & count badges
@@ -785,11 +884,69 @@
     var cartChangeJsonUrl = (routesObj.cart_change_url || {{ routes.cart_change_url | json }}) + '.js';
     var pendingRemoveTarget = null;
 
+    // Clear all: reuses the same confirm modal with its own texts
+    var confirmTitleEl = confirmModal ? confirmModal.querySelector('.cart-confirm__title') : null;
+    var clearAllBtn = drawerRootEl ? drawerRootEl.querySelector('[data-cart-clear-all]') : null;
+    var clearAllTexts = {
+      title: {{ 'cart.clear_all.title' | t | json }},
+      message: {{ 'cart.clear_all.message' | t | json }},
+      cancel: {{ 'cart.clear_all.cancel' | t | json }},
+      confirm: {{ 'cart.clear_all.confirm' | t | json }}
+    };
+    var defaultConfirmTexts = confirmModal ? {
+      title: confirmTitleEl ? confirmTitleEl.textContent : '',
+      message: confirmMsgEl ? confirmMsgEl.textContent : '',
+      cancel: confirmCancelBtn ? confirmCancelBtn.textContent : '',
+      confirm: confirmOkBtn ? confirmOkBtn.textContent : ''
+    } : null;
+    var confirmMode = 'remove';
+
+    function setConfirmTexts(t) {
+      if (confirmTitleEl) confirmTitleEl.textContent = t.title;
+      if (confirmMsgEl) confirmMsgEl.textContent = t.message;
+      if (confirmCancelBtn) confirmCancelBtn.textContent = t.cancel;
+      if (confirmOkBtn) confirmOkBtn.textContent = t.confirm;
+    }
+
+    function openClearAllConfirm() {
+      if (!confirmModal) return;
+      confirmMode = 'clear';
+      pendingRemoveTarget = null;
+      setConfirmTexts(clearAllTexts);
+      confirmModal.hidden = false;
+      confirmModal.setAttribute('aria-hidden', 'false');
+      if (confirmCancelBtn) confirmCancelBtn.focus();
+    }
+
+    function clearCartNow() {
+      var formEl = drawerRootEl.querySelector('[data-cart-form]');
+      var itemsEl = drawerRootEl.querySelector('[data-line-items]');
+      if (formEl) formEl.classList.add('cart--loading');
+      if (clearAllBtn) clearAllBtn.disabled = true;
+      fetch({{ routes.cart_clear_url | json }} + '.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+        .then(function(res) { return res.json(); })
+        .then(function(cart) {
+          if (itemsEl) itemsEl.innerHTML = '';
+          syncCartDrawerUI(cart);
+          document.dispatchEvent(new CustomEvent('theme:cart:change', { detail: { cart: cart }, bubbles: true }));
+        })
+        .catch(function(err) { console.error(err); })
+        .then(function() {
+          if (formEl) formEl.classList.remove('cart--loading');
+          if (clearAllBtn) clearAllBtn.disabled = false;
+        });
+    }
+
     function closeRemoveConfirm(restoreValue) {
       if (restoreValue && pendingRemoveTarget && pendingRemoveTarget.input) {
         pendingRemoveTarget.input.value = pendingRemoveTarget.prevQty || '1';
       }
       pendingRemoveTarget = null;
+      if (confirmMode === 'clear' && defaultConfirmTexts) setConfirmTexts(defaultConfirmTexts);
+      confirmMode = 'remove';
       if (!confirmModal) return;
       confirmModal.hidden = true;
       confirmModal.setAttribute('aria-hidden', 'true');
@@ -850,6 +1007,10 @@
         }
       }, true);
 
+      if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', openClearAllConfirm);
+      }
+
       if (confirmCancelBtn) {
         confirmCancelBtn.addEventListener('click', function() {
           closeRemoveConfirm(true);
@@ -858,6 +1019,11 @@
 
       if (confirmOkBtn) {
         confirmOkBtn.addEventListener('click', function() {
+          if (confirmMode === 'clear') {
+            closeRemoveConfirm(false);
+            clearCartNow();
+            return;
+          }
           var target = pendingRemoveTarget;
           closeRemoveConfirm(false);
           if (!target || !target.input) return;
