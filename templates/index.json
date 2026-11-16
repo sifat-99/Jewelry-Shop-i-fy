@@ -307,7 +307,9 @@
         "edge_fade": true,
         "card_radius": 0,
         "padding_top": 64,
-        "padding_bottom": 12
+        "padding_bottom": 12,
+        "show_mobile_marquee": true,
+        "mobile_speed": 30
       }
     },
     "section_richtext_PtYik4": {
