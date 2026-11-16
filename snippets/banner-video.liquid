@@ -45,7 +45,7 @@
   muted
   loop
   playsinline
-  preload="none"
+  preload="{% if eager %}metadata{% else %}none{% endif %}"
   disablepictureinpicture
   aria-label="{{ alt | escape }}"
   tabindex="-1"

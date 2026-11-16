@@ -647,6 +647,7 @@
                 {% render 'product-grid-item',
                   product: product,
                   fallback_index: forloop.index,
+                  lazy_load: true,
                   card_border_radius: section.settings.card_border_radius
                 %}
               </div>
@@ -656,6 +657,7 @@
               <div class="collection-split__product" data-item>
                 {% render 'product-grid-item',
                   fallback_index: i,
+                  lazy_load: true,
                   card_border_radius: section.settings.card_border_radius
                 %}
               </div>

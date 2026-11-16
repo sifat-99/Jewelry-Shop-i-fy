@@ -883,11 +883,13 @@
       border-bottom: 1px solid var(--lv-accent, #c5a76a);
     }
     .product__grid__price[data-on-sale="true"] .price-item--regular { color: #8c2b3f; }
-    .product__grid__price .price-item--compare {
+    .product__grid__price .price-item--compare,
+    s.price-item.price-item--compare {
       font-family: var(--FONT-STACK-BODY, sans-serif);
       font-size: 12px;
       line-height: 1.35;
-      color: #595959;
+      color: #3b3b3b !important;
+      opacity: 1 !important;
     }
   </style>
 
@@ -965,15 +967,15 @@
     <a href="{{ product.url | default: routes.all_products_collection_url }}" class="lv-card-img-link" aria-label="{{ product.title | default: demo_title | default: fallback_shop_label | escape }}">
       <div class="card-media-slider" data-current-index="0" data-total-slides="{{ card_media.size | default: 1 }}">
         {%- if card_media.size > 0 -%}
-          {%- for item in card_media limit: 6 -%}
+          {%- for item in card_media limit: 2 -%}
             <img
-              src="{{ item | image_url: width: 900 }}"
-              srcset="{{ item | image_url: width: 360 }} 360w, {{ item | image_url: width: 540 }} 540w, {{ item | image_url: width: 720 }} 720w, {{ item | image_url: width: 900 }} 900w, {{ item | image_url: width: 1254 }} 1254w, {{ item | image_url: width: 1600 }} 1600w"
-              sizes="(min-width: 1400px) 25vw, (min-width: 990px) 33vw, (min-width: 768px) 50vw, 100vw"
+              src="{{ item | image_url: width: 600 }}"
+              srcset="{{ item | image_url: width: 280 }} 280w, {{ item | image_url: width: 420 }} 420w, {{ item | image_url: width: 600 }} 600w, {{ item | image_url: width: 800 }} 800w, {{ item | image_url: width: 1000 }} 1000w"
+              sizes="(min-width: 1400px) 320px, (min-width: 990px) 28vw, (min-width: 768px) 38vw, 48vw"
               alt="{{ product.title | escape }}"
-              width="{{ item.width | default: 900 }}"
-              height="{{ item.height | default: 900 }}"
-              loading="{% if forloop.first and fallback_index <= 4 %}eager{% else %}lazy{% endif %}"
+              width="{{ item.width | default: 600 }}"
+              height="{{ item.height | default: 600 }}"
+              loading="{% if forloop.first and fallback_index <= 2 and lazy_load != true %}eager{% else %}lazy{% endif %}"
               decoding="async"
               class="card-media-slide {% if forloop.first %}is-active{% endif %}"
               data-slide-index="{{ forloop.index0 }}"
@@ -981,12 +983,12 @@
           {%- endfor -%}
         {%- elsif product.featured_media -%}
           <img
-            src="{{ product.featured_media | image_url: width: 900 }}"
-            srcset="{{ product.featured_media | image_url: width: 360 }} 360w, {{ product.featured_media | image_url: width: 540 }} 540w, {{ product.featured_media | image_url: width: 720 }} 720w, {{ product.featured_media | image_url: width: 900 }} 900w, {{ product.featured_media | image_url: width: 1254 }} 1254w, {{ product.featured_media | image_url: width: 1600 }} 1600w"
-            sizes="(min-width: 1400px) 25vw, (min-width: 990px) 33vw, (min-width: 768px) 50vw, 100vw"
+            src="{{ product.featured_media | image_url: width: 600 }}"
+            srcset="{{ product.featured_media | image_url: width: 280 }} 280w, {{ product.featured_media | image_url: width: 420 }} 420w, {{ product.featured_media | image_url: width: 600 }} 600w, {{ product.featured_media | image_url: width: 800 }} 800w, {{ product.featured_media | image_url: width: 1000 }} 1000w"
+            sizes="(min-width: 1400px) 320px, (min-width: 990px) 28vw, (min-width: 768px) 38vw, 48vw"
             alt="{{ product.title | escape }}"
-            width="{{ product.featured_media.width | default: 900 }}"
-            height="{{ product.featured_media.height | default: 900 }}"
+            width="{{ product.featured_media.width | default: 600 }}"
+            height="{{ product.featured_media.height | default: 600 }}"
             loading="lazy"
             decoding="async"
             class="card-media-slide is-active"

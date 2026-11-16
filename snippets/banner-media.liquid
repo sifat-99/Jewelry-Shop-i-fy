@@ -49,11 +49,16 @@
 
 {%- if use_video -%}
   {%- comment -%} Same file for both breakpoints: render once. Different files: render both, JS plays the matching one. {%- endcomment -%}
+  {%- assign vw_desktop = target_width | default: 1200 -%}
+  {%- assign vw_mobile = 720 -%}
+  {%- if eager and desktop_video.preview_image != blank -%}
+    <link rel="preload" as="image" href="{{ desktop_video.preview_image | image_url: width: vw_desktop }}" fetchpriority="high">
+  {%- endif -%}
   {%- if desktop_video.id == mobile_video.id -%}
-    {%- render 'banner-video', video: desktop_video, device: 'all', focus: focus, target_width: 1920, alt: alt_text -%}
+    {%- render 'banner-video', video: desktop_video, device: 'all', focus: focus, target_width: vw_desktop, alt: alt_text, eager: eager -%}
   {%- else -%}
-    {%- render 'banner-video', video: desktop_video, device: 'desktop', focus: focus, target_width: 1920, alt: alt_text -%}
-    {%- render 'banner-video', video: mobile_video, device: 'mobile', focus: focus, target_width: 1080, alt: alt_text -%}
+    {%- render 'banner-video', video: desktop_video, device: 'desktop', focus: focus, target_width: vw_desktop, alt: alt_text, eager: eager -%}
+    {%- render 'banner-video', video: mobile_video, device: 'mobile', focus: focus, target_width: vw_mobile, alt: alt_text, eager: eager -%}
   {%- endif -%}
 {%- else -%}
   <picture class="banner-media__picture">

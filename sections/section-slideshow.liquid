@@ -10,8 +10,6 @@
   assign scroll_mode = section.settings.scroll_behavior | default: 'smooth_snap'
 -%}
 
-{{ 'banner.css' | asset_url | stylesheet_tag }}
-
 <div class="section-slideshow section-slideshow-{{ section_id }} color-{{ section.settings.color_scheme | default: 'scheme-1' }}{% if is_fullscreen %} section-slideshow--fullscreen{% endif %}"
   data-section-id="{{ section_id }}"
   data-section-type="slideshow"

@@ -41,8 +41,6 @@
   endif
 -%}
 
-{{ 'banner.css' | asset_url | stylesheet_tag }}
-
 <style>
   #shopify-section-{{ section.id }} {
     --mosaic-gap: {{ section.settings.grid_gap | default: 14 }}px;
@@ -708,6 +706,7 @@
                 {%- render 'banner-media',
                   settings: block.settings,
                   alt: block.settings.title,
+                  target_width: 800,
                   eager: false,
                   fallback: fallback_asset
                 -%}

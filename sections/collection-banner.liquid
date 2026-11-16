@@ -75,7 +75,6 @@
 
 {%- comment -%} Nothing uploaded (and no collection image): render nothing on the storefront, show a placeholder in the theme editor only {%- endcomment -%}
 {%- if has_media or request.design_mode -%}
-{{ 'banner.css' | asset_url | stylesheet_tag }}
 
 <div class="collection-banner collection-banner-{{ section_id }} color-{{ section.settings.color_scheme | default: 'scheme-1' }} banner--tone-{{ tone }}"
   data-section-id="{{ section_id }}"

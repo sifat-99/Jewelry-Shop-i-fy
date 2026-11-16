@@ -70,7 +70,7 @@
       if chosen contains key
         assign n = n | plus: 1
         capture card
-          render 'product-grid-item', product: product, fallback_index: n, card_border_radius: radius, extra_class: 'dp-pg'
+          render 'product-grid-item', product: product, fallback_index: n, lazy_load: true, card_border_radius: radius, extra_class: 'dp-pg'
         endcapture
         if n <= half
           assign cards_a = cards_a | append: card
