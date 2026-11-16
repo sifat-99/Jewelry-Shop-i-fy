@@ -39,6 +39,7 @@
   {% render 'css-variables' %}
   {{ 'theme.css' | asset_url | stylesheet_tag }}
   {{ 'banner.css' | asset_url | stylesheet_tag }}
+  {{ 'product-grid.css' | asset_url | stylesheet_tag }}
 
   <style>
     :root {
@@ -57,6 +58,45 @@
     }
     .lv-rating-stars { display: inline-flex; align-items: center; gap: 2px; color: transparent; white-space: nowrap; }
     .lv-rating-stars__star { display: inline-block; color: transparent; font-size: 1em; font-weight: 700; line-height: 1; background: linear-gradient(90deg, var(--lv-rating-star-gold) 0 var(--lv-star-fill), var(--lv-rating-star-empty) var(--lv-star-fill) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 1px 0 var(--lv-rating-star-shadow)); }
+
+    /* Critical Pre-Hydration Layout Constraints (Prevents FOUC Card Explosion on Reload) */
+    .dp { overflow: hidden !important; }
+    .dp__stage, .dp__track, .dp__pin { position: relative; width: 100%; }
+    .dp__grid { display: grid !important; overflow: hidden !important; }
+    .dp__clip { overflow: hidden !important; height: 100% !important; max-width: 340px !important; }
+    .dp__col { max-width: 320px !important; width: 100% !important; margin: 0 auto !important; }
+    .dp__col-track { max-width: 320px !important; width: 100% !important; margin: 0 auto !important; }
+    .dp-pg, product-grid-item.dp-pg { width: 100% !important; max-width: 320px !important; margin: 0 auto !important; box-sizing: border-box !important; }
+
+    /* Global Product Grid Fallback Constraints before JS/Hydration */
+    .lv-product-grid {
+      display: grid !important;
+      grid-template-columns: repeat(var(--cols-desktop, 4), minmax(0, 1fr)) !important;
+      gap: 28px 18px;
+    }
+    @media (max-width: 1024px) {
+      .lv-product-grid {
+        grid-template-columns: repeat(var(--cols-1024, 3), minmax(0, 1fr)) !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .lv-product-grid {
+        grid-template-columns: repeat(var(--cols-768, 2), minmax(0, 1fr)) !important;
+      }
+    }
+    @media (max-width: 450px) {
+      .lv-product-grid {
+        grid-template-columns: repeat(var(--cols-mobile, 2), minmax(0, 1fr)) !important;
+      }
+    }
+    product-grid-item, .lv-product-card {
+      display: flex !important;
+      flex-direction: column !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
     body {
       font-family: var(--FONT-STACK-BODY, 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif);
       font-weight: var(--FONT-WEIGHT-BODY, 500);

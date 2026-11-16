@@ -85,92 +85,6 @@
   -%}
 {%- endpaginate -%}
 
-<div id="dp-{{ section.id }}" class="dp color-{{ section.settings.color_scheme | default: 'scheme-1' }}{% unless section.settings.edge_fade %} dp--nofade{% endunless %}" style="--dp-radius: {{ radius }}px; --dp-gap: {{ gap }}px; --dp-cols: {{ grid_cols }}; --dp-max-h: {{ stage_h }}px; --dp-pin: {{ section.settings.pin_distance | default: 100 }}; --PT: {{ section.settings.padding_top | default: 64 }}px; --PB: {{ section.settings.padding_bottom | default: 24 }}px;" data-dp data-strength="{{ strength }}" data-per-side="{{ half }}" data-shuffle="{{ section.settings.shuffle_products }}" data-cards="{{ section.settings.cards_devices | default: 'desktop' }}" data-auto="{{ section.settings.auto_scroll }}" data-speed="{{ section.settings.scroll_speed | default: 40 }}" data-dir="{{ section.settings.scroll_direction | default: 'up_down' }}" data-pause="{{ section.settings.pause_on_hover }}" data-wheel="{{ section.settings.wheel_scroll }}" data-wheelspeed="{{ section.settings.wheel_speed | default: 3 }}">
-  <div class="wrapper--full dp__inner">
-
-    <div class="dp__stage">
-      <div class="dp__track">
-      <div class="dp__pin">
-      <div class="dp__grid">
-
-        <div class="dp__clip" data-dp-clip>
-          <div class="dp__col dp__col--a" data-dp-col="a">
-            <div class="dp__col-track">
-              {%- if cards_a != blank -%}
-                {{ cards_a }}
-              {%- else -%}
-                {%- for i in (1..2) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
-              {%- endif -%}
-            </div>
-            <div class="dp__col-track" aria-hidden="true">
-              {%- if cards_a != blank -%}
-                {{ cards_a }}
-              {%- else -%}
-                {%- for i in (1..2) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
-              {%- endif -%}
-            </div>
-          </div>
-        </div>
-
-        <div class="dp__center">
-          <div class="dp__sticky">
-            <header class="dp__head">
-              {%- if section.settings.eyebrow != blank -%}<p class="dp__eyebrow">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
-              {%- if section.settings.heading != blank or section.settings.heading_accent != blank -%}
-                <h2 class="dp__title">{{ section.settings.heading | escape }}{% if section.settings.heading_accent != blank %} <em class="dp__accent">{{ section.settings.heading_accent | escape }}</em>{% endif %}</h2>
-              {%- endif -%}
-              {%- if section.settings.subheading != blank -%}<p class="dp__sub">{{ section.settings.subheading | escape }}</p>{%- endif -%}
-            </header>
-            <div class="dp__media" data-dp-media>
-              {%- if section.settings.media_type == 'video' and section.settings.video != blank -%}
-                {%- assign parallax_video_alt = section.settings.heading | default: section.settings.eyebrow | default: 'Showcase video' | escape -%}
-                {%- capture parallax_video_html -%}
-                  {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true, preload: 'metadata', image_size: '1200x', class: 'dp__video' }}
-                {%- endcapture -%}
-                {%- capture parallax_video_alt_tag -%}<img alt="{{ parallax_video_alt }}" {% endcapture -%}
-                {{ parallax_video_html | replace: '<img ', parallax_video_alt_tag }}
-              {%- elsif section.settings.image != blank -%}
-                <img class="dp__img" src="{{ section.settings.image | image_url: width: 1200 }}" srcset="{{ section.settings.image | image_url: width: 700 }} 700w, {{ section.settings.image | image_url: width: 1000 }} 1000w, {{ section.settings.image | image_url: width: 1400 }} 1400w, {{ section.settings.image | image_url: width: 2000 }} 2000w" sizes="(min-width: 801px) 44vw, 92vw" alt="{{ section.settings.image.alt | default: section.settings.heading | escape }}" width="{{ section.settings.image.width }}" height="{{ section.settings.image.height }}" loading="eager">
-              {%- else -%}
-                {{ 'lifestyle-1' | placeholder_svg_tag: 'dp__img dp__img--ph' }}
-              {%- endif -%}
-            </div>
-            {%- if section.settings.button_label != blank -%}
-              <a class="btn btn--primary dp__btn" href="{{ btn_url }}">
-                <span class="btn__text-content">{{ section.settings.button_label | escape }}</span>
-                <span class="dp__btn-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-              </a>
-            {%- endif -%}
-          </div>
-        </div>
-
-        <div class="dp__clip" data-dp-clip>
-          <div class="dp__col dp__col--b" data-dp-col="b">
-            <div class="dp__col-track">
-              {%- if cards_b != blank -%}
-                {{ cards_b }}
-              {%- else -%}
-                {%- for i in (3..4) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
-              {%- endif -%}
-            </div>
-            <div class="dp__col-track" aria-hidden="true">
-              {%- if cards_b != blank -%}
-                {{ cards_b }}
-              {%- else -%}
-                {%- for i in (3..4) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
-              {%- endif -%}
-            </div>
-          </div>
-        </div>
-
-      </div>
-      </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
 <style>
   #dp-{{ section.id }} {
     padding: var(--PT) 0 var(--PB);
@@ -241,6 +155,9 @@
     flex-direction: column;
     will-change: transform;
     transform: translateZ(0);
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
   }
   #dp-{{ section.id }} .dp__col-track {
     display: flex;
@@ -248,8 +165,11 @@
     gap: var(--dp-gap);
     padding-bottom: var(--dp-gap);
     flex-shrink: 0;
+    width: 100%;
+    max-width: 320px;
   }
-  #dp-{{ section.id }} .dp-pg {
+  #dp-{{ section.id }} .dp-pg,
+  #dp-{{ section.id }} product-grid-item.dp-pg {
     width: 100% !important;
     max-width: 320px !important;
     margin: 0 auto !important;
@@ -326,6 +246,92 @@
     #dp-{{ section.id }} .dp__col { animation: none !important; transform: none !important; }
   }
 </style>
+
+<div id="dp-{{ section.id }}" class="dp color-{{ section.settings.color_scheme | default: 'scheme-1' }}{% unless section.settings.edge_fade %} dp--nofade{% endunless %}" style="--dp-radius: {{ radius }}px; --dp-gap: {{ gap }}px; --dp-cols: {{ grid_cols }}; --dp-max-h: {{ stage_h }}px; --dp-pin: {{ section.settings.pin_distance | default: 100 }}; --PT: {{ section.settings.padding_top | default: 64 }}px; --PB: {{ section.settings.padding_bottom | default: 24 }}px;" data-dp data-strength="{{ strength }}" data-per-side="{{ half }}" data-shuffle="{{ section.settings.shuffle_products }}" data-cards="{{ section.settings.cards_devices | default: 'desktop' }}" data-auto="{{ section.settings.auto_scroll }}" data-speed="{{ section.settings.scroll_speed | default: 40 }}" data-dir="{{ section.settings.scroll_direction | default: 'up_down' }}" data-pause="{{ section.settings.pause_on_hover }}" data-wheel="{{ section.settings.wheel_scroll }}" data-wheelspeed="{{ section.settings.wheel_speed | default: 3 }}">
+  <div class="wrapper--full dp__inner">
+
+    <div class="dp__stage">
+      <div class="dp__track">
+      <div class="dp__pin">
+      <div class="dp__grid" style="display: grid; grid-template-columns: {{ grid_cols }}; gap: {{ gap }}px; height: var(--dp-stage-h, {{ stage_h }}px); overflow: hidden;">
+
+        <div class="dp__clip" data-dp-clip style="height: 100%; overflow: hidden !important; width: 100%; max-width: 340px;">
+          <div class="dp__col dp__col--a" data-dp-col="a" style="display: flex; flex-direction: column; width: 100%; max-width: 320px; margin: 0 auto;">
+            <div class="dp__col-track" style="display: flex; flex-direction: column; gap: {{ gap }}px; width: 100%; max-width: 320px;">
+              {%- if cards_a != blank -%}
+                {{ cards_a }}
+              {%- else -%}
+                {%- for i in (1..2) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
+              {%- endif -%}
+            </div>
+            <div class="dp__col-track" aria-hidden="true" style="display: flex; flex-direction: column; gap: {{ gap }}px; width: 100%; max-width: 320px;">
+              {%- if cards_a != blank -%}
+                {{ cards_a }}
+              {%- else -%}
+                {%- for i in (1..2) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+
+        <div class="dp__center">
+          <div class="dp__sticky">
+            <header class="dp__head">
+              {%- if section.settings.eyebrow != blank -%}<p class="dp__eyebrow">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+              {%- if section.settings.heading != blank or section.settings.heading_accent != blank -%}
+                <h2 class="dp__title">{{ section.settings.heading | escape }}{% if section.settings.heading_accent != blank %} <em class="dp__accent">{{ section.settings.heading_accent | escape }}</em>{% endif %}</h2>
+              {%- endif -%}
+              {%- if section.settings.subheading != blank -%}<p class="dp__sub">{{ section.settings.subheading | escape }}</p>{%- endif -%}
+            </header>
+            <div class="dp__media" data-dp-media>
+              {%- if section.settings.media_type == 'video' and section.settings.video != blank -%}
+                {%- assign parallax_video_alt = section.settings.heading | default: section.settings.eyebrow | default: 'Showcase video' | escape -%}
+                {%- capture parallax_video_html -%}
+                  {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true, preload: 'metadata', image_size: '1200x', class: 'dp__video' }}
+                {%- endcapture -%}
+                {%- capture parallax_video_alt_tag -%}<img alt="{{ parallax_video_alt }}" {% endcapture -%}
+                {{ parallax_video_html | replace: '<img ', parallax_video_alt_tag }}
+              {%- elsif section.settings.image != blank -%}
+                <img class="dp__img" src="{{ section.settings.image | image_url: width: 1200 }}" srcset="{{ section.settings.image | image_url: width: 700 }} 700w, {{ section.settings.image | image_url: width: 1000 }} 1000w, {{ section.settings.image | image_url: width: 1400 }} 1400w, {{ section.settings.image | image_url: width: 2000 }} 2000w" sizes="(min-width: 801px) 44vw, 92vw" alt="{{ section.settings.image.alt | default: section.settings.heading | escape }}" width="{{ section.settings.image.width }}" height="{{ section.settings.image.height }}" loading="eager">
+              {%- else -%}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'dp__img dp__img--ph' }}
+              {%- endif -%}
+            </div>
+            {%- if section.settings.button_label != blank -%}
+              <a class="btn btn--primary dp__btn" href="{{ btn_url }}">
+                <span class="btn__text-content">{{ section.settings.button_label | escape }}</span>
+                <span class="dp__btn-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <div class="dp__clip" data-dp-clip style="height: 100%; overflow: hidden !important; width: 100%; max-width: 340px;">
+          <div class="dp__col dp__col--b" data-dp-col="b" style="display: flex; flex-direction: column; width: 100%; max-width: 320px; margin: 0 auto;">
+            <div class="dp__col-track" style="display: flex; flex-direction: column; gap: var(--dp-gap); width: 100%; max-width: 320px;">
+              {%- if cards_b != blank -%}
+                {{ cards_b }}
+              {%- else -%}
+                {%- for i in (3..4) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
+              {%- endif -%}
+            </div>
+            <div class="dp__col-track" aria-hidden="true" style="display: flex; flex-direction: column; gap: var(--dp-gap); width: 100%; max-width: 320px;">
+              {%- if cards_b != blank -%}
+                {{ cards_b }}
+              {%- else -%}
+                {%- for i in (3..4) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+
+      </div>
+      </div>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script>
   (function () {
