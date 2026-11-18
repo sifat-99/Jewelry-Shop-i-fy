@@ -46,13 +46,22 @@
 The root of this repository is strictly organized as a clean **Shopify Online Store 2.0 Theme**. All non-theme data, tooling, and documentation are categorized in `_project_resources/` (ignored by Git and Shopify CLI):
 
 ```text
-Jewelry_Shopify/
+Le_Velair_Shopify/
 ├── assets/                 # Compiled stylesheets (.css), JavaScript modules (.js), brand SVGs & fonts
 ├── config/                 # Global theme settings schema & presets
 │   ├── settings_schema.json
 │   └── settings_data.json  # (Merchant settings - DO NOT overwrite manually)
+├── docs/                   # Interactive single-page store documentation & markdown guides
+│   ├── index.html          # Self-contained documentation app (49 chapters, full-text search)
+│   └── reference/          # Section, snippet & asset technical reference sheets
 ├── layout/                 # Base layout wrappers (theme.liquid, password.liquid)
 ├── locales/                # Internationalization translation dictionaries (en.default.json, nl.json)
+├── reviews-api/            # Standalone Vercel Serverless Function for Reviews & Welcome Email
+│   ├── api/
+│   │   ├── review.js       # CORS-protected GraphQL review ingestion endpoint with HMAC verification
+│   │   └── welcome-email.js
+│   ├── package.json
+│   └── .env.example
 ├── sections/               # 32 modular full-width page sections (parallax-showcase, product-reviews, etc.)
 ├── snippets/               # 68 reusable Liquid components (product-grid-item, review-form, feedback-card, etc.)
 ├── templates/              # JSON page structure templates (index.json, product.json, collection.json, etc.)
@@ -64,14 +73,12 @@ Jewelry_Shopify/
 └── README.md               # Theme repository documentation
 ```
 
-### 📦 Non-Theme Resources (`_project_resources/`)
-All non-theme assets are preserved locally in `_project_resources/` and excluded from Git commits and theme pushes:
-- **`archives/`**: Full theme zip backups and raw image zip archives.
+### 📦 Local Project Resources (`_project_resources/`)
+Heavy datasets, raw archives, and offline scripts are kept locally in `_project_resources/` (ignored by Git and Shopify CLI):
+- **`archives/`**: Full theme zip backups and raw image zip archives (~27 MB).
 - **`catalog_and_data/`**: Product CSV import datasets (EUR & BDT), enrichment JSON files, and mockup generation queues.
-- **`docs/`**: The complete single-page interactive documentation site (`docs/index.html`) and markdown guides.
-- **`images/`**: Source and enhanced product photography collections.
-- **`reviews-api/`**: The standalone Vercel Serverless Function source code (`/api/review.js`).
-- **`scripts/`**: Automation tools for Gemini lifestyle image generation, image optimization, and collection publishing.
+- **`images/`**: Raw and enhanced source photography datasets.
+- **`scripts/`**: Automation scripts for Gemini lifestyle image generation, image optimization, and collection publishing.
 - **`backups/`**: Archival file versions.
 
 ---
@@ -110,10 +117,10 @@ shopify theme push --theme <LIVE_THEME_ID> --allow-live
 
 ## ⚙️ Reviews Microservice Setup (Vercel)
 
-The serverless Reviews API lives in `_project_resources/reviews-api` and deploys to Vercel:
+The serverless Reviews API lives in `reviews-api/` and deploys to Vercel:
 
 ```bash
-cd _project_resources/reviews-api
+cd reviews-api
 
 # Deploy to Vercel production
 vercel --prod
@@ -162,7 +169,7 @@ In **Shopify Admin > Settings > Custom data > Metaobjects > Review**:
 ## 📖 Documentation Reference
 
 A comprehensive, self-contained single-page documentation app is included at:
-👉 `_project_resources/docs/store-docs/index.html`
+👉 `docs/index.html`
 
 It provides:
 - **12 Interactive Guides:** Merchant workflows, store operations, design systems, and troubleshooting.
