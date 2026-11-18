@@ -43,7 +43,7 @@
 
 ## 📁 Repository Structure
 
-The root of this repository is strictly organized as a clean **Shopify Online Store 2.0 Theme**. All non-theme data, tooling, and documentation are categorized in `_project_resources/` (ignored by Git and Shopify CLI):
+The root of this repository is strictly organized as a clean **Shopify Online Store 2.0 Theme**.
 
 ```text
 Jewelry_Shopify/
@@ -72,7 +72,7 @@ Jewelry_Shopify/
 ├── AGENTS.md               # Coding agent platform rules & Shopify guidelines
 └── README.md               # Theme repository documentation
 ```
-
+<!--
 ### 📦 Local Project Resources (`_project_resources/`)
 Heavy datasets, raw archives, and offline scripts are kept locally in `_project_resources/` (ignored by Git and Shopify CLI):
 - **`archives/`**: Full theme zip backups and raw image zip archives (~27 MB).
@@ -81,7 +81,7 @@ Heavy datasets, raw archives, and offline scripts are kept locally in `_project_
 - **`scripts/`**: Automation scripts for Gemini lifestyle image generation, image optimization, and collection publishing.
 - **`backups/`**: Archival file versions.
 
----
+--- -->
 
 ## 🚀 Getting Started
 
