@@ -1,92 +1,257 @@
 {% doc %}
-  "Write a review" button + dialog form. Posts JSON to the reviews API (Vercel), which saves a DRAFT metaobject. Accepts: endpoint (full https URL of /api/review), sid (unique...
+  Renders a product review button and a configurable review submission dialog.
 
-  @param [endpoint] - Optional endpoint passed by the parent file
-  @param [sid] - Optional sid passed by the parent file
-  @param [product_id] - Optional product id passed by the parent file
-  @param [product_title] - Optional product title passed by the parent file
-  @param [button_label] - Optional button label passed by the parent file
+  @param {string} endpoint - Review API endpoint
+  @param {string} sid - Unique section identifier
+  @param {string} [product_id] - Shopify product ID for this review form
+  @param {string} [product_title] - Current product title
+  @param {image} [product_image] - Current product image for the split form
+  @param {string} [form_design] - Modal, split, or steps layout
+  @param {string} [button_label] - Optional button label
 {% enddoc %}
 {%- comment -%}
   "Write a review" button + dialog form. Posts JSON to the reviews API (Vercel), which saves a DRAFT metaobject.
   Accepts: endpoint (full https URL of /api/review), sid (unique id), product_id (optional), button_label
 {%- endcomment -%}
-{%- assign rf_default_btn = 'products.reviews.write_review' | t -%}
-<div class="rf" id="rf-{{ sid }}" data-endpoint="{{ endpoint | escape }}" data-product-id="{{ product_id }}">
+{%- liquid
+  assign rf_default_btn = 'products.reviews.write_review' | t
+  assign rf_design = form_design | default: settings.review_form_design | default: 'modal'
+  assign rf_side_image = product_image | default: settings.review_form_image
+
+  comment
+    Only signed-in customers can review. The name and email come from the customer account, and are sent to the
+    reviews API as a signed token (HMAC with Theme settings > Reviews > Review signing secret) so they can't be faked.
+    rf_state: 'login' = not signed in, 'unavailable' = signed in but no signing secret set, 'ready' = show the form.
+  endcomment
+  assign rf_state = 'login'
+  assign rf_token = ''
+  assign rf_name = ''
+  if customer
+    assign rf_state = 'unavailable'
+    assign rf_secret = settings.review_signing_secret | strip
+    if rf_secret != blank
+      assign rf_state = 'ready'
+      assign rf_name = customer.name | strip
+      if rf_name == blank
+        assign rf_name = customer.first_name | strip
+      endif
+      if rf_name == blank
+        assign rf_name = customer.email | split: '@' | first
+      endif
+      assign rf_email_enc = customer.email | url_encode
+      assign rf_name_enc = rf_name | url_encode
+      assign rf_ts = 'now' | date: '%s'
+      assign rf_payload = 'id=' | append: customer.id | append: '&email=' | append: rf_email_enc | append: '&name=' | append: rf_name_enc | append: '&ts=' | append: rf_ts
+      assign rf_b64 = rf_payload | base64_url_safe_encode
+      assign rf_sig = rf_b64 | hmac_sha256: rf_secret
+      assign rf_token = rf_b64 | append: '.' | append: rf_sig
+    endif
+  endif
+  assign rf_sep = '?'
+  if routes.account_login_url contains '?'
+    assign rf_sep = '&'
+  endif
+  assign rf_login_url = routes.account_login_url | append: rf_sep | append: 'return_url=' | append: request.path | append: '%23product-reviews'
+-%}
+<div class="rf rf--{{ rf_design }}" id="rf-{{ sid }}" data-form-design="{{ rf_design }}" data-endpoint="{{ endpoint | escape }}" data-product-id="{{ product_id }}" data-rf-state="{{ rf_state }}"{% if rf_state == 'ready' %} data-customer-token="{{ rf_token }}" data-customer-name="{{ rf_name | escape }}"{% endif %}>
   <button type="button" class="btn btn--outline rf__open" data-rf-open>{{ button_label | default: rf_default_btn | escape }}</button>
 
   <dialog class="rf__dialog" data-rf-dialog aria-labelledby="rf-title-{{ sid }}">
-    <form class="rf__form" data-rf-form novalidate>
-      <button type="button" class="rf__close" data-rf-close aria-label="{{ 'accessibility.close' | t }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-      <h3 class="rf__title" id="rf-title-{{ sid }}">{{ 'products.reviews.write_review' | t }}</h3>
-      <p class="rf__lead">{{ 'products.reviews.form_lead' | t }}</p>
+    <aside class="rf__side" aria-hidden="true">
+      {%- if rf_side_image != blank -%}
+        <img src="{{ rf_side_image | image_url: width: 1000 }}" alt="" width="{{ rf_side_image.width | default: 1000 }}" height="{{ rf_side_image.height | default: 1200 }}" loading="lazy">
+      {%- else -%}
+        <div class="rf__side-copy"><span>AURELLE</span><p>{{ 'products.reviews.side_note' | t }}</p></div>
+      {%- endif -%}
+    </aside>
+    <div class="rf__content">
+      <div class="rf__grab" data-rf-grab aria-hidden="true"><span></span></div>
+      {%- if rf_state == 'ready' -%}
+      <form class="rf__form" data-rf-form novalidate>
+        <button type="button" class="rf__close" data-rf-close aria-label="{{ 'accessibility.close' | t }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        <h3 class="rf__title" id="rf-title-{{ sid }}">{{ 'products.reviews.write_review' | t }}</h3>
+        <p class="rf__lead">{{ 'products.reviews.form_lead' | t }}</p>
+        <ol class="rf__progress" data-rf-progress{% unless rf_design == 'steps' %} hidden{% endunless %} aria-label="{{ 'products.reviews.progress_label' | t }}">
+          <li data-rf-progress-step="1" aria-current="step"><span>01</span>{{ 'products.reviews.progress_rating' | t }}</li>
+          <li data-rf-progress-step="2"><span>02</span>{{ 'products.reviews.progress_story' | t }}</li>
+          <li data-rf-progress-step="3"><span>03</span>{{ 'products.reviews.progress_details' | t }}</li>
+        </ol>
 
-      <fieldset class="rf__rating">
-        <legend>{{ 'products.reviews.your_rating' | t }}</legend>
-        <div class="rf__stars">
-          {%- for i in (1..5) reversed -%}
-            <input type="radio" name="rating" id="rf-{{ sid }}-star-{{ i }}" value="{{ i }}"><label for="rf-{{ sid }}-star-{{ i }}" title="{{ 'products.reviews.star_count' | t: count: i }}">★<span class="rf__sr">{{ 'products.reviews.star_count' | t: count: i }}</span></label>
-          {%- endfor -%}
+        <div class="rf__step" data-rf-step="1">
+          <fieldset class="rf__rating">
+            <legend>{{ 'products.reviews.your_rating' | t }}</legend>
+            <div class="rf__stars">
+              {%- for i in (1..5) reversed -%}
+                <input type="radio" name="rating" id="rf-{{ sid }}-star-{{ i }}" value="{{ i }}"><label for="rf-{{ sid }}-star-{{ i }}" title="{{ 'products.reviews.star_count' | t: count: i }}">★<span class="rf__sr">{{ 'products.reviews.star_count' | t: count: i }}</span></label>
+              {%- endfor -%}
+            </div>
+          </fieldset>
+          {%- if product_id != blank and product_title != blank -%}
+          <div class="rf__field rf__product rf__product--locked" data-rf-product data-locked>
+            <span>{{ 'products.reviews.field_product_fixed' | t }}</span>
+            <div class="rf__pbox">
+              <input type="text" data-rf-psearch value="{{ product_title | escape }}" readonly aria-readonly="true" aria-label="{{ 'products.reviews.field_product_fixed' | t }}">
+            </div>
+          </div>
+          {%- else -%}
+          <div class="rf__field rf__product" data-rf-product>
+            <span>{{ 'products.reviews.field_product_html' | t }}</span>
+            <div class="rf__pbox"><svg class="rf__psi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input type="text" data-rf-psearch placeholder="{{ 'products.reviews.search_product' | t }}" autocomplete="off" value="{{ product_title | escape }}" aria-label="{{ 'products.reviews.search_product' | t }}" role="combobox" aria-expanded="false" aria-controls="rf-plist-{{ sid }}">
+              <button type="button" class="rf__pclear" data-rf-pclear aria-label="{{ 'products.reviews.clear_product' | t }}" hidden>&times;</button>
+              <ul class="rf__plist" id="rf-plist-{{ sid }}" data-rf-plist role="listbox" hidden></ul>
+            </div>
+          </div>
+          {%- endif -%}
+          <button type="button" class="btn btn--primary rf__next" data-rf-next{% unless rf_design == 'steps' %} hidden{% endunless %}>{{ 'products.reviews.next_step' | t }}</button>
         </div>
-      </fieldset>
 
-      <label class="rf__field"><span>{{ 'products.reviews.field_name' | t }}</span><input type="text" name="name" maxlength="60" autocomplete="name" required></label>
-      <div class="rf__field rf__product" data-rf-product>
-        <span>{{ 'products.reviews.field_product_html' | t }}</span>
-        <div class="rf__pbox"><svg class="rf__psi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input type="text" data-rf-psearch placeholder="{{ 'products.reviews.search_product' | t }}" autocomplete="off" value="{{ product_title | escape }}" aria-label="{{ 'products.reviews.search_product' | t }}" role="combobox" aria-expanded="false" aria-controls="rf-plist-{{ sid }}">
-          <button type="button" class="rf__pclear" data-rf-pclear aria-label="{{ 'products.reviews.clear_product' | t }}" hidden>&times;</button>
-          <ul class="rf__plist" id="rf-plist-{{ sid }}" data-rf-plist role="listbox" hidden></ul>
+        <div class="rf__step" data-rf-step="2"{% if rf_design == 'steps' %} hidden{% endif %}>
+          <label class="rf__field"><span>{{ 'products.reviews.field_title_html' | t }}</span><input type="text" name="title" maxlength="80"></label>
+          <label class="rf__field"><span>{{ 'products.reviews.field_body' | t }}</span><textarea name="body" rows="5" maxlength="1500" required></textarea></label>
+          <div class="rf__step-actions"{% unless rf_design == 'steps' %} hidden{% endunless %}>
+            <button type="button" class="btn btn--outline" data-rf-back>{{ 'products.reviews.previous_step' | t }}</button>
+            <button type="button" class="btn btn--primary rf__next" data-rf-next>{{ 'products.reviews.next_step' | t }}</button>
+          </div>
         </div>
+
+        <div class="rf__step" data-rf-step="3"{% if rf_design == 'steps' %} hidden{% endif %}>
+          <p class="rf__as">{{ 'products.reviews.reviewing_as' | t: name: rf_name, email: customer.email }}</p>
+          <input type="hidden" name="name" value="{{ rf_name | escape }}">
+          <label class="rf__field rf__photo-field">
+            <span>{{ 'products.reviews.field_photo' | t }}</span>
+            <input type="file" name="photo" data-rf-photo accept="image/jpeg,image/png,image/webp">
+            <small>{{ 'products.reviews.photo_hint' | t }}</small>
+            <span class="rf__photo-preview" data-rf-photo-preview hidden><img data-rf-photo-preview-image alt="" width="76" height="76"><button type="button" data-rf-photo-remove>{{ 'products.reviews.remove_photo' | t }}</button></span>
+          </label>
+          <div class="rf__hp" aria-hidden="true"><label>{{ 'products.reviews.field_website' | t }}<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+          <div class="rf__step-actions"{% unless rf_design == 'steps' %} hidden{% endunless %}>
+            <button type="button" class="btn btn--outline" data-rf-back>{{ 'products.reviews.previous_step' | t }}</button>
+            <button type="submit" class="btn btn--primary rf__submit" data-rf-submit><span class="btn__text-content">{{ 'products.reviews.submit' | t }}</span></button>
+          </div>
+        </div>
+
+        <p class="rf__msg" data-rf-msg role="alert" hidden></p>
+        <button type="submit" class="btn btn--primary rf__submit" data-rf-submit{% if rf_design == 'steps' %} hidden{% endif %}><span class="btn__text-content">{{ 'products.reviews.submit' | t }}</span></button>
+      </form>
+      <div class="rf__done" data-rf-done hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
+        <h3 class="rf__title">{{ 'products.reviews.done_title' | t }}</h3>
+        <p class="rf__lead">{{ 'products.reviews.done_lead' | t }}</p>
+        <button type="button" class="btn btn--outline" data-rf-close>{{ 'accessibility.close' | t }}</button>
       </div>
-      <label class="rf__field"><span>{{ 'products.reviews.field_title_html' | t }}</span><input type="text" name="title" maxlength="80"></label>
-      <label class="rf__field"><span>{{ 'products.reviews.field_body' | t }}</span><textarea name="body" rows="5" maxlength="1500" required></textarea></label>
-      <div class="rf__hp" aria-hidden="true"><label>{{ 'products.reviews.field_website' | t }}<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-
-      <p class="rf__msg" data-rf-msg role="alert" hidden></p>
-      <button type="submit" class="btn btn--primary rf__submit" data-rf-submit><span class="btn__text-content">{{ 'products.reviews.submit' | t }}</span></button>
-    </form>
-    <div class="rf__done" data-rf-done hidden>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
-      <h3 class="rf__title">{{ 'products.reviews.done_title' | t }}</h3>
-      <p class="rf__lead">{{ 'products.reviews.done_lead' | t }}</p>
-      <button type="button" class="btn btn--outline" data-rf-close>{{ 'accessibility.close' | t }}</button>
+      {%- else -%}
+      <div class="rf__login" data-rf-login>
+        <button type="button" class="rf__close" data-rf-close aria-label="{{ 'accessibility.close' | t }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        {%- if rf_state == 'login' -%}
+          <h3 class="rf__title" id="rf-title-{{ sid }}">{{ 'products.reviews.login_title' | t }}</h3>
+          <p class="rf__lead">{{ 'products.reviews.login_lead' | t }}</p>
+          <div class="rf__login-actions">
+            <a class="btn btn--primary" href="{{ rf_login_url }}"><span class="btn__text-content">{{ 'products.reviews.login_button' | t }}</span></a>
+            <a class="btn btn--outline" href="{{ routes.account_register_url }}"><span class="btn__text-content">{{ 'products.reviews.register_button' | t }}</span></a>
+          </div>
+        {%- else -%}
+          <h3 class="rf__title" id="rf-title-{{ sid }}">{{ 'products.reviews.write_review' | t }}</h3>
+          <p class="rf__lead">{{ 'products.reviews.unavailable' | t }}</p>
+          <button type="button" class="btn btn--outline" data-rf-close>{{ 'accessibility.close' | t }}</button>
+        {%- endif -%}
+      </div>
+      {%- endif -%}
     </div>
   </dialog>
 </div>
 
 <style>
+  /* ---------- Write a review popup ---------- */
   #rf-{{ sid }} { text-align: center; margin-top: 34px; }
   #rf-{{ sid }} .rf__open { display: inline-flex; align-items: center; justify-content: center; min-height: var(--ctl-h, 46px); padding: 0 30px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-  #rf-{{ sid }} .rf__dialog { width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border: 1px solid var(--hairline, var(--lv-border)); background: var(--bg, #fff); color: var(--text, #111); text-align: left; overflow: auto; }
-  #rf-{{ sid }} .rf__dialog::backdrop { background: rgba(12, 12, 12, .55); backdrop-filter: blur(3px); }
-  #rf-{{ sid }} .rf__form, #rf-{{ sid }} .rf__done { position: relative; padding: 32px 28px 28px; display: flex; flex-direction: column; gap: 16px; }
-  #rf-{{ sid }} .rf__done { align-items: center; text-align: center; gap: 12px; }
-  #rf-{{ sid }} .rf__done svg { width: 46px; height: 46px; color: var(--lv-accent, #9b7c53); }
-  #rf-{{ sid }} .rf__done[hidden], #rf-{{ sid }} .rf__form[hidden], #rf-{{ sid }} .rf__msg[hidden] { display: none; }
-  #rf-{{ sid }} .rf__title { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-  #rf-{{ sid }} .rf__lead { margin: -6px 0 0; font-size: 13.5px; line-height: 1.6; opacity: .7; }
-  #rf-{{ sid }} .rf__close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: inherit; cursor: pointer; }
+
+  /* dialog: centred card on desktop, bottom sheet on phones (see the media query below) */
+  #rf-{{ sid }} .rf__dialog {
+    position: fixed; inset: 0; width: min(540px, calc(100vw - 32px)); max-width: none;
+    max-height: min(780px, calc(100vh - 32px)); max-height: min(780px, calc(100dvh - 32px));
+    margin: auto; padding: 0; border: 0; border-top: 2px solid var(--lv-accent, #9b7c53);
+    background: var(--bg, #fff); color: var(--text, #111); text-align: left;
+    overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain;
+    box-shadow: 0 40px 90px -30px rgba(20, 14, 6, .5);
+  }
+  /* a closed dialog must stay hidden whatever display value the layouts below set (split / phone sheet) */
+  #rf-{{ sid }} .rf__dialog:not([open]) { display: none !important; }
+  #rf-{{ sid }} .rf__dialog[open] { animation: rf-in .34s cubic-bezier(.22, .8, .3, 1) both; }
+  #rf-{{ sid }} .rf__dialog.is-closing { animation: rf-out .22s ease-in both; }
+  #rf-{{ sid }} .rf__dialog::backdrop { background: rgba(18, 14, 10, .52); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+  #rf-{{ sid }} .rf__dialog[open]::backdrop { animation: rf-fade-in .3s ease-out both; }
+  #rf-{{ sid }} .rf__dialog.is-closing::backdrop, #rf-{{ sid }} .rf__dialog.is-dragclose::backdrop { animation: rf-fade-out .24s ease-in both; }
+  @keyframes rf-in { from { opacity: 0; transform: translateY(16px) scale(.985); } to { opacity: 1; transform: none; } }
+  @keyframes rf-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(12px) scale(.985); } }
+  @keyframes rf-sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+  @keyframes rf-sheet-out { from { transform: none; } to { transform: translateY(100%); } }
+  @keyframes rf-fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes rf-fade-out { from { opacity: 1; } to { opacity: 0; } }
+  html.rf-scroll-lock { overflow: hidden; }
+
+  #rf-{{ sid }} .rf__content { min-width: 0; }
+  #rf-{{ sid }} .rf__side { display: none; }
+  #rf-{{ sid }} .rf__grab { display: none; }
+
+  #rf-{{ sid }} .rf__form, #rf-{{ sid }} .rf__done, #rf-{{ sid }} .rf__login { position: relative; display: flex; flex-direction: column; gap: 18px; padding: 40px 36px 34px; }
+  #rf-{{ sid }} .rf__login { align-items: center; text-align: center; padding-block: 52px 42px; }
+  #rf-{{ sid }} .rf__login .rf__lead { max-width: 380px; margin: 0; }
+  #rf-{{ sid }} .rf__login .rf__title, #rf-{{ sid }} .rf__done .rf__title { padding-right: 0; }
+  #rf-{{ sid }} .rf__login .rf__title::after { margin-inline: auto; }
+  #rf-{{ sid }} .rf__login-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
+  #rf-{{ sid }} .rf__done { align-items: center; text-align: center; gap: 14px; padding-block: 52px 42px; }
+  #rf-{{ sid }} .rf__done svg { width: 52px; height: 52px; color: var(--lv-accent, #9b7c53); }
+  #rf-{{ sid }} .rf__done .rf__title::after { margin-inline: auto; }
+
+  /* heading: theme heading font + a short gold rule */
+  #rf-{{ sid }} .rf__title { margin: 0; padding-right: 36px; font-family: var(--FONT-STACK-HEADING, inherit); font-size: 28px; font-weight: 500; line-height: 1.15; letter-spacing: 0; text-transform: none; }
+  #rf-{{ sid }} .rf__title::after { content: ""; display: block; width: 40px; height: 2px; margin-top: 14px; background: var(--lv-accent, #9b7c53); }
+  #rf-{{ sid }} .rf__lead { margin: -4px 0 0; font-size: 14px; line-height: 1.65; opacity: .72; }
+  #rf-{{ sid }} .rf__close { position: absolute; top: 14px; right: 14px; z-index: 6; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: inherit; cursor: pointer; transition: background-color .2s ease; }
+  #rf-{{ sid }} .rf__close:hover { background: color-mix(in srgb, var(--text, #111) 7%, transparent); }
   #rf-{{ sid }} .rf__close svg { width: 18px; height: 18px; }
+
+  #rf-{{ sid }} .rf__as { margin: 0; padding: 13px 16px; font-size: 13px; line-height: 1.55; text-align: left; background: color-mix(in srgb, var(--bg, #fff) 94%, var(--lv-accent, #9b7c53)); border: 1px solid var(--hairline, var(--lv-border)); border-left: 2px solid var(--lv-accent, #9b7c53); overflow-wrap: anywhere; }
+
+  #rf-{{ sid }} .rf__step[hidden], #rf-{{ sid }} .rf__step-actions[hidden], #rf-{{ sid }} [hidden] { display: none !important; }
+  #rf-{{ sid }} .rf__step { display: flex; flex-direction: column; gap: 18px; }
+  #rf-{{ sid }} .rf__step-actions { display: flex; gap: 10px; }
+  #rf-{{ sid }} .rf__step-actions > * { flex: 1 1 0; }
+  #rf-{{ sid }} .rf__next { width: 100%; min-height: var(--ctl-h-lg, 52px); }
+  #rf-{{ sid }} .rf__progress { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  #rf-{{ sid }} .rf__progress li { flex: 1 1 0; padding: 8px 6px; border-bottom: 1px solid var(--hairline, var(--lv-border)); color: color-mix(in srgb, var(--text, #111) 48%, transparent); font-size: 10px; line-height: 1.35; text-transform: uppercase; letter-spacing: .07em; }
+  #rf-{{ sid }} .rf__progress li[aria-current="step"] { border-color: var(--lv-accent, #9b7c53); color: var(--text, #111); }
+  #rf-{{ sid }} .rf__progress li span { display: block; margin-bottom: 3px; color: var(--lv-accent, #9b7c53); font-weight: 700; }
+
+  /* rating + fields */
   #rf-{{ sid }} .rf__rating { border: 0; margin: 0; padding: 0; }
-  #rf-{{ sid }} .rf__rating legend, #rf-{{ sid }} .rf__field > span { padding: 0; margin: 0 0 8px; font-size: 11.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  #rf-{{ sid }} .rf__rating legend, #rf-{{ sid }} .rf__field > span { padding: 0; margin: 0 0 9px; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
   #rf-{{ sid }} .rf__field > span em { font-style: normal; font-weight: 500; text-transform: none; letter-spacing: .02em; opacity: .6; }
-  #rf-{{ sid }} .rf__stars { display: inline-flex; flex-direction: row-reverse; justify-content: flex-end; gap: 4px; }
+  #rf-{{ sid }} .rf__stars { display: inline-flex; flex-direction: row-reverse; justify-content: flex-end; gap: 6px; }
   #rf-{{ sid }} .rf__stars input { position: absolute; opacity: 0; pointer-events: none; }
-  #rf-{{ sid }} .rf__stars label { font-size: 30px; line-height: 1; cursor: pointer; color: var(--lv-rating-star-empty, #ded8c8); text-shadow: 0 1px 1px var(--lv-rating-star-shadow, rgba(141, 104, 21, 0.22)); transition: color .2s ease, transform .2s ease, text-shadow .2s ease; }
-  #rf-{{ sid }} .rf__stars label:hover, #rf-{{ sid }} .rf__stars label:hover ~ label, #rf-{{ sid }} .rf__stars input:checked ~ label { color: var(--lv-rating-star-gold, #d4af37); text-shadow: 0 1px 1px var(--lv-rating-star-shadow, rgba(141, 104, 21, 0.22)); }
+  #rf-{{ sid }} .rf__stars label { font-size: 34px; line-height: 1; cursor: pointer; color: var(--lv-rating-star-empty, #ded8c8); text-shadow: 0 1px 1px var(--lv-rating-star-shadow, rgba(141, 104, 21, 0.22)); transition: color .2s ease, transform .2s ease; }
+  #rf-{{ sid }} .rf__stars label:hover { transform: scale(1.12); }
+  #rf-{{ sid }} .rf__stars label:hover, #rf-{{ sid }} .rf__stars label:hover ~ label, #rf-{{ sid }} .rf__stars input:checked ~ label { color: var(--lv-rating-star-gold, #d4af37); }
   #rf-{{ sid }} .rf__stars input:focus-visible + label { outline: 2px solid var(--text, #111); outline-offset: 2px; }
   #rf-{{ sid }} .rf__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   #rf-{{ sid }} .rf__field { display: flex; flex-direction: column; }
-  #rf-{{ sid }} .rf__field input, #rf-{{ sid }} .rf__field textarea { width: 100%; box-sizing: border-box; padding: 12px 14px; font: inherit; font-size: 14px; color: inherit; background: color-mix(in srgb, var(--text, #111) 4%, var(--bg, #fff)); border: 1px solid var(--hairline, var(--lv-border)); border-radius: var(--input-radius, 0); outline: none; transition: border-color .2s ease; }
-  #rf-{{ sid }} .rf__field textarea { resize: vertical; min-height: 110px; }
-  #rf-{{ sid }} .rf__field input:focus, #rf-{{ sid }} .rf__field textarea:focus { border-color: var(--text, #111); }
+  #rf-{{ sid }} .rf__field input, #rf-{{ sid }} .rf__field textarea { width: 100%; box-sizing: border-box; margin: 0 !important; padding: 13px 15px; font: inherit; font-size: 14.5px; color: inherit; background: color-mix(in srgb, var(--text, #111) 3.5%, var(--bg, #fff)); border: 1px solid var(--hairline, var(--lv-border)); border-radius: var(--input-radius, 0); outline: none; transition: border-color .2s ease, background-color .2s ease; }
+  #rf-{{ sid }} .rf__field input:focus, #rf-{{ sid }} .rf__field textarea:focus { border-color: var(--lv-accent, #9b7c53); background: var(--bg, #fff); }
+  #rf-{{ sid }} .rf__field textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+  #rf-{{ sid }} .rf__field input[type="file"] { padding: 10px; font-size: 12px; }
+  #rf-{{ sid }} .rf__photo-field small { margin-top: 7px; font-size: 11.5px; line-height: 1.5; opacity: .66; }
+  #rf-{{ sid }} .rf__photo-preview { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+  #rf-{{ sid }} .rf__photo-preview img { display: block; width: 76px; height: 76px; object-fit: cover; border: 1px solid var(--hairline, var(--lv-border)); }
+  #rf-{{ sid }} .rf__photo-preview button { padding: 8px 0; border: 0; border-bottom: 1px solid currentColor; background: transparent; color: inherit; font: inherit; font-size: 12px; cursor: pointer; }
+
+  /* product picker */
   #rf-{{ sid }} .rf__pbox { position: relative; }
-  #rf-{{ sid }} .rf__field input, #rf-{{ sid }} .rf__field textarea { margin: 0 !important; }
-  #rf-{{ sid }} .rf__pbox input { display: block; height: 48px; padding: 0 38px 0 40px; line-height: 48px; }
-  #rf-{{ sid }} .rf__psi { position: absolute; left: 14px; top: 50%; width: 16px; height: 16px; margin-top: -8px; opacity: .55; pointer-events: none; }
-  #rf-{{ sid }} .rf__pclear { position: absolute; top: 0; right: 0; width: 42px; height: 100%; border: 0; background: transparent; color: inherit; font-size: 22px; line-height: 1; cursor: pointer; opacity: .6; }
+  #rf-{{ sid }} .rf__pbox input { display: block; height: 50px; padding: 0 40px 0 42px; line-height: 50px; }
+  #rf-{{ sid }} .rf__psi { position: absolute; left: 15px; top: 50%; width: 16px; height: 16px; margin-top: -8px; opacity: .55; pointer-events: none; }
+  #rf-{{ sid }} .rf__pclear { position: absolute; top: 0; right: 0; width: 44px; height: 100%; border: 0; background: transparent; color: inherit; font-size: 22px; line-height: 1; cursor: pointer; opacity: .6; }
   #rf-{{ sid }} .rf__pclear:hover { opacity: 1; }
+  #rf-{{ sid }} .rf__product--locked .rf__pbox input { padding: 0 15px; cursor: default; pointer-events: none; text-overflow: ellipsis; background: color-mix(in srgb, var(--bg, #fff) 94%, var(--lv-accent, #9b7c53)); border-left: 2px solid var(--lv-accent, #9b7c53); }
   #rf-{{ sid }} .rf__pclear[hidden], #rf-{{ sid }} .rf__plist[hidden] { display: none; }
   #rf-{{ sid }} .rf__plist { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: 4px 0; list-style: none; max-height: 300px; overflow-y: auto; overscroll-behavior: contain; background: var(--bg, #fff); border: 1px solid var(--text, #111); box-shadow: 0 14px 28px -14px rgba(0, 0, 0, .35); }
   #rf-{{ sid }} .rf__plist li { margin: 0; }
@@ -95,10 +260,57 @@
   #rf-{{ sid }} .rf__plist button:hover, #rf-{{ sid }} .rf__plist button:focus-visible { background: color-mix(in srgb, var(--text, #111) 6%, var(--bg, #fff)); outline: none; }
   #rf-{{ sid }} .rf__plist img { width: 38px; height: 38px; object-fit: cover; flex: none; }
   #rf-{{ sid }} .rf__plist .rf__pnone { padding: 10px 12px; font-size: 13px; opacity: .6; }
+
   #rf-{{ sid }} .rf__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-  #rf-{{ sid }} .rf__msg { margin: 0; font-size: 13px; font-weight: 600; color: #b3261e; }
+  #rf-{{ sid }} .rf__msg { margin: 0; padding: 11px 14px; font-size: 13px; font-weight: 600; line-height: 1.5; color: #b3261e; background: #fdf1ef; border-left: 2px solid #b3261e; }
   #rf-{{ sid }} .rf__submit { width: 100%; min-height: var(--ctl-h-lg, 52px); }
   #rf-{{ sid }} .rf__submit[disabled] { opacity: .6; cursor: wait; }
+  #rf-{{ sid }} .rf__done[hidden], #rf-{{ sid }} .rf__form[hidden], #rf-{{ sid }} .rf__msg[hidden] { display: none; }
+
+  /* split design (image on the left) */
+  #rf-{{ sid }}.rf--split .rf__dialog { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); width: min(920px, calc(100vw - 48px)); height: min(700px, calc(100vh - 48px)); max-height: calc(100vh - 48px); overflow: hidden; }
+  #rf-{{ sid }}.rf--split .rf__side { display: block; position: relative; min-width: 0; overflow: hidden; background: #f5f1e9; }
+  #rf-{{ sid }}.rf--split .rf__side > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  #rf-{{ sid }}.rf--split .rf__side-copy { position: absolute; inset: auto 26px 30px; color: #332821; text-align: left; }
+  #rf-{{ sid }}.rf--split .rf__side-copy > span { font-family: var(--FONT-STACK-HEADING, Georgia, serif); font-size: 28px; letter-spacing: .12em; }
+  #rf-{{ sid }}.rf--split .rf__side-copy p { max-width: 260px; margin: 8px 0 0; font-size: 13px; line-height: 1.6; }
+  #rf-{{ sid }}.rf--split .rf__content { overflow-y: auto; overscroll-behavior: contain; }
+  #rf-{{ sid }}.rf--split .rf__form, #rf-{{ sid }}.rf--split .rf__done { min-height: 100%; box-sizing: border-box; justify-content: center; }
+
+  /* ---------- phones: bottom sheet. Slides up from the bottom, slides down to close, swipe the handle down to dismiss ---------- */
+  @media (max-width: 700px) {
+    #rf-{{ sid }} .rf__dialog, #rf-{{ sid }}.rf--split .rf__dialog {
+      inset: auto 0 0; width: 100%; max-width: 100%; height: auto; margin: 0;
+      max-height: 92vh; max-height: 92dvh; border: 0; border-top: 2px solid var(--lv-accent, #9b7c53);
+      border-radius: 16px 16px 0 0; box-shadow: 0 -18px 50px rgba(20, 14, 6, .22);
+      display: block; overflow-x: hidden; overflow-y: auto; will-change: transform;
+    }
+    #rf-{{ sid }} .rf__dialog[open] { animation: rf-sheet-in .42s cubic-bezier(.32, .72, 0, 1) both; }
+    #rf-{{ sid }} .rf__dialog.is-closing { animation: rf-sheet-out .3s cubic-bezier(.4, 0, 1, 1) both; }
+    #rf-{{ sid }}.rf--split .rf__side { display: none; }
+    #rf-{{ sid }}.rf--split .rf__content { max-height: none; overflow: visible; }
+
+    /* grab handle (also the swipe target) */
+    #rf-{{ sid }} .rf__grab { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: center; width: 100%; height: 30px; margin: 0 0 -30px; background: var(--bg, #fff); border-radius: 16px 16px 0 0; cursor: grab; touch-action: none; }
+    #rf-{{ sid }} .rf__grab span { width: 44px; height: 4px; border-radius: 4px; background: color-mix(in srgb, var(--text, #111) 22%, transparent); }
+
+    #rf-{{ sid }} .rf__form, #rf-{{ sid }} .rf__done, #rf-{{ sid }} .rf__login { padding: 38px 22px max(24px, env(safe-area-inset-bottom)); gap: 16px; }
+    #rf-{{ sid }} .rf__login { padding-block: 46px max(30px, env(safe-area-inset-bottom)); }
+    #rf-{{ sid }} .rf__title { font-size: 24px; }
+    #rf-{{ sid }} .rf__close { top: 10px; right: 8px; }
+    #rf-{{ sid }} .rf__stars { gap: 8px; }
+    #rf-{{ sid }} .rf__stars label { font-size: 38px; }
+    /* 16px inputs: stops iOS Safari from zooming in when a field is focused */
+    #rf-{{ sid }} .rf__field input, #rf-{{ sid }} .rf__field textarea { font-size: 16px; }
+    #rf-{{ sid }} .rf__field input[type="file"] { font-size: 13px; }
+    /* the submit button stays visible while the form scrolls */
+    #rf-{{ sid }} .rf__form > .rf__submit { position: sticky; bottom: 0; z-index: 3; box-shadow: 0 0 0 10px var(--bg, #fff); }
+    #rf-{{ sid }} .rf__login-actions { width: 100%; flex-direction: column; }
+    #rf-{{ sid }} .rf__login-actions .btn { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #rf-{{ sid }} .rf__dialog[open], #rf-{{ sid }} .rf__dialog[open]::backdrop, #rf-{{ sid }} .rf__dialog.is-closing, #rf-{{ sid }} .rf__dialog.is-closing::backdrop { animation: none; }
+  }
 </style>
 
 <script>
@@ -111,13 +323,208 @@
       var form = root.querySelector('[data-rf-form]');
       var done = root.querySelector('[data-rf-done]');
       var msg = root.querySelector('[data-rf-msg]');
-      var btn = root.querySelector('[data-rf-submit]');
-      var open = function () { form.hidden = false; done.hidden = true; msg.hidden = true; if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); };
-      var close = function () { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); };
+      var submitButtons = Array.prototype.slice.call(root.querySelectorAll('[data-rf-submit]'));
+      var stepsMode = root.dataset.formDesign === 'steps';
+      var stepNodes = Array.prototype.slice.call(root.querySelectorAll('[data-rf-step]'));
+      var progressNodes = Array.prototype.slice.call(root.querySelectorAll('[data-rf-progress-step]'));
+      var currentStep = 1;
+      var photoData = '';
+      var photoProcessing = false;
+      var photoSequence = 0;
+      var photoInput = root.querySelector('[data-rf-photo]');
+      var photoPreview = root.querySelector('[data-rf-photo-preview]');
+      var photoPreviewImage = root.querySelector('[data-rf-photo-preview-image]');
+      /* ---- open / close: fade-scale on desktop, slides up from the bottom on phones, scroll lock, swipe down to close ---- */
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var isSheet = function () { return window.matchMedia && window.matchMedia('(max-width: 700px)').matches; };
+      var closing = false;
+      var isOpen = function () { return dlg.open || dlg.hasAttribute('open'); };
+      var finishClose = function () {
+        dlg.classList.remove('is-closing', 'is-dragclose');
+        dlg.style.transform = ''; dlg.style.transition = '';
+        closing = false;
+        if (dlg.close) dlg.close(); else dlg.removeAttribute('open');
+        document.documentElement.classList.remove('rf-scroll-lock');
+      };
+      var openDialog = function () {
+        closing = false;
+        dlg.classList.remove('is-closing', 'is-dragclose');
+        dlg.style.transform = ''; dlg.style.transition = '';
+        if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+        document.documentElement.classList.add('rf-scroll-lock');
+        dlg.scrollTop = 0;
+      };
+      var closeDialog = function () {
+        if (closing || !isOpen()) return;
+        if (reduceMotion) { finishClose(); return; }
+        closing = true;
+        dlg.classList.add('is-closing');
+        var timer = setTimeout(finishClose, 480);
+        dlg.addEventListener('animationend', function onEnd(e) {
+          if (e.target !== dlg) return;
+          dlg.removeEventListener('animationend', onEnd);
+          clearTimeout(timer);
+          finishClose();
+        });
+      };
+      /* Esc key: close with the same animation */
+      dlg.addEventListener('cancel', function (e) { e.preventDefault(); closeDialog(); });
+      dlg.addEventListener('close', function () { document.documentElement.classList.remove('rf-scroll-lock'); });
+      /* swipe the handle down to dismiss the sheet */
+      var grab = root.querySelector('[data-rf-grab]');
+      if (grab && window.PointerEvent) {
+        var dragging = false, startY = 0, dy = 0, startT = 0;
+        grab.addEventListener('pointerdown', function (e) {
+          if (!isSheet() || closing) return;
+          dragging = true; startY = e.clientY; dy = 0; startT = Date.now();
+          dlg.style.transition = 'none';
+          try { grab.setPointerCapture(e.pointerId); } catch (err) {}
+        });
+        grab.addEventListener('pointermove', function (e) {
+          if (!dragging) return;
+          dy = Math.max(0, e.clientY - startY);
+          dlg.style.transform = 'translateY(' + dy + 'px)';
+        });
+        var endDrag = function () {
+          if (!dragging) return;
+          dragging = false;
+          var velocity = dy / Math.max(1, Date.now() - startT);
+          if (dy > 110 || (dy > 40 && velocity > 0.6)) {
+            closing = true;
+            dlg.classList.add('is-dragclose');
+            dlg.style.transition = 'transform .24s ease-in';
+            dlg.style.transform = 'translateY(100%)';
+            setTimeout(finishClose, 250);
+          } else {
+            dlg.style.transition = 'transform .2s ease-out';
+            dlg.style.transform = '';
+            setTimeout(function () { dlg.style.transition = ''; }, 220);
+          }
+        };
+        grab.addEventListener('pointerup', endDrag);
+        grab.addEventListener('pointercancel', endDrag);
+      }
+      var close = closeDialog;
+
+      /* Not signed in (or reviews not configured): the dialog only shows the sign-in panel, there is no form to wire up */
+      if (!form) {
+        root.querySelector('[data-rf-open]').addEventListener('click', openDialog);
+        root.querySelectorAll('[data-rf-close]').forEach(function (b) { b.addEventListener('click', closeDialog); });
+        dlg.addEventListener('click', function (e) { if (e.target === dlg) closeDialog(); });
+        return;
+      }
+      var open = function () {
+        form.hidden = false; done.hidden = true; msg.hidden = true;
+        currentStep = 1; setStep(currentStep);
+        openDialog();
+      };
       root.querySelector('[data-rf-open]').addEventListener('click', open);
       root.querySelectorAll('[data-rf-close]').forEach(function (b) { b.addEventListener('click', close); });
       dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
       var fail = function (t) { msg.textContent = t; msg.hidden = false; };
+      var setStep = function (step) {
+        if (!stepsMode) return;
+        currentStep = step;
+        stepNodes.forEach(function (node) { node.hidden = Number(node.dataset.rfStep) !== step; });
+        progressNodes.forEach(function (node) {
+          if (Number(node.dataset.rfProgressStep) === step) node.setAttribute('aria-current', 'step');
+          else node.removeAttribute('aria-current');
+        });
+        msg.hidden = true;
+        var content = root.querySelector('.rf__content');
+        if (content) content.scrollTop = 0;
+      };
+      root.querySelectorAll('[data-rf-next]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          if (currentStep === 1 && !form.querySelector('input[name="rating"]:checked')) return fail(rfI18n.errRating);
+          if (currentStep === 2 && String(form.querySelector('[name="body"]').value || '').trim().length < 10) return fail(rfI18n.errLength);
+          setStep(Math.min(3, currentStep + 1));
+        });
+      });
+      root.querySelectorAll('[data-rf-back]').forEach(function (button) {
+        button.addEventListener('click', function () { setStep(Math.max(1, currentStep - 1)); });
+      });
+
+      var readAsDataUrl = function (blob) {
+        return new Promise(function (resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function () { resolve(String(reader.result || '')); };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      };
+      var compressPhoto = function (file) {
+        if (!file || !/^image\/(jpeg|png|webp)$/i.test(file.type)) return Promise.reject(new Error(rfI18n.errPhotoType));
+        if (file.size > 8 * 1024 * 1024) return Promise.reject(new Error(rfI18n.errPhotoSize));
+        var imagePromise = window.createImageBitmap ? window.createImageBitmap(file).then(function (image) {
+          return { image: image, width: image.width, height: image.height, close: function () { image.close(); } };
+        }) : new Promise(function (resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function () {
+            var image = new Image();
+            image.onload = function () { resolve({ image: image, width: image.naturalWidth, height: image.naturalHeight }); };
+            image.onerror = reject;
+            image.src = reader.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        return imagePromise.then(function (source) {
+          var scale = Math.min(1, 1400 / Math.max(source.width, source.height));
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(source.width * scale));
+          canvas.height = Math.max(1, Math.round(source.height * scale));
+          var context = canvas.getContext('2d');
+          context.drawImage(source.image, 0, 0, canvas.width, canvas.height);
+          if (source.close) source.close();
+          var qualities = [.82, .72, .62, .52];
+          var makeBlob = function (index) {
+            return new Promise(function (resolve) { canvas.toBlob(resolve, 'image/jpeg', qualities[index]); }).then(function (blob) {
+              if (!blob) throw new Error(rfI18n.errPhotoType);
+              if (blob.size <= 900 * 1024 || index === qualities.length - 1) {
+                if (blob.size > 1200 * 1024) throw new Error(rfI18n.errPhotoSize);
+                return blob;
+              }
+              return makeBlob(index + 1);
+            });
+          };
+          return makeBlob(0);
+        }).then(readAsDataUrl);
+      };
+      if (photoInput) {
+        photoInput.addEventListener('change', function () {
+          var file = photoInput.files && photoInput.files[0];
+          var sequence = ++photoSequence;
+          photoData = '';
+          if (!file) {
+            photoProcessing = false; photoPreview.hidden = true;
+            submitButtons.forEach(function (button) { button.disabled = false; });
+            return;
+          }
+          photoProcessing = true;
+          submitButtons.forEach(function (button) { button.disabled = true; });
+          compressPhoto(file).then(function (dataUrl) {
+            if (sequence !== photoSequence) return;
+            photoData = dataUrl;
+            photoPreviewImage.src = dataUrl;
+            photoPreview.hidden = false;
+            msg.hidden = true;
+            photoProcessing = false;
+            submitButtons.forEach(function (button) { button.disabled = false; });
+          }).catch(function (error) {
+            if (sequence !== photoSequence) return;
+            photoInput.value = '';
+            photoPreview.hidden = true;
+            photoProcessing = false;
+            submitButtons.forEach(function (button) { button.disabled = false; });
+            fail(error.message || rfI18n.errPhotoType);
+          });
+        });
+        root.querySelector('[data-rf-photo-remove]').addEventListener('click', function () {
+          photoSequence += 1; photoProcessing = false; photoData = ''; photoInput.value = ''; photoPreviewImage.removeAttribute('src'); photoPreview.hidden = true;
+          submitButtons.forEach(function (button) { button.disabled = false; });
+        });
+      }
 
       /* product picker: type to search the store's products (predictive search), pick one or leave empty */
       var psearch = root.querySelector('[data-rf-psearch]');
@@ -129,15 +536,18 @@
         errName: {{ 'products.reviews.error_name' | t | json }},
         errLength: {{ 'products.reviews.error_length' | t | json }},
         errGeneric: {{ 'products.reviews.error_generic' | t | json }},
-        errNetwork: {{ 'products.reviews.error_network' | t | json }}
+        errNetwork: {{ 'products.reviews.error_network' | t | json }},
+        errPhotoType: {{ 'products.reviews.error_photo_type' | t | json }},
+        errPhotoSize: {{ 'products.reviews.error_photo_size' | t | json }},
+        errPhotoProcessing: {{ 'products.reviews.error_photo_processing' | t | json }}
       };
       var suggestBase = (window.theme && window.theme.routes && window.theme.routes.predictive_search_url)
         ? (window.theme.routes.predictive_search_url + '.json')
         : {{ routes.predictive_search_url | append: '.json' | json }};
       var pid = root.dataset.productId || '';
       var ptimer = null, pseq = 0;
-      var syncClear = function () { pclear.hidden = !psearch.value; };
-      var hideList = function () { plist.hidden = true; psearch.setAttribute('aria-expanded', 'false'); };
+      var syncClear = function () { if (pclear) pclear.hidden = !psearch.value; };
+      var hideList = function () { if (!plist) return; plist.hidden = true; psearch.setAttribute('aria-expanded', 'false'); };
       var pick = function (id, title) { pid = String(id); psearch.value = title; hideList(); syncClear(); };
       var render = function (items) {
         plist.innerHTML = '';
@@ -173,32 +583,43 @@
         if (q.length < 2) { hideList(); return; }
         ptimer = setTimeout(function () { search(q); }, 250);
       });
-      pclear.addEventListener('click', function () { pid = ''; psearch.value = ''; hideList(); syncClear(); psearch.focus(); });
+      if (pclear) pclear.addEventListener('click', function () { pid = ''; psearch.value = ''; hideList(); syncClear(); psearch.focus(); });
       document.addEventListener('click', function (e) { if (!e.target.closest('[data-rf-product]')) hideList(); });
       syncClear();
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         msg.hidden = true;
+        if (photoProcessing) return fail(rfI18n.errPhotoProcessing);
         var fd = new FormData(form);
         var rating = fd.get('rating');
         if (!rating) return fail(rfI18n.errRating);
         if (!String(fd.get('name') || '').trim()) return fail(rfI18n.errName);
         if (String(fd.get('body') || '').trim().length < 10) return fail(rfI18n.errLength);
-        btn.disabled = true;
+        submitButtons.forEach(function (button) { button.disabled = true; });
         fetch(root.dataset.endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: fd.get('name'), rating: rating, title: fd.get('title'), body: fd.get('body'),
-            website: fd.get('website'), productId: pid
+            website: fd.get('website'), productId: pid, photoData: photoData,
+            customerToken: root.dataset.customerToken || ''
           })
         }).then(function (r) { return r.json().catch(function () { return {}; }); })
           .then(function (j) {
-            btn.disabled = false;
-            if (j && j.ok) { form.reset(); form.hidden = true; done.hidden = false; }
-            else fail((j && j.error) || rfI18n.errGeneric);
+            submitButtons.forEach(function (button) { button.disabled = false; });
+            if (j && j.ok) {
+              form.reset(); form.hidden = true; done.hidden = false; photoData = '';
+              photoSequence += 1; photoProcessing = false;
+              if (photoPreview) photoPreview.hidden = true;
+              if (photoPreviewImage) photoPreviewImage.removeAttribute('src');
+              setStep(1);
+            }
+            else {
+              if (j && j.reason && window.console) console.warn('Review not accepted. Reason:', j.reason);
+              fail((j && j.error) || rfI18n.errGeneric);
+            }
           })
-          .catch(function () { btn.disabled = false; fail(rfI18n.errNetwork); });
+          .catch(function () { submitButtons.forEach(function (button) { button.disabled = false; }); fail(rfI18n.errNetwork); });
       });
     };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

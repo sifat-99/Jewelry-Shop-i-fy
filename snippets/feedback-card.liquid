@@ -1,5 +1,5 @@
 {% doc %}
-  One customer feedback card (used by sections/customer-feedback.liquid). Accepts: name, rating (0-5, including halves), title, body, photo, reviewed_product, product_title,...
+  A customer feedback card shared by the home page and product review sections. It can show a linked product thumbnail when enabled in the global Reviews settings.
 
   @param [name] - Optional name passed by the parent file
   @param [rating] - Optional rating passed by the parent file
@@ -12,7 +12,7 @@
   @param [date] - Optional date passed by the parent file
 {% enddoc %}
 {%- comment -%}
-  One customer feedback card (used by sections/customer-feedback.liquid).
+  A customer feedback card shared by sections/customer-feedback.liquid and sections/product-reviews.liquid.
   Accepts: name, rating (0-5, including halves), title, body, photo, reviewed_product, product_title, verified, date
 {%- endcomment -%}
 {%- assign r = rating | plus: 0 | round: 1 -%}
@@ -20,23 +20,48 @@
 {%- if r < 0 -%}{%- assign r = 0 -%}{%- endif -%}
 {%- assign display_product_title = product_title -%}
 {%- assign product_url = reviewed_product.url -%}
+{%- assign display_product_image = reviewed_product.featured_image -%}
 {%- if reviewed_product != blank -%}
   {%- assign display_product_title = reviewed_product.title | default: product_title -%}
 {%- elsif product_title != blank -%}
   {%- assign product_handle = product_title | handleize -%}
   {%- assign matched_product = all_products[product_handle] -%}
   {%- if matched_product != blank -%}
+    {%- assign reviewed_product = matched_product -%}
     {%- assign display_product_title = matched_product.title -%}
     {%- assign product_url = matched_product.url -%}
+    {%- assign display_product_image = matched_product.featured_image -%}
   {%- endif -%}
 {%- endif -%}
-<article class="cf-card">
-  <div class="cf-card__rating">
-    {%- render 'rating-stars', rating: r, class_name: 'cf-stars' -%}
-    <span class="cf-card__rating-value">{{ r }} / 5</span>
+{%- assign show_product_image = false -%}
+{%- if settings.show_review_product_image -%}
+  {%- if display_product_image != blank -%}
+    {%- assign show_product_image = true -%}
+  {%- endif -%}
+{%- endif -%}
+<article class="cf-card{% if photo != blank %} cf-card--has-photo{% endif %}{% if show_product_image %} cf-card--with-product-image{% endif %}">
+  <div class="cf-card__main">
+    <div class="cf-card__content">
+      {%- if photo != blank -%}
+        <div class="cf-card__photo-frame">
+          <img class="cf-card__photo" src="{{ photo | image_url: width: 1200 }}" alt="{{ photo.alt | default: display_product_title | default: name | escape }}" width="{{ photo.width | default: 1200 }}" height="{{ photo.height | default: 900 }}" loading="lazy">
+        </div>
+      {%- endif -%}
+      <div class="cf-card__rating">
+        {%- render 'rating-stars', rating: r, class_name: 'cf-stars' -%}
+        <span class="cf-card__rating-value">{{ r }} / 5</span>
+      </div>
+      {%- if title != blank -%}<h3 class="cf-card__title">{{ title | escape }}</h3>{%- endif -%}
+      {%- if body != blank -%}<p class="cf-card__text">{{ body | escape }}</p>{%- endif -%}
+    </div>
+    {%- if show_product_image -%}
+      <div class="cf-card__product-image-frame">
+        {%- if product_url != blank -%}<a href="{{ product_url }}" aria-label="{{ display_product_title | escape }}">{%- endif -%}
+        <img class="cf-card__product-image" src="{{ display_product_image | image_url: width: 640 }}" alt="{{ display_product_image.alt | default: display_product_title | default: name | escape }}" width="{{ display_product_image.width }}" height="{{ display_product_image.height }}" loading="lazy">
+        {%- if product_url != blank -%}</a>{%- endif -%}
+      </div>
+    {%- endif -%}
   </div>
-  {%- if title != blank -%}<h3 class="cf-card__title">{{ title | escape }}</h3>{%- endif -%}
-  {%- if body != blank -%}<p class="cf-card__text">{{ body | escape }}</p>{%- endif -%}
   <div class="cf-card__by">
     {%- if photo != blank -%}
       <img class="cf-card__avatar" src="{{ photo | image_url: width: 120, height: 120, crop: 'center' }}" alt="{{ name | escape }}" width="44" height="44" loading="lazy">

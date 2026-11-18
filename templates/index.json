@@ -274,7 +274,7 @@
         "card_border_radius": 0,
         "overlay_opacity": 0,
         "padding_top": 35,
-        "padding_bottom": 35
+        "padding_bottom": 0
       }
     },
     "parallax_showcase": {
@@ -293,13 +293,13 @@
         "products_count": 12,
         "shuffle_products": true,
         "cards_devices": "desktop",
-        "pin_distance": 0,
+        "pin_distance": 40,
         "auto_scroll": true,
         "scroll_speed": 30,
         "scroll_direction": "up_down",
         "pause_on_hover": true,
-        "wheel_scroll": false,
-        "wheel_speed": 1,
+        "wheel_scroll": true,
+        "wheel_speed": 3,
         "parallax_strength": 80,
         "stage_height": 860,
         "side_width": "medium",
@@ -374,71 +374,6 @@
         "padding_bottom": 35
       }
     },
-    "instagram_feed": {
-      "type": "instagram-feed",
-      "blocks": {
-        "insta_1": {
-          "type": "image",
-          "settings": {
-            "link": "",
-            "alt_text": ""
-          }
-        },
-        "insta_2": {
-          "type": "image",
-          "settings": {
-            "link": "",
-            "alt_text": ""
-          }
-        },
-        "insta_3": {
-          "type": "image",
-          "settings": {
-            "link": "",
-            "alt_text": ""
-          }
-        },
-        "insta_4": {
-          "type": "image",
-          "settings": {
-            "link": "",
-            "alt_text": ""
-          }
-        },
-        "insta_5": {
-          "type": "image",
-          "settings": {
-            "link": "",
-            "alt_text": ""
-          }
-        },
-        "insta_6": {
-          "type": "image",
-          "settings": {
-            "link": "",
-            "alt_text": ""
-          }
-        }
-      },
-      "block_order": [
-        "insta_1",
-        "insta_2",
-        "insta_3",
-        "insta_4",
-        "insta_5",
-        "insta_6"
-      ],
-      "disabled": true,
-      "settings": {
-        "color_scheme": "",
-        "title": "Follow us - Jewelry Shop",
-        "link": "https://www.instagram.com/bssoln",
-        "padding_top": 40,
-        "padding_bottom": 40,
-        "overlay_opacity": 25,
-        "image_border_radius": 0
-      }
-    },
     "customer_feedback_qqhYpM": {
       "type": "customer-feedback",
       "blocks": {
@@ -490,17 +425,20 @@
       "name": "Customer feedback",
       "settings": {
         "color_scheme": "",
-        "heading": "What our customers say",
-        "subheading": "Real words from people who wear Aurelle",
+        "heading": "Loved by Those Who Wear It",
+        "subheading": "CUSTOMER REVIEWS",
         "show_summary": true,
         "source": "auto",
         "metaobject_type": "review",
         "limit": 12,
-        "show_form": true,
-        "form_endpoint": "https://le-velair-reviews-api.vercel.app/api/review",
-        "form_button_label": "Write a review",
-        "layout": "carousel",
+        "initial_count": 3,
         "columns": 3,
+        "bubble_title": "Beautiful pieces,",
+        "bubble_title_bold": "real stories.",
+        "bubble_side_title": "Words from Our Customers",
+        "bubble_source_label": "Customer reviews",
+        "bubble_show_quote": true,
+        "bubble_show_progress": true,
         "autoplay": false,
         "autoplay_speed": 4,
         "show_divider": false,
@@ -611,7 +549,6 @@
     "parallax_showcase",
     "section_richtext_PtYik4",
     "split_rings",
-    "instagram_feed",
     "customer_feedback_qqhYpM",
     "trust_icons",
     "sale_nLqFpM"

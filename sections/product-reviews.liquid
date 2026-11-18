@@ -7,79 +7,145 @@
     render 'product-review-stats', product_id: product.id
   endcapture
   assign st = rs | split: '~~'
-  assign avg = st[0]
+  assign review_average = st[0] | plus: 0
   assign cnt = st[1] | plus: 0
-  assign endpoint = section.settings.form_endpoint | default: settings.reviews_api_url | default: 'https://le-velair-reviews-api.vercel.app/api/review'
+  assign review_columns = cnt | at_most: 2
+  if cnt > 2
+    assign review_columns = 2
+  endif
   assign initial = section.settings.initial_count | default: 6
+  assign review_design = settings.review_design | default: 'luxury_minimal'
+  case review_design
+    when 'editorial'
+      assign review_design = 'luxury_minimal'
+    when 'spotlight'
+      assign review_design = 'editorial_magazine'
+    when 'journal'
+      assign review_design = 'modern_grid'
+  endcase
+  comment
+    The speech bubble slider reuses the carousel behaviour (swipe list + arrows), only the cards look different
+  endcomment
+  assign pr_carousel = false
+  assign pr_bubble = false
+  if review_design == 'carousel'
+    assign pr_carousel = true
+  endif
+  if review_design == 'speech_bubble'
+    assign pr_carousel = true
+    assign pr_bubble = true
+  endif
 -%}
-<section id="product-reviews" class="pr color-{{ section.settings.color_scheme | default: 'scheme-1' }}" style="--PT: {{ section.settings.padding_top | default: 48 }}px; --PB: {{ section.settings.padding_bottom | default: 48 }}px;">
+<section id="product-reviews" class="pr pr--{{ review_design }}{% if pr_bubble %} pr--carousel{% endif %}{% if cnt == 1 %} pr--single-review{% endif %} color-{{ section.settings.color_scheme | default: 'scheme-1' }}" style="--PT: {{ section.settings.padding_top | default: 48 }}px; --PB: {{ section.settings.padding_bottom | default: 48 }}px; --pr-columns: {{ review_columns }};" data-pr-count="{{ cnt }}" data-pr-initial="{{ initial }}" data-pr-initial-mobile="2"{% if review_design == 'parallax_wall' %} data-review-parallax{% endif %}>
   <div class="pr__inner wrapper--full section-padding">
     {%- assign pr_heading_default = 'products.reviews.heading' | t -%}
-    <h2 class="pr__title kicker-flourished">{{ section.settings.heading | default: pr_heading_default | escape }}</h2>
-
-    <div class="pr__top">
-      {%- if cnt > 0 -%}
-        <div class="pr__sum">
-          <p class="pr__avg">{{ avg }}</p>
-          {%- render 'rating-stars', rating: avg, class_name: 'lv-stars pr__sumstars' -%}
-          <p class="pr__count">{{ 'products.reviews.based_on' | t: count: cnt }}</p>
+    <div class="pr__intro">
+      <h2 class="pr__title">{{ section.settings.heading | default: pr_heading_default | escape }}</h2>
+      {%- if review_design == 'parallax_wall' and cnt > 0 -%}
+        <div class="pr__summary">
+          {%- render 'rating-stars', rating: review_average, class_name: 'lv-stars pr__summary-stars' -%}
+          <p class="pr__summary-score"><strong>{{ review_average }}</strong><span>/ 5</span></p>
+          <p class="pr__summary-count">{{ 'products.reviews.based_on' | t: count: cnt }}</p>
         </div>
-        <div class="pr__bars">
-          {%- for i in (0..4) -%}
-            {%- assign star = 5 | minus: i -%}
-            {%- assign idx = i | plus: 2 -%}
-            {%- assign n = st[idx] | plus: 0 -%}
-            <div class="pr__bar"><span>{{ star }} <span class="pr__bar__star" aria-hidden="true">★</span></span><div class="pr__track"><i style="width: {{ n | times: 100.0 | divided_by: cnt }}%"></i></div><span>{{ n }}</span></div>
-          {%- endfor -%}
-        </div>
-      {%- else -%}
-        <p class="pr__none">{{ 'products.reviews.none_yet' | t }}</p>
-      {%- endif -%}
-      {%- if endpoint != blank -%}
-        {%- assign rf_btn_label = 'products.reviews.write_review' | t -%}
-        <div class="pr__cta">{%- render 'review-form', endpoint: endpoint, sid: section.id, product_id: product.id, product_title: product.title, button_label: rf_btn_label -%}</div>
       {%- endif -%}
     </div>
 
+    {%- if cnt == 0 -%}
+      <p class="pr__none">{{ 'products.reviews.none_yet' | t }}</p>
+    {%- endif -%}
     {%- if cnt > 0 -%}
-      <div class="pr__list" data-pr-list>
-        {%- assign shown = 0 -%}
-        {%- for e in shop.metaobjects.review.values -%}
-          {%- if e.product.value.id == product.id and e.approved != false -%}
-            {%- assign shown = shown | plus: 1 -%}
-            <div class="pr__item{% if shown > initial %} pr__item--extra{% endif %}"{% if shown > initial %} hidden{% endif %}>
-              {%- render 'feedback-card', name: e.name, rating: e.rating.value, title: e.title, body: e.body, photo: e.photo.value, product_title: '', verified: e.verified.value, date: e.date.value -%}
-            </div>
-          {%- endif -%}
-        {%- endfor -%}
+      {%- if cnt > 1 -%}
+        <div class="pr__controls" data-review-controls>
+          <label><span>{{ 'products.reviews.filter_by_rating' | t }}</span>
+            <select data-review-filter>
+              <option value="all">{{ 'products.reviews.all_ratings' | t }}</option>
+              <option value="5">5 {{ 'products.reviews.stars_label' | t }}</option>
+              <option value="4">4 {{ 'products.reviews.stars_and_up' | t }}</option>
+              <option value="3">3 {{ 'products.reviews.stars_and_up' | t }}</option>
+              <option value="2">2 {{ 'products.reviews.stars_and_up' | t }}</option>
+              <option value="1">1 {{ 'products.reviews.stars_and_up' | t }}</option>
+            </select>
+          </label>
+          <label><span>{{ 'products.reviews.sort_by' | t }}</span>
+            <select data-review-sort>
+              <option value="newest">{{ 'products.reviews.most_recent' | t }}</option>
+              <option value="highest">{{ 'products.reviews.highest_rated' | t }}</option>
+            </select>
+          </label>
+        </div>
+      {%- endif -%}
+      <p class="pr__filter-empty" data-pr-empty hidden>{{ 'products.reviews.no_matching_reviews' | t }}</p>
+      <div class="pr__list-wrap">
+        {%- if pr_carousel -%}
+          <button type="button" class="pr__arrow pr__arrow--prev" data-pr-prev aria-label="{{ 'products.reviews.previous' | t }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
+        {%- endif -%}
+        <div class="pr__list" data-pr-list>
+          {%- assign shown = 0 -%}
+          {%- for e in shop.metaobjects.review.values -%}
+            {%- if e.product.value.id == product.id and e.approved != false -%}
+              {%- assign shown = shown | plus: 1 -%}
+              <div class="pr__item{% if shown > initial %} pr__item--extra{% endif %}{% if shown > 2 %} pr__item--mobile-extra{% endif %}" data-review-card data-rating="{{ e.rating.value }}" data-review-date="{{ e.date.value | date: '%s' }}"{% if shown > initial %} hidden{% endif %}>
+                {%- if pr_bubble -%}
+                  {%- render 'feedback-bubble', name: e.name, rating: e.rating.value, title: e.title, body: e.body, photo: e.photo.value, reviewed_product: product, product_title: '', verified: e.verified.value, date: e.date.value -%}
+                {%- else -%}
+                {%- render 'feedback-card', name: e.name, rating: e.rating.value, title: e.title, body: e.body, photo: e.photo.value, reviewed_product: product, product_title: '', verified: e.verified.value, date: e.date.value -%}
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+        {%- if pr_carousel -%}
+          <button type="button" class="pr__arrow pr__arrow--next" data-pr-next aria-label="{{ 'products.reviews.next' | t }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+        {%- endif -%}
       </div>
-      {%- if cnt > initial -%}
-        <div class="pr__more"><button type="button" class="btn btn--outline" data-pr-more>{{ 'products.reviews.show_more' | t }}</button></div>
+      {%- if cnt > initial or cnt > 2 -%}
+        <div class="pr__more"><button type="button" class="btn btn--outline" data-pr-more aria-expanded="false" data-show-more-label="{{ 'products.reviews.show_more' | t | escape }}" data-show-less-label="{{ 'products.reviews.show_less' | t | escape }}">{{ 'products.reviews.show_more' | t }}</button></div>
       {%- endif -%}
     {%- endif -%}
   </div>
 </section>
 
 <style>
-  #product-reviews { padding: var(--PT) 0 var(--PB); background: var(--bg, #fff); color: var(--text, #111); --cf-accent: var(--lv-accent, #9b7c53); --cf-line: var(--lv-border); scroll-margin-top: 90px; }
-  #product-reviews .pr__title { margin: 0 0 clamp(22px, 3vw, 34px); text-align: center; font-size: clamp(20px, 2.6vw, 28px); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
-  #product-reviews .pr__top { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: clamp(20px, 4vw, 56px); align-items: center; max-width: 980px; margin: 0 auto clamp(26px, 4vw, 44px); padding: 26px clamp(18px, 3vw, 36px); border: 1px solid var(--cf-line); background: color-mix(in srgb, var(--text, #111) 3%, var(--bg, #fff)); }
-  #product-reviews .pr__sum { text-align: center; }
-  #product-reviews .pr__avg { margin: 0; font-size: 46px; font-weight: 600; line-height: 1; letter-spacing: .02em; }
-  #product-reviews .pr__sumstars { font-size: 20px; margin: 8px 0 6px; }
-  #product-reviews .pr__count { margin: 0; font-size: 12.5px; opacity: .65; }
-  #product-reviews .pr__bars { display: grid; gap: 6px; min-width: 0; }
-  #product-reviews .pr__bar { display: grid; grid-template-columns: 34px minmax(0, 1fr) 24px; gap: 10px; align-items: center; font-size: 12px; }
-  #product-reviews .pr__bar span:last-child { text-align: right; opacity: .65; }
-  #product-reviews .pr__track { height: 6px; background: color-mix(in srgb, var(--text, #111) 12%, transparent); }
-  #product-reviews .pr__track i { display: block; height: 100%; background: var(--cf-accent); }
-  #product-reviews .pr__none { margin: 0; grid-column: 1 / 3; font-size: 14.5px; opacity: .75; }
-  #product-reviews .pr__cta .rf { margin-top: 0; }
-  #product-reviews .pr__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; max-width: 980px; margin: 0 auto; }
+  #product-reviews { padding: var(--PT) 0 var(--PB); background: color-mix(in srgb, var(--bg, #fff) 94%, #f7f2e8); color: var(--text, #111); --cf-accent: var(--lv-accent, #9b7c53); --cf-line: var(--lv-border, #e6e2d8); scroll-margin-top: 90px; }
+  #product-reviews .pr__title { position: relative; margin: 0 0 clamp(28px, 3.5vw, 42px); padding-bottom: 16px; text-align: center; font-family: var(--FONT-STACK-HEADING, Georgia, serif) !important; font-size: clamp(28px, 3vw, 38px) !important; font-weight: 400 !important; letter-spacing: .01em !important; line-height: 1.2; text-transform: none !important; }
+  #product-reviews .pr__title::after { position: absolute; bottom: 0; left: 50%; width: 42px; height: 2px; background: var(--cf-accent); content: ''; transform: translateX(-50%); }
+  #product-reviews .pr__summary { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+  #product-reviews .pr__summary-stars { color: var(--lv-rating-star-gold, #d4af37); font-size: 20px; }
+  #product-reviews .pr__summary-score, #product-reviews .pr__summary-count { margin: 0; font-size: 14px; }
+  #product-reviews .pr__summary-score { display: flex; align-items: baseline; gap: 5px; }
+  #product-reviews .pr__summary-score strong { font-size: 28px; line-height: 1; }
+  #product-reviews .pr__summary-count { opacity: .72; }
+  #product-reviews .pr__none { max-width: 980px; margin: 0 auto 22px; font-size: 14.5px; opacity: .75; text-align: center; }
+  #product-reviews .pr__controls { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px 20px; max-width: 1180px; margin: 0 auto 22px; padding: 12px 16px; border: 1px solid color-mix(in srgb, var(--cf-accent) 18%, var(--cf-line)); background: color-mix(in srgb, var(--bg, #fff) 96%, #f7f2e8); }
+  #product-reviews .pr__controls label { display: flex; align-items: center; gap: 10px; font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  #product-reviews .pr__controls select { min-width: 168px; min-height: 42px; padding: 0 34px 0 12px; border: 1px solid var(--cf-line); border-radius: var(--input-radius, 0); background: #fff; color: inherit; font: inherit; font-size: 12px; letter-spacing: .02em; text-transform: none; }
+  #product-reviews .pr__filter-empty { margin: 24px auto; text-align: center; font-size: 14px; opacity: .7; }
+  #product-reviews .pr__filter-empty[hidden] { display: none; }
+  #product-reviews .pr__list-wrap { position: relative; max-width: 1180px; margin: 0 auto; }
+  #product-reviews .pr__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 0 auto; }
+  #product-reviews.pr--single-review .pr__list-wrap { max-width: 760px; }
+  #product-reviews.pr--single-review .pr__list { grid-template-columns: minmax(0, 1fr); }
   #product-reviews .pr__item { display: flex; min-width: 0; }
   #product-reviews .pr__item[hidden] { display: none; }
   #product-reviews .pr__more { text-align: center; margin-top: 28px; }
-  #product-reviews .cf-card { display: flex; flex-direction: column; gap: 12px; width: 100%; box-sizing: border-box; padding: 24px 22px 20px; background: color-mix(in srgb, var(--text, #111) 3%, var(--bg, #fff)); border: 1px solid var(--cf-line); border-radius: var(--card-radius, 0); }
+  #product-reviews.pr--parallax_wall .pr__inner { display: grid; grid-template-columns: minmax(220px, .72fr) minmax(0, 1.65fr); align-items: start; column-gap: clamp(32px, 6vw, 92px); row-gap: 0; }
+  #product-reviews.pr--parallax_wall .pr__intro { position: sticky; top: 116px; grid-column: 1; grid-row: 1 / span 4; max-width: 420px; }
+  #product-reviews.pr--parallax_wall .pr__title { max-width: 390px; margin: 0 0 22px; padding-bottom: 16px; text-align: left; }
+  #product-reviews.pr--parallax_wall .pr__title::after { left: 0; transform: none; }
+  #product-reviews.pr--parallax_wall .pr__controls,
+  #product-reviews.pr--parallax_wall .pr__list-wrap,
+  #product-reviews.pr--parallax_wall .pr__more,
+  #product-reviews.pr--parallax_wall .pr__filter-empty,
+  #product-reviews.pr--parallax_wall .pr__none { grid-column: 2; }
+  #product-reviews.pr--parallax_wall .pr__controls { max-width: none; margin-bottom: 20px; }
+  #product-reviews.pr--parallax_wall .pr__list-wrap { max-width: none; }
+  #product-reviews.pr--parallax_wall .pr__list { grid-template-columns: repeat(var(--pr-columns), minmax(0, 1fr)); align-items: start; gap: clamp(16px, 2vw, 28px); }
+  #product-reviews.pr--parallax_wall .pr__item { transform: translate3d(0, var(--review-parallax-y, 0px), 0); will-change: transform; }
+  #product-reviews.pr--parallax_wall .pr__item:nth-child(even) { margin-top: clamp(56px, 7vw, 96px); }
+  #product-reviews.pr--parallax_wall .pr__item:nth-child(4n + 3) { margin-top: clamp(12px, 2vw, 26px); }
+  #product-reviews .cf-card { display: flex; flex-direction: column; gap: 14px; width: 100%; box-sizing: border-box; padding: 26px 26px 22px; background: color-mix(in srgb, var(--bg, #fff) 97%, #f7f2e8); border: 1px solid color-mix(in srgb, var(--cf-accent) 24%, var(--cf-line)); border-radius: var(--card-radius, 0); box-shadow: 0 10px 30px rgb(65 49 28 / 5%); transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease; }
+  #product-reviews .pr__item:hover .cf-card,
+  #product-reviews .pr__item:focus-within .cf-card { transform: translateY(-2px); border-color: color-mix(in srgb, var(--cf-accent) 42%, var(--cf-line)); box-shadow: 0 14px 34px rgb(65 49 28 / 9%); }
   #product-reviews .cf-stars { font-size: 20px; }
   #product-reviews .pr__bar__star { color: var(--lv-rating-star-gold, #d4af37); }
   #product-reviews .cf-card__title { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; line-height: 1.4; }
@@ -92,22 +158,269 @@
   #product-reviews .cf-card__verified { display: inline-flex; align-items: center; color: var(--cf-accent); cursor: help; }
   #product-reviews .cf-card__verified svg { width: 20px; height: 20px; }
   #product-reviews .cf-card__meta { margin: 2px 0 0; font-size: 12px; opacity: .65; }
+  #product-reviews .cf-card__main { min-width: 0; }
+  #product-reviews .cf-card__content { display: flex; grid-area: content; min-width: 0; flex: 1 1 auto; flex-direction: column; gap: 14px; }
+  #product-reviews .cf-card--with-product-image { gap: 0; padding: 20px; }
+  #product-reviews .cf-card--with-product-image .cf-card__main { display: grid; grid-template-columns: minmax(0, 2fr) minmax(120px, 1fr); grid-template-areas: "content product"; align-items: stretch; gap: 20px; }
+  #product-reviews .cf-card__product-image-frame { grid-area: product; width: 100%; min-width: 0; min-height: 150px; aspect-ratio: 1 / 1; overflow: hidden; border: 1px solid color-mix(in srgb, var(--cf-accent) 20%, var(--cf-line)); border-radius: var(--media-radius, var(--card-radius, 0)); background: #f7f5f1; }
+  #product-reviews .cf-card__product-image-frame a { display: block; width: 100%; height: 100%; }
+  #product-reviews .cf-card__product-image { display: block; width: 100%; height: 100%; object-fit: contain; }
+  #product-reviews .cf-card__photo-frame { display: none; overflow: hidden; aspect-ratio: 4 / 3; background: #f5f1e9; }
+  #product-reviews .cf-card__photo { display: block; width: 100%; height: 100%; object-fit: cover; }
+  #product-reviews.pr--luxury_minimal .cf-card { box-shadow: 0 8px 28px rgb(65 49 28 / 4%); }
+  #product-reviews.pr--customer_photo .cf-card { gap: 8px; padding: 0 0 22px; }
+  #product-reviews.pr--customer_photo .cf-card__photo-frame,
+  #product-reviews.pr--editorial_magazine .cf-card__photo-frame,
+  #product-reviews.pr--masonry .cf-card__photo-frame { display: block; }
+  #product-reviews.pr--customer_photo .cf-card:not(.cf-card--has-photo) .cf-card__photo-frame,
+  #product-reviews.pr--editorial_magazine .cf-card:not(.cf-card--has-photo) .cf-card__photo-frame,
+  #product-reviews.pr--masonry .cf-card:not(.cf-card--has-photo) .cf-card__photo-frame { display: none; }
+  #product-reviews.pr--customer_photo .cf-card--has-photo .cf-card__avatar,
+  #product-reviews.pr--editorial_magazine .cf-card--has-photo .cf-card__avatar,
+  #product-reviews.pr--masonry .cf-card--has-photo .cf-card__avatar { display: none; }
+  #product-reviews.pr--customer_photo .cf-card__rating,
+  #product-reviews.pr--customer_photo .cf-card__title,
+  #product-reviews.pr--customer_photo .cf-card__text,
+  #product-reviews.pr--customer_photo .cf-card__by { margin-inline: 22px; }
+  #product-reviews.pr--customer_photo .cf-card__rating { margin-top: 16px; }
+  #product-reviews.pr--customer_photo .cf-card__content { gap: 8px; }
+  /* Customer photo cards: keep the card padding when the product image sits beside the text */
+  /* Cards respond to their OWN width (not the screen): when a card is narrow the product image moves above the text */
+  #product-reviews .pr__item { container-type: inline-size; }
+  #product-reviews.pr--editorial_magazine .pr__item:first-child .cf-card__main { flex: 1 1 auto; }
+  #product-reviews.pr--editorial_magazine .pr__item:first-child .cf-card__by { margin-top: auto; }
+  #product-reviews .cf-card__rating { white-space: nowrap; flex-wrap: nowrap; }
+  @container (min-width: 401px) {
+    #product-reviews.pr--customer_photo .cf-card--with-product-image { padding: 20px; }
+    #product-reviews.pr--customer_photo .cf-card--with-product-image .cf-card__rating,
+    #product-reviews.pr--customer_photo .cf-card--with-product-image .cf-card__title,
+    #product-reviews.pr--customer_photo .cf-card--with-product-image .cf-card__text,
+    #product-reviews.pr--customer_photo .cf-card--with-product-image .cf-card__by { margin-inline: 0; }
+    #product-reviews.pr--customer_photo .cf-card--with-product-image .cf-card__rating { margin-top: 0; }
+  }
+  @container (max-width: 400px) {
+    #product-reviews .cf-card--with-product-image { padding: 0 !important; }
+    #product-reviews .cf-card--with-product-image .cf-card__main { grid-template-columns: minmax(0, 1fr); grid-template-areas: "product" "content"; gap: 0; }
+    #product-reviews .cf-card__product-image-frame { min-height: 0; aspect-ratio: 16 / 10; border: 0; border-bottom: 1px solid color-mix(in srgb, var(--cf-accent) 20%, var(--cf-line)); }
+    #product-reviews .cf-card--with-product-image .cf-card__content { padding: 16px 16px 0; }
+    #product-reviews .cf-card--with-product-image .cf-card__by { margin: 8px 16px 16px; }
+    #product-reviews.pr--customer_photo .cf-card--with-product-image .cf-card__rating,
+    #product-reviews.pr--customer_photo .cf-card--with-product-image .cf-card__title,
+    #product-reviews.pr--customer_photo .cf-card--with-product-image .cf-card__text { margin-inline: 0; }
+    #product-reviews.pr--customer_photo .cf-card--with-product-image .cf-card__rating { margin-top: 0; }
+    #product-reviews.pr--customer_photo .cf-card--with-product-image .cf-card__by { margin: 8px 16px 16px; }
+  }
+  #product-reviews.pr--modern_grid .cf-card { border-top: 2px solid var(--cf-accent); }
+  #product-reviews.pr--editorial_magazine .pr__list { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(180px, auto); }
+  #product-reviews.pr--editorial_magazine .pr__item:first-child { grid-row: span 2; }
+  #product-reviews.pr--editorial_magazine[data-pr-count="1"] .pr__item:first-child { grid-row: auto; }
+  #product-reviews.pr--editorial_magazine[data-pr-count="2"] .pr__item:nth-child(2) { grid-row: span 2; }
+  #product-reviews.pr--editorial_magazine .pr__item:first-child .cf-card { justify-content: center; padding: clamp(28px, 4vw, 48px); background: #f5f1e9; border-color: color-mix(in srgb, var(--cf-accent) 35%, var(--cf-line)); }
+  #product-reviews.pr--editorial_magazine .pr__item:first-child .cf-card__text { font-family: var(--FONT-STACK-HEADING, Georgia, serif); font-size: clamp(17px, 1.5vw, 21px); line-height: 1.65; }
+  #product-reviews.pr--editorial_magazine .pr__item:first-child .cf-card__title { font-family: var(--FONT-STACK-HEADING, Georgia, serif); font-size: 18px; font-weight: 500; letter-spacing: .02em; text-transform: none; }
+  #product-reviews.pr--editorial_magazine .pr__item:first-child .cf-card.cf-card--with-product-image { justify-content: flex-start; padding: 24px; }
+  /* Masonry: grid with 8px rows; the script sets each card's row span from its height (fills left -> right, no empty column) */
+  #product-reviews.pr--masonry .pr__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; row-gap: 20px; align-items: start; }
+  #product-reviews.pr--masonry.pr--masonry-ready .pr__list { grid-auto-rows: 8px; row-gap: 0; }
+  #product-reviews.pr--masonry .pr__item { display: flex; width: 100%; margin: 0; align-self: start; }
+  #product-reviews.pr--masonry .pr__item[hidden] { display: none; }
+  #product-reviews.pr--masonry .cf-card { height: auto; }
+  /* One review only: keep a single centred column (these two designs set their own columns above) */
+  #product-reviews.pr--single-review.pr--editorial_magazine .pr__list { grid-template-columns: minmax(0, 1fr); }
+  #product-reviews.pr--single-review.pr--masonry .pr__list { grid-template-columns: minmax(0, 1fr); }
+  /* Speech bubble slider: same swipe list + arrows as the carousel, with bubble cards */
+  #product-reviews.pr--speech_bubble.pr--carousel .pr__list { gap: 24px; padding-bottom: 24px; }
+  #product-reviews.pr--speech_bubble.pr--carousel .pr__item { flex: 0 0 min(380px, 82%); }
+  #product-reviews.pr--single-review.pr--speech_bubble.pr--carousel .pr__item { flex: 0 1 460px; }
+  #product-reviews.pr--parallax_wall.pr--masonry-ready .pr__list { grid-auto-rows: 8px; row-gap: 0; }
+  #product-reviews.pr--carousel .pr__list { overflow-anchor: none; display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; padding: 2px 0; }
+  #product-reviews.pr--carousel .pr__list::-webkit-scrollbar { display: none; }
+  #product-reviews.pr--carousel .pr__item { flex: 0 0 calc((100% - 20px) / 2); scroll-snap-align: start; }
+  #product-reviews.pr--single-review.pr--carousel .pr__list { justify-content: center; }
+  #product-reviews.pr--single-review.pr--carousel .pr__item { flex: 0 1 760px; }
+  #product-reviews.pr--single-review.pr--carousel .pr__arrow { display: none; }
+  #product-reviews.pr--carousel .cf-card { box-shadow: 0 8px 24px rgb(65 49 28 / 5%); }
+  #product-reviews .pr__arrow { position: absolute; top: 50%; z-index: 2; display: inline-flex; width: 42px; height: 42px; align-items: center; justify-content: center; transform: translateY(-50%); padding: 0; border: 1px solid var(--cf-line); border-radius: 50%; background: #fff; color: #171511; cursor: pointer; }
+  #product-reviews .pr__arrow svg { width: 18px; height: 18px; }
+  #product-reviews .pr__arrow--prev { left: -18px; }
+  #product-reviews .pr__arrow--next { right: -18px; }
+  #product-reviews .pr__arrow[disabled] { opacity: .35; pointer-events: none; }
   @media (max-width: 820px) {
-    #product-reviews .pr__top { grid-template-columns: minmax(0, 1fr); text-align: center; }
-    #product-reviews .pr__none { grid-column: auto; }
-    #product-reviews .pr__list { grid-template-columns: minmax(0, 1fr); }
+    #product-reviews .pr__none { text-align: center; }
+    #product-reviews .pr__list { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    #product-reviews .pr__controls { justify-content: stretch; }
+    #product-reviews.pr--editorial_magazine .pr__list { grid-template-columns: minmax(0, 1fr); }
+    #product-reviews.pr--editorial_magazine .pr__item:first-child,
+    #product-reviews.pr--editorial_magazine .pr__item:nth-child(2) { grid-row: auto; }
+    #product-reviews.pr--carousel .pr__item { flex-basis: 100%; }
+    #product-reviews.pr--carousel .pr__arrow--prev { left: -10px; }
+    #product-reviews.pr--carousel .pr__arrow--next { right: -10px; }
+    #product-reviews.pr--masonry .pr__list { grid-template-columns: minmax(0, 1fr); }
+    #product-reviews .pr__controls { flex-direction: column; align-items: stretch; }
+    #product-reviews .pr__controls label { justify-content: space-between; }
+    #product-reviews .pr__controls select { flex: 1; }
+  }
+  @media (max-width: 900px) {
+    #product-reviews.pr--parallax_wall .pr__inner { display: block; }
+    #product-reviews.pr--parallax_wall .pr__intro { position: static; max-width: 760px; margin: 0 auto 28px; text-align: center; }
+    #product-reviews.pr--parallax_wall .pr__title { max-width: none; text-align: center; }
+    #product-reviews.pr--parallax_wall .pr__title::after { left: 50%; transform: translateX(-50%); }
+    #product-reviews.pr--parallax_wall .pr__summary { align-items: center; }
+    #product-reviews.pr--parallax_wall .pr__controls { margin-bottom: 20px; }
+    #product-reviews.pr--parallax_wall .pr__list { grid-template-columns: repeat(var(--pr-columns), minmax(0, 1fr)); }
+    #product-reviews.pr--parallax_wall .pr__item { margin-top: 0 !important; transform: none !important; will-change: auto; }
+  }
+  @media (max-width: 650px) {
+    #product-reviews .pr__item--mobile-extra { display: none; }
+    #product-reviews.pr--mobile-expanded .pr__item--mobile-extra:not([hidden]) { display: flex; }
+    #product-reviews .cf-card--with-product-image { padding: 0; }
+    #product-reviews.pr--editorial_magazine .pr__item:first-child .cf-card.cf-card--with-product-image { padding: 0; }
+    #product-reviews .cf-card--with-product-image .cf-card__main { grid-template-columns: minmax(0, 1fr); grid-template-areas: "product" "content"; gap: 0; }
+    #product-reviews .cf-card__product-image-frame { min-height: 0; aspect-ratio: 16 / 10; border: 0; border-bottom: 1px solid color-mix(in srgb, var(--cf-accent) 20%, var(--cf-line)); }
+    #product-reviews .cf-card--with-product-image .cf-card__content { padding: 16px 16px 0; }
+    #product-reviews .cf-card--with-product-image .cf-card__by { margin: 8px 16px 16px; }
+    #product-reviews.pr--carousel .pr__list { display: grid; grid-template-columns: minmax(0, 1fr); overflow: visible; scroll-snap-type: none; }
+    #product-reviews.pr--carousel .pr__item { flex: none; width: 100%; }
+    #product-reviews.pr--carousel .pr__arrow { display: none; }
+    #product-reviews.pr--parallax_wall .pr__list { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #product-reviews .cf-card { transition: none; }
+    #product-reviews .pr__item:hover .cf-card,
+    #product-reviews .pr__item:focus-within .cf-card { transform: none; }
   }
 </style>
 <script>
   (function () {
-    var btn = document.querySelector('#product-reviews [data-pr-more]');
-    if (!btn) return;
-    btn.addEventListener('click', function () {
-      document.querySelectorAll('#product-reviews .pr__item--extra').forEach(function (el) { el.hidden = false; });
-      btn.parentNode.hidden = true;
-    });
+    var root = document.getElementById('product-reviews');
+    if (!root) return;
+    var track = root.querySelector('[data-pr-list]');
+    var more = root.querySelector('[data-pr-more]');
+    var controls = root.querySelector('[data-review-controls]');
+    var filter = controls && controls.querySelector('[data-review-filter]');
+    var sort = controls && controls.querySelector('[data-review-sort]');
+    var empty = root.querySelector('[data-pr-empty]');
+    var mobileQuery = window.matchMedia('(max-width: 650px)');
+    var desktopInitial = Number(root.dataset.prInitial) || 6;
+    var mobileInitial = Number(root.dataset.prInitialMobile) || 2;
+    var cards = track ? Array.prototype.slice.call(track.querySelectorAll('[data-review-card]')) : [];
+    var expanded = false;
+    var prev = root.querySelector('[data-pr-prev]');
+    var next = root.querySelector('[data-pr-next]');
+    function syncCarousel() {
+      if (!track || !prev || !next) return;
+      prev.disabled = track.scrollLeft <= 4;
+      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+    }
+    function updateVisibility() {
+      var visibleLimit = mobileQuery.matches ? mobileInitial : desktopInitial;
+      /* Carousel (desktop): every review is a slide, so nothing is hidden behind "Show more" */
+      if (root.classList.contains('pr--carousel') && !mobileQuery.matches) visibleLimit = cards.length;
+      var visibleIndex = 0;
+      var visibleCount = 0;
+      root.classList.toggle('pr--mobile-expanded', mobileQuery.matches && expanded);
+      cards.forEach(function (card) {
+        if (track && card.parentNode !== track) track.appendChild(card);
+        var filtered = card.dataset.filterHidden === 'true';
+        if (filtered) {
+          card.hidden = true;
+          card.classList.remove('pr__item--extra', 'pr__item--mobile-extra');
+          return;
+        }
+        var isExtra = visibleIndex >= visibleLimit;
+        card.classList.toggle('pr__item--extra', visibleIndex >= desktopInitial);
+        card.classList.toggle('pr__item--mobile-extra', visibleIndex >= mobileInitial);
+        card.hidden = !expanded && isExtra;
+        visibleIndex += 1;
+        visibleCount += 1;
+      });
+      if (empty) empty.hidden = visibleCount > 0;
+      if (more) {
+        var canExpand = visibleCount > visibleLimit;
+        if (more.parentNode) more.parentNode.hidden = !canExpand;
+        more.setAttribute('aria-expanded', String(expanded));
+        more.textContent = expanded ? more.dataset.showLessLabel : more.dataset.showMoreLabel;
+      }
+      if (root.classList.contains('pr--carousel')) window.requestAnimationFrame(syncCarousel);
+      queueMasonry();
+    }
+    /* Masonry: give every visible card a row span that matches its height */
+    var masonryQueued = false;
+    var usesRowSpans = root.classList.contains('pr--masonry') || root.classList.contains('pr--parallax_wall');
+    function layoutMasonry() {
+      if (!track || !usesRowSpans) return;
+      var gap = parseFloat(getComputedStyle(track).columnGap) || 20;
+      root.classList.add('pr--masonry-ready');
+      cards.forEach(function (card) {
+        if (card.hidden) return;
+        var mt = parseFloat(getComputedStyle(card).marginTop) || 0; /* parallax wall staggers cards with a top margin */
+        card.style.gridRowEnd = 'span ' + Math.ceil((card.offsetHeight + mt + gap) / 8);
+      });
+    }
+    function queueMasonry() {
+      if (!usesRowSpans || masonryQueued) return;
+      masonryQueued = true;
+      window.requestAnimationFrame(function () { masonryQueued = false; layoutMasonry(); });
+    }
+    if (usesRowSpans) {
+      if ('ResizeObserver' in window) {
+        var masonryRO = new ResizeObserver(queueMasonry);
+        cards.forEach(function (card) { masonryRO.observe(card); });
+      }
+      window.addEventListener('resize', queueMasonry);
+      window.addEventListener('load', queueMasonry);
+    }
+    function applyControls() {
+      cards.sort(function (a, b) {
+        if (sort && sort.value === 'highest') {
+          var byRating = (Number(b.dataset.rating) || 0) - (Number(a.dataset.rating) || 0);
+          if (byRating) return byRating;
+        }
+        return (Number(b.dataset.reviewDate) || 0) - (Number(a.dataset.reviewDate) || 0);
+      });
+      var threshold = filter && filter.value !== 'all' ? Number(filter.value) || 0 : 0;
+      cards.forEach(function (card) {
+        if (track) track.appendChild(card);
+        var rating = Number(card.dataset.rating) || 0;
+        card.dataset.filterHidden = String(threshold > 0 && (filter.value === '5' ? rating !== 5 : rating < threshold));
+      });
+      expanded = false;
+      updateVisibility();
+      if (root.classList.contains('pr--carousel') && track) track.scrollTo({ left: 0, behavior: 'smooth' });
+    }
+    cards.forEach(function (card) { card.dataset.filterHidden = 'false'; });
+    applyControls();
+    if (more) {
+      more.addEventListener('click', function () {
+        expanded = !expanded;
+        updateVisibility();
+        if (!expanded && track && track.scrollLeft > 0) track.scrollTo({ left: 0, behavior: 'smooth' });
+      });
+    }
+    if (filter) filter.addEventListener('change', applyControls);
+    if (sort) sort.addEventListener('change', applyControls);
+    var onBreakpointChange = function () {
+      expanded = false;
+      updateVisibility();
+    };
+    if (mobileQuery.addEventListener) mobileQuery.addEventListener('change', onBreakpointChange);
+    else if (mobileQuery.addListener) mobileQuery.addListener(onBreakpointChange);
+    if (!root.classList.contains('pr--carousel')) return;
+    if (!track || !prev || !next) return;
+    function step() {
+      var item = track.querySelector('.pr__item:not([hidden])');
+      return item ? item.getBoundingClientRect().width + 20 : track.clientWidth;
+    }
+    prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+    next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+    track.addEventListener('scroll', function () { window.requestAnimationFrame(syncCarousel); }, { passive: true });
+    window.addEventListener('resize', syncCarousel);
+    syncCarousel();
   })();
 </script>
+{%- if review_design == 'parallax_wall' -%}
+  {%- render 'review-parallax-script', root_id: 'product-reviews', root_prefix: '' -%}
+{%- endif -%}
 
 {% schema %}
 {
@@ -117,8 +430,7 @@
   "settings": [
     { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
     { "type": "text", "id": "heading", "label": "Heading" },
-    { "type": "range", "id": "initial_count", "min": 2, "max": 20, "step": 2, "label": "Reviews shown at first", "default": 6 },
-    { "type": "url", "id": "form_endpoint", "label": "Reviews API URL (optional)", "info": "Leave empty to use Theme settings > Reviews." },
+    { "type": "range", "id": "initial_count", "min": 2, "max": 20, "step": 2, "label": "Desktop reviews shown at first", "default": 6, "info": "Mobile shows the first two reviews before the Show more button." },
     { "type": "range", "id": "padding_top", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Top padding", "default": 48 },
     { "type": "range", "id": "padding_bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Bottom padding", "default": 48 }
   ]

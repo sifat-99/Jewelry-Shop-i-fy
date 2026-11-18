@@ -1,6 +1,6 @@
 # 🚀 Shopify CLI ক্যাটালগ ইমপোর্ট মাস্টার ডকুমেন্টেশন (Enterprise Pipeline Guide)
 
-> **প্রকল্প:** Aurelle / Lè Velair Fine Jewelry  
+> **প্রকল্প:** Aurelle Fine Jewelry  
 > **উদ্দেশ্য:** লোকাল WebP ছবি, ম্যাপিং CSV এবং প্রোডাক্ট মেটাডাটা ব্যবহার করে Shopify CLI ও GraphQL API-এর মাধ্যমে অটোমেটেড ও নির্ভুল প্রোডাক্ট ক্যাটালগ আপলোড গাইডলাইন।
 
 ---

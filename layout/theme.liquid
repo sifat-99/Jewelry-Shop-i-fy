@@ -60,7 +60,7 @@
     .lv-rating-stars__star { display: inline-block; color: transparent; font-size: 1em; font-weight: 700; line-height: 1; background: linear-gradient(90deg, var(--lv-rating-star-gold) 0 var(--lv-star-fill), var(--lv-rating-star-empty) var(--lv-star-fill) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 1px 0 var(--lv-rating-star-shadow)); }
 
     /* Critical Pre-Hydration Layout Constraints (Prevents FOUC Card Explosion on Reload) */
-    .dp { overflow: hidden !important; width: 100%; }
+    .dp { overflow: clip; width: 100%; }
     .dp__stage, .dp__track, .dp__pin { position: relative; width: 100%; }
     .dp__grid { display: grid !important; grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr) minmax(0, .8fr) !important; overflow: hidden !important; width: 100% !important; }
     .dp__clip { overflow: hidden !important; height: 100% !important; width: 100% !important; }
@@ -884,9 +884,6 @@
         badge_sale_type: {{ settings.sale_badge_type | default: "percentage" | json }},
         animate_hover: {{ settings.enable_hover_animations | default: true | json }},
         animate_scroll: {{ settings.enable_scroll_animations | default: true | json }},
-        smooth_scroll: {{ smooth_scroll_on | json }},
-        smooth_scroll_strength: {{ settings.smooth_scroll_strength | default: 3 | json }},
-        smooth_scroll_anchors: {{ smooth_scroll_anchors_on | json }},
         currency_code_enable: {{ settings.currency_code_enabled | default: false | json }}
       },
       currency: {{ shop.currency | json }},
@@ -896,6 +893,16 @@
     let windowInnerHeight = window.innerHeight;
     document.documentElement.style.setProperty('--full-screen', `${windowInnerHeight}px`);
   </script>
+
+  <style>
+    html {
+      scroll-behavior: {% if smooth_scroll_on and smooth_scroll_anchors_on %}smooth{% else %}auto{% endif %};
+      --scroll-behavior: {% if smooth_scroll_on and smooth_scroll_anchors_on %}smooth{% else %}auto{% endif %};
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; --scroll-behavior: auto; }
+    }
+  </style>
 
   {%- if settings.custom_css != blank -%}
     <style id="ThemeCustomCSS">
@@ -908,9 +915,6 @@
   <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'banner.js' | asset_url }}" defer="defer"></script>
-  {%- if smooth_scroll_on -%}
-    <script src="{{ 'smooth-page-scroll.js' | asset_url }}" defer="defer"></script>
-  {%- endif -%}
 </head>
 <body id="{{ page_title | handle }}" class="template-{{ template.name | handle }}">
   {% sections 'header-group' %}

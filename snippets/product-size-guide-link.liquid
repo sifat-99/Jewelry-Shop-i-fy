@@ -27,7 +27,7 @@
   -%}
   {%- if has_size_option == false and anchor != blank -%}
     <p class="pv-sg-link">
-      <a href="{{ page.url }}{{ anchor }}" target="_blank" rel="noopener">
+      <a href="{{ page.url }}{{ anchor }}" data-size-guide-modal-trigger>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17 17 3l4 4L7 21z"/><path d="m7 13 2 2M10 10l2 2M13 7l2 2"/></svg>
         {%- assign sg_default_label = 'products.product.size_guide' | t -%}
         {{ label | default: sg_default_label }}

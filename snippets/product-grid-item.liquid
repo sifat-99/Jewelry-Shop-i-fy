@@ -5,6 +5,7 @@
   @param [fallback_index] - Optional fallback index passed by the parent file
   @param [card_border_radius] - Optional card border radius passed by the parent file
   @param [extra_class] - Optional extra class passed by the parent file
+  @param {boolean} [lazy_load] - Lazy-load all card imagery when true
 {% enddoc %}
 <!-- /snippets/product-grid-item.liquid -->
 {%- liquid
@@ -268,6 +269,16 @@
       z-index: 20;
     }
 
+    @media (hover: hover) {
+      .lv-card-side-actions { opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
+      .lv-card-media-wrap:hover .lv-card-side-actions,
+      .lv-card-media-wrap:focus-within .lv-card-side-actions,
+      .lv-card-media-wrap.lv-has-wishlist-item .lv-card-side-actions { opacity: 1; transform: none; pointer-events: auto; }
+    }
+    @media (hover: none) {
+      .lv-card-side-actions { opacity: 1; transform: none; pointer-events: auto; }
+    }
+
     .lv-card-action-btn {
       position: relative !important;
       overflow: hidden !important;
@@ -348,6 +359,9 @@
     }
 
     /* Wishlist Active State */
+    .card-wishlist-btn.is-active svg.icon-wishlist-outline {
+      display: none !important;
+    }
     .card-wishlist-btn.is-active svg.icon-wishlist-solid {
       display: block !important;
       color: #e53935 !important;
@@ -912,8 +926,16 @@
             type="button"
             class="lv-card-action-btn card-wishlist-btn"
             data-wishlist-id="{{ product.id }}"
+            data-wishlist-handle="{{ product.handle | escape }}"
+            data-wishlist-title="{{ product.title | escape }}"
+            data-wishlist-url="{{ product.url | escape }}"
+            data-wishlist-image="{{ product.featured_image | image_url: width: 720 | escape }}"
+            data-wishlist-price="{{ current_variant.price | default: product.price | money | escape }}"
+            data-wishlist-compare-price="{% if current_variant.compare_at_price > current_variant.price %}{{ current_variant.compare_at_price | money | escape }}{% endif %}"
+            data-wishlist-remove-label="{{ 'products.wishlist.remove' | t | escape }}"
             title="{{ 'products.wishlist.add' | t }}"
             aria-label="{{ 'products.wishlist.add' | t }}"
+            aria-pressed="false"
           >
             <svg class="icon-wishlist-outline" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -1032,7 +1054,7 @@
       {%- if show_quick_add_mobile -%}
         {%- if product.available != false -%}{% render 'card-mini-add', product: product, demo_title: demo_title, demo_price: demo_price %}{%- endif -%}
       {%- endif -%}
-      <div class="lv-card-quick-add-wrap {% if has_size_variants %}has-sizes{% endif %}">
+      <div class="lv-card-quick-add-wrap {% if has_size_variants %}has-sizes{% endif %}{% unless show_quick_add_mobile %} hide-on-mobile{% endunless %}">
         {% render 'card-engrave-bar', product: product %}
         {%- if product.available != false -%}
           {%- if has_size_variants -%}

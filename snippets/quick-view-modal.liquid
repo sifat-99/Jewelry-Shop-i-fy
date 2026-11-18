@@ -846,15 +846,55 @@
       }, 2600);
     }
 
+    function readWishlistIds() {
+      try {
+        var ids = JSON.parse(localStorage.getItem('bss_wishlist') || '[]');
+        return Array.isArray(ids) ? ids.map(String) : [];
+      } catch(e) {
+        return [];
+      }
+    }
+
+    function readWishlistItems() {
+      try {
+        var items = JSON.parse(localStorage.getItem('bss_wishlist_products') || '[]');
+        return Array.isArray(items) ? items : [];
+      } catch(e) {
+        return [];
+      }
+    }
+
+    function writeWishlistItemFromButton(btn, productId) {
+      if (!btn) return;
+      var title = btn.getAttribute('data-wishlist-title');
+      var url = btn.getAttribute('data-wishlist-url');
+      if (!title || !url) return;
+
+      var items = readWishlistItems();
+      var record = {
+        id: String(productId),
+        handle: btn.getAttribute('data-wishlist-handle') || '',
+        title: title,
+        url: url,
+        image: btn.getAttribute('data-wishlist-image') || '',
+        price: btn.getAttribute('data-wishlist-price') || '',
+        comparePrice: btn.getAttribute('data-wishlist-compare-price') || ''
+      };
+      var index = items.findIndex(function(item) { return item && String(item.id) === record.id; });
+      if (index > -1) items[index] = record;
+      else items.push(record);
+      try { localStorage.setItem('bss_wishlist_products', JSON.stringify(items)); } catch(e) {}
+    }
+
+    function removeWishlistItem(productId) {
+      var items = readWishlistItems().filter(function(item) { return item && String(item.id) !== String(productId); });
+      try { localStorage.setItem('bss_wishlist_products', JSON.stringify(items)); } catch(e) {}
+    }
+
     // === Wishlist Storage Manager ===
     window.toggleWishlist = function(productId, btn) {
       productId = String(productId);
-      var wishlist = [];
-      try {
-        wishlist = JSON.parse(localStorage.getItem('bss_wishlist') || '[]');
-      } catch(e) {
-        wishlist = [];
-      }
+      var wishlist = readWishlistIds();
 
       var index = wishlist.indexOf(productId);
       var isAdded = false;
@@ -869,6 +909,8 @@
       try {
         localStorage.setItem('bss_wishlist', JSON.stringify(wishlist));
       } catch(e) {}
+      if (isAdded) writeWishlistItemFromButton(btn, productId);
+      else removeWishlistItem(productId);
 
       var qvI18n = {
         inWishlist: {{ 'products.wishlist.in_wishlist' | t | json }},
@@ -903,29 +945,39 @@
       document.querySelectorAll('[data-wishlist-id="' + productId + '"]').forEach(function(el) {
         if (isAdded) {
           el.classList.add('is-active');
-          el.setAttribute('title', qvI18n.inWishlist);
+          var removeLabel = el.getAttribute('data-wishlist-remove-label') || qvI18n.inWishlist;
+          el.setAttribute('title', removeLabel);
+          el.setAttribute('aria-label', removeLabel);
+          el.setAttribute('aria-pressed', 'true');
+          writeWishlistItemFromButton(el, productId);
         } else {
           el.classList.remove('is-active');
           el.setAttribute('title', qvI18n.addWishlist);
+          el.setAttribute('aria-label', qvI18n.addWishlist);
+          el.setAttribute('aria-pressed', 'false');
         }
+        var media = el.closest('.lv-card-media-wrap');
+        if (media) media.classList.toggle('lv-has-wishlist-item', isAdded);
       });
 
       showToast(isAdded ? qvI18n.wishlistAdded : qvI18n.wishlistRemoved);
+      document.dispatchEvent(new CustomEvent('bss:wishlist:change', { detail: { id: productId, added: isAdded } }));
     };
 
     function syncWishlistIcons() {
-      var wishlist = [];
-      try {
-        wishlist = JSON.parse(localStorage.getItem('bss_wishlist') || '[]');
-      } catch(e) {
-        wishlist = [];
-      }
-      var inWishlistTitle = (window.theme && window.theme.i18n && window.theme.i18n.wishlistIn) || {{ 'products.wishlist.in_wishlist' | t | json }};
-      wishlist.forEach(function(id) {
-        document.querySelectorAll('[data-wishlist-id="' + id + '"]').forEach(function(el) {
-          el.classList.add('is-active');
-          el.setAttribute('title', inWishlistTitle);
-        });
+      var wishlist = readWishlistIds();
+      var addWishlistTitle = (window.theme && window.theme.i18n && window.theme.i18n.wishlistAdd) || {{ 'products.wishlist.add' | t | json }};
+      document.querySelectorAll('.card-wishlist-btn[data-wishlist-id]').forEach(function(el) {
+        var id = String(el.getAttribute('data-wishlist-id'));
+        var isSaved = wishlist.indexOf(id) > -1;
+        el.classList.toggle('is-active', isSaved);
+        var removeLabel = el.getAttribute('data-wishlist-remove-label') || {{ 'products.wishlist.in_wishlist' | t | json }};
+        el.setAttribute('title', isSaved ? removeLabel : addWishlistTitle);
+        el.setAttribute('aria-label', isSaved ? removeLabel : addWishlistTitle);
+        el.setAttribute('aria-pressed', isSaved ? 'true' : 'false');
+        var media = el.closest('.lv-card-media-wrap');
+        if (media) media.classList.toggle('lv-has-wishlist-item', isSaved);
+        if (isSaved) writeWishlistItemFromButton(el, id);
       });
     }
 
@@ -1399,5 +1451,8 @@
     } else {
       syncWishlistIcons();
     }
+    window.addEventListener('storage', function(event) {
+      if (event.key === 'bss_wishlist' || event.key === 'bss_wishlist_products') syncWishlistIcons();
+    });
   })();
 </script>

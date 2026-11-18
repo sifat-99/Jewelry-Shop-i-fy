@@ -14,8 +14,6 @@
       "settings": {
         "color_scheme": "scheme-1",
         "show_wishlist": true,
-        "wishlist_url": "/pages/wishlist",
-        "concierge_email": "info@bssoln.com",
         "padding_top": 40,
         "padding_bottom": 60
       }

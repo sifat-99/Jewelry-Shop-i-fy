@@ -1,0 +1,71 @@
+{% doc %}
+  Adds subtle scroll speed differences to review cards in the parallax wall layout.
+
+  @param {string} root_id - The id of the reviews section to initialize
+  @param {string} [root_prefix] - Optional prefix applied to the section id
+{% enddoc %}
+<script>
+  (function () {
+    var rootId = {{ root_id | prepend: root_prefix | json }};
+    var root = document.getElementById(rootId);
+    if (!root) return;
+
+    if (!window.lvReviewParallaxRuntime) {
+      var roots = [];
+      var frame = 0;
+      var smallScreen = window.matchMedia('(max-width: 900px)');
+      var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      var update = function () {
+        frame = 0;
+        roots = roots.filter(function (item) { return document.documentElement.contains(item); });
+
+        roots.forEach(function (item) {
+          var cards = item.querySelectorAll('[data-review-card]');
+          if (smallScreen.matches || reducedMotion.matches) {
+            cards.forEach(function (card) { card.style.removeProperty('--review-parallax-y'); });
+            return;
+          }
+
+          var sectionTopProgress = Math.max(0, -item.getBoundingClientRect().top);
+          var speeds = [-0.055, 0.08];
+          cards.forEach(function (card, index) {
+            var offset = Math.max(-64, Math.min(64, sectionTopProgress * speeds[index % speeds.length]));
+            card.style.setProperty('--review-parallax-y', offset.toFixed(1) + 'px');
+          });
+        });
+      };
+
+      var schedule = function () {
+        if (!frame) frame = window.requestAnimationFrame(update);
+      };
+
+      var init = function (item) {
+        if (!item || item.dataset.reviewParallaxReady === 'true') return;
+        item.dataset.reviewParallaxReady = 'true';
+        roots.push(item);
+        schedule();
+      };
+
+      window.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule, { passive: true });
+      if (smallScreen.addEventListener) smallScreen.addEventListener('change', schedule);
+      else if (smallScreen.addListener) smallScreen.addListener(schedule);
+      if (reducedMotion.addEventListener) reducedMotion.addEventListener('change', schedule);
+      else if (reducedMotion.addListener) reducedMotion.addListener(schedule);
+
+      document.addEventListener('shopify:section:load', function (event) {
+        if (!event.target) return;
+        if (event.target.matches && event.target.matches('[data-review-parallax]')) init(event.target);
+        event.target.querySelectorAll('[data-review-parallax]').forEach(init);
+      });
+      document.addEventListener('shopify:section:unload', function (event) {
+        roots = roots.filter(function (item) { return !event.target || !event.target.contains(item); });
+      });
+
+      window.lvReviewParallaxRuntime = { init: init };
+    }
+
+    window.lvReviewParallaxRuntime.init(root);
+  })();
+</script>

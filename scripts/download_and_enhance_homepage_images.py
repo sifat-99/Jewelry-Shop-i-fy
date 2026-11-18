@@ -5,7 +5,7 @@ import urllib.request
 import subprocess
 from PIL import Image, ImageEnhance, ImageStat
 
-BASE_DIR = "/Users/sifat/Project/Le_Velair_Shopify/homepage_product_images"
+BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "homepage_product_images")
 ORIGINAL_DIR = os.path.join(BASE_DIR, "original")
 ENHANCED_DIR = os.path.join(BASE_DIR, "enhanced")
 

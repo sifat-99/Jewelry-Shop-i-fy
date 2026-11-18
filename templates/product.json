@@ -96,7 +96,6 @@
         "color_scheme": "scheme-1",
         "heading": "Customer reviews",
         "initial_count": 6,
-        "form_endpoint": "",
         "padding_top": 48,
         "padding_bottom": 48
       }
@@ -108,6 +107,7 @@
         "title": "You May Also Like",
         "subtitle": "Complete your jewelry stack",
         "collection": "",
+        "use_product_collection": true,
         "limit": 8,
         "shuffle_products": true,
         "rows_by_screen": true,
@@ -115,8 +115,8 @@
         "grid_columns_1024": 3,
         "grid_columns_960": 3,
         "grid_columns_768": 2,
-        "grid_columns_650": "1",
-        "grid_columns_mobile": "1",
+        "grid_columns_650": "2",
+        "grid_columns_mobile": "2",
         "show_view_all": true,
         "card_border_radius": 0,
         "padding_top": 25,

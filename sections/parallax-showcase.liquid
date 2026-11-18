@@ -97,9 +97,7 @@
     color: var(--text, #111);
     --dp-accent: var(--lv-accent-dark, #785b30);
     --dp-stage-h: min(calc(100vh - 120px), var(--dp-max-h, 780px));
-    overflow: hidden;
-    position: relative;
-    contain: layout style;
+    overflow: clip;
   }
   @supports (height: 100svh) {
     #dp-{{ section.id }} { --dp-stage-h: min(calc(100svh - 120px), var(--dp-max-h, 780px)); }
@@ -122,7 +120,7 @@
     #dp-{{ section.id }} .dp__sub { font-size: 14px; max-width: 480px; }
   }
 
-  /* 100% Natural Scrolling - No Scroll Hijack, No Sticky Hold */
+  /* Keep the showcase pinned while the product columns continue scrolling. */
   #dp-{{ section.id }} .dp__stage {
     position: relative;
     width: 100%;
@@ -130,9 +128,11 @@
   #dp-{{ section.id }} .dp__track {
     position: relative;
     width: 100%;
+    height: calc(var(--dp-stage-h) + var(--dp-pin, 100) * 1vh);
   }
   #dp-{{ section.id }} .dp__pin {
-    position: relative;
+    position: sticky;
+    top: var(--dp-top, 96px);
     width: 100%;
     height: var(--dp-stage-h);
   }
@@ -227,6 +227,9 @@
       --dp-stage-h: auto;
       overflow: visible;
     }
+    #dp-{{ section.id }} .dp__track {
+      height: auto;
+    }
     #dp-{{ section.id }} .dp__pin {
       position: static !important;
       height: auto !important;
@@ -266,10 +269,20 @@
 
     #dp-{{ section.id }} .dp__mobile-track-wrap {
       width: 100%;
-      overflow: hidden;
+      overflow-x: auto;
+      overflow-y: hidden;
       position: relative;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
       -webkit-mask-image: linear-gradient(to right, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
       mask-image: linear-gradient(to right, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+    }
+
+    #dp-{{ section.id }} .dp__mobile-track-wrap::-webkit-scrollbar {
+      display: none;
     }
 
     #dp-{{ section.id }}.dp--nofade .dp__mobile-track-wrap {
@@ -280,23 +293,6 @@
     #dp-{{ section.id }} .dp__mobile-track {
       display: flex;
       width: max-content;
-      will-change: transform;
-      transform: translate3d(0, 0, 0);
-    }
-
-    #dp-{{ section.id }} .dp__mobile-track--right {
-      animation: dpMobileMarqueeRight var(--dp-m-speed, 32s) linear infinite;
-    }
-
-    #dp-{{ section.id }} .dp__mobile-track--left {
-      animation: dpMobileMarqueeLeft var(--dp-m-speed, 32s) linear infinite;
-    }
-
-    #dp-{{ section.id }} .dp__mobile-track-wrap:hover .dp__mobile-track,
-    #dp-{{ section.id }} .dp__mobile-track-wrap:active .dp__mobile-track,
-    #dp-{{ section.id }} .dp__mobile-track.is-paused,
-    #dp-{{ section.id }}.dp--paused .dp__mobile-track {
-      animation-play-state: paused !important;
     }
 
     #dp-{{ section.id }} .dp__mobile-group {
@@ -365,19 +361,8 @@
     }
   }
 
-  @keyframes dpMobileMarqueeRight {
-    0% { transform: translate3d(-50%, 0, 0); }
-    100% { transform: translate3d(0%, 0, 0); }
-  }
-
-  @keyframes dpMobileMarqueeLeft {
-    0% { transform: translate3d(0%, 0, 0); }
-    100% { transform: translate3d(-50%, 0, 0); }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     #dp-{{ section.id }} .dp__col { animation: none !important; transform: none !important; }
-    #dp-{{ section.id }} .dp__mobile-track { animation: none !important; }
   }
 </style>
 
@@ -419,12 +404,7 @@
             </header>
             <div class="dp__media" data-dp-media>
               {%- if section.settings.media_type == 'video' and section.settings.video != blank -%}
-                {%- assign parallax_video_alt = section.settings.heading | default: section.settings.eyebrow | default: 'Showcase video' | escape -%}
-                {%- capture parallax_video_html -%}
-                  {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true, preload: 'metadata', image_size: '1200x', class: 'dp__video' }}
-                {%- endcapture -%}
-                {%- capture parallax_video_alt_tag -%}<img alt="{{ parallax_video_alt }}" {% endcapture -%}
-                {{ parallax_video_html | replace: '<img ', parallax_video_alt_tag }}
+                {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true, preload: 'metadata', image_size: '1200x', class: 'dp__video' }}
               {%- elsif section.settings.image != blank -%}
                 <img class="dp__img" src="{{ section.settings.image | image_url: width: 1200 }}" srcset="{{ section.settings.image | image_url: width: 700 }} 700w, {{ section.settings.image | image_url: width: 1000 }} 1000w, {{ section.settings.image | image_url: width: 1400 }} 1400w, {{ section.settings.image | image_url: width: 2000 }} 2000w" sizes="(min-width: 801px) 44vw, 92vw" alt="{{ section.settings.image.alt | default: section.settings.heading | escape }}" width="{{ section.settings.image.width }}" height="{{ section.settings.image.height }}" loading="eager">
               {%- else -%}
@@ -479,11 +459,15 @@
         {%- endcapture -%}
       {%- endif -%}
 
-      <div class="dp__mobile-marquees" data-dp-mobile-marquee style="--dp-m-speed: {{ mobile_speed }}s;">
+      <div class="dp__mobile-marquees" data-dp-mobile-marquee data-mobile-speed="{{ mobile_speed }}">
         <!-- Row 1: Scrolling Right -->
         <div class="dp__mobile-track-wrap dp__mobile-track-wrap--right">
           <div class="dp__mobile-track dp__mobile-track--right">
             <div class="dp__mobile-group">
+              {{ mobile_cards_1 }}
+              {%- if half < 4 -%}{{ mobile_cards_1 }}{%- endif -%}
+            </div>
+            <div class="dp__mobile-group" aria-hidden="true">
               {{ mobile_cards_1 }}
               {%- if half < 4 -%}{{ mobile_cards_1 }}{%- endif -%}
             </div>
@@ -498,6 +482,10 @@
         <div class="dp__mobile-track-wrap dp__mobile-track-wrap--left">
           <div class="dp__mobile-track dp__mobile-track--left">
             <div class="dp__mobile-group">
+              {{ mobile_cards_2 }}
+              {%- if half < 4 -%}{{ mobile_cards_2 }}{%- endif -%}
+            </div>
+            <div class="dp__mobile-group" aria-hidden="true">
               {{ mobile_cards_2 }}
               {%- if half < 4 -%}{{ mobile_cards_2 }}{%- endif -%}
             </div>
@@ -531,6 +519,13 @@
     var colB = root.querySelector('.dp__col--b');
     var clips = root.querySelectorAll('.dp__clip');
     var mTracks = root.querySelectorAll('.dp__mobile-track');
+    var mobileItems = [];
+    var mobileRafId = null;
+    var mobileLastTime = 0;
+    var mobileTouching = false;
+    var mobileResumeAt = 0;
+    var mobileMarquee = root.querySelector('[data-dp-mobile-marquee]');
+    var mobileDuration = mobileMarquee ? (parseFloat(mobileMarquee.getAttribute('data-mobile-speed')) || 30) : 30;
 
     /* 1. Viewport Visibility Tracking */
     var isVisible = true;
@@ -545,6 +540,7 @@
             lastTime = 0;
             rafId = requestAnimationFrame(loop);
           }
+          startMobileLoop();
         }
       }, { threshold: 0.05 }).observe(root);
     }
@@ -562,6 +558,60 @@
 
     function isDesktop() {
       return window.innerWidth > 1024;
+    }
+
+    function syncMobileItem(item) {
+      var width = item.group.getBoundingClientRect().width;
+      if (width <= 0) return false;
+
+      if (Math.abs(width - item.loopWidth) > 1) {
+        item.loopWidth = width;
+        item.wrap.scrollLeft = Math.min(width, item.wrap.scrollWidth - item.wrap.clientWidth);
+      }
+      return true;
+    }
+
+    function normalizeMobileScroll(item) {
+      if (!item.loopWidth) return;
+      var maxScroll = item.wrap.scrollWidth - item.wrap.clientWidth;
+      if (maxScroll <= 0) return;
+
+      if (item.wrap.scrollLeft <= 1) {
+        item.wrap.scrollLeft += item.loopWidth;
+      } else if (item.wrap.scrollLeft >= maxScroll - 1) {
+        item.wrap.scrollLeft -= item.loopWidth;
+      }
+    }
+
+    function mobileLoop(now) {
+      mobileRafId = null;
+      if (isDesktop() || reduce || !isVisible) {
+        mobileLastTime = 0;
+        return;
+      }
+
+      var dt = mobileLastTime ? Math.min(0.05, (now - mobileLastTime) / 1000) : 0.016;
+      mobileLastTime = now;
+
+      mobileItems.forEach(function (item) {
+        if (!item.loopWidth && !syncMobileItem(item)) return;
+        normalizeMobileScroll(item);
+
+        if (!mobileTouching && now >= mobileResumeAt) {
+          var speed = item.loopWidth / mobileDuration;
+          item.wrap.scrollLeft += speed * dt * item.direction;
+          normalizeMobileScroll(item);
+        }
+      });
+
+      mobileRafId = requestAnimationFrame(mobileLoop);
+    }
+
+    function startMobileLoop() {
+      if (!isDesktop() && !reduce && isVisible && mobileItems.length && mobileRafId === null) {
+        mobileLastTime = 0;
+        mobileRafId = requestAnimationFrame(mobileLoop);
+      }
     }
 
     function updateHeights() {
@@ -683,18 +733,43 @@
       }, { passive: false });
     });
 
-    /* 4. Touch Handlers for Mobile Marquee Rows */
+    /* 4. Touch scrolling and seamless loop handling for mobile rows */
     mTracks.forEach(function (track) {
-      var resumeTimer = null;
-      track.addEventListener('touchstart', function () {
-        clearTimeout(resumeTimer);
-        track.classList.add('is-paused');
+      var wrap = track.closest('.dp__mobile-track-wrap');
+      var group = track.querySelector('.dp__mobile-group');
+      if (!wrap || !group) return;
+
+      var item = {
+        track: track,
+        wrap: wrap,
+        group: group,
+        loopWidth: 0,
+        direction: track.classList.contains('dp__mobile-track--right') ? -1 : 1
+      };
+      mobileItems.push(item);
+
+      wrap.addEventListener('scroll', function () {
+        normalizeMobileScroll(item);
       }, { passive: true });
-      track.addEventListener('touchend', function () {
-        resumeTimer = setTimeout(function () {
-          track.classList.remove('is-paused');
-        }, 1200);
+
+      wrap.addEventListener('touchstart', function () {
+        mobileTouching = true;
+        mobileResumeAt = 0;
       }, { passive: true });
+
+      function releaseTouch(event) {
+        if (event.touches && event.touches.length) return;
+        mobileTouching = false;
+        mobileResumeAt = performance.now() + 1200;
+        startMobileLoop();
+      }
+
+      wrap.addEventListener('touchend', releaseTouch, { passive: true });
+      wrap.addEventListener('touchcancel', releaseTouch, { passive: true });
+
+      requestAnimationFrame(function () {
+        syncMobileItem(item);
+      });
     });
 
     /* 5. Responsive Resize Handling */
@@ -705,13 +780,19 @@
       } else {
         if (colA) { colA.style.transform = ''; colA.style.animation = ''; }
         if (colB) { colB.style.transform = ''; colB.style.animation = ''; }
+        mobileItems.forEach(syncMobileItem);
+        startMobileLoop();
       }
     });
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initDesktop);
+      document.addEventListener('DOMContentLoaded', function () {
+        initDesktop();
+        startMobileLoop();
+      });
     } else {
       initDesktop();
+      startMobileLoop();
     }
   })();
 </script>
@@ -760,9 +841,9 @@
       "info": "On the other screens only the heading, media and button are shown."
     },
     { "type": "header", "content": "Scrolling" },
-    { "type": "range", "id": "pin_distance", "min": 0, "max": 300, "step": 20, "unit": "%", "label": "Hold on screen (% of screen height)", "default": 100, "info": "Desktop: the section sticks to the screen for this much scrolling while the columns keep moving, then the page continues. 0 turns the hold off." },
+    { "type": "range", "id": "pin_distance", "min": 0, "max": 300, "step": 20, "unit": "%", "label": "Sticky hold distance (% of screen height)", "default": 40, "info": "Desktop: keeps the section pinned while the product columns scroll. Shorter values bring the next section up sooner." },
     { "type": "checkbox", "id": "auto_scroll", "label": "Columns scroll by themselves", "default": true },
-    { "type": "range", "id": "scroll_speed", "min": 10, "max": 160, "step": 5, "unit": "px", "label": "Auto-scroll speed (px per second)", "default": 40 },
+    { "type": "range", "id": "scroll_speed", "min": 10, "max": 160, "step": 5, "unit": "px", "label": "Product auto-scroll speed", "default": 40, "info": "Controls how fast both product columns move automatically. Mouse-wheel speed has its own control below." },
     {
       "type": "select",
       "id": "scroll_direction",
@@ -775,7 +856,7 @@
     },
     { "type": "checkbox", "id": "pause_on_hover", "label": "Pause when hovering a column", "default": true },
     { "type": "checkbox", "id": "wheel_scroll", "label": "Mouse wheel moves the columns while hovering", "default": true, "info": "Scrolls the two columns in opposite directions. The page scrolls normally everywhere else." },
-    { "type": "range", "id": "wheel_speed", "min": 1, "max": 10, "step": 1, "label": "Mouse wheel sensitivity", "default": 3 },
+    { "type": "range", "id": "wheel_speed", "min": 1, "max": 10, "step": 1, "label": "Mouse-wheel scroll speed", "default": 3, "info": "Controls how far the product columns move for each wheel scroll." },
     { "type": "range", "id": "parallax_strength", "min": 40, "max": 280, "step": 10, "unit": "px", "label": "Tablet drift distance", "default": 140, "info": "Only changes the soft drift of the product grid on tablets." },
     { "type": "header", "content": "Layout & style" },
     { "type": "range", "id": "stage_height", "min": 520, "max": 960, "step": 20, "unit": "px", "label": "Maximum height of the scrolling area", "default": 780 },

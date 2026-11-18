@@ -2,7 +2,7 @@
 
 এই থিমটি **Bangladesh Software Solutions** কর্তৃক ডেভেলপকৃত লাক্সারি জুয়েলারি ব্র্যান্ডের সম্পূর্ণ ডিজাইন, লেআউট, অ্যানিমেশন, কালার কম্বিনেশন এবং ইউজার এক্সপেরিয়েন্স সহ একটি সম্পূর্ণ স্বাধীন ও ফ্রেশ Shopify Online Store 2.0 থিম হিসেবে তৈরি করা হয়েছে।
 
-> **বিশেষ দ্রষ্টব্য:** আপনার আগের প্রজেক্ট ফোল্ডার (`/Users/sifat/Project/BSS_Shopify`) সম্পূর্ণ অপরিবর্তিত ও সুরক্ষিত রাখা হয়েছে। এই নতুন থিমটি সম্পূর্ণ আলাদা ফোল্ডার `/Users/sifat/Project/Le_Velair_Shopify` তে তৈরি করা হয়েছে।
+> **বিশেষ দ্রষ্টব্য:** আপনার আগের প্রজেক্ট ফোল্ডার (`/Users/sifat/Project/BSS_Shopify`) সম্পূর্ণ অপরিবর্তিত ও সুরক্ষিত রাখা হয়েছে। এই নতুন থিমটি এই প্রজেক্ট ফোল্ডারে তৈরি করা হয়েছে।
 
 ---
 
@@ -88,7 +88,7 @@ Jewelry Shop-এর সব প্রোডাক্ট ও ইমেজ এক�
 
 ```bash
 # ১. নতুন থিম ফোল্ডারে যান
-cd /Users/sifat/Project/Le_Velair_Shopify
+cd <project-folder>
 
 # ২. লোকাল ডেভেলপমেন্ট সার্ভার চালু করুন
 shopify theme dev --store your-store-name.myshopify.com
@@ -103,7 +103,7 @@ shopify theme dev --store your-store-name.myshopify.com
 লোকালি চেক করার পর থিমটি আপনার শপিফাই স্টোরে আপলোড করতে:
 
 ```bash
-cd /Users/sifat/Project/Le_Velair_Shopify
+cd <project-folder>
 
 # স্টোরে থিম পুশ করতে
 shopify theme push --store your-store-name.myshopify.com

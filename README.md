@@ -85,6 +85,8 @@ Configure the following environment variables in Vercel:
 - `SHOPIFY_CLIENT_SECRET`: Dev Dashboard Client Secret
 - `ALLOWED_ORIGINS`: Allowed store origins (e.g. `https://le-velair-w6ickwvy.myshopify.com`)
 
+The Shopify app needs the `write_metaobjects` scope for review submissions. To accept customer photos, also grant `write_files` and add a `photo` field with type **File** to the `review` metaobject definition. The API uploads each compressed image through Shopify staged uploads before attaching it to the draft review.
+
 ---
 
 ## 🛡️ License

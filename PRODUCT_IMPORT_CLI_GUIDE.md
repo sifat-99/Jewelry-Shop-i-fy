@@ -1,6 +1,6 @@
 # 📦 Complete Guide: Shopify Product Import & Automation via CLI
 
-> **Project:** Aurelle / Lè Velair Luxury Jewelry  
+> **Project:** Aurelle Luxury Jewelry  
 > **Author:** Bangladesh Software Solutions  
 > **Purpose:** Step-by-step master documentation for image preparation, CSV generation, CLI authentication, automated collection mapping, and store publishing.
 

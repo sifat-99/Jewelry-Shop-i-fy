@@ -8,15 +8,38 @@
 {% enddoc %}
 {%- comment -%} One order row for the account dashboard. Expects: order {%- endcomment -%}
 <div class="lv-acct-order">
-  <div class="lv-acct-order__id">
-    <button
-      type="button"
-      class="lv-acct-order__num"
-      data-lv-acct-open-modal="LvAcctOrderModal-{{ order.id }}"
-      aria-haspopup="dialog"
-    >
-      {{- order.name -}}
-    </button>
+  <div class="lv-acct-order__main">
+    <div class="lv-acct-order__top">
+      <button
+        type="button"
+        class="lv-acct-order__num"
+        data-lv-acct-open-modal="LvAcctOrderModal-{{ order.id }}"
+        aria-haspopup="dialog"
+      >
+        {{- order.name -}}
+      </button>
+      {%- assign fin_key = order.financial_status | default: 'pending' | downcase | replace: ' ', '_' -%}
+      {%- assign ful_key = order.fulfillment_status | default: 'unfulfilled' | downcase | replace: ' ', '_' -%}
+      {%- assign has_tracking = false -%}
+      {%- for item in order.line_items -%}
+        {%- if item.fulfillment -%}
+          {%- if item.fulfillment.tracking_number != blank or item.fulfillment.tracking_url != blank -%}
+            {%- assign has_tracking = true -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+      <div class="lv-acct-order__status">
+        {%- if order.cancelled -%}
+          <span class="lv-acct-pill lv-acct-pill--cancelled">{{ 'customer.order.cancelled' | t }}</span>
+        {%- endif -%}
+        <span class="lv-acct-pill lv-acct-pill--{{ fin_key }}">{{ order.financial_status_label }}</span>
+        <span class="lv-acct-pill lv-acct-pill--{{ ful_key }}">{{ order.fulfillment_status_label }}</span>
+        {%- if has_tracking -%}
+          <span class="lv-acct-pill lv-acct-pill--tracking">{{ 'customer.orders.tracking_available' | t }}</span>
+        {%- endif -%}
+      </div>
+    </div>
     <p class="lv-acct-order__date">{{ order.created_at | time_tag: format: 'date' }}</p>
     <div class="lv-acct-order__thumbs">
       {%- for item in order.line_items limit: 4 -%}
@@ -24,27 +47,6 @@
       {%- endfor -%}
       {%- if order.line_items.size > 4 -%}{%- assign extra_items_count = order.line_items.size | minus: 4 -%}<span class="lv-acct-order__more">{{ 'customer.orders.more_items' | t: count: extra_items_count }}</span>{%- endif -%}
     </div>
-  </div>
-  {%- assign fin_key = order.financial_status | default: 'pending' | downcase | replace: ' ', '_' -%}
-  {%- assign ful_key = order.fulfillment_status | default: 'unfulfilled' | downcase | replace: ' ', '_' -%}
-  {%- assign has_tracking = false -%}
-  {%- for item in order.line_items -%}
-    {%- if item.fulfillment -%}
-      {%- if item.fulfillment.tracking_number != blank or item.fulfillment.tracking_url != blank -%}
-        {%- assign has_tracking = true -%}
-        {%- break -%}
-      {%- endif -%}
-    {%- endif -%}
-  {%- endfor -%}
-  <div class="lv-acct-order__status">
-    {%- if order.cancelled -%}
-      <span class="lv-acct-pill lv-acct-pill--cancelled">{{ 'customer.order.cancelled' | t }}</span>
-    {%- endif -%}
-    <span class="lv-acct-pill lv-acct-pill--{{ fin_key }}">{{ order.financial_status_label }}</span>
-    <span class="lv-acct-pill lv-acct-pill--{{ ful_key }}">{{ order.fulfillment_status_label }}</span>
-    {%- if has_tracking -%}
-      <span class="lv-acct-pill lv-acct-pill--tracking">{{ 'customer.orders.tracking_available' | t }}</span>
-    {%- endif -%}
   </div>
   <div class="lv-acct-order__buy">
     <span class="lv-acct-order__total">{{ order.total_price | money_with_currency }}</span>

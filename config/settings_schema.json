@@ -252,6 +252,7 @@
           { "value": "raleway", "label": "Raleway — Light airy editorial sans" },
           { "value": "dm_sans", "label": "DM Sans — Precision minimalist sans" },
           { "value": "inter", "label": "Inter — Swiss minimalist clarity" },
+          { "value": "bricolage_grotesque", "label": "Bricolage Grotesque — Expressive variable sans" },
           { "value": "quicksand", "label": "Quicksand — Soft boutique geometric" },
           { "value": "shopify_heading", "label": "Shopify Heading Font Picker (below)" },
           { "value": "shopify_body", "label": "Shopify Body Font Picker (below)" }
@@ -273,6 +274,7 @@
           { "value": "tenor_sans", "label": "Tenor Sans — Minimalist Paris sans" },
           { "value": "dm_sans", "label": "DM Sans — Clean minimalist sans" },
           { "value": "inter", "label": "Inter — Crisp UI sans" },
+          { "value": "bricolage_grotesque", "label": "Bricolage Grotesque — Expressive variable sans" },
           { "value": "cormorant_garamond", "label": "Cormorant Garamond — Luxury italic serif" },
           { "value": "playfair_display", "label": "Playfair Display — Editorial serif" },
           { "value": "bodoni_moda", "label": "Bodoni Moda — Couture serif" },
@@ -298,6 +300,7 @@
           { "value": "raleway", "label": "Raleway — Light editorial sans" },
           { "value": "inter", "label": "Inter — Ultra-legible minimalist" },
           { "value": "tenor_sans", "label": "Tenor Sans — Couture minimalist" },
+          { "value": "bricolage_grotesque", "label": "Bricolage Grotesque — Expressive variable sans" },
           { "value": "cormorant_garamond", "label": "Cormorant Garamond — Editorial serif" },
           { "value": "eb_garamond", "label": "EB Garamond — Book-style serif" },
           { "value": "lora", "label": "Lora — Readable luxury serif" },
@@ -322,6 +325,7 @@
           { "value": "quicksand", "label": "Quicksand — Soft geometric sans" },
           { "value": "dm_sans", "label": "DM Sans — Minimalist sans" },
           { "value": "inter", "label": "Inter — Swiss sans" },
+          { "value": "bricolage_grotesque", "label": "Bricolage Grotesque — Expressive variable sans" },
           { "value": "tenor_sans", "label": "Tenor Sans — Couture sans" },
           { "value": "cinzel", "label": "Cinzel — Classical serif" },
           { "value": "cormorant_garamond", "label": "Cormorant Garamond — Serif" }
@@ -342,6 +346,7 @@
           { "value": "quicksand", "label": "Quicksand" },
           { "value": "dm_sans", "label": "DM Sans" },
           { "value": "inter", "label": "Inter" },
+          { "value": "bricolage_grotesque", "label": "Bricolage Grotesque" },
           { "value": "raleway", "label": "Raleway" },
           { "value": "tenor_sans", "label": "Tenor Sans" },
           { "value": "cinzel", "label": "Cinzel" },
@@ -742,20 +747,9 @@
       {
         "type": "checkbox",
         "id": "enable_smooth_scroll",
-        "label": "Enable subtle smooth scroll",
+        "label": "Enable smooth page links",
         "default": true,
-        "info": "Adds gentle momentum easing to page scrolling across the store."
-      },
-      {
-        "type": "range",
-        "id": "smooth_scroll_strength",
-        "min": 1,
-        "max": 10,
-        "step": 1,
-        "label": "Scroll smoothness level",
-        "default": 3,
-        "info": "1–2 = ultra-crisp, 3–4 = subtle luxury glide (recommended), 7–10 = deeper deceleration.",
-        "visible_if": "{{ settings.enable_smooth_scroll }}"
+        "info": "Uses the browser's native scroll for page input and smooth animation for in-page links."
       },
       {
         "type": "checkbox",
@@ -1112,7 +1106,7 @@
         "type": "checkbox",
         "id": "card_show_wishlist",
         "label": "Enable Wishlist button",
-        "default": false
+        "default": true
       },
       {
         "type": "checkbox",
@@ -1294,11 +1288,59 @@
         "content": "Customer reviews"
       },
       {
+        "type": "select",
+        "id": "review_design",
+        "label": "Review card layout",
+        "options": [
+          { "value": "luxury_minimal", "label": "Luxury minimal" },
+          { "value": "customer_photo", "label": "Customer photo cards" },
+          { "value": "editorial_magazine", "label": "Editorial magazine" },
+          { "value": "modern_grid", "label": "Modern rating grid" },
+          { "value": "masonry", "label": "Masonry gallery" },
+          { "value": "carousel", "label": "Swipe carousel" },
+          { "value": "parallax_wall", "label": "Parallax review wall" },
+          { "value": "speech_bubble", "label": "Speech bubble slider" }
+        ],
+        "default": "luxury_minimal",
+        "info": "One customer review card layout for the home page and product pages."
+      },
+      {
+        "type": "checkbox",
+        "id": "show_review_product_image",
+        "label": "Show product image in review cards",
+        "default": true,
+        "info": "Display the reviewed product image beside desktop review cards and above the content on mobile."
+      },
+      {
+        "type": "text",
+        "id": "review_signing_secret",
+        "label": "Review signing secret",
+        "info": "Only signed-in customers can submit reviews. The theme signs the customer's name and email with this secret and the reviews API checks the signature, so it can't be faked. Use a long random string and set the SAME value as REVIEW_SIGNING_SECRET in the reviews API (Vercel). Keep it private. Leave empty and nobody can submit."
+      },
+      {
+        "type": "select",
+        "id": "review_form_design",
+        "label": "Review submission form",
+        "options": [
+          { "value": "modal", "label": "Elegant popup" },
+          { "value": "split", "label": "Split screen" },
+          { "value": "steps", "label": "Step by step" }
+        ],
+        "default": "modal",
+        "info": "Controls the Write a review form on product pages."
+      },
+      {
+        "type": "image_picker",
+        "id": "review_form_image",
+        "label": "Review form image",
+        "info": "Shown in the split screen form when a product image is not available."
+      },
+      {
         "type": "text",
         "id": "reviews_api_url",
         "label": "Reviews API URL",
         "default": "https://le-velair-reviews-api.vercel.app/api/review",
-        "info": "Where 'Write a review' forms send reviews (your Vercel endpoint)."
+        "info": "Where product review forms send reviews. Photo uploads also require the API app's write_files permission and a file reference field named photo on the review metaobject."
       }
     ]
   },

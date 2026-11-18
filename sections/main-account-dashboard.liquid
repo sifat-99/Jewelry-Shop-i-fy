@@ -1,14 +1,10 @@
 <!-- /sections/main-account-dashboard.liquid -->
 {%- liquid
-  assign concierge_email = section.settings.concierge_email | default: 'info@bssoln.com'
   assign root_prefix = routes.root_url
   unless root_prefix == '/'
     assign root_prefix = root_prefix | append: '/'
   endunless
-  assign default_wishlist_url = root_prefix | append: 'pages/wishlist'
-  assign wishlist_url = section.settings.wishlist_url | default: default_wishlist_url
   assign size_guide_url = root_prefix | append: 'pages/size-guide'
-  assign permanent_jewelry_url = root_prefix | append: 'pages/permanent-jewelry-on-site'
 
   comment
     With New customer accounts customer.orders_count / total_spent can read 0 even though customer.orders lists the orders,
@@ -267,43 +263,46 @@
   .lv-acct-card__title svg.lv-acct-i { stroke: var(--lv-acct-accent); }
 
   /* ---------- Stats ---------- */
-  .lv-acct-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 18px); margin-bottom: clamp(16px, 2.4vw, 24px); }
-  .lv-acct-stat { display: flex; align-items: center; gap: 16px; padding: clamp(16px, 2vw, 24px); background: var(--lv-acct-surface); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); min-width: 0; }
+  .lv-acct-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-bottom: clamp(16px, 2.4vw, 24px); overflow: hidden; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--lv-acct-surface); }
+  .lv-acct-stat { display: flex; align-items: center; gap: 16px; min-width: 0; padding: clamp(16px, 2vw, 24px); background: transparent; }
+  .lv-acct-stat + .lv-acct-stat { border-left: 1px solid var(--lv-acct-line); }
   .lv-acct-stat__icon { width: 46px; height: 46px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--lv-acct-accent) 45%, transparent); border-radius: 50%; color: var(--lv-acct-accent); flex: none; }
   .lv-acct-stat__body { min-width: 0; }
   .lv-acct-stat__label { margin: 0 0 4px; font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--lv-acct-muted); }
   .lv-acct-stat__val { margin: 0; font-size: clamp(18px, 2vw, 24px); font-weight: 700; letter-spacing: .04em; line-height: 1.1; overflow-wrap: anywhere; }
 
   /* ---------- Quick actions ---------- */
-  .lv-acct-quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 16px); margin-bottom: clamp(16px, 2.4vw, 24px); }
-  .lv-acct-quick__item { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 18px; background: var(--bg); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); color: var(--text); text-decoration: none; font: inherit; text-align: left; cursor: pointer; transition: border-color .25s, transform .25s; }
-  .lv-acct-quick__item:hover { border-color: var(--lv-acct-accent); transform: translateY(-2px); }
+  .lv-acct-quick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-bottom: clamp(16px, 2.4vw, 24px); overflow: hidden; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--bg); }
+  .lv-acct-quick__item { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; padding: 18px; border: 0; border-radius: 0; background: transparent; color: var(--text); text-decoration: none; font: inherit; text-align: left; cursor: pointer; transition: background-color .2s, color .2s; }
+  .lv-acct-quick__item + .lv-acct-quick__item { border-left: 1px solid var(--lv-acct-line); }
+  .lv-acct-quick__item:hover { background: var(--lv-acct-surface); color: var(--text); }
+  .lv-acct-quick__item:focus-visible { position: relative; z-index: 1; outline: 2px solid var(--lv-acct-accent); outline-offset: -3px; }
   .lv-acct-quick__item svg.lv-acct-i { stroke: var(--lv-acct-accent); width: 22px; height: 22px; }
   .lv-acct-quick__name { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
   .lv-acct-quick__sub { font-size: 12.5px; color: var(--lv-acct-muted); line-height: 1.5; margin-top: -4px; }
 
   /* ---------- Orders ---------- */
-  .lv-acct-order { display: grid; grid-template-columns: minmax(0, 1fr) clamp(176px, 17vw, 196px) minmax(var(--lv-acct-cta-w), auto); gap: 14px clamp(16px, 3vw, 36px); align-items: center; padding: clamp(14px, 2vw, 22px) var(--lv-acct-edge-x); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--bg); margin-bottom: 14px; transition: border-color .25s; }
+  .lv-acct-orders-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: 14px; }
+  .lv-acct-orders-grid > .lv-acct-empty, .lv-acct-orders-grid > .lv-acct-pagination { grid-column: 1 / -1; }
+  .lv-acct-order { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 12px; min-width: 0; padding: clamp(14px, 2vw, 22px) var(--lv-acct-edge-x); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--bg); margin-bottom: 0; transition: border-color .25s; }
   .lv-acct-order:last-child { margin-bottom: 0; }
   .lv-acct-order:hover { border-color: color-mix(in srgb, var(--text) 40%, transparent); }
-  .lv-acct-order__id { min-width: 0; }
-  .lv-acct-order__num { display: inline-block; padding: 0; border: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 700; letter-spacing: .08em; color: var(--text); text-decoration: none; cursor: pointer; text-align: left; transition: color .2s; }
+  .lv-acct-order__main { min-width: 0; }
+  .lv-acct-order__top { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; min-width: 0; }
+  .lv-acct-order__num { display: inline-block; flex: none; padding: 0; border: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 700; letter-spacing: .08em; color: var(--text); text-decoration: none; cursor: pointer; text-align: left; transition: color .2s; }
   .lv-acct-order__num:hover { color: var(--lv-acct-accent); }
   .lv-acct-order__num:focus-visible { outline: 2px solid var(--lv-acct-accent); outline-offset: 2px; }
-  .lv-acct-order__date { margin: 3px 0 10px; font-size: 12.5px; color: var(--lv-acct-muted); }
+  .lv-acct-order__date { margin: 6px 0 10px; font-size: 12.5px; color: var(--lv-acct-muted); }
   .lv-acct-order__thumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .lv-acct-order__thumb { width: 52px; height: 52px; object-fit: cover; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-media-r); background: var(--lv-acct-surface); }
   .lv-acct-order__more { font-size: 12px; font-weight: 600; color: var(--lv-acct-muted); }
-  .lv-acct-order__status { display: flex; flex-direction: column; align-items: stretch; gap: 6px; width: 100%; }
-  .lv-acct-order__buy { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; text-align: right; }
+  .lv-acct-order__status { display: flex; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 6px; min-width: 0; }
+  .lv-acct-order__buy { display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; padding-top: 12px; border-top: 1px solid var(--lv-acct-line); text-align: left; }
   .lv-acct-order__total { font-size: 16px; font-weight: 700; letter-spacing: .04em; }
   .lv-acct-pill { display: inline-flex; align-items: center; justify-content: center; padding: 4px 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; line-height: 1.25; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-badge-r); background: var(--lv-acct-surface); color: var(--text); white-space: nowrap; box-sizing: border-box; }
-  .lv-acct-order__status .lv-acct-pill { width: 100%; text-align: center; }
-  .lv-acct-pill--paid, .lv-acct-pill--fulfilled { color: #2d6a4f; border-color: color-mix(in srgb, #2d6a4f 35%, transparent); background: color-mix(in srgb, #2d6a4f 9%, transparent); }
-  .lv-acct-pill--pending, .lv-acct-pill--partially_paid, .lv-acct-pill--partial, .lv-acct-pill--partially_fulfilled, .lv-acct-pill--authorized, .lv-acct-pill--in_progress, .lv-acct-pill--scheduled, .lv-acct-pill--on_hold { color: #a16207; border-color: color-mix(in srgb, #b45309 38%, transparent); background: color-mix(in srgb, #d97706 11%, transparent); }
-  .lv-acct-pill--unfulfilled { color: var(--lv-acct-muted); border-color: var(--lv-acct-line); background: var(--lv-acct-surface); }
-  .lv-acct-pill--cancelled, .lv-acct-pill--refunded, .lv-acct-pill--partially_refunded, .lv-acct-pill--voided, .lv-acct-pill--restocked { color: #9f2d2d; border-color: color-mix(in srgb, #9f2d2d 35%, transparent); background: color-mix(in srgb, #9f2d2d 9%, transparent); }
-  .lv-acct-pill--tracking { color: var(--lv-acct-accent); border-color: color-mix(in srgb, var(--lv-acct-accent) 35%, transparent); background: color-mix(in srgb, var(--lv-acct-accent) 8%, transparent); }
+  .lv-acct-pill--paid, .lv-acct-pill--fulfilled, .lv-acct-pill--tracking { color: var(--lv-acct-accent); border-color: color-mix(in srgb, var(--lv-acct-accent) 38%, var(--lv-acct-line)); background: color-mix(in srgb, var(--lv-acct-accent) 8%, var(--bg)); }
+  .lv-acct-pill--pending, .lv-acct-pill--partially_paid, .lv-acct-pill--partial, .lv-acct-pill--partially_fulfilled, .lv-acct-pill--authorized, .lv-acct-pill--in_progress, .lv-acct-pill--scheduled, .lv-acct-pill--on_hold, .lv-acct-pill--unfulfilled { color: var(--lv-acct-muted); border-color: var(--lv-acct-line); background: var(--lv-acct-surface); }
+  .lv-acct-pill--cancelled, .lv-acct-pill--refunded, .lv-acct-pill--partially_refunded, .lv-acct-pill--voided, .lv-acct-pill--restocked { color: var(--text); border-color: var(--lv-acct-line); background: var(--lv-acct-surface-2); }
   .lv-acct-refresh-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 14px; min-height: var(--lv-acct-cta-h); font-family: var(--TYPE-STACK-BUTTON, inherit); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; line-height: 1.2; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-btn-r); background: var(--bg); color: var(--text); cursor: pointer; transition: border-color .2s, color .2s; white-space: nowrap; }
   .lv-acct-refresh-btn:hover { border-color: var(--lv-acct-accent); color: var(--lv-acct-accent); }
   .lv-acct-refresh-btn:disabled { opacity: .65; cursor: wait; }
@@ -311,7 +310,7 @@
   .lv-acct-refresh-btn.is-loading svg { animation: lvAcctSpin .85s linear infinite; }
   @keyframes lvAcctSpin { to { transform: rotate(360deg); } }
 
-  /* ---------- Addresses / concierge ---------- */
+  /* ---------- Addresses ---------- */
   .lv-acct-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: clamp(12px, 1.8vw, 18px); }
   .lv-acct-grid--addresses { grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr)); }
   .lv-acct-tile { position: relative; padding: 20px; background: var(--lv-acct-surface); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); font-size: 13.5px; line-height: 1.65; }
@@ -329,6 +328,28 @@
   .lv-acct-grid--addresses[data-view="list"] .lv-acct-tile__top { justify-content: flex-start; gap: 10px; margin-bottom: 6px; }
   .lv-acct-grid--addresses[data-view="list"] .lv-acct-tile address p { margin: 0; }
   .lv-acct-grid--addresses[data-view="list"] .lv-acct-tile__actions { margin-top: 0; padding-top: 0; border-top: 0; flex-shrink: 0; }
+
+  /* ---------- Saved wishlist ---------- */
+  .lv-acct-wishlist-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 1.8vw, 20px); }
+  .lv-acct-wishlist-grid[hidden], .lv-acct-wishlist-legacy[hidden], .lv-acct-wishlist-empty[hidden] { display: none !important; }
+  .lv-saved-card { min-width: 0; }
+  .lv-saved-card__media { position: relative; overflow: hidden; aspect-ratio: 1; background: var(--lv-acct-surface); border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-media-r); }
+  .lv-saved-card__image-link { display: block; width: 100%; height: 100%; }
+  .lv-saved-card__image { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+  .lv-saved-card:hover .lv-saved-card__image { transform: scale(1.035); }
+  .lv-saved-card__favorite { position: absolute; top: 10px; right: 10px; z-index: 2; display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 1px solid var(--lv-acct-line); border-radius: 50%; background: var(--bg); color: var(--lv-acct-accent); box-shadow: 0 2px 10px rgba(0,0,0,.08); cursor: pointer; }
+  .lv-saved-card__favorite svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+  .lv-saved-card__favorite .icon-wishlist-solid { display: none; }
+  .lv-saved-card__favorite.is-active .icon-wishlist-outline { display: none; }
+  .lv-saved-card__favorite.is-active .icon-wishlist-solid { display: block; fill: currentColor; }
+  .lv-saved-card__info { padding-top: 11px; }
+  .lv-saved-card__title { display: block; overflow: hidden; color: var(--text); font-size: 12px; font-weight: 600; letter-spacing: .06em; line-height: 1.5; text-overflow: ellipsis; text-decoration: none; text-transform: uppercase; }
+  .lv-saved-card__title:hover { color: var(--lv-acct-accent); }
+  .lv-saved-card__prices { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-top: 5px; font-size: 14px; font-weight: 700; }
+  .lv-saved-card__compare { color: var(--lv-acct-muted); font-size: 12px; font-weight: 400; text-decoration: line-through; }
+  .lv-acct-wishlist-legacy { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; padding: 16px 18px; border: 1px solid var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--lv-acct-surface); color: var(--lv-acct-muted); font-size: 13px; line-height: 1.6; }
+  .lv-acct-wishlist-legacy p { margin: 0; }
+  .lv-acct-wishlist-legacy .lv-acct-btn { flex: none; }
 
   /* ---------- Empty ---------- */
   .lv-acct-empty { text-align: center; padding: clamp(32px, 5vw, 56px) 20px; border: 1px dashed var(--lv-acct-line); border-radius: var(--lv-acct-radius); background: var(--lv-acct-surface); }
@@ -678,9 +699,9 @@
   /* ================= Tablet ================= */
   @media (max-width: 1024px) {
     .lv-acct-quick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .lv-acct-order { grid-template-columns: minmax(0, 1fr) 176px; }
-    .lv-acct-order__status { grid-column: 2; grid-row: 1; align-items: stretch; }
-    .lv-acct-order__buy { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; border-top: 1px solid var(--lv-acct-line); padding-top: 14px; text-align: left; }
+    .lv-acct-quick__item:nth-child(3) { border-top: 1px solid var(--lv-acct-line); border-left: 0; }
+    .lv-acct-orders-grid { grid-template-columns: minmax(0, 1fr); }
+    .lv-acct-wishlist-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 
   /* ================= Tablet portrait + mobile: slide-out sidebar drawer ================= */
@@ -826,7 +847,7 @@
     .lv-acct-view-btn { padding: 0 10px; font-size: 10.5px; gap: 5px; }
     .lv-acct-ptitle .lv-acct-btn,
     .lv-acct-ptitle .lv-acct-refresh-btn { min-height: 36px; padding: 8px 14px; font-size: 11px; }
-    .lv-acct-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .lv-acct-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
     .lv-acct-stat { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 12px; }
     .lv-acct-stat__icon { width: 34px; height: 34px; }
     .lv-acct-stat__icon svg.lv-acct-i { width: 16px; height: 16px; }
@@ -834,14 +855,14 @@
     .lv-acct-stat__val { font-size: 16px; }
     .lv-acct-quick__item { padding: 14px; }
     .lv-acct-quick__sub { display: none; }
-    .lv-acct-order { grid-template-columns: minmax(0, 1fr); }
-    .lv-acct-order__status { grid-column: auto; grid-row: auto; flex-direction: row; flex-wrap: wrap; align-items: center; width: auto; }
-    .lv-acct-order__status .lv-acct-pill { width: auto; }
-    .lv-acct-order__buy { flex-direction: column; align-items: stretch; gap: 12px; text-align: center; }
+    .lv-acct-order { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .lv-acct-order__buy { flex-direction: column; align-items: stretch; gap: 12px; min-height: 0; padding: 12px 0 0; border-top: 1px solid var(--lv-acct-line); border-left: 0; text-align: center; }
     .lv-acct-order__buy .btn { width: 100%; }
     .lv-acct-order__thumb { width: 46px; height: 46px; }
     .lv-acct-grid--addresses[data-view="list"] .lv-acct-tile { flex-direction: column; align-items: stretch; gap: 14px; }
     .lv-acct-grid--addresses[data-view="list"] .lv-acct-tile__actions { margin-top: 2px; padding-top: 12px; border-top: 1px solid var(--lv-acct-line); justify-content: flex-start; }
+    .lv-acct-wishlist-legacy { align-items: stretch; flex-direction: column; }
+    .lv-acct-wishlist-legacy .lv-acct-btn { width: 100%; }
     .lv-acct-perks { grid-template-columns: minmax(0, 1fr); }
     .lv-acct-perk { justify-content: flex-start; padding: 14px 16px; }
     .lv-acct-perk + .lv-acct-perk { border-left: 0; border-top: 1px solid var(--lv-acct-line); }
@@ -942,10 +963,6 @@
                   <span class="lv-acct-nav__label">{{ 'customer.account.nav_saved' | t }}</span>
                 </button>
               {% endif %}
-              <button type="button" class="lv-acct-nav__btn" data-tab-target="concierge" role="tab" aria-selected="false">
-                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span class="lv-acct-nav__label">{{ 'customer.account.nav_concierge' | t }}</span>
-              </button>
             </div>
 
             <div class="lv-acct-nav__foot">
@@ -988,10 +1005,6 @@
               <a class="lv-acct-quick__item" href="{{ size_guide_url }}">
                 <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></svg>
                 <span class="lv-acct-quick__name">{{ 'customer.account.quick_size' | t }}</span><span class="lv-acct-quick__sub">{{ 'customer.account.quick_size_sub' | t }}</span>
-              </a>
-              <a class="lv-acct-quick__item" href="mailto:{{ concierge_email }}">
-                <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><polyline points="3 7 12 13 21 7"/></svg>
-                <span class="lv-acct-quick__name">{{ 'customer.account.quick_contact' | t }}</span><span class="lv-acct-quick__sub">{{ 'customer.account.quick_contact_sub' | t }}</span>
               </a>
             </div>
 
@@ -1049,7 +1062,7 @@
                 <span>{{ 'customer.orders.refresh_status' | t }}</span>
               </button>
             </div>
-            <div data-lv-acct-orders-list>
+            <div class="lv-acct-orders-grid" data-lv-acct-orders-list>
               {% if customer.orders.size > 0 %}
                 {% paginate customer.orders by 15 %}
                   {% for order in customer.orders %}
@@ -1130,42 +1143,22 @@
           {% if section.settings.show_wishlist %}
             <div class="lv-acct-panel" data-tab-panel="wishlist" role="tabpanel">
               <div class="lv-acct-ptitle"><div><span class="lv-acct-eyebrow">{{ 'customer.account.saved_eyebrow' | t }}</span><h2>{{ 'customer.account.saved_title' | t }}</h2></div></div>
-              <div class="lv-acct-empty">
+              <div class="lv-acct-wishlist-grid" data-lv-acct-wishlist-grid data-remove-label="{{ 'products.wishlist.remove' | t | escape }}" aria-live="polite" hidden></div>
+              <div class="lv-acct-empty lv-acct-wishlist-empty" data-lv-acct-wishlist-empty>
                 <svg class="lv-acct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 <p class="lv-acct-empty__title">{{ 'customer.account.saved_empty_title' | t }}</p>
                 <p class="lv-acct-empty__text">{{ 'customer.account.saved_empty_text' | t }}</p>
                 <div class="lv-acct-actions">
-                  <a href="{{ wishlist_url }}" class="btn btn-sliding-hover lv-acct-btn">{{ 'customer.account.view_wishlist' | t }}</a>
+                  <a href="{{ routes.all_products_collection_url }}" class="btn btn-sliding-hover lv-acct-btn">{{ 'customer.account.explore_collection' | t }}</a>
                   <a href="{{ routes.collections_url }}/bestsellers" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--ghost">{{ 'customer.account.bestsellers' | t }}</a>
                 </div>
               </div>
+              <div class="lv-acct-wishlist-legacy" data-lv-acct-wishlist-legacy hidden>
+                <p>{{ 'customer.account.saved_legacy_text' | t }}</p>
+                <a href="{{ routes.all_products_collection_url }}" class="btn btn-sliding-hover lv-acct-btn lv-acct-btn--ghost">{{ 'customer.account.explore_collection' | t }}</a>
+              </div>
             </div>
           {% endif %}
-
-          <!-- CONCIERGE -->
-          <div class="lv-acct-panel" data-tab-panel="concierge" role="tabpanel">
-            <div class="lv-acct-ptitle"><div><span class="lv-acct-eyebrow">{{ 'customer.account.atelier_eyebrow' | t }}</span><h2>{{ 'customer.account.concierge_title' | t }}</h2></div></div>
-            <div class="lv-acct-grid">
-              <div class="lv-acct-tile">
-                <svg class="lv-acct-i lv-acct-tile__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></svg>
-                <h4 class="lv-acct-tile__title">{{ 'customer.account.concierge_sizing_title' | t }}</h4>
-                <p class="lv-acct-tile__text">{{ 'customer.account.concierge_sizing_text' | t }}</p>
-                <a href="{{ size_guide_url }}" class="lv-acct-link">{{ 'customer.account.concierge_sizing_link' | t }}</a>
-              </div>
-              <div class="lv-acct-tile">
-                <svg class="lv-acct-i lv-acct-tile__icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-                <h4 class="lv-acct-tile__title">{{ 'customer.account.concierge_permanent_title' | t }}</h4>
-                <p class="lv-acct-tile__text">{{ 'customer.account.concierge_permanent_text' | t }}</p>
-                <a href="{{ permanent_jewelry_url }}" class="lv-acct-link">{{ 'customer.account.concierge_permanent_link' | t }}</a>
-              </div>
-              <div class="lv-acct-tile">
-                <svg class="lv-acct-i lv-acct-tile__icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><polyline points="3 7 12 13 21 7"/></svg>
-                <h4 class="lv-acct-tile__title">{{ 'customer.account.concierge_questions_title' | t }}</h4>
-                <p class="lv-acct-tile__text">{{ 'customer.account.concierge_questions_text' | t }}</p>
-                <a href="mailto:{{ concierge_email }}" class="lv-acct-link">{{ 'customer.account.concierge_email_link' | t }}</a>
-              </div>
-            </div>
-          </div>
 
         </main>
       </div>
@@ -2727,10 +2720,154 @@
       }
     }
 
+    function initSavedWishlist() {
+      var root = document.querySelector('[data-lv-acct-dashboard]');
+      var grid = root && root.querySelector('[data-lv-acct-wishlist-grid]');
+      if (!grid) return;
+
+      var empty = root.querySelector('[data-lv-acct-wishlist-empty]');
+      var legacy = root.querySelector('[data-lv-acct-wishlist-legacy]');
+
+      function readArray(key) {
+        try {
+          var value = JSON.parse(localStorage.getItem(key) || '[]');
+          return Array.isArray(value) ? value : [];
+        } catch(e) {
+          return [];
+        }
+      }
+
+      function makeHeart(className, filled) {
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', className);
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('aria-hidden', 'true');
+        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', 'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z');
+        if (filled) path.setAttribute('fill', 'currentColor');
+        svg.appendChild(path);
+        return svg;
+      }
+
+      function safeProductUrl(value) {
+        if (!value) return '';
+        try {
+          var url = new URL(value, window.location.origin);
+          return url.origin === window.location.origin ? url.pathname + url.search : '';
+        } catch(e) {
+          return '';
+        }
+      }
+
+      function makeCard(item) {
+        var card = document.createElement('article');
+        card.className = 'lv-saved-card';
+
+        var media = document.createElement('div');
+        media.className = 'lv-saved-card__media';
+        var imageLink = document.createElement('a');
+        imageLink.className = 'lv-saved-card__image-link';
+        imageLink.href = safeProductUrl(item.url);
+        imageLink.setAttribute('aria-label', item.title);
+        if (item.image) {
+          var image = document.createElement('img');
+          image.className = 'lv-saved-card__image';
+          image.src = item.image;
+          image.alt = item.title;
+          image.loading = 'lazy';
+          image.decoding = 'async';
+          imageLink.appendChild(image);
+        }
+        media.appendChild(imageLink);
+
+        var favorite = document.createElement('button');
+        favorite.type = 'button';
+        favorite.className = 'lv-saved-card__favorite card-wishlist-btn is-active';
+        favorite.setAttribute('data-wishlist-id', String(item.id));
+        favorite.setAttribute('data-wishlist-handle', item.handle || '');
+        favorite.setAttribute('data-wishlist-title', item.title);
+        favorite.setAttribute('data-wishlist-url', item.url || '');
+        favorite.setAttribute('data-wishlist-image', item.image || '');
+        favorite.setAttribute('data-wishlist-price', item.price || '');
+        favorite.setAttribute('data-wishlist-compare-price', item.comparePrice || '');
+        favorite.setAttribute('data-wishlist-remove-label', grid.getAttribute('data-remove-label'));
+        favorite.setAttribute('title', grid.getAttribute('data-remove-label'));
+        favorite.setAttribute('aria-label', grid.getAttribute('data-remove-label'));
+        favorite.setAttribute('aria-pressed', 'true');
+        favorite.appendChild(makeHeart('icon-wishlist-outline', false));
+        favorite.appendChild(makeHeart('icon-wishlist-solid', true));
+        media.appendChild(favorite);
+        card.appendChild(media);
+
+        var info = document.createElement('div');
+        info.className = 'lv-saved-card__info';
+        var title = document.createElement('a');
+        title.className = 'lv-saved-card__title';
+        title.href = safeProductUrl(item.url);
+        title.textContent = item.title;
+        info.appendChild(title);
+
+        var prices = document.createElement('div');
+        prices.className = 'lv-saved-card__prices';
+        var currentPrice = document.createElement('span');
+        currentPrice.textContent = item.price || '';
+        prices.appendChild(currentPrice);
+        if (item.comparePrice) {
+          var comparePrice = document.createElement('span');
+          comparePrice.className = 'lv-saved-card__compare';
+          comparePrice.textContent = item.comparePrice;
+          prices.appendChild(comparePrice);
+        }
+        if (item.price || item.comparePrice) info.appendChild(prices);
+        card.appendChild(info);
+        return card;
+      }
+
+      function render() {
+        var ids = readArray('bss_wishlist').map(String);
+        var savedItems = readArray('bss_wishlist_products');
+        var itemById = {};
+        savedItems.forEach(function(item) {
+          if (item && item.id != null) itemById[String(item.id)] = item;
+        });
+
+        var items = [];
+        var missingCount = 0;
+        ids.forEach(function(id) {
+          var item = itemById[id];
+          if (item && item.title && safeProductUrl(item.url)) items.push(item);
+          else missingCount += 1;
+        });
+
+        grid.replaceChildren();
+        items.forEach(function(item) { grid.appendChild(makeCard(item)); });
+        grid.hidden = items.length === 0;
+        if (empty) empty.hidden = ids.length > 0;
+        if (legacy) {
+          legacy.hidden = missingCount === 0;
+        }
+      }
+
+      if (window.__lvAcctWishlistChangeHandler) {
+        document.removeEventListener('bss:wishlist:change', window.__lvAcctWishlistChangeHandler);
+        window.removeEventListener('storage', window.__lvAcctWishlistStorageHandler);
+        window.removeEventListener('pageshow', window.__lvAcctWishlistChangeHandler);
+      }
+      window.__lvAcctWishlistChangeHandler = render;
+      window.__lvAcctWishlistStorageHandler = function(event) {
+        if (!event || event.key === 'bss_wishlist' || event.key === 'bss_wishlist_products') render();
+      };
+      document.addEventListener('bss:wishlist:change', window.__lvAcctWishlistChangeHandler);
+      window.addEventListener('storage', window.__lvAcctWishlistStorageHandler);
+      window.addEventListener('pageshow', window.__lvAcctWishlistChangeHandler);
+      render();
+    }
+
     function initAll() {
       initStickySync();
       initMobileDrawer();
       initDashboardTabs();
+      initSavedWishlist();
       initAddressViewToggle();
       initAddressModals();
       initAddressForms();
@@ -2766,17 +2903,6 @@
       "id": "show_wishlist",
       "label": "Show Wishlist tab",
       "default": true
-    },
-    {
-      "type": "url",
-      "id": "wishlist_url",
-      "label": "Wishlist page URL"
-    },
-    {
-      "type": "text",
-      "id": "concierge_email",
-      "label": "Concierge email address",
-      "default": "info@bssoln.com"
     },
     {
       "type": "header",

@@ -464,6 +464,8 @@
       margin-left: auto; font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
       text-transform: none; text-decoration: underline; text-underline-offset: 3px; color: var(--text, #111);
     }
+    .pv-opt__guide:focus-visible,
+    .pv-sg-link a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
     .pv-opt__row { display: flex; flex-wrap: wrap; gap: 8px; }
     .pv-opt__input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
     .pv-opt__pill {
@@ -619,6 +621,89 @@
     .pv-sg-link { margin: -6px 0 18px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; }
     .pv-sg-link a { display: inline-flex; align-items: center; gap: 8px; text-decoration: underline; text-underline-offset: 3px; color: var(--text, #111); }
     .pv-sg-link svg { width: 18px; height: 18px; }
+
+    /* Product size guide dialog */
+    .pv-size-guide-modal:not([open]) { display: none; }
+    .pv-size-guide-modal {
+      display: grid; grid-template-rows: auto minmax(0, 1fr);
+      width: min(760px, calc(100vw - 32px)); max-width: none; max-height: min(82vh, 760px);
+      margin: auto; padding: 0; overflow: hidden; color: var(--text, #111);
+      background: var(--bg, #fff); border: 1px solid var(--pv-line, #ded8ce);
+      border-radius: var(--card-radius, 0px); opacity: 0; transform: translateY(12px);
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+    .pv-size-guide-modal[open].is-visible { opacity: 1; transform: translateY(0); }
+    .pv-size-guide-modal::backdrop { background: rgb(16 14 12 / 0); transition: background 220ms ease; }
+    .pv-size-guide-modal[open].is-visible::backdrop { background: rgb(16 14 12 / 54%); }
+    .pv-size-guide-modal__head {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding: 18px 22px; border-bottom: 1px solid var(--pv-line, #ded8ce);
+    }
+    .pv-size-guide-modal__title { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+    .pv-size-guide-modal__close {
+      display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; padding: 0;
+      color: inherit; background: transparent; border: 1px solid var(--pv-line, #ded8ce);
+      border-radius: var(--btn-radius, 0px); cursor: pointer;
+    }
+    .pv-size-guide-modal__close svg { width: 18px; height: 18px; }
+    .pv-size-guide-modal__close:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+    .pv-size-guide-modal__body { min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 24px; -webkit-overflow-scrolling: touch; }
+    .pv-size-guide-modal__section + .pv-size-guide-modal__section { margin-top: 28px; }
+    .pv-size-guide-modal .sg__h {
+      margin: 0 0 14px; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    .pv-size-guide-modal .sg__table-wrap {
+      overflow-x: hidden; border: 1px solid var(--pv-line, #ded8ce); border-radius: var(--card-radius, 0px);
+      -webkit-overflow-scrolling: touch;
+    }
+    .pv-size-guide-modal .sg__table { width: 100%; min-width: 0; table-layout: fixed; border-collapse: collapse; font-size: 14px; }
+    .pv-size-guide-modal .sg__table th,
+    .pv-size-guide-modal .sg__table td {
+      padding: 13px 12px; text-align: left; white-space: normal; overflow-wrap: anywhere; vertical-align: top;
+    }
+    .pv-size-guide-modal .sg__table th:first-child,
+    .pv-size-guide-modal .sg__table td:first-child { width: 34%; }
+    .pv-size-guide-modal .sg__table th {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      background: var(--pv-soft, #f7f6f3); border-bottom: 1px solid var(--pv-line, #ded8ce);
+    }
+    .pv-size-guide-modal .sg__table td { border-bottom: 1px solid var(--pv-line, #ded8ce); }
+    .pv-size-guide-modal .sg__table tr:last-child td { border-bottom: 0; }
+    .pv-size-guide-modal .sg__table tbody td:first-child { font-weight: 700; }
+    .pv-size-guide-modal .sg__steps { margin: 0; padding: 0; list-style: none; counter-reset: pv-sg; }
+    .pv-size-guide-modal .sg__steps li {
+      position: relative; counter-increment: pv-sg; padding: 0 0 16px 44px; font-size: 14px; line-height: 1.65;
+    }
+    .pv-size-guide-modal .sg__steps li::before {
+      content: counter(pv-sg); position: absolute; left: 0; top: -2px; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center; border: 1px solid var(--pv-line, #ded8ce);
+      border-radius: 50%; background: var(--pv-soft, #f7f6f3); font-size: 12px; font-weight: 700;
+    }
+    .pv-size-guide-modal .sg__tips {
+      margin: 8px 0 0; padding: 16px 18px; list-style: none; background: var(--pv-soft, #f7f6f3);
+      border: 1px solid var(--pv-line, #ded8ce); border-radius: var(--card-radius, 0px); font-size: 13.5px; line-height: 1.6;
+    }
+    .pv-size-guide-modal .sg__tips li { display: flex; gap: 10px; }
+    .pv-size-guide-modal .sg__tips li + li { margin-top: 8px; }
+    .pv-size-guide-modal .sg__tips li::before { content: "✦"; flex: 0 0 auto; font-size: 11px; margin-top: 3px; }
+    .pv-size-guide-modal__status { margin: 0; font-size: 14px; line-height: 1.6; }
+    .pv-size-guide-modal__status a { color: inherit; text-underline-offset: 3px; }
+    @media (max-width: 767px) {
+      .pv-size-guide-modal {
+        position: fixed; inset: auto 0 0; width: 100%; max-height: 88vh; max-height: 88dvh; margin: 0;
+        border-width: 1px 0 0; border-radius: var(--card-radius, 0px) var(--card-radius, 0px) 0 0;
+        transform: translateY(100%); transition-duration: 280ms;
+      }
+      .pv-size-guide-modal[open].is-visible { transform: translateY(0); }
+      .pv-size-guide-modal__head { padding: 13px 18px; }
+      .pv-size-guide-modal__body { padding: 20px 18px max(24px, env(safe-area-inset-bottom)); }
+      .pv-size-guide-modal .sg__table { font-size: 12px; }
+      .pv-size-guide-modal .sg__table th,
+      .pv-size-guide-modal .sg__table td { padding: 10px 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .pv-size-guide-modal, .pv-size-guide-modal::backdrop { transition-duration: 0.01ms; }
+    }
 
     /* ---------- Engraving: one unified card (count options + text) ---------- */
     .pv-eng-card { margin: 0 0 24px; padding: 18px 18px 20px; background: var(--bg, #fff); border: var(--btn-border-thickness, 1px) solid var(--eng-border, var(--pv-line)); border-radius: 0; }
@@ -1115,7 +1200,7 @@
                   <span class="pv-opt__selected" data-pv-selected>{{ option.selected_value }}{% if selected_extra != blank %} <span class="pv-opt__extra-price" style="color: var(--lv-accent-deep, #806745); font-weight: 700;">{{ selected_extra | strip }}</span>{% endif %}</span>
                   {%- if is_sizeish and section.settings.size_guide_page != blank -%}
                     {%- assign pv_sg_default = 'products.product.size_guide' | t -%}
-                    <a class="pv-opt__guide" href="{{ section.settings.size_guide_page.url }}{% render 'product-size-guide-anchor', product: product %}" target="_blank" rel="noopener">{{ section.settings.size_guide_label | default: pv_sg_default }}</a>
+                    <a class="pv-opt__guide" href="{{ section.settings.size_guide_page.url }}{% render 'product-size-guide-anchor', product: product %}" data-size-guide-modal-trigger>{{ section.settings.size_guide_label | default: pv_sg_default }}</a>
                   {%- endif -%}
                 </legend>
 
@@ -1218,6 +1303,7 @@
               <div class="pv-acc__panel rte">{{ section.settings.material_content }}</div>
             </details>
           {%- endif -%}
+          {%- render 'product-review-summary', product: product, sid: section.id -%}
           <script>
             (function () {
               var list = document.currentScript.parentNode;
@@ -1271,6 +1357,20 @@
     </button>
   </div>
 
+  {%- if section.settings.size_guide_page != blank -%}
+    {%- assign pv_sg_modal_label = section.settings.size_guide_label -%}
+    {%- if pv_sg_modal_label == blank -%}{%- assign pv_sg_modal_label = 'products.product.size_guide' | t -%}{%- endif -%}
+    <dialog class="pv-size-guide-modal" data-size-guide-modal aria-labelledby="pv-size-guide-title-{{ section.id }}">
+      <div class="pv-size-guide-modal__head">
+        <h2 class="pv-size-guide-modal__title" id="pv-size-guide-title-{{ section.id }}">{{ pv_sg_modal_label | escape }}</h2>
+        <button class="pv-size-guide-modal__close" type="button" data-size-guide-modal-close aria-label="{{ 'accessibility.close' | t | escape }}">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="pv-size-guide-modal__body" data-size-guide-modal-content aria-live="polite" aria-busy="false"></div>
+    </dialog>
+  {%- endif -%}
+
   <script type="application/json" data-pv-variants>
     {%- render 'product-variants-json', product: product -%}
   </script>
@@ -1319,6 +1419,110 @@
       var i18n = config.i18n || {};
       var pvRoutes = config.routes || {};
       function escAttr(s) { return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+      /* ================= SIZE GUIDE DIALOG ================= */
+      var sizeGuideModal = $('[data-size-guide-modal]');
+      var sizeGuideContent = sizeGuideModal ? $('[data-size-guide-modal-content]', sizeGuideModal) : null;
+      var sizeGuideClose = sizeGuideModal ? $('[data-size-guide-modal-close]', sizeGuideModal) : null;
+      var sizeGuideTrigger = null;
+      var sizeGuideCloseTimer = 0;
+      var sizeGuideRequest = 0;
+      function setSizeGuideStatus(message, fallbackUrl) {
+        if (!sizeGuideContent) return;
+        sizeGuideContent.textContent = '';
+        var status = document.createElement('p');
+        status.className = 'pv-size-guide-modal__status';
+        status.textContent = message;
+        sizeGuideContent.appendChild(status);
+        if (fallbackUrl) {
+          var link = document.createElement('a');
+          link.href = fallbackUrl;
+          link.textContent = 'Open the full size guide';
+          status.appendChild(document.createTextNode(' '));
+          status.appendChild(link);
+        }
+      }
+      function appendSizeGuideSection(sourcePanel, destination, selectors) {
+        var sources = selectors.map(function (selector) { return sourcePanel.querySelector(selector); }).filter(Boolean);
+        if (!sources.length) return false;
+        var section = document.createElement('section');
+        section.className = 'pv-size-guide-modal__section';
+        var heading = sources[0].previousElementSibling;
+        if (heading && heading.matches('.sg__h')) section.appendChild(document.importNode(heading, true));
+        sources.forEach(function (source) { section.appendChild(document.importNode(source, true)); });
+        destination.appendChild(section);
+        return true;
+      }
+      function renderSizeGuidePage(html, requestedKey, fallbackUrl) {
+        var guideDoc = new DOMParser().parseFromString(html, 'text/html');
+        var tabs = Array.prototype.slice.call(guideDoc.querySelectorAll('[data-sg-tab]'));
+        var tab = tabs.find(function (item) { return (item.getAttribute('data-key') || '').toLowerCase() === requestedKey; });
+        if (!tab) tab = tabs.find(function (item) { return item.getAttribute('aria-selected') === 'true'; }) || tabs[0];
+        var panel = tab && guideDoc.getElementById(tab.getAttribute('aria-controls'));
+        if (!panel) {
+          setSizeGuideStatus('This size guide is not available right now.', fallbackUrl);
+          return;
+        }
+        sizeGuideContent.textContent = '';
+        var hasTable = appendSizeGuideSection(panel, sizeGuideContent, ['.sg__table-wrap']);
+        var hasInstructions = appendSizeGuideSection(panel, sizeGuideContent, ['.sg__steps', '.sg__tips']);
+        if (!hasTable && !hasInstructions) setSizeGuideStatus('This size guide is not available right now.', fallbackUrl);
+      }
+      function closeSizeGuideModal() {
+        if (!sizeGuideModal || !sizeGuideModal.open) return;
+        sizeGuideModal.classList.remove('is-visible');
+        window.clearTimeout(sizeGuideCloseTimer);
+        sizeGuideCloseTimer = window.setTimeout(function () {
+          if (sizeGuideModal.open) sizeGuideModal.close();
+        }, window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 300);
+      }
+      function openSizeGuideModal(trigger) {
+        if (!sizeGuideModal || !sizeGuideContent || typeof sizeGuideModal.showModal !== 'function') return false;
+        var url;
+        try { url = new URL(trigger.href, window.location.href); } catch (error) { return false; }
+        if (url.origin !== window.location.origin) return false;
+        sizeGuideTrigger = trigger;
+        window.clearTimeout(sizeGuideCloseTimer);
+        sizeGuideModal.classList.remove('is-visible');
+        sizeGuideContent.setAttribute('aria-busy', 'true');
+        setSizeGuideStatus('Loading size guide…');
+        if (!sizeGuideModal.open) sizeGuideModal.showModal();
+        window.requestAnimationFrame(function () { sizeGuideModal.classList.add('is-visible'); });
+        if (sizeGuideClose) sizeGuideClose.focus({ preventScroll: true });
+        var requestId = ++sizeGuideRequest;
+        fetch(url.pathname + url.search, { credentials: 'same-origin', headers: { 'Accept': 'text/html' } })
+          .then(function (response) {
+            if (!response.ok) throw new Error('Size guide request failed');
+            return response.text();
+          })
+          .then(function (html) {
+            if (requestId !== sizeGuideRequest) return;
+            renderSizeGuidePage(html, (url.hash || '').slice(1).toLowerCase(), url.href);
+          })
+          .catch(function () {
+            if (requestId === sizeGuideRequest) setSizeGuideStatus('Unable to load the size guide.', url.href);
+          })
+          .finally(function () {
+            if (requestId === sizeGuideRequest) sizeGuideContent.setAttribute('aria-busy', 'false');
+          });
+        return true;
+      }
+      $$('[data-size-guide-modal-trigger]').forEach(function (trigger) {
+        trigger.addEventListener('click', function (event) {
+          if (openSizeGuideModal(trigger)) event.preventDefault();
+        });
+      });
+      if (sizeGuideClose) sizeGuideClose.addEventListener('click', closeSizeGuideModal);
+      if (sizeGuideModal) {
+        sizeGuideModal.addEventListener('cancel', function (event) { event.preventDefault(); closeSizeGuideModal(); });
+        sizeGuideModal.addEventListener('click', function (event) {
+          if (event.target === sizeGuideModal) closeSizeGuideModal();
+        });
+        sizeGuideModal.addEventListener('close', function () {
+          sizeGuideModal.classList.remove('is-visible');
+          if (sizeGuideTrigger) sizeGuideTrigger.focus({ preventScroll: true });
+        });
+      }
 
       /* ---- sticky offset below a sticky header ---- */
       var header = document.querySelector('[data-header-height]');

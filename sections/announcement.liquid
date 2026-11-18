@@ -72,6 +72,7 @@
   <div
     class="accent-size-2"
     x-data="announcementSlider({{ section.settings.speed | default: 5000 }})"
+    data-announcement-slider
   >
     {%- for block in section.blocks -%}
       {%- liquid
@@ -144,6 +145,65 @@
     {%- endfor -%}
   </div>
 </div>
+
+{% javascript %}
+  (() => {
+    if (window.__lvAnnouncementTickerTiming) return;
+    window.__lvAnnouncementTickerTiming = true;
+
+    let resizeTimer;
+
+    function syncTickerTiming(sliderElement) {
+      if (!sliderElement || !window.Alpine || typeof window.Alpine.$data !== 'function') return;
+
+      const component = window.Alpine.$data(sliderElement);
+      const flickity = component && component.flkty;
+      if (!flickity || !flickity.options) return;
+
+      const baseDelay = Number(component.options && component.options.autoPlay) || 5000;
+      let nextDelay = baseDelay;
+
+      if (window.matchMedia('(max-width: 767px)').matches) {
+        const durations = Array.from(sliderElement.querySelectorAll('[data-ticker-scale]'))
+          .map((scale) => parseFloat(getComputedStyle(scale).getPropertyValue('--animation-time')) * 1000)
+          .filter((duration) => Number.isFinite(duration) && duration > 0);
+        const longestDuration = durations.length ? Math.max.apply(Math, durations) : 0;
+        nextDelay = Math.max(baseDelay, longestDuration + 750);
+      }
+
+      if (flickity.options.autoPlay === nextDelay) return;
+
+      const playerState = flickity.player && flickity.player.state;
+      flickity.stopPlayer();
+      flickity.options.autoPlay = nextDelay;
+      if (playerState === 'playing') flickity.playPlayer();
+      else if (playerState === 'paused') flickity.pausePlayer();
+    }
+
+    function syncAllAnnouncementSliders() {
+      document.querySelectorAll('[data-announcement-slider]').forEach(syncTickerTiming);
+    }
+
+    window.addEventListener('theme:announcement:loaded', (event) => {
+      const sliderElement = event.detail && event.detail.slider;
+      if (sliderElement) requestAnimationFrame(() => syncTickerTiming(sliderElement));
+    });
+
+    function scheduleTimingSync() {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(syncAllAnnouncementSliders, 450);
+    }
+
+    window.addEventListener('resize', scheduleTimingSync, { passive: true });
+    document.addEventListener('theme:resize', scheduleTimingSync);
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', syncAllAnnouncementSliders, { once: true });
+    } else {
+      requestAnimationFrame(syncAllAnnouncementSliders);
+    }
+  })();
+{% endjavascript %}
 
 {% schema %}
 {

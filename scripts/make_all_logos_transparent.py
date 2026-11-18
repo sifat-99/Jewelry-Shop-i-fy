@@ -2,13 +2,13 @@ import os
 import math
 from PIL import Image
 
-ASSETS_DIR = "/Users/sifat/Project/Le_Velair_Shopify/assets"
+ASSETS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
 ARTIFACT_DIR = "/Users/sifat/.gemini/antigravity/brain/360c4548-2eaf-46e2-8ed7-c94f399ed28e"
 
 logos_to_process = [
     {
-        "src": os.path.join(ASSETS_DIR, "le_velair_luxury_logo.jpg"),
-        "dest_name": "le_velair_luxury_logo_transparent.png",
+        "src": os.path.join(ASSETS_DIR, "aurelle_luxury_logo.jpg"),
+        "dest_name": "aurelle_luxury_logo_transparent.png",
         "thresh_low": 16,
         "thresh_high": 42
     },

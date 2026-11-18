@@ -1,0 +1,74 @@
+{% doc %}
+  Renders a compact rating summary with a five-star distribution for a product.
+
+  @param {product} product - Product whose approved reviews are summarized
+  @param {string} sid - Unique identifier for this summary instance
+{% enddoc %}
+{%- capture review_stats -%}
+  {%- render 'product-review-stats', product_id: product.id -%}
+{%- endcapture -%}
+{%- assign review_parts = review_stats | split: '~~' -%}
+{%- assign review_average = review_parts[0] | plus: 0 -%}
+{%- assign review_count = review_parts[1] | plus: 0 -%}
+{%- assign summary_form_sid = sid | append: '-review-summary' -%}
+{%- assign summary_form_label = 'products.reviews.write_review' | t -%}
+{%- assign summary_form_endpoint = settings.reviews_api_url | default: 'https://le-velair-reviews-api.vercel.app/api/review' -%}
+<section class="prs" id="prs-{{ sid }}" aria-label="{{ 'products.reviews.rating_summary' | t }}">
+  <div class="prs__grid">
+    <div class="prs__score">
+      {%- if review_count > 0 -%}
+        <p class="prs__average">{{ review_average }}</p>
+        {%- render 'rating-stars', rating: review_average, class_name: 'lv-stars prs__stars' -%}
+        <p class="prs__count">{{ 'products.reviews.based_on' | t: count: review_count }}</p>
+      {%- else -%}
+        <p class="prs__no-reviews">{{ 'products.reviews.none_short' | t }}</p>
+      {%- endif -%}
+    </div>
+    <div class="prs__bars" aria-label="{{ 'products.reviews.rating_distribution' | t }}">
+      {%- for i in (0..4) -%}
+        {%- assign star_value = 5 | minus: i -%}
+        {%- assign stat_index = i | plus: 2 -%}
+        {%- assign star_count = review_parts[stat_index] | plus: 0 -%}
+        {%- assign star_percent = 0 -%}
+        {%- if review_count > 0 -%}
+          {%- assign star_percent = star_count | times: 100.0 | divided_by: review_count | round -%}
+        {%- endif -%}
+        <div class="prs__bar" aria-label="{{ 'products.reviews.rating_bar_aria' | t: rating: star_value, percent: star_percent }}">
+          <span class="prs__bar-label">{{ star_value }} <span aria-hidden="true">★</span></span>
+          <span class="prs__track" aria-hidden="true"><i style="width: {{ star_percent }}%"></i></span>
+          <span class="prs__percent">{{ star_percent }}%</span>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+  <div class="prs__actions">
+    {%- render 'review-form', endpoint: summary_form_endpoint, sid: summary_form_sid, product_id: product.id, product_title: product.title, product_image: product.featured_image, form_design: settings.review_form_design, button_label: summary_form_label -%}
+    <a class="prs__link" href="#product-reviews">{{ 'products.reviews.view_all' | t }}</a>
+  </div>
+</section>
+
+<style>
+  #prs-{{ sid }} { margin: 18px 0 4px; padding: 18px 16px 14px; border: 1px solid var(--lv-border, #e5dfd4); background: #f8f6f1; color: var(--text, #171511); }
+  #prs-{{ sid }} .prs__grid { display: grid; grid-template-columns: minmax(108px, .72fr) minmax(0, 1.5fr); align-items: center; gap: clamp(14px, 2vw, 26px); }
+  #prs-{{ sid }} .prs__score { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  #prs-{{ sid }} .prs__average { margin: 0 0 3px; font-size: clamp(28px, 3vw, 36px); line-height: 1; font-weight: 600; }
+  #prs-{{ sid }} .prs__stars { color: var(--lv-rating-star-gold, #d4af37); font-size: 17px; letter-spacing: 1px; line-height: 1.2; }
+  #prs-{{ sid }} .prs__count, #prs-{{ sid }} .prs__no-reviews { margin: 5px 0 0; font-size: 11px; line-height: 1.45; opacity: .72; }
+  #prs-{{ sid }} .prs__bars { display: grid; gap: 6px; min-width: 0; }
+  #prs-{{ sid }} .prs__bar { display: grid; grid-template-columns: 34px minmax(0, 1fr) 34px; align-items: center; gap: 8px; font-size: 11px; line-height: 1; }
+  #prs-{{ sid }} .prs__bar-label { white-space: nowrap; }
+  #prs-{{ sid }} .prs__bar-label span { color: var(--lv-rating-star-gold, #d4af37); }
+  #prs-{{ sid }} .prs__track { display: block; height: 5px; overflow: hidden; background: color-mix(in srgb, var(--text, #171511) 13%, transparent); }
+  #prs-{{ sid }} .prs__track i { display: block; height: 100%; background: var(--lv-rating-star-gold, #d4af37); }
+  #prs-{{ sid }} .prs__percent { text-align: right; opacity: .7; }
+  #prs-{{ sid }} .prs__actions { margin-top: 14px; text-align: center; }
+  #prs-{{ sid }} .prs__actions .rf { margin-top: 0; }
+  #prs-{{ sid }} .prs__actions .rf__open { width: 100%; min-height: 40px; }
+  #prs-{{ sid }} .prs__link { display: inline-block; width: fit-content; margin: 10px auto 0; color: inherit; font-size: 10px; font-weight: 600; letter-spacing: .09em; text-align: center; text-decoration: underline; text-underline-offset: 3px; text-transform: uppercase; }
+  #prs-{{ sid }} .prs__link:hover { color: var(--lv-accent-deep, #806745); }
+  @media (max-width: 420px) {
+    #prs-{{ sid }} { padding: 15px 11px 12px; }
+    #prs-{{ sid }} .prs__grid { grid-template-columns: minmax(84px, .65fr) minmax(0, 1.35fr); gap: 10px; }
+    #prs-{{ sid }} .prs__bar { grid-template-columns: 30px minmax(0, 1fr) 30px; gap: 6px; font-size: 10px; }
+  }
+</style>
