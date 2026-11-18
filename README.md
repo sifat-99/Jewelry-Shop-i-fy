@@ -46,7 +46,7 @@
 The root of this repository is strictly organized as a clean **Shopify Online Store 2.0 Theme**. All non-theme data, tooling, and documentation are categorized in `_project_resources/` (ignored by Git and Shopify CLI):
 
 ```text
-Le_Velair_Shopify/
+Jewelry_Shopify/
 ├── assets/                 # Compiled stylesheets (.css), JavaScript modules (.js), brand SVGs & fonts
 ├── config/                 # Global theme settings schema & presets
 │   ├── settings_schema.json
