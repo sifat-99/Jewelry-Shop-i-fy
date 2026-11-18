@@ -24,6 +24,22 @@ For the store team and for any developer who looks after the project.
 
 `shopify theme dev` creates a private **development theme** in the store and uploads your files to it. It is safe: customers never see it. A development theme that is no longer needed can be deleted in Online Store > Themes.
 
+### Store & Product Automation Commands (CLI)
+
+Beyond theme operations, products, collections, media, navigation, and customer reviews can be queried and modified directly from the command line using Shopify GraphQL CLI mutations.
+
+> 📖 **Full Command Guide:** See [CLI Commands & Store Automation Reference](CLI_COMMANDS_REFERENCE.md) for the complete collection of copy-paste queries and mutations.
+
+| Operation | Command Example |
+| --- | --- |
+| **Inspect a product** | `shopify store execute --store your-store.myshopify.com --query '{ productByHandle(handle: "...") { id title status tags } }'` |
+| **Update product status to ACTIVE** | `shopify store execute --store your-store.myshopify.com --allow-mutations --query 'mutation { productUpdate(input: { id: "gid://shopify/Product/...", status: ACTIVE }) { product { id } } }'` |
+| **Add tags (e.g. engravable)** | `shopify store execute --store your-store.myshopify.com --allow-mutations --query 'mutation { tagsAdd(id: "gid://shopify/Product/...", tags: ["engravable"]) { node { id } } }'` |
+| **Update variant price** | `shopify store execute --store your-store.myshopify.com --allow-mutations --query 'mutation { productVariantsBulkUpdate(productId: "...", variants: [{ id: "...", price: "49.00" }]) { productVariants { id } } }'` |
+| **Attach lifestyle image to product** | `shopify store execute --store your-store.myshopify.com --allow-mutations --query 'mutation { productCreateMedia(productId: "...", media: [{ originalSource: "...", mediaContentType: IMAGE }]) { media { id } } }'` |
+| **List pending reviews** | `shopify store execute --store your-store.myshopify.com --query '{ metaobjects(type: "review", first: 10) { edges { node { id handle fields { key value } } } } }'` |
+| **Run batch automation scripts** | `node _project_resources/scripts/populate-all-collections.js` |
+
 ### The golden rules
 
 1. **Never edit the live theme directly.** Work in a development theme or a duplicate, then publish.
