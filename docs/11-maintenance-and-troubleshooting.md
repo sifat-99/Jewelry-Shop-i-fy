@@ -104,7 +104,7 @@ These values are **not** controlled from the theme editor. Changing them needs a
 | Instagram fallback link | `sections/instagram-feed.liquid` | `https://www.instagram.com/bssoln` |
 | Footer credit "Developed by Bangladesh Software Solution" | `sections/footer-group.json` (the subfooter extra text) | Editable in the theme editor, in the Subfooter section |
 | Welcome discount code | Backend (`WELCOME_DISCOUNT_CODE`, default `WELCOME10`), footer newsletter settings, email templates | Must match a real discount in Shopify |
-| Store domain in scripts | `scripts/*` | `your-store.myshopify.com` |
+| Store domain in scripts | `_project_resources/scripts/*` | `your-store.myshopify.com` |
 | Local file paths in scripts | `scripts/*.py`, `scripts/*.js` | Paths on the original developer's computer |
 
 ---

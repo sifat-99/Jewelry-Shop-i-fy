@@ -1339,7 +1339,7 @@
         "type": "text",
         "id": "reviews_api_url",
         "label": "Reviews API URL",
-        "default": "https://le-velair-reviews-api.vercel.app/api/review",
+        "default": "https://your-reviews-service.vercel.app/api/review",
         "info": "Where product review forms send reviews. Photo uploads also require the API app's write_files permission and a file reference field named photo on the review metaobject."
       }
     ]

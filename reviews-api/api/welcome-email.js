@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 function allowedOrigins() {
   const custom = (process.env.ALLOWED_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
   return [
-    'https://le-velair-w6ickwvy.myshopify.com',
+    'https://shopify-jewelry.bssoln.com',
     'https://bssoln.com',
     'http://127.0.0.1:9292',
     ...custom
@@ -151,7 +151,7 @@ module.exports = async function handler(req, res) {
   }
 
   const discountCode = process.env.WELCOME_DISCOUNT_CODE || 'WELCOME10';
-  const storeUrl = process.env.STORE_URL || 'https://le-velair-w6ickwvy.myshopify.com';
+  const storeUrl = process.env.STORE_URL || 'https://shopify-jewelry.bssoln.com';
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',

@@ -1,6 +1,6 @@
 # 8. Backend services (custom applications)
 
-Shopify themes cannot safely do a few things on their own: write data into the store, send emails, or keep secrets. For these jobs the project has a small **serverless application** hosted on **Vercel**. It is one Vercel project named **`your-reviews-service`** (address `https://your-reviews-service.vercel.app`) with several endpoints.
+Shopify themes cannot safely do a few things on their own: write data into the store, send emails, or keep secrets. For these jobs the project has a small **serverless application** hosted on **Vercel**. It is a Vercel project named **`your-reviews-service`** (address `https://your-reviews-service.vercel.app`) with several endpoints.
 
 > **Plain-English summary.** Think of it as a small assistant that lives on the internet. The theme calls it when a customer submits a review or subscribes to the newsletter. It does the secure part (saving the review, sending the welcome email) and replies.
 
@@ -18,7 +18,7 @@ Shopify themes cannot safely do a few things on their own: write data into the s
 
 | Folder | Content | Note |
 | --- | --- | --- |
-| `Project_Root/reviews-api/` (inside the theme repository) | `api/review.js` (newest, with sign-in check and photo upload) and `api/welcome-email.js` (dark-style welcome email) | **This is the code that is currently live.** Linked to the Vercel project `your-reviews-service` |
+| `reviews-api/` (inside the theme repository) | `api/review.js` (with HMAC customer token check, staged upload photo pipeline, and draft metaobject creation) and `api/welcome-email.js` (dark-style welcome email) | **This is the active production code.** Deployed to Vercel at `https://your-reviews-service.vercel.app` |
 | `Reviews_API/` (a separate folder next to the repository) | `api/campaign.js`, `api/unsubscribe.js`, `api/_email-layout.js`, an alternative `api/welcome-email.js` (light layout, unsubscribe link) and an **older** `api/review.js` | Linked to the **same** Vercel project. Whichever folder was deployed last decides what is live. The latest deployment came from `reviews-api/`, so campaign and unsubscribe are currently offline |
 
 > **Important for the next developer.** The two folders are linked to the same Vercel project, which means deploying from one folder **removes** the endpoints that only exist in the other. Before deploying, merge everything you want to keep into one folder (see [8.7](#87-merging-and-deploying)). Never deploy the old `review.js` over the new one: it has no sign-in check and no photo upload.

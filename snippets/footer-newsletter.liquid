@@ -72,7 +72,7 @@
       var email = input ? input.value : '';
       if (email && email.indexOf('@') > -1) {
         try {
-          fetch('https://le-velair-reviews-api.vercel.app/api/welcome-email', {
+          fetch('https://your-reviews-service.vercel.app/api/welcome-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email.trim() }),

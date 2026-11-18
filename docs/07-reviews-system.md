@@ -162,13 +162,13 @@ Responses: `{ ok: true }` on success; `{ ok: false, error }` otherwise (`400` in
 
 ## 7.7 Setup checklist
 
-- [ ] The Shopify store has a metaobject definition of type `review` with the fields above and **Storefronts: read** access.
-- [ ] The review service is deployed on Vercel with its environment variables (see [Backend services](08-backend-services.md#82-review-service)).
-- [ ] The Shopify app credentials used by the service have the scopes `write_metaobjects` and `write_files` (photos).
-- [ ] The service's `ALLOWED_ORIGINS` contains the store's public domain.
-- [ ] **Review signing secret** in Theme settings equals `REVIEW_SIGNING_SECRET` in Vercel.
-- [ ] The **Reviews API URL** setting (or its default) points to the deployed service.
-- [ ] Customer accounts are enabled so customers can sign in.
+- [ ] The Shopify store has a metaobject definition of type `review` with the required fields (`name`, `rating`, `title`, `body`, `photo` as File, `product`, `verified`, `approved`, `date`) and **Storefronts: read** access.
+- [ ] The review service is deployed on Vercel at `https://your-reviews-service.vercel.app` with its environment variables (see [Backend services](08-backend-services.md#82-review-service)).
+- [ ] The Shopify Partner/Custom App (e.g. version `reviews-2`) has the scopes `read_files,write_files,read_metaobjects,write_metaobjects,read_products` active and released.
+- [ ] The service's `ALLOWED_ORIGINS` contains `https://shopify-jewelry.bssoln.com`, `https://your-store.myshopify.com`, and local testing origins (`http://127.0.0.1:9292`, `http://localhost:9292`).
+- [ ] **Review signing secret** in Theme settings equals `REVIEW_SIGNING_SECRET` in Vercel Production environment.
+- [ ] The **Reviews API URL** setting in Theme settings points to `https://your-reviews-service.vercel.app/api/review`.
+- [ ] Customer accounts are enabled in Shopify Admin so customers can sign in.
 
 ---
 
@@ -176,12 +176,13 @@ Responses: `{ ok: true }` on success; `{ ok: false, error }` otherwise (`400` in
 
 | Symptom | Likely cause and fix |
 | --- | --- |
-| "Please sign in ... refresh the page" although signed in | Open the browser console (F12) and read **Reason**. `bad_signature`: the two secrets differ, copy them again. `no_secret`: the Vercel variable is missing for the Production environment, add it and redeploy. `expired`: the page was open more than 12 hours, refresh |
-| "Origin not allowed" | Add the store domain (for example `https://shopify-jewelry.bssoln.com`) to `ALLOWED_ORIGINS` and redeploy |
-| Review saved but not visible | It is still a **Draft**. Set it to Active. Or the metaobject definition does not allow storefront reading |
-| Photo missing | The service needs `write_files` scope and the review definition needs a photo file field. Redeploy the **latest** service version |
-| The form shows "Reviews can't be submitted right now" | The signing secret is empty in Theme settings |
-| Some reviews do not show | See the 50-review limit below |
+| "Please sign in ... refresh the page" although signed in | Open the browser console (F12) and read **Reason**. `bad_signature`: the two secrets differ, copy them again. `no_secret`: the Vercel variable `REVIEW_SIGNING_SECRET` is missing for the Production environment, add it and redeploy with `vercel --prod`. `expired`: the page was open more than 12 hours, refresh |
+| "Origin not allowed" (403) | Add the store domain (`https://shopify-jewelry.bssoln.com` and `https://your-store.myshopify.com`) to `ALLOWED_ORIGINS` on Vercel and redeploy |
+| Review saved but not visible | It is still a **Draft**. Go to **Content > Metaobjects > Review** and set it to Active. Or verify the metaobject definition allows Storefront reading |
+| "Customer photo uploads are not enabled for this review service yet" | The Shopify app lacks `write_files` scope in its active version. Create and release an app version with `read_files,write_files,read_metaobjects,write_metaobjects,read_products` (e.g. `reviews-2`) in the Shopify Partner Dashboard |
+| "Could not attach the image. Check that the review metaobject has a photo file field" | In Shopify Admin > Settings > Custom data > Metaobjects > Review, add a field named `photo` with type **File** (Accept images) |
+| The form shows "Reviews can't be submitted right now" | The signing secret is empty in Theme settings > Reviews |
+| Some reviews do not show | Liquid reads only the first 50 metaobject entries storewide (see known limits below) |
 | Pop-up always visible on phones | Fixed in the current theme (a closed pop-up is always hidden). Hard refresh the page |
 
 ### Known limits

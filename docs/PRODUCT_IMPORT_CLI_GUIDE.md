@@ -64,7 +64,7 @@ If your images are saved locally, you can upload them to Shopify Files using `sh
 
 ```bash
 # 1. Generate staged upload target URL
-shopify store execute --store le-velair-w6ickwvy.myshopify.com --allow-mutations --query '
+shopify store execute --store your-store.myshopify.com --allow-mutations --query '
 mutation {
   stagedUploadsCreate(input: [{
     resource: FILE,
@@ -86,7 +86,7 @@ mutation {
 
 ```bash
 # 2. Register uploaded file in Shopify Files
-shopify store execute --store le-velair-w6ickwvy.myshopify.com --allow-mutations --query '
+shopify store execute --store your-store.myshopify.com --allow-mutations --query '
 mutation {
   fileCreate(files: [{
     originalSource: "https://your-staged-upload-url/ring_gold_01.webp",
@@ -251,7 +251,7 @@ shopify theme list
 ### 3.2 Verify GraphQL Permission
 Ensure `shopify store execute` can query and perform mutations:
 ```bash
-shopify store execute --store le-velair-w6ickwvy.myshopify.com --allow-mutations --query '
+shopify store execute --store your-store.myshopify.com --allow-mutations --query '
 query {
   shop {
     name
@@ -279,7 +279,7 @@ There are two primary methods to import the generated CSV:
 For individual products or batch script creation:
 
 ```bash
-shopify store execute --store le-velair-w6ickwvy.myshopify.com --allow-mutations --query '
+shopify store execute --store your-store.myshopify.com --allow-mutations --query '
 mutation {
   productCreate(input: {
     title: "Luna Star Enamel Hand Chain",
@@ -341,7 +341,7 @@ node scripts/publish-all-collections.js
 
 ### 6.2 Verify Product Publication via GraphQL
 ```bash
-shopify store execute --store le-velair-w6ickwvy.myshopify.com --query '
+shopify store execute --store your-store.myshopify.com --query '
 query {
   products(first: 5) {
     nodes {

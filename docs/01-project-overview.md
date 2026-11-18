@@ -9,9 +9,9 @@ It is made of four parts:
 | Part | What it is | Where it lives |
 | --- | --- | --- |
 | **1. The Shopify theme** ("Jewelry Shop" v2.0.0) | Everything customers see: home page, collections, product pages, cart, account area, blog, search | This repository: `layout/`, `sections/`, `snippets/`, `templates/`, `assets/`, `config/`, `locales/` |
-| **2. Custom backend services** | Small serverless applications that do things Shopify cannot do alone: save reviews safely, send the welcome email, send email campaigns, handle unsubscribes | `reviews-api/` in this repository, and the deployed service folder `Reviews_API` (hosted on Vercel) |
+| **2. Custom backend services** | Small serverless applications that do things Shopify cannot do alone: save reviews safely, send the welcome email, send email campaigns, handle unsubscribes | `reviews-api/` in this repository, deployed to Vercel at `https://your-reviews-service.vercel.app` |
 | **3. Email templates** | 17 branded versions of Shopify's order, shipping, account and marketing emails | `Email_Templates/email-notification-templates.md` (copied into Shopify Admin) |
-| **4. Catalog and data tools** | Scripts and a web app to create collections and menus, import products and photos, and generate lifestyle product images | `scripts/`, the `shopify-catalog-importer` web app, and the CSV/JSON files in the project root |
+| **4. Catalog and data tools** | Scripts and data tools to create collections and menus, import products and photos, and generate lifestyle product images | `_project_resources/` (scripts, CSV/JSON catalogs, image archives) |
 
 The theme is built on the **Pipeline** theme framework by Groupthought Themes and has been heavily customized. All Aurelle-specific design, features and sections were added on top of it by BSS Software Solutions.
 
@@ -20,7 +20,8 @@ The theme is built on the **Pipeline** theme framework by Groupthought Themes an
 | Item | Value |
 | --- | --- |
 | Brand name on the storefront | **Aurelle** (Fine Jewelry) |
-| Shopify store | `your-store.myshopify.com` |
+| Custom storefront domain | `https://shopify-jewelry.bssoln.com` |
+| Shopify store domain | `your-store.myshopify.com` |
 | Languages | English (default) and Dutch (`nl`) |
 | Main currency | Euro (€). Bangladeshi Taka is also supported where the store sells in BDT |
 | Free shipping | From **€39** (shown in the cart drawer progress message and in the announcement bar) |
@@ -83,7 +84,7 @@ Store team
 | JavaScript | Vanilla JS and native web components (no build step for the custom parts); Pipeline framework bundle for the core |
 | Data | Shopify products/collections, **metaobjects** (type `review`), customer accounts, `localStorage` for the wishlist |
 | Backend | **Vercel serverless functions** (Node.js 18+), Shopify **Admin GraphQL API**, Nodemailer with Gmail SMTP |
-| Tooling | Shopify CLI (`theme dev`, `theme push`, `store execute`), Node and Python scripts |
+| Tooling | Shopify CLI (`v5.0.2`: `theme dev`, `theme push`), Node and Python automation scripts |
 
 ## 1.7 Design system
 
@@ -136,42 +137,37 @@ All fonts, sizes, weights and letter spacing can be changed in Theme settings > 
 ## 1.8 Folder map
 
 ```
-Project_Root/                    (the theme + project root)
-├── assets/                           JavaScript, CSS, images, swatches.json  → reference/assets.md
+Le_Velair_Shopify/               (Theme repository root)
+├── assets/                           CSS, JavaScript, icons, swatches.json → reference/assets.md
 ├── config/
-│   ├── settings_schema.json          definition of Theme settings (19 groups)
-│   └── settings_data.json            the current values of Theme settings
+│   ├── settings_schema.json          Theme settings definitions (19 groups)
+│   └── settings_data.json            Current theme settings data
 ├── layout/
-│   ├── theme.liquid                  frame around every page
-│   └── password.liquid               frame of the password page
+│   ├── theme.liquid                  Main HTML frame for every storefront page
+│   └── password.liquid               Password landing page frame
 ├── locales/
-│   ├── en.default.json               English texts
-│   └── nl.json                       Dutch texts
-├── sections/                         32 sections + 2 section groups (header, footer)  → 05-sections-guide.md
-├── snippets/                         66 reusable pieces                              → reference/snippets.md
-├── templates/                        16 JSON page templates + 8 Liquid templates (account, gift card)
-├── reviews-api/                      custom serverless service (reviews, welcome email)  → 08-backend-services.md
-├── scripts/                          14 automation scripts                                → 10-catalog-and-data-tools.md
-├── docs/                             this documentation
-├── products_full.json                full product data
-├── shopify_products_*.csv            product import files (EUR, import, BDT English)
-├── product_images_mapping.csv        which image belongs to which product
-├── mockup_generation_queue.json      queue for AI lifestyle image generation
-├── Aurelle_Main_Product_Images.zip product photo archive
-├── Aurelle Luxury Theme-1.0.0.zip  the original theme package (version 1.0.0) kept as a backup
-├── README.md / README_BN.md          project readmes (English / Bengali)
-├── PRODUCT_IMPORT_CLI_GUIDE.md       product import guide (English)
-├── CLI_CATALOG_IMPORT_WORKFLOW_BN.md catalog import workflow (Bengali)
-└── copilot-instructions.md           AI coding assistant instructions (developers only)
+│   ├── en.default.json               English translations
+│   └── nl.json                       Dutch translations
+├── sections/                         32 modular sections + 2 section groups → 05-sections-guide.md
+├── snippets/                         66 reusable Liquid UI components → reference/snippets.md
+├── templates/                        16 JSON page templates + customer liquid templates
+├── reviews-api/                      Serverless reviews API & welcome email (Vercel) → 08-backend-services.md
+├── docs/                             Interactive single-page documentation & reference
+├── _project_resources/               (Git-ignored) Catalog CSVs, heavy image archives, backup zips, scripts
+└── README.md                         Project overview and developer guidelines
 ```
 
-### Related projects outside this repository
+### Resource storage (`_project_resources/`)
 
-| Folder | What it is | Documented in |
-| --- | --- | --- |
-| `Reviews_API/` | The deployed Vercel service: review, welcome email, campaign tool, unsubscribe page, shared email layout | [8. Backend services](08-backend-services.md) |
-| `Email_Templates/` | The 17 notification email templates (ready-to-paste code) | [9. Email templates](09-email-templates.md) |
-| `shopify-catalog-importer/` | A web app that uploads images and imports products from CSV | [10. Catalog and data tools](10-catalog-and-data-tools.md) |
+All heavy, non-theme assets are preserved locally in `_project_resources/` (ignored by git to keep the theme lightweight):
+
+| Folder | What it holds |
+| --- | --- |
+| `_project_resources/catalog_and_data/` | Product CSV import files, `products_full.json`, image mapping tables |
+| `_project_resources/archives/` | Original photo zip archives (`Aurelle_Main_Product_Images.zip`) |
+| `_project_resources/backups/` | Theme zip backups (`Aurelle Luxury Theme-1.0.0.zip`) |
+| `_project_resources/scripts/` | 14 automation scripts for catalog import, menu creation, and AI photo processing |
+| `_project_resources/images/` | Raw product images and lifestyle shot queues |
 
 ## 1.9 Counts
 

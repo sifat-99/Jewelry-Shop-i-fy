@@ -12,7 +12,7 @@
 {%- assign review_count = review_parts[1] | plus: 0 -%}
 {%- assign summary_form_sid = sid | append: '-review-summary' -%}
 {%- assign summary_form_label = 'products.reviews.write_review' | t -%}
-{%- assign summary_form_endpoint = settings.reviews_api_url | default: 'https://le-velair-reviews-api.vercel.app/api/review' -%}
+{%- assign summary_form_endpoint = settings.reviews_api_url | default: 'https://your-reviews-service.vercel.app/api/review' -%}
 <section class="prs" id="prs-{{ sid }}" aria-label="{{ 'products.reviews.rating_summary' | t }}">
   <div class="prs__grid">
     <div class="prs__score">
