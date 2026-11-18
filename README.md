@@ -1,93 +1,179 @@
-# Jewelry-Shop-i-fy
+# Aurelle — Bespoke Luxury Jewelry Shopify Theme
 
-> **Aurelle — Bespoke Luxury Jewelry Shopify Theme & Reviews Microservice**  
-> Developed by **Bangladesh Software Solutions** for **Aurelle Fine Jewelry**.  
-> Featuring custom engravings, retina product galleries, split-screen collection showcases, and a serverless Shopify Metaobjects reviews integration.
+[![Shopify CLI](https://img.shields.io/badge/Shopify_CLI-5.0.2-96bf48.svg?logo=shopify&logoColor=white)](https://shopify.dev/docs/themes/tools/cli)
+[![Liquid Theme](https://img.shields.io/badge/Shopify-Liquid_Theme-7ab55c.svg?logo=shopify&logoColor=white)](https://shopify.dev/docs/api/liquid)
+[![Vercel Serverless](https://img.shields.io/badge/Vercel-Serverless_API-000000.svg?logo=vercel&logoColor=white)](https://vercel.com)
+[![BSS Software Solutions](https://img.shields.io/badge/Developed_by-Bangladesh_Software_Solutions-0052cc.svg)](https://bssoln.com)
+
+> **Aurelle Fine Jewelry** is a high-performance, bespoke Shopify Online Store 2.0 luxury theme and serverless microservice suite. Built by **Bangladesh Software Solutions** with editorial typography, interactive custom engraving calculators, full-width parallax showcases, and an authentic Shopify Metaobjects reviews architecture.
 
 ---
 
-## ✨ Highlights & Key Features
+## ✨ Key Features & Architecture
 
-### 💎 Luxury Aesthetics & Design System
-- **Editorial Typography & Spacing:** Custom CSS tokens, fluid responsive typography, and refined serif/sans-serif pairings.
-- **Dynamic Color Schemes:** Multi-palette theme support with contrast-safe background/text/accent tokens.
-- **Retina Crisp Contrast:** Full 2x & 3x srcset rendering for brand logos, hero banners, and high-definition jewelry closeups without blur.
+### 💎 Editorial Design System & Typography
+- **Curated Font Pairing:** Headings in refined *Playfair Display* serif paired with crisp, readable *Quicksand* sans-serif.
+- **Fluid Tokens & Contrast-Safe Palette:** Pure white surfaces, warm champagne neutrals, rich bronze gold (`#8a6a3a`), and high-contrast ink accents (`#1d1b18`).
+- **Retina-Crisp Graphics:** Automated 2x & 3x srcset rendering for brand logos, hero banners, and high-definition jewelry closeups without blur.
 
 ### 🔠 Interactive Custom Engraving System
-- **Tiered Character Pricing:** Dynamic character-length price calculation (3, 5, 7, 10, 12 characters) with live price adjustment.
-- **Inline Badges:** Instant visual price tags on engraving option pills (`+€X`).
-- **Live Preview & Validation:** Character count limiters, disallowed character filters, and custom cart line-item property integration.
+- **Tiered Character Pricing:** Dynamic length-based price adjustments (3, 5, 7, 10, 12 characters) with live price updates on variant pills.
+- **Instant Option Badges:** Automatic `+€X` price badges displayed on engraving options.
+- **Client-Side Validation & Cart Properties:** Character count limiters, disallowed character filters, and custom cart line-item property integration (`_engraving_text`, `_engraving_font`).
 
-### 🖼️ High-Impact Visuals & Sticky Banners
-- **Split Collection Sections:** 2:3 vertical aspect-ratio desktop sticky banner alongside a high-density product grid, transitioning to a 1:1 square banner on mobile.
-- **Aspect Ratio Locking:** Locked 3:2 mosaic hero grids and retina-optimized image zoom.
-- **Pan-and-Magnify Zoom:** Interactive modal zoom allowing customers to inspect delicate clasps, stone settings, and engravings up close.
+### 🎞️ Parallax Showcase & Mobile Dual Marquee
+- **Edge-to-Edge Layout:** Full-width container with responsive outer gutters eliminating artificial desktop column clamps.
+- **Desktop Momentum & Hover Pause:** Interactive mouse wheel scrolling with smooth inertia decay and automatic hover pause on product cards.
+- **Dual-Row Mobile Marquee:** Dual oppositely auto-scrolling rows on mobile and tablet devices with configurable theme editor speed controls.
+- **Zero FOUC Reload Protection:** Pre-hydration CSS guards in `<head>` preventing card explosion during initial asset loads.
 
-### 🛍️ Smooth Shopping & Conversion Boosters
-- **High-Variant Bottom Sheet & Carousel:** Smooth swipe, arrows, drag-to-scroll, and mouse-wheel support for products with multiple stone and metal variations.
-- **Mobile Two-Tap Interaction:** First tap reveals available variants, second tap instantly adds the chosen variant to the cart.
-- **Ajax Cart Drawer:** Free shipping threshold progress bar, line-item quantity controls, and custom engraving note displays.
+### ⭐ Authenticated Reviews Microservice (Shopify Metaobjects)
+- **Signed Customer Tokens:** Tamper-proof HMAC-SHA256 customer session tokens generated in Liquid via `settings.review_signing_secret` to ensure only logged-in customers review under their genuine identity.
+- **3-Step Modal Experience:** Multi-step submission dialog with star ratings, predictive product autocomplete, and client-side canvas JPEG compression (<900KB).
+- **Automated Draft Metaobjects:** Vercel serverless API exchanging client credentials for Shopify Admin tokens to create draft `review` metaobjects awaiting merchant moderation.
+- **Customer Photo Uploads:** Staged file creation pipeline attaching customer photos directly to the Shopify CDN and linking to the metaobject record.
 
-### ⭐ Serverless Reviews & Shopify Metaobjects
-- **Shopify Metaobjects Integration:** Customer reviews stored directly in Shopify as `review` metaobjects.
-- **Auto-Refreshing OAuth API:** Vercel serverless microservice utilizing Shopify Dev Dashboard Client Credentials with automated 24-hour token refresh and caching.
-- **Verified Buyer Badges:** Golden star rating breakdowns, verified customer markers, and moderation support (Draft vs Active).
+### 🛍️ Conversion-Focused Storefront Interactions
+- **Sticky Pan-and-Magnify Gallery:** Desktop pin-gallery layout with smooth interactive zoom modal for inspecting clasps, engravings, and stone settings.
+- **Slide-Out Ajax Cart Drawer:** Dynamic free-shipping milestone progress bar (€39 threshold), custom engraving notes, and sticky checkout buttons.
+- **Quick View & High-Density Grids:** Bottom sheets for mobile variant selection, fast swatch color switching, and instant add-to-cart workflows.
+- **Customer Account Dashboard:** Centralized order tracking, address book management, and return URL redirects (`return_url=%23product-reviews`).
 
 ---
 
 ## 📁 Repository Structure
 
+The root of this repository is strictly organized as a clean **Shopify Online Store 2.0 Theme**. All non-theme data, tooling, and documentation are categorized in `_project_resources/` (ignored by Git and Shopify CLI):
+
+```text
+Le_Velair_Shopify/
+├── assets/                 # Compiled stylesheets (.css), JavaScript modules (.js), brand SVGs & fonts
+├── config/                 # Global theme settings schema & presets
+│   ├── settings_schema.json
+│   └── settings_data.json  # (Merchant settings - DO NOT overwrite manually)
+├── layout/                 # Base layout wrappers (theme.liquid, password.liquid)
+├── locales/                # Internationalization translation dictionaries (en.default.json, nl.json)
+├── sections/               # 32 modular full-width page sections (parallax-showcase, product-reviews, etc.)
+├── snippets/               # 68 reusable Liquid components (product-grid-item, review-form, feedback-card, etc.)
+├── templates/              # JSON page structure templates (index.json, product.json, collection.json, etc.)
+│   └── customers/          # Customer account templates (login, register, addresses, order)
+├── .shopify/               # Shopify CLI local state
+├── .theme-check.yml        # Shopify Theme Check linter configuration
+├── .gitignore              # Git ignore rules
+├── AGENTS.md               # Coding agent platform rules & Shopify guidelines
+└── README.md               # Theme repository documentation
 ```
-Jewelry-Shop-i-fy/
-├── assets/                 # Compiled stylesheets, JavaScript modules, fonts, SVGs, and brand logos
-├── config/                 # Shopify theme settings schema & presets (settings_schema.json, settings_data.json)
-├── layout/                 # Theme layouts (theme.liquid, password.liquid)
-├── locales/                # Internationalization locale files (en.default.json, nl.json)
-├── sections/               # Modular theme sections (header, footer, collection-split, customer-feedback, etc.)
-├── snippets/               # Reusable Liquid components (product-grid-item, review-form, engraving-info, etc.)
-├── templates/              # JSON template files for homepage, collections, PDPs, cart, search, etc.)
-│   └── customers/          # Customer account management templates (login, register, addresses, order history)
-├── reviews-api/            # Standalone Vercel Serverless Function for Shopify Metaobjects review ingestion
-│   ├── api/
-│   │   └── review.js       # CORS-protected GraphQL review ingestion endpoint with automated token refresh
-│   ├── package.json
-│   └── .env.example
-├── scripts/                # Data enrichment, collection push, and automation utilities
-└── data/                   # Product catalog imports & CSV datasets
-```
+
+### 📦 Non-Theme Resources (`_project_resources/`)
+All non-theme assets are preserved locally in `_project_resources/` and excluded from Git commits and theme pushes:
+- **`archives/`**: Full theme zip backups and raw image zip archives.
+- **`catalog_and_data/`**: Product CSV import datasets (EUR & BDT), enrichment JSON files, and mockup generation queues.
+- **`docs/`**: The complete single-page interactive documentation site (`docs/index.html`) and markdown guides.
+- **`images/`**: Source and enhanced product photography collections.
+- **`reviews-api/`**: The standalone Vercel Serverless Function source code (`/api/review.js`).
+- **`scripts/`**: Automation tools for Gemini lifestyle image generation, image optimization, and collection publishing.
+- **`backups/`**: Archival file versions.
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Theme Development with Shopify CLI
-```bash
-# Clone the repository
-git clone https://github.com/sifat-99/Jewelry-Shop-i-fy.git
-cd Jewelry-Shop-i-fy
+### Prerequisites
+- [Shopify CLI 5.0+](https://shopify.dev/docs/themes/tools/cli) installed globally (`npm install -g @shopify/cli@latest`)
+- Node.js `v18+` or `v20+` (verified compatible up to `v26.x`)
+- Active collaborator or staff access to the target Shopify store
 
-# Start local theme development server
-shopify theme dev --store le-velair-w6ickwvy.myshopify.com
+### 1. Local Theme Development
+Connect to the development store and spin up a hot-reloading dev preview server:
+
+```bash
+# Authenticate with the store
+shopify auth login --store le-velair-w6ickwvy.myshopify.com
+
+# Start local development server on port 9292
+shopify theme dev
+```
+Open `http://127.0.0.1:9292` in your browser to test live changes with local hot-reloading.
+
+### 2. Deploying Theme Changes
+To push your local code changes to Shopify:
+
+```bash
+# Push to development theme
+shopify theme push
+
+# Push directly to live production theme (Caution: Affects live shoppers)
+shopify theme push --theme <LIVE_THEME_ID> --allow-live
 ```
 
-### 2. Deploy Reviews API on Vercel
+---
+
+## ⚙️ Reviews Microservice Setup (Vercel)
+
+The serverless Reviews API lives in `_project_resources/reviews-api` and deploys to Vercel:
+
 ```bash
-cd reviews-api
-npm install
+cd _project_resources/reviews-api
 
 # Deploy to Vercel production
 vercel --prod
 ```
 
-Configure the following environment variables in Vercel:
-- `SHOPIFY_STORE_DOMAIN`: `le-velair-w6ickwvy.myshopify.com`
-- `SHOPIFY_CLIENT_ID`: Dev Dashboard Client ID
-- `SHOPIFY_CLIENT_SECRET`: Dev Dashboard Client Secret
-- `ALLOWED_ORIGINS`: Allowed store origins (e.g. `https://le-velair-w6ickwvy.myshopify.com`)
+### Required Vercel Environment Variables
+Set these variables in **Vercel Dashboard > Settings > Environment Variables** (or via `vercel env add`):
 
-The Shopify app needs the `write_metaobjects` scope for review submissions. To accept customer photos, also grant `write_files` and add a `photo` field with type **File** to the `review` metaobject definition. The API uploads each compressed image through Shopify staged uploads before attaching it to the draft review.
+| Variable | Description | Example / Note |
+| :--- | :--- | :--- |
+| `SHOPIFY_STORE_DOMAIN` | Connected Shopify store domain | `le-velair-w6ickwvy.myshopify.com` |
+| `SHOPIFY_CLIENT_ID` | Partner Dev Dashboard App Client ID | Client ID from `dev.shopify.com` |
+| `SHOPIFY_CLIENT_SECRET` | Partner Dev Dashboard App Client Secret | Secret from `dev.shopify.com` |
+| `REVIEW_SIGNING_SECRET` | HMAC signature secret | **Must match** `Theme settings > Reviews > Review signing secret` |
+| `ALLOWED_ORIGINS` | Permitted CORS caller origins | `https://shopify-jewelry.bssoln.com,https://le-velair-w6ickwvy.myshopify.com,http://127.0.0.1:9292` |
+| `REVIEW_REQUIRE_LOGIN` | Require signed customer token | `true` (Default) |
+| `REVIEW_TOKEN_TTL_HOURS` | Token expiration duration | `12` (Default: 12 hours) |
+
+### Shopify App Scopes Checklist
+In **Shopify Dev Dashboard** (`dev.shopify.com`) or Custom App Configuration:
+- ✅ `read_products`
+- ✅ `read_metaobjects` & `write_metaobjects`
+- ✅ `read_files` & `write_files` *(Required for customer photo uploads)*
+
+> [!IMPORTANT]
+> When adding new access scopes (such as `write_files`) in the Partner Dashboard, open your Shopify Store Admin to approve and install the updated permissions on the store.
+
+### Shopify `review` Metaobject Definition
+In **Shopify Admin > Settings > Custom data > Metaobjects > Review**:
+- **Type / Handle:** `review`
+- **Capabilities:** Publishable (Enabled)
+- **Access:** Storefront (Public read)
+- **Field Definitions:**
+  - `name`: Single line text (Required)
+  - `rating`: Number integer or Single line text (Required)
+  - `title`: Single line text
+  - `body`: Multi-line text (Required)
+  - `date`: Date (Required)
+  - `verified`: Boolean (True / False)
+  - `approved`: Boolean (True / False)
+  - `product`: Product reference
+  - `photo`: File reference (Images only)
 
 ---
 
-## 🛡️ License
-Private & Proprietary © Bangladesh Software Solutions. All rights reserved.
+## 📖 Documentation Reference
+
+A comprehensive, self-contained single-page documentation app is included at:
+👉 `_project_resources/docs/store-docs/index.html`
+
+It provides:
+- **12 Interactive Guides:** Merchant workflows, store operations, design systems, and troubleshooting.
+- **32 Section Reference Sheets:** Every liquid section documented with schema tables, default values, and block architectures.
+- **Instant Full-Text Search:** In-memory keyword lookup and highlighted snippets across all 49 chapters.
+- **Dark & Light Mode:** Built-in theme switcher respecting client system preferences.
+
+---
+
+## 🛡️ License & Credits
+
+- **Client:** Aurelle Fine Jewelry
+- **Development & Architecture:** [Bangladesh Software Solutions](https://bssoln.com)
+- **Proprietary & Confidential:** Private codebase. All rights reserved.
