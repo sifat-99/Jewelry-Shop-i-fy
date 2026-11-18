@@ -88,7 +88,7 @@ Connect to the development store and spin up a hot-reloading dev preview server:
 
 ```bash
 # Authenticate with the store
-shopify auth login --store le-velair-w6ickwvy.myshopify.com
+shopify auth login --store your-store.myshopify.com
 
 # Start local development server on port 9292
 shopify theme dev
@@ -124,11 +124,11 @@ Set these variables in **Vercel Dashboard > Settings > Environment Variables** (
 
 | Variable | Description | Example / Note |
 | :--- | :--- | :--- |
-| `SHOPIFY_STORE_DOMAIN` | Connected Shopify store domain | `le-velair-w6ickwvy.myshopify.com` |
+| `SHOPIFY_STORE_DOMAIN` | Connected Shopify store domain | `your-store.myshopify.com` |
 | `SHOPIFY_CLIENT_ID` | Partner Dev Dashboard App Client ID | Client ID from `dev.shopify.com` |
 | `SHOPIFY_CLIENT_SECRET` | Partner Dev Dashboard App Client Secret | Secret from `dev.shopify.com` |
 | `REVIEW_SIGNING_SECRET` | HMAC signature secret | **Must match** `Theme settings > Reviews > Review signing secret` |
-| `ALLOWED_ORIGINS` | Permitted CORS caller origins | `https://shopify-jewelry.bssoln.com,https://le-velair-w6ickwvy.myshopify.com,http://127.0.0.1:9292` |
+| `ALLOWED_ORIGINS` | Permitted CORS caller origins | `https://shopify-jewelry.bssoln.com,https://your-store.myshopify.com,http://127.0.0.1:9292` |
 | `REVIEW_REQUIRE_LOGIN` | Require signed customer token | `true` (Default) |
 | `REVIEW_TOKEN_TTL_HOURS` | Token expiration duration | `12` (Default: 12 hours) |
 
