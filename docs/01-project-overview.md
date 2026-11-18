@@ -137,7 +137,7 @@ All fonts, sizes, weights and letter spacing can be changed in Theme settings > 
 ## 1.8 Folder map
 
 ```
-Le_Velair_Shopify/               (Theme repository root)
+Jewelry_Shopify/               (Theme repository root)
 ├── assets/                           CSS, JavaScript, icons, swatches.json → reference/assets.md
 ├── config/
 │   ├── settings_schema.json          Theme settings definitions (19 groups)
