@@ -1,7 +1,0 @@
-{
-  "name": "bss-reviews-api",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Bangladesh Software Solutions Serverless API for Shopify Metaobjects review ingestion.",
-  "engines": { "node": ">=18" }
-}

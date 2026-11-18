@@ -29,3 +29,7 @@ yarn-error.log*
 *.tmp
 *.log
 .cache/
+
+# Non-theme project resources (docs, tools, data, scripts, zips)
+_project_resources/
+
