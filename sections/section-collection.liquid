@@ -86,7 +86,11 @@
     assign shuffle_enabled = true
   endif
 
+  assign layout = section.settings.layout | default: 'grid'
   assign display_limit = section.settings.limit | default: 8
+  if layout == 'split'
+    assign display_limit = section.settings.split_limit | default: 12
+  endif
   assign pool_limit = display_limit
   if shuffle_enabled
     assign pool_limit = 48
@@ -133,15 +137,11 @@
   style="--PT: {{ section.settings.padding_top | default: 26 }}px; --PB: {{ section.settings.padding_bottom | default: 14 }}px; --card-radius: {{ section.settings.card_border_radius | default: settings.card_border_radius | default: 4 }}px;">
   <div class="wrapper--full section-padding">
 
-    {%- if section.settings.title != blank -%}
-      <h2 class="kicker-flourished mb-r9">{{ section.settings.title }}</h2>
-    {%- endif -%}
-    {%- if section.settings.subtitle != blank -%}
-      <p style="text-align: center; font-family: var(--FONT-STACK-SUBHEADING, sans-serif); font-size: calc(13.5px * var(--FONT-ADJUST-ACCENT, 1)); font-weight: var(--FONT-WEIGHT-SUBHEADING, 500); color: var(--text, #2b2622); margin: -6px auto 26px auto; letter-spacing: var(--FONT-SUBHEADING-LETTER-SPACING, 0.05em); text-transform: var(--FONT-SUBHEADING-TRANSFORM, none); max-width: 600px; opacity: 1;">{{ section.settings.subtitle }}</p>
-    {%- endif -%}
-
-    <div class="lv-product-grid" style="{% render 'product-grid-vars', settings: section.settings %}">
+    {%- capture product_cards -%}
       {%- assign rendered_count = 0 -%}
+      {%- comment -%} Performance: below the first section the card images are lazy-loaded (they do not compete with the page HTML). {%- endcomment -%}
+      {%- assign cards_lazy = false -%}
+      {%- if section.index != nil and section.index > 1 -%}{%- assign cards_lazy = true -%}{%- endif -%}
       {%- if featured_collection.products.size > 0 -%}
         {%- for rec_product in featured_collection.products limit: loop_fetch_limit -%}
           {%- if current_product != blank -%}
@@ -156,7 +156,7 @@
               {%- assign extra_cls = 'lv-shuffled-hidden' -%}
             {%- endif -%}
           {%- endif -%}
-          {% render 'product-grid-item', product: rec_product, fallback_index: rendered_count, card_border_radius: section.settings.card_border_radius, extra_class: extra_cls %}
+          {% render 'product-grid-item', product: rec_product, fallback_index: rendered_count, card_border_radius: section.settings.card_border_radius, extra_class: extra_cls, lazy_load: cards_lazy %}
           {%- if rendered_count >= pool_limit -%}
             {%- break -%}
           {%- endif -%}
@@ -167,7 +167,68 @@
           {% render 'product-grid-item', fallback_index: i, card_border_radius: section.settings.card_border_radius %}
         {%- endfor -%}
       {%- endif -%}
+    {%- endcapture -%}
+
+    {%- if layout == 'split' -%}
+      {%- comment -%}
+        Text panel + product slider: heading, text, note and arrows on the left, the product cards scroll
+        horizontally on the right. Stacks (text on top, cards below) on tablets and phones.
+      {%- endcomment -%}
+      <collection-slider class="lv-nis" style="--nis-cols: {{ section.settings.split_columns | default: 3 }};">
+        <div class="lv-nis__intro">
+          {%- if section.settings.split_image != blank -%}
+            {%- liquid
+              assign banner_img = section.settings.split_image
+              assign banner_url = section.settings.split_image_link | default: featured_collection.url | default: routes.all_products_collection_url
+              assign banner_label = banner_img.alt | default: section.settings.title | default: featured_collection.title
+            -%}
+            {%- comment -%} Banner keeps its own aspect ratio (never cropped) on every screen size and links to the collection. {%- endcomment -%}
+            <a class="lv-nis__banner" href="{{ banner_url }}" aria-label="{{ banner_label | escape }}" style="aspect-ratio: {{ banner_img.aspect_ratio | default: 0.75 }};">
+              {{ banner_img | image_url: width: 1400 | image_tag: widths: '400, 600, 800, 1000, 1200, 1400', sizes: '(min-width: 990px) 26vw, 100vw', loading: 'lazy', class: 'lv-nis__banner-img', alt: banner_label }}
+            </a>
+          {%- endif -%}
+          {%- if section.settings.split_image == blank -%}
+          <div class="lv-nis__copy">
+            {%- if section.settings.title != blank -%}
+              <h2 class="lv-nis__title">{{ section.settings.title }}</h2>
+            {%- endif -%}
+            {%- if section.settings.split_text != blank -%}
+              <div class="lv-nis__text rte">{{ section.settings.split_text }}</div>
+            {%- endif -%}
+            {%- if section.settings.split_note != blank -%}
+              <p class="lv-nis__note">{{ section.settings.split_note | escape }}</p>
+            {%- endif -%}
+            {%- if section.settings.show_view_all -%}
+              <a class="lv-nis__link" href="{{ featured_collection.url | default: routes.all_products_collection_url }}">{{ 'collections.general.view_all_products' | t }}</a>
+            {%- endif -%}
+          </div>
+          {%- endif -%}
+        </div>
+        <div class="lv-nis__track" data-product-row data-nis-track tabindex="0" aria-label="{{ section.settings.title | default: featured_collection.title | escape }}">
+          {{ product_cards }}
+        </div>
+        <div class="lv-nis__nav">
+          <button type="button" class="lv-nis__btn" data-nis-prev aria-label="{{ 'sections.collection_slider.previous' | t }}">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span class="lv-nis__count" aria-live="polite"><span data-nis-current>1</span>/<span data-nis-total>{{ display_limit }}</span></span>
+          <button type="button" class="lv-nis__btn" data-nis-next aria-label="{{ 'sections.collection_slider.next' | t }}">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </collection-slider>
+    {%- else -%}
+    {%- if section.settings.title != blank -%}
+      <h2 class="kicker-flourished mb-r9">{{ section.settings.title }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subtitle != blank -%}
+      <p style="text-align: center; font-family: var(--FONT-STACK-SUBHEADING, sans-serif); font-size: calc(13.5px * var(--FONT-ADJUST-ACCENT, 1)); font-weight: var(--FONT-WEIGHT-SUBHEADING, 500); color: var(--text, #2b2622); margin: -6px auto 26px auto; letter-spacing: var(--FONT-SUBHEADING-LETTER-SPACING, 0.05em); text-transform: var(--FONT-SUBHEADING-TRANSFORM, none); max-width: 600px; opacity: 1;">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+
+    <div class="lv-product-grid" data-product-row style="{% render 'product-grid-vars', settings: section.settings %}">
+      {{ product_cards }}
     </div>
+    {%- endif -%}
 
     {%- if shuffle_enabled -%}
       <script>
@@ -175,7 +236,7 @@
           function shuffleGrid() {
             var sectionEl = document.getElementById('shopify-section-{{ section.id }}');
             if (!sectionEl) return;
-            var grid = sectionEl.querySelector('.lv-product-grid');
+            var grid = sectionEl.querySelector('[data-product-row]');
             if (!grid) return;
             var items = Array.prototype.slice.call(grid.querySelectorAll('product-grid-item, .product-grid-item'));
             if (items.length <= 1) return;
@@ -203,6 +264,7 @@
               frag.appendChild(item);
             }
             grid.appendChild(frag);
+            grid.dispatchEvent(new CustomEvent('lv:products-shuffled', { bubbles: true }));
           }
 
           // Run immediately inline
@@ -218,7 +280,7 @@
       </script>
     {%- endif -%}
 
-    {%- if section.settings.show_view_all -%}
+    {%- if section.settings.show_view_all and layout != 'split' -%}
       <div style="text-align: center; margin-top: 36px;">
         <a href="{{ featured_collection.url | default: routes.all_products_collection_url }}" class="btn btn--outline btn-sliding-hover" style="display: inline-flex; padding: 12px 32px; font-family: var(--TYPE-STACK-BUTTON, sans-serif); font-size: 12px; font-weight: var(--TYPE-WEIGHT-BUTTON, 600); text-transform: var(--FONT-BUTTON-TRANSFORM, uppercase); letter-spacing: var(--FONT-BUTTON-LETTER-SPACING, 0.15em); text-decoration: none;">
           <span class="btn__text-content">{{ 'collections.general.view_all_products' | t }}</span>
@@ -228,6 +290,311 @@
 
   </div>
 </div>
+
+{% stylesheet %}
+  /* ---------- Layout "Text panel + product slider" ---------- */
+  .lv-nis {
+    --nis-gap: clamp(12px, 1.4vw, 20px);
+    display: grid;
+    grid-template-columns: minmax(220px, 25%) minmax(0, 1fr);
+    /* desktop: text on the left, arrows in the top right corner above the cards */
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      'intro nav'
+      'intro track';
+    column-gap: clamp(20px, 3.2vw, 56px);
+    row-gap: 18px;
+    align-items: stretch;
+  }
+
+  .lv-nis__intro { grid-area: intro; }
+  .lv-nis__track { grid-area: track; }
+  .lv-nis__nav { grid-area: nav; }
+
+  .lv-nis__intro {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  /* Optional banner: shown at its own aspect ratio (width follows the column, height follows the image) */
+  /* the link box carries the image's own aspect ratio, so the picture is never cropped or stretched */
+  .lv-nis__banner {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    border-radius: var(--card-radius, 0px);
+  }
+
+  .lv-nis__banner-img {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .lv-nis__banner:hover .lv-nis__banner-img {
+    transform: scale(1.03);
+  }
+
+  .lv-nis__banner:focus-visible {
+    outline: 2px solid var(--lv-accent-deep, #806745);
+    outline-offset: 3px;
+  }
+
+  .lv-nis__title {
+    margin: 0 0 18px;
+    font-family: var(--FONT-STACK-HEADING, serif);
+    font-size: clamp(36px, 4.2vw, 64px);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    text-align: left;
+    color: inherit;
+    text-wrap: balance;
+  }
+
+  .lv-nis__text {
+    max-width: 34ch;
+    font-size: 15px;
+    line-height: 1.5;
+    opacity: 0.78;
+  }
+
+  .lv-nis__text p {
+    margin: 0;
+  }
+
+  .lv-nis__note {
+    margin: 18px 0 0;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .lv-nis__link {
+    display: inline-block;
+    margin-top: 18px;
+    padding-bottom: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+  }
+
+  .lv-nis__link:hover {
+    opacity: 0.7;
+  }
+
+  .lv-nis__nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    align-self: end;
+    justify-self: end;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lv-nis__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .lv-nis__btn:hover:not([disabled]) {
+    background: var(--lv-accent-deep, #806745);
+    border-color: var(--lv-accent-deep, #806745);
+    color: #fff;
+  }
+
+  .lv-nis__btn[disabled] {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .lv-nis__count {
+    min-width: 3.4em;
+    text-align: center;
+  }
+
+  .lv-nis__track {
+    display: flex;
+    gap: var(--nis-gap);
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .lv-nis__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .lv-nis__track:focus-visible {
+    outline: 2px solid var(--lv-accent-deep, #806745);
+    outline-offset: 4px;
+  }
+
+  .lv-nis__track > * {
+    flex: 0 0 calc((100% - (var(--nis-cols) - 1) * var(--nis-gap)) / var(--nis-cols));
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .lv-nis__track > .lv-shuffled-hidden {
+    display: none !important;
+  }
+
+  /* Tablet: text on top with the arrows on its right, about two and a half cards below */
+  @media (max-width: 989px) {
+    .lv-nis {
+      --nis-cols: 2.4 !important;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-rows: auto auto;
+      grid-template-areas:
+        'intro nav'
+        'track track';
+      gap: 26px 24px;
+    }
+
+    .lv-nis__banner {
+      max-width: 440px;
+    }
+
+    .lv-nis__text {
+      max-width: 48ch;
+      font-size: 17px;
+      line-height: 1.55;
+    }
+
+    .lv-nis__note {
+      font-size: 12.5px;
+    }
+  }
+
+  /* Phone: text on top, one card and a peek of the next, arrows under the cards */
+  @media (max-width: 599px) {
+    .lv-nis {
+      --nis-cols: 1.3 !important;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'intro'
+        'track'
+        'nav';
+      gap: 22px;
+    }
+
+    .lv-nis__title {
+      margin-bottom: 12px;
+    }
+
+    .lv-nis__text {
+      max-width: none;
+      font-size: 16px;
+    }
+
+    .lv-nis__banner {
+      max-width: none;
+    }
+
+    .lv-nis__nav {
+      justify-self: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lv-nis__track {
+      scroll-behavior: auto;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    if (customElements.get('collection-slider')) return;
+
+    class CollectionSlider extends HTMLElement {
+      connectedCallback() {
+        this.track = this.querySelector('[data-nis-track]');
+        this.prev = this.querySelector('[data-nis-prev]');
+        this.next = this.querySelector('[data-nis-next]');
+        this.cur = this.querySelector('[data-nis-current]');
+        this.tot = this.querySelector('[data-nis-total]');
+        if (!this.track) return;
+        var self = this;
+        this.update = this.update.bind(this);
+        this.prev.addEventListener('click', function () { self.go(-1); });
+        this.next.addEventListener('click', function () { self.go(1); });
+        this.track.addEventListener('scroll', function () {
+          if (self.raf) return;
+          self.raf = requestAnimationFrame(function () { self.raf = null; self.update(); });
+        }, { passive: true });
+        this.track.addEventListener('keydown', function (e) {
+          if (e.key === 'ArrowRight') { e.preventDefault(); self.go(1); }
+          if (e.key === 'ArrowLeft') { e.preventDefault(); self.go(-1); }
+        });
+        this.addEventListener('lv:products-shuffled', function () { self.track.scrollLeft = 0; self.update(); });
+        window.addEventListener('resize', this.update, { passive: true });
+        this.update();
+      }
+
+      disconnectedCallback() {
+        window.removeEventListener('resize', this.update);
+      }
+
+      cards() {
+        return Array.prototype.filter.call(this.track.children, function (c) { return c.offsetParent !== null; });
+      }
+
+      stepSize() {
+        var cards = this.cards();
+        if (cards.length < 2) return cards[0] ? cards[0].offsetWidth : this.track.clientWidth;
+        return cards[1].offsetLeft - cards[0].offsetLeft;
+      }
+
+      go(dir) {
+        this.track.scrollBy({ left: dir * this.stepSize(), behavior: 'smooth' });
+      }
+
+      update() {
+        var cards = this.cards();
+        var step = this.stepSize() || 1;
+        var max = this.track.scrollWidth - this.track.clientWidth;
+        var x = this.track.scrollLeft;
+        var idx = max <= 2 ? 0 : Math.round(x / step);
+        if (x >= max - 2) idx = Math.max(idx, cards.length - Math.round(this.track.clientWidth / step));
+        if (this.cur) this.cur.textContent = String(Math.min(cards.length, idx + 1));
+        if (this.tot) this.tot.textContent = String(cards.length);
+        this.prev.disabled = x <= 2;
+        this.next.disabled = x >= max - 2;
+      }
+    }
+
+    customElements.define('collection-slider', CollectionSlider);
+  })();
+{% endjavascript %}
 
 {% schema %}
 {
@@ -248,7 +615,77 @@
     {
       "type": "text",
       "id": "subtitle",
-      "label": "Subheading"
+      "label": "Subheading",
+      "visible_if": "{{ section.settings.layout != 'split' }}"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid (classic)"
+        },
+        {
+          "value": "split",
+          "label": "Text panel + product slider"
+        }
+      ],
+      "default": "grid",
+      "info": "Text panel + product slider: heading and text on the left, product cards scrolling on the right."
+    },
+    {
+      "type": "richtext",
+      "id": "split_text",
+      "label": "Text",
+      "default": "<p>A curated selection of newly arrived pieces, made to bring a little everyday elegance.</p>",
+      "visible_if": "{{ section.settings.layout == 'split' and section.settings.split_image == blank }}"
+    },
+    {
+      "type": "text",
+      "id": "split_note",
+      "label": "Small note",
+      "default": "*Limited seasonal drop",
+      "visible_if": "{{ section.settings.layout == 'split' and section.settings.split_image == blank }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "split_image",
+      "label": "Banner image",
+      "info": "Optional. When a banner is chosen it replaces the text panel (heading, text, note and link are hidden). It keeps its own proportions on every screen size and opens the link below when clicked.",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
+    },
+    {
+      "type": "url",
+      "id": "split_image_link",
+      "label": "Banner link",
+      "info": "Leave empty to open the collection above.",
+      "visible_if": "{{ section.settings.layout == 'split' and section.settings.split_image != blank }}"
+    },
+    {
+      "type": "range",
+      "id": "split_limit",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "label": "Products in the slider",
+      "default": 12,
+      "visible_if": "{{ section.settings.layout == 'split' }}"
+    },
+    {
+      "type": "range",
+      "id": "split_columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Cards visible on desktop",
+      "default": 3,
+      "visible_if": "{{ section.settings.layout == 'split' }}"
     },
     {
       "type": "collection",
@@ -269,7 +706,8 @@
       "max": 24,
       "step": 1,
       "label": "Products to show",
-      "default": 8
+      "default": 8,
+      "visible_if": "{{ section.settings.layout != 'split' }}"
     },
     {
       "type": "checkbox",
@@ -283,11 +721,13 @@
       "id": "rows_by_screen",
       "label": "Fit product count to columns",
       "default": false,
-      "info": "Above 1024px: 1 row. Smaller screens: 2 rows (e.g. 4 cols = 4 products, 3 = 6, 2 = 4, 1 = 2). Set 'Products to show' to 8 or more."
+      "info": "Above 1024px: 1 row. Smaller screens: 2 rows (e.g. 4 cols = 4 products, 3 = 6, 2 = 4, 1 = 2). Set 'Products to show' to 8 or more.",
+      "visible_if": "{{ section.settings.layout != 'split' }}"
     },
     {
       "type": "header",
-      "content": "Product grid columns"
+      "content": "Product grid columns",
+      "visible_if": "{{ section.settings.layout != 'split' }}"
     },
     {
       "type": "range",
@@ -296,7 +736,8 @@
       "max": 6,
       "step": 1,
       "label": "Columns: above 1024px",
-      "default": 4
+      "default": 4,
+      "visible_if": "{{ section.settings.layout != 'split' }}"
     },
     {
       "type": "range",
@@ -305,7 +746,8 @@
       "max": 6,
       "step": 1,
       "label": "Columns: 1024px and below",
-      "default": 3
+      "default": 3,
+      "visible_if": "{{ section.settings.layout != 'split' }}"
     },
     {
       "type": "range",
@@ -314,7 +756,8 @@
       "max": 6,
       "step": 1,
       "label": "Columns: 960px and below",
-      "default": 3
+      "default": 3,
+      "visible_if": "{{ section.settings.layout != 'split' }}"
     },
     {
       "type": "range",
@@ -323,18 +766,29 @@
       "max": 6,
       "step": 1,
       "label": "Columns: 768px and below",
-      "default": 2
+      "default": 2,
+      "visible_if": "{{ section.settings.layout != 'split' }}"
     },
     {
       "type": "select",
       "id": "grid_columns_650",
       "label": "Columns: 650px and below",
       "options": [
-        { "value": "1", "label": "1 product per row" },
-        { "value": "2", "label": "2 products per row" },
-        { "value": "3", "label": "3 products per row" }
+        {
+          "value": "1",
+          "label": "1 product per row"
+        },
+        {
+          "value": "2",
+          "label": "2 products per row"
+        },
+        {
+          "value": "3",
+          "label": "3 products per row"
+        }
       ],
-      "default": "1"
+      "default": "1",
+      "visible_if": "{{ section.settings.layout != 'split' }}"
     },
     {
       "type": "select",
@@ -354,7 +808,8 @@
           "label": "3 products per row"
         }
       ],
-      "default": "1"
+      "default": "1",
+      "visible_if": "{{ section.settings.layout != 'split' }}"
     },
     {
       "type": "checkbox",

@@ -1,0 +1,1613 @@
+<title>Aurelle Section Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Quicksand:wght@400;500;600;700&family=Great+Vibes&display=swap">
+<style>
+    /* Layout: full-width bands, each one a future theme section, alternating the theme's colour schemes */
+    :root {
+        --ink: #1a1a1a;
+        --ink-soft: #5d554b;
+        --ivory: #ffffff;
+        --cream: #f7f5f0;
+        --sand: #f0e9dd;
+        --line: #e2d8ca;
+        --gold: #806745;
+        --gold-soft: #b59a76;
+        --champ-1: #f6e6d3;
+        --champ-2: #e9c6a6;
+        --glow: #f9dccd;
+        --wine: #8c2b3f;
+        --card: #ffffff;
+        --shadow: rgba(64, 42, 18, 0.12);
+        --ok: #3f7d55;
+        --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+        --font-body: 'Quicksand', 'Avenir Next', 'Segoe UI', sans-serif;
+        --font-script: 'Great Vibes', 'Snell Roundhand', cursive;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            --ink: #f4efe8;
+            --ink-soft: #b9ae9f;
+            --ivory: #1c1a17;
+            --cream: #221f1b;
+            --sand: #2a2620;
+            --line: #3d372f;
+            --gold: #c9ad86;
+            --gold-soft: #b59a76;
+            --champ-1: #3a2f25;
+            --champ-2: #2a221b;
+            --glow: #4a3a2c;
+            --wine: #d77a8e;
+            --card: #2a2621;
+            --shadow: rgba(0, 0, 0, 0.45);
+            --ok: #7cc495;
+            color-scheme: dark;
+        }
+    }
+
+    :root[data-theme="dark"] {
+        --ink: #f4efe8;
+        --ink-soft: #b9ae9f;
+        --ivory: #1c1a17;
+        --cream: #221f1b;
+        --sand: #2a2620;
+        --line: #3d372f;
+        --gold: #c9ad86;
+        --gold-soft: #b59a76;
+        --champ-1: #3a2f25;
+        --champ-2: #2a221b;
+        --glow: #4a3a2c;
+        --wine: #d77a8e;
+        --card: #2a2621;
+        --shadow: rgba(0, 0, 0, 0.45);
+        --ok: #7cc495;
+        color-scheme: dark;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--ivory);
+        color: var(--ink);
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    h1,
+    h2,
+    h3 {
+        font-family: var(--font-display);
+        font-weight: 400;
+        text-wrap: balance;
+        margin: 0;
+    }
+
+    p {
+        margin: 0;
+    }
+
+    button,
+    input {
+        font: inherit;
+        color: inherit;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 3px;
+    }
+
+    .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding-left: max(16px, env(safe-area-inset-left, 0px));
+        padding-right: max(16px, env(safe-area-inset-right, 0px));
+    }
+
+    /* ---------- intro ---------- */
+    .intro {
+        padding-block: 56px 36px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .intro__brand {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--gold);
+        font-size: 20px;
+        letter-spacing: 0.04em;
+    }
+
+    .intro h1 {
+        font-size: clamp(34px, 5vw, 58px);
+        line-height: 1.08;
+        margin-top: 10px;
+        max-width: 16ch;
+    }
+
+    .intro p {
+        color: var(--ink-soft);
+        max-width: 62ch;
+        margin-top: 14px;
+    }
+
+    .jump {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 26px;
+    }
+
+    .jump a {
+        text-decoration: none;
+        color: var(--ink);
+        border: 1px solid var(--line);
+        padding: 7px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 500;
+        background: var(--card);
+        transition: border-color .2s, color .2s;
+    }
+
+    .jump a:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    /* ---------- band / section shell ---------- */
+    .band {
+        padding-block: 72px;
+    }
+
+    .band--ivory {
+        background: var(--ivory);
+    }
+
+    .band--cream {
+        background: var(--cream);
+    }
+
+    .band--sand {
+        background: var(--sand);
+    }
+
+    .band--champ {
+        background: radial-gradient(55% 60% at 50% 50%, var(--glow), transparent 70%), linear-gradient(180deg, var(--champ-1), var(--champ-2));
+    }
+
+    .band+.band {
+        border-top: 1px solid var(--line);
+    }
+
+    .spec {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px 24px;
+        margin-bottom: 32px;
+    }
+
+    .spec__l {
+        min-width: 0;
+        max-width: 640px;
+    }
+
+    .eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--gold);
+    }
+
+    .spec h2 {
+        font-size: clamp(28px, 3.4vw, 42px);
+        line-height: 1.15;
+        margin-top: 6px;
+    }
+
+    .spec__l p {
+        color: var(--ink-soft);
+        margin-top: 8px;
+    }
+
+    .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .chip {
+        font-size: 11.5px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: var(--ink-soft);
+        background: color-mix(in srgb, var(--card) 70%, transparent);
+        white-space: nowrap;
+    }
+
+    .chip b {
+        color: var(--ink);
+        font-weight: 600;
+    }
+
+    .stage {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        gap: 32px;
+        align-items: center;
+    }
+
+    @media (max-width: 860px) {
+        .stage {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    .panel {
+        display: grid;
+        gap: 20px;
+        min-width: 0;
+    }
+
+    .label {
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--ink-soft);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .seg {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .seg button {
+        border: 1px solid var(--line);
+        background: var(--card);
+        padding: 9px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: 13.5px;
+        font-weight: 500;
+        transition: border-color .2s, background .2s, color .2s;
+    }
+
+    .seg button:hover {
+        border-color: var(--gold-soft);
+    }
+
+    .seg button[aria-pressed="true"] {
+        background: var(--ink);
+        color: var(--ivory);
+        border-color: var(--ink);
+    }
+
+    .swatch {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        vertical-align: -1px;
+        margin-right: 6px;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15);
+    }
+
+    .field {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--card);
+        font-size: 16px;
+    }
+
+    .field:focus {
+        outline: none;
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 20%, transparent);
+    }
+
+    .hint {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        margin-top: 6px;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .buy {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+        flex-wrap: wrap;
+    }
+
+    .price {
+        font-family: var(--font-display);
+        font-size: 28px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .price small {
+        font-family: var(--font-body);
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        display: block;
+    }
+
+    .btn {
+        border: 0;
+        background: var(--gold);
+        color: #fff;
+        padding: 13px 22px;
+        border-radius: 999px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-size: 12.5px;
+        cursor: pointer;
+        transition: background .2s, transform .2s;
+    }
+
+    .btn:hover {
+        background: var(--ink);
+        color: var(--ivory);
+    }
+
+    .btn:active {
+        transform: scale(.98);
+    }
+
+    .btn--ghost {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--ink);
+    }
+
+    .toast {
+        font-size: 13px;
+        color: var(--ok);
+        min-height: 1.4em;
+    }
+
+    .canvas {
+        position: relative;
+        border-radius: 18px;
+        background: var(--card);
+        box-shadow: 0 24px 60px var(--shadow);
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    .canvas svg {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    /* ---------- 1. engraving ---------- */
+    .eng-canvas {
+        background: radial-gradient(70% 70% at 50% 40%, var(--glow), transparent 72%), linear-gradient(180deg, var(--champ-1), var(--champ-2));
+    }
+
+    .eng-text {
+        transition: opacity .25s;
+    }
+
+    /* ---------- 2. birthstone dial ---------- */
+    .dial-wrap {
+        display: grid;
+        place-items: center;
+        padding: 24px 0;
+    }
+
+    .dial {
+        position: relative;
+        width: min(440px, 100%);
+        aspect-ratio: 1;
+    }
+
+    .dial__ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 1px dashed color-mix(in srgb, var(--gold) 45%, transparent);
+        transition: transform .7s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .dial__item {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 56px;
+        height: 56px;
+        margin: -28px;
+        border-radius: 50%;
+        border: 0;
+        background: var(--card);
+        box-shadow: 0 6px 16px var(--shadow);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        transition: box-shadow .25s;
+    }
+
+    .dial__item span {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        position: absolute;
+        bottom: -18px;
+        color: var(--ink-soft);
+    }
+
+    .dial__item[aria-pressed="true"] {
+        box-shadow: 0 0 0 2px var(--gold), 0 8px 22px var(--shadow);
+    }
+
+    .dial__item svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    .dial__core {
+        position: absolute;
+        inset: 22%;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 40%, var(--card) 0%, var(--cream) 100%);
+        box-shadow: inset 0 0 0 1px var(--line), 0 20px 50px var(--shadow);
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 8%;
+    }
+
+    .dial__core svg {
+        width: 42%;
+        filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .18));
+        transition: transform .5s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .dial__core .m {
+        font-size: 11px;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--gold);
+        margin-top: 6px;
+    }
+
+    .dial__core .n {
+        font-family: var(--font-display);
+        font-size: clamp(20px, 3vw, 28px);
+        line-height: 1.1;
+    }
+
+    .stone-facts {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .fact {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+        min-width: 0;
+    }
+
+    .fact dt {
+        font-size: 11px;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        font-weight: 700;
+    }
+
+    .fact dd {
+        margin: 4px 0 0;
+        font-weight: 600;
+    }
+
+    @media (max-width: 480px) {
+        .stone-facts {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .dial__item {
+            width: 46px;
+            height: 46px;
+            margin: -23px;
+        }
+    }
+
+    /* ---------- 3. charm builder ---------- */
+    .charm-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+        gap: 10px;
+    }
+
+    .charm-btn {
+        display: grid;
+        justify-items: center;
+        gap: 4px;
+        padding: 12px 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
+        cursor: pointer;
+        transition: border-color .2s, transform .2s;
+    }
+
+    .charm-btn:hover {
+        border-color: var(--gold);
+        transform: translateY(-2px);
+    }
+
+    .charm-btn svg {
+        width: 38px;
+        height: 38px;
+    }
+
+    .charm-btn b {
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .charm-btn small {
+        color: var(--ink-soft);
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .slot {
+        cursor: pointer;
+    }
+
+    .slot:focus-visible {
+        outline: none;
+    }
+
+    .slot:focus-visible circle.slot-ring {
+        stroke: var(--gold);
+        stroke-width: 2.5;
+    }
+
+    .charm-drop {
+        animation: drop .5s cubic-bezier(.3, 1.6, .5, 1);
+        transform-box: fill-box;
+        transform-origin: 50% 0;
+    }
+
+    @keyframes drop {
+        from {
+            transform: translateY(-26px) rotate(-12deg);
+            opacity: 0;
+        }
+
+        to {
+            transform: none;
+            opacity: 1;
+        }
+    }
+
+    .charm-sway {
+        animation: sway 3.6s ease-in-out infinite;
+        transform-box: fill-box;
+        transform-origin: 50% 0;
+    }
+
+    @keyframes sway {
+
+        0%,
+        100% {
+            transform: rotate(-3deg);
+        }
+
+        50% {
+            transform: rotate(3deg);
+        }
+    }
+
+    /* ---------- 4. layering ---------- */
+    .len-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 8px;
+    }
+
+    .len {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
+        cursor: pointer;
+        text-align: left;
+        transition: border-color .2s;
+    }
+
+    .len[aria-pressed="true"] {
+        border-color: var(--ink);
+        box-shadow: inset 0 0 0 1px var(--ink);
+    }
+
+    .len i {
+        width: 18px;
+        height: 3px;
+        border-radius: 2px;
+        flex: none;
+    }
+
+    .len b {
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+    }
+
+    .len small {
+        display: block;
+        color: var(--ink-soft);
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    .note {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-size: 13.5px;
+    }
+
+    .note--ok {
+        background: color-mix(in srgb, var(--ok) 12%, transparent);
+        color: var(--ink);
+    }
+
+    .note--warn {
+        background: color-mix(in srgb, var(--wine) 12%, transparent);
+        color: var(--ink);
+    }
+
+    .note::before {
+        content: '';
+        flex: none;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 7px;
+        background: var(--ok);
+    }
+
+    .note--warn::before {
+        background: var(--wine);
+    }
+
+    /* ---------- 5. gift finder ---------- */
+    .quiz {
+        background: var(--card);
+        border-radius: 18px;
+        box-shadow: 0 24px 60px var(--shadow);
+        padding: clamp(20px, 4vw, 40px);
+        max-width: 860px;
+        margin: 0 auto;
+    }
+
+    .quiz__bar {
+        height: 3px;
+        background: var(--line);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 26px;
+    }
+
+    .quiz__bar span {
+        display: block;
+        height: 100%;
+        background: var(--gold);
+        transition: width .45s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .quiz__step {
+        font-size: 12px;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        font-weight: 700;
+    }
+
+    .quiz h3 {
+        font-size: clamp(24px, 3vw, 34px);
+        margin: 6px 0 22px;
+    }
+
+    .opts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+    }
+
+    .opt {
+        padding: 18px 16px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--cream);
+        cursor: pointer;
+        text-align: left;
+        transition: border-color .2s, transform .2s, background .2s;
+    }
+
+    .opt:hover {
+        border-color: var(--gold);
+        transform: translateY(-2px);
+    }
+
+    .opt b {
+        display: block;
+        font-family: var(--font-display);
+        font-size: 19px;
+        font-weight: 400;
+    }
+
+    .opt small {
+        color: var(--ink-soft);
+        font-size: 12.5px;
+    }
+
+    .quiz__nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 22px;
+        gap: 12px;
+    }
+
+    .linkish {
+        background: none;
+        border: 0;
+        padding: 4px 0;
+        cursor: pointer;
+        color: var(--ink-soft);
+        border-bottom: 1px solid currentColor;
+        font-size: 13px;
+    }
+
+    .linkish[disabled] {
+        visibility: hidden;
+    }
+
+    .recs {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    @media (max-width: 720px) {
+        .recs {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    .rec {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--card);
+        display: grid;
+        min-width: 0;
+    }
+
+    .rec__art {
+        aspect-ratio: 4 / 3;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(180deg, var(--champ-1), var(--champ-2));
+    }
+
+    .rec__art svg {
+        width: 46%;
+        height: auto;
+    }
+
+    .rec__body {
+        padding: 14px 16px 16px;
+        display: grid;
+        gap: 4px;
+    }
+
+    .rec__body b {
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: 19px;
+    }
+
+    .rec__body p {
+        color: var(--ink-soft);
+        font-size: 13px;
+    }
+
+    .rec__body span {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-top: 6px;
+    }
+
+    .fade-in {
+        animation: fadeIn .4s ease both;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    /* ---------- 6. ring size ---------- */
+    .size-out {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .size-out div {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+        min-width: 0;
+    }
+
+    .size-out small {
+        display: block;
+        font-size: 11px;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        font-weight: 700;
+    }
+
+    .size-out b {
+        font-family: var(--font-display);
+        font-size: 28px;
+        font-weight: 400;
+        font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+        width: 100%;
+        accent-color: var(--gold);
+    }
+
+    .ring-canvas {
+        display: grid;
+        place-items: center;
+        padding: 30px 10px;
+        background: radial-gradient(60% 60% at 50% 45%, var(--glow), transparent 70%), var(--cream);
+    }
+
+    footer {
+        padding-block: 40px 56px;
+        color: var(--ink-soft);
+        font-size: 13px;
+        border-top: 1px solid var(--line);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+        *,
+        *::before,
+        *::after {
+            animation: none !important;
+            transition: none !important;
+        }
+    }
+</style>
+
+<header class="intro">
+    <div class="wrap">
+        <p class="intro__brand">Aurelle</p>
+        <h1>Six section ideas for the storefront</h1>
+        <p>Each band below is a working prototype of a section that can be built into the theme. They use the theme's
+            own palette, Playfair Display and Quicksand, and the store's real collections: engraving, birthstones,
+            charms, chains and rings. Click, type and drag to try them.</p>
+        <nav class="jump" aria-label="Section ideas">
+            <a href="#engraving">Engraving studio</a>
+            <a href="#birthstone">Birthstone dial</a>
+            <a href="#charms">Charm builder</a>
+            <a href="#layering">Layering guide</a>
+            <a href="#gift">Gift finder</a>
+            <a href="#ring-size">Ring size finder</a>
+        </nav>
+    </div>
+</header>
+
+<!-- ============ 1. ENGRAVING STUDIO ============ -->
+<section class="band band--ivory" id="engraving">
+    <div class="wrap">
+        <div class="spec">
+            <div class="spec__l">
+                <p class="eyebrow">Engraving studio</p>
+                <h2>See the name on the piece before you order</h2>
+                <p>A live preview for Engravable Jewelry. Shoppers type, pick a style and metal, and the engraving
+                    updates on the pendant. It feeds the same engraving line-item property the product page already
+                    uses.</p>
+            </div>
+            <div class="chips"><span class="chip"><b>Data</b> product + engraving metafields</span><span
+                    class="chip"><b>Scheme</b> 1 · Ivory</span></div>
+        </div>
+
+        <div class="stage">
+            <div class="canvas eng-canvas">
+                <svg id="engSvg" viewBox="0 0 600 460" role="img" aria-label="Engraved pendant preview">
+                    <defs>
+                        <linearGradient id="m-gold" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#f3dc9e" />
+                            <stop offset=".45" stop-color="#d8b065" />
+                            <stop offset=".7" stop-color="#f6e2a8" />
+                            <stop offset="1" stop-color="#b98d45" />
+                        </linearGradient>
+                        <linearGradient id="m-silver" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#f7f8fa" />
+                            <stop offset=".45" stop-color="#c3c8cf" />
+                            <stop offset=".7" stop-color="#eef0f3" />
+                            <stop offset="1" stop-color="#9aa1aa" />
+                        </linearGradient>
+                        <linearGradient id="m-rose" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#f7d6c6" />
+                            <stop offset=".45" stop-color="#d99a84" />
+                            <stop offset=".7" stop-color="#f4cdbb" />
+                            <stop offset="1" stop-color="#b8735e" />
+                        </linearGradient>
+                        <filter id="engrave" x="-10%" y="-30%" width="120%" height="160%">
+                            <feOffset dx="0" dy="1.2" in="SourceAlpha" result="o" />
+                            <feFlood flood-color="#ffffff" flood-opacity=".75" />
+                            <feComposite in2="o" operator="in" result="hl" />
+                            <feMerge>
+                                <feMergeNode in="hl" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <filter id="soft" x="-20%" y="-20%" width="140%" height="160%">
+                            <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#5a3d1e" flood-opacity=".25" />
+                        </filter>
+                    </defs>
+                    <g id="engChain" fill="none" stroke-width="2.4" stroke-linecap="round"></g>
+                    <g id="engPiece" filter="url(#soft)"></g>
+                    <text id="engText" class="eng-text" x="300" y="300" text-anchor="middle" dominant-baseline="middle"
+                        filter="url(#engrave)"></text>
+                </svg>
+            </div>
+
+            <div class="panel">
+                <div>
+                    <label class="label" for="engInput">Engraving</label>
+                    <input id="engInput" class="field" maxlength="12" value="Amélie" autocomplete="off"
+                        spellcheck="false">
+                    <p class="hint"><span>Letters, numbers and &amp; . ♥</span><span id="engCount">6 / 12</span></p>
+                </div>
+                <div>
+                    <span class="label" id="engStyleL">Style</span>
+                    <div class="seg" role="group" aria-labelledby="engStyleL" id="engStyle">
+                        <button type="button" data-v="script" aria-pressed="true">Script</button>
+                        <button type="button" data-v="serif" aria-pressed="false">Serif</button>
+                        <button type="button" data-v="block" aria-pressed="false">Block caps</button>
+                    </div>
+                </div>
+                <div>
+                    <span class="label" id="engShapeL">Piece</span>
+                    <div class="seg" role="group" aria-labelledby="engShapeL" id="engShape">
+                        <button type="button" data-v="bar" aria-pressed="true">Bar necklace</button>
+                        <button type="button" data-v="disc" aria-pressed="false">Disc pendant</button>
+                        <button type="button" data-v="heart" aria-pressed="false">Heart locket</button>
+                    </div>
+                </div>
+                <div>
+                    <span class="label" id="engMetalL">Metal</span>
+                    <div class="seg" role="group" aria-labelledby="engMetalL" id="engMetal">
+                        <button type="button" data-v="gold" aria-pressed="true"><i class="swatch"
+                                style="background:#d8b065"></i>18k gold plated</button>
+                        <button type="button" data-v="silver" aria-pressed="false"><i class="swatch"
+                                style="background:#c3c8cf"></i>Silver</button>
+                        <button type="button" data-v="rose" aria-pressed="false"><i class="swatch"
+                                style="background:#d99a84"></i>Rose gold</button>
+                    </div>
+                </div>
+                <div class="buy">
+                    <p class="price" id="engPrice">€44,95<small>incl. engraving €5,00</small></p>
+                    <button class="btn" type="button" id="engAdd">Add to bag</button>
+                </div>
+                <p class="toast" id="engToast" role="status"></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ 2. BIRTHSTONE DIAL ============ -->
+<section class="band band--champ" id="birthstone">
+    <div class="wrap">
+        <div class="spec">
+            <div class="spec__l">
+                <p class="eyebrow">Birthstone dial</p>
+                <h2>Twelve months on one dial</h2>
+                <p>A rotating dial for Birthstone Rings and Birth Month Charms. Picking a month turns the ring, shows
+                    the stone and links to the matching filter. Use the arrow keys or click a stone.</p>
+            </div>
+            <div class="chips"><span class="chip"><b>Data</b> 12 blocks · stone, colour, collection</span><span
+                    class="chip"><b>Scheme</b> 6 · Champagne glow</span></div>
+        </div>
+
+        <div class="stage">
+            <div class="dial-wrap">
+                <div class="dial" id="dial">
+                    <div class="dial__ring" id="dialRing"></div>
+                    <div class="dial__core" aria-live="polite">
+                        <div>
+                            <svg id="bigGem" viewBox="0 0 100 100" aria-hidden="true"></svg>
+                            <p class="m" id="gemMonth">March</p>
+                            <p class="n" id="gemName">Aquamarine</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <dl class="stone-facts">
+                    <div class="fact">
+                        <dt>Meaning</dt>
+                        <dd id="gemMeaning">Calm &amp; courage</dd>
+                    </div>
+                    <div class="fact">
+                        <dt>Colour</dt>
+                        <dd id="gemColor">Sea blue</dd>
+                    </div>
+                    <div class="fact">
+                        <dt>Hardness</dt>
+                        <dd id="gemHard">7.5–8 Mohs</dd>
+                    </div>
+                </dl>
+                <p id="gemStory" style="color:var(--ink-soft)">Named after seawater, aquamarine was carried by sailors
+                    for a safe passage home.</p>
+                <div class="buy">
+                    <p class="price"><span id="gemCount">7</span> pieces<small>in Birthstone Rings &amp; Charms</small>
+                    </p>
+                    <button class="btn" type="button" id="gemShop">Shop March</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ 3. CHARM BUILDER ============ -->
+<section class="band band--cream" id="charms">
+    <div class="wrap">
+        <div class="spec">
+            <div class="spec__l">
+                <p class="eyebrow">Charm builder</p>
+                <h2>Build a bracelet charm by charm</h2>
+                <p>Pick a chain, then tap charms to hang them on the next free link. Tap a hanging charm to take it off.
+                    The total updates as you go, and the whole set goes to the cart as one bundle.</p>
+            </div>
+            <div class="chips"><span class="chip"><b>Data</b> Charms + Charm Holders collections</span><span
+                    class="chip"><b>Scheme</b> 2 · Cream</span></div>
+        </div>
+
+        <div class="stage">
+            <div class="canvas">
+                <svg id="charmSvg" viewBox="0 0 640 380" role="img" aria-label="Bracelet with charms">
+                    <defs>
+                        <linearGradient id="chainG" x1="0" x2="1">
+                            <stop offset="0" stop-color="#b98d45" />
+                            <stop offset=".5" stop-color="#f3dc9e" />
+                            <stop offset="1" stop-color="#b98d45" />
+                        </linearGradient>
+                    </defs>
+                    <path id="chainPath" d="M40 120 Q320 250 600 120" fill="none" stroke="url(#chainG)" stroke-width="5"
+                        stroke-dasharray="10 5" stroke-linecap="round" />
+                    <g id="slots"></g>
+                </svg>
+            </div>
+            <div class="panel">
+                <div>
+                    <span class="label">Charms · tap to add</span>
+                    <div class="charm-list" id="charmList"></div>
+                </div>
+                <div>
+                    <label class="label" for="initial">Initial charm letter</label>
+                    <input id="initial" class="field" maxlength="1" value="A"
+                        style="max-width:90px;text-transform:uppercase;text-align:center">
+                </div>
+                <div class="buy">
+                    <p class="price" id="charmPrice">€29,95<small>Bracelet €29,95 · 0 charms</small></p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button class="btn btn--ghost" type="button" id="charmClear">Clear</button>
+                        <button class="btn" type="button" id="charmAdd">Add set to bag</button>
+                    </div>
+                </div>
+                <p class="toast" id="charmToast" role="status"></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ 4. LAYERING GUIDE ============ -->
+<section class="band band--ivory" id="layering">
+    <div class="wrap">
+        <div class="spec">
+            <div class="spec__l">
+                <p class="eyebrow">Layering guide</p>
+                <h2>Where each chain length sits</h2>
+                <p>Choose chain lengths to see where they fall on the neckline. The guide checks the spacing and
+                    suggests a gap, so a layered look does not tangle. It also works as a size guide on every chain
+                    product.</p>
+            </div>
+            <div class="chips"><span class="chip"><b>Data</b> length variant option</span><span
+                    class="chip"><b>Scheme</b> 1 · Ivory</span></div>
+        </div>
+
+        <div class="stage">
+            <div class="canvas" style="background:linear-gradient(180deg,var(--sand),var(--cream))">
+                <svg id="neckSvg" viewBox="0 0 600 470" role="img" aria-label="Necklace lengths on a neckline">
+                    <defs>
+                        <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="#e8c3a4" />
+                            <stop offset="1" stop-color="#d9ac88" />
+                        </linearGradient>
+                    </defs>
+                    <path
+                        d="M235 0 C 238 70, 230 105, 190 128 C 120 160, 40 172, 0 200 L 0 470 L 600 470 L 600 200 C 560 172, 480 160, 410 128 C 370 105, 362 70, 365 0 Z"
+                        fill="url(#skin)" />
+                    <path d="M150 168 C 220 150, 260 158, 296 170 M 304 170 C 340 158, 380 150, 450 168" fill="none"
+                        stroke="#c99677" stroke-width="2" stroke-linecap="round" opacity=".7" />
+                    <path d="M0 330 C 120 300, 200 360, 300 440 C 400 360, 480 300, 600 330 L600 470 L0 470 Z"
+                        fill="#f4efe6" opacity=".95" />
+                    <g id="chains"></g>
+                    <g id="lenTicks" font-family="Quicksand, sans-serif" font-size="12" font-weight="700"></g>
+                </svg>
+            </div>
+            <div class="panel">
+                <div>
+                    <span class="label">Chain lengths · choose up to 3</span>
+                    <div class="len-list" id="lenList"></div>
+                </div>
+                <div id="lenNote" class="note note--ok" role="status"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ 5. GIFT FINDER ============ -->
+<section class="band band--sand" id="gift">
+    <div class="wrap">
+        <div class="spec">
+            <div class="spec__l">
+                <p class="eyebrow">Gift finder</p>
+                <h2>Three questions to the right gift</h2>
+                <p>A short quiz that ends on three collections with a reason for each. The answers map to collections
+                    and tags the store already has, so there is no extra app to install.</p>
+            </div>
+            <div class="chips"><span class="chip"><b>Data</b> question blocks → collections</span><span
+                    class="chip"><b>Scheme</b> 3 · Sand</span></div>
+        </div>
+        <div class="quiz" id="quiz"></div>
+    </div>
+</section>
+
+<!-- ============ 6. RING SIZE FINDER ============ -->
+<section class="band band--ivory" id="ring-size">
+    <div class="wrap">
+        <div class="spec">
+            <div class="spec__l">
+                <p class="eyebrow">Ring size finder</p>
+                <h2>Find a ring size with a strip of paper</h2>
+                <p>Wrap a strip of paper around the finger, mark where it meets and measure it in millimetres. Slide to
+                    that length and the finder converts it to EU, US and UK sizes. It sits under the size option of
+                    every ring.</p>
+            </div>
+            <div class="chips"><span class="chip"><b>Data</b> size table in a metaobject</span><span
+                    class="chip"><b>Scheme</b> 1 · Ivory</span></div>
+        </div>
+        <div class="stage">
+            <div class="canvas ring-canvas">
+                <svg id="ringSvg" viewBox="0 0 300 300" style="max-width:340px" role="img"
+                    aria-label="Ring at chosen size">
+                    <defs>
+                        <linearGradient id="band" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#f3dc9e" />
+                            <stop offset=".5" stop-color="#c79a52" />
+                            <stop offset="1" stop-color="#f6e2a8" />
+                        </linearGradient>
+                    </defs>
+                    <circle id="ringBand" cx="150" cy="150" r="80" fill="none" stroke="url(#band)" stroke-width="16" />
+                    <line id="ringDia" x1="70" y1="150" x2="230" y2="150" stroke="var(--gold)" stroke-width="1"
+                        stroke-dasharray="4 4" />
+                    <text id="ringDiaT" x="150" y="140" text-anchor="middle" font-family="Quicksand, sans-serif"
+                        font-size="13" font-weight="700" fill="var(--ink)">17.2 mm</text>
+                </svg>
+            </div>
+            <div class="panel">
+                <div>
+                    <label class="label" for="circ">Inside circumference</label>
+                    <input type="range" id="circ" min="44" max="70" step="0.5" value="54">
+                    <p class="hint"><span>44 mm</span><span id="circV" style="color:var(--ink);font-weight:700">54
+                            mm</span><span>70 mm</span></p>
+                </div>
+                <div class="size-out">
+                    <div><small>EU</small><b id="szEU">54</b></div>
+                    <div><small>US</small><b id="szUS">7</b></div>
+                    <div><small>UK</small><b id="szUK">N</b></div>
+                </div>
+                <p id="szTip" class="note note--ok">Between two sizes? Choose the larger one: fingers are a little
+                    bigger in the evening and in warm weather.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="wrap">Prototypes for the Aurelle theme. Prices, counts and stock are example values; each section reads
+        real collections and metafields once it is built in Liquid.</div>
+</footer>
+
+<script>
+    (function () {
+        var EUR = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' });
+        var NS = 'http://www.w3.org/2000/svg';
+        function el(tag, attrs, parent) {
+            var n = document.createElementNS(NS, tag);
+            for (var k in attrs) n.setAttribute(k, attrs[k]);
+            if (parent) parent.appendChild(n);
+            return n;
+        }
+        function segGroup(id, onChange) {
+            var g = document.getElementById(id);
+            g.addEventListener('click', function (e) {
+                var b = e.target.closest('button'); if (!b) return;
+                g.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+                onChange(b.dataset.v);
+            });
+            return function () { return g.querySelector('[aria-pressed="true"]').dataset.v; };
+        }
+        function toast(id, msg) {
+            var t = document.getElementById(id); t.textContent = msg;
+            clearTimeout(t._t); t._t = setTimeout(function () { t.textContent = ''; }, 3200);
+        }
+
+        /* ================= 1. Engraving ================= */
+        var engPrices = { bar: 39.95, disc: 34.95, heart: 49.95 };
+        var engState = { style: 'script', shape: 'bar', metal: 'gold' };
+        var engInput = document.getElementById('engInput');
+        var engText = document.getElementById('engText');
+        var engPiece = document.getElementById('engPiece');
+        var engChain = document.getElementById('engChain');
+        var inkFor = { gold: '#7a5a22', silver: '#5d646d', rose: '#8a4c3a' };
+        var chainFor = { gold: '#c9a25a', silver: '#aab0b8', rose: '#c9866f' };
+
+        function drawEngraving() {
+            var s = engState, fill = 'url(#m-' + s.metal + ')';
+            engPiece.innerHTML = ''; engChain.innerHTML = '';
+            engChain.setAttribute('stroke', chainFor[s.metal]);
+            var cx = 300, top;
+            if (s.shape === 'bar') {
+                el('path', { d: 'M40 40 Q170 210 150 262 M560 40 Q430 210 450 262' }, engChain);
+                el('rect', { x: 120, y: 256, width: 360, height: 88, rx: 12, fill: fill, stroke: 'rgba(0,0,0,.12)' }, engPiece);
+                el('circle', { cx: 132, cy: 262, r: 6, fill: 'none', stroke: chainFor[s.metal], 'stroke-width': 3 }, engPiece);
+                el('circle', { cx: 468, cy: 262, r: 6, fill: 'none', stroke: chainFor[s.metal], 'stroke-width': 3 }, engPiece);
+                top = 300;
+            } else if (s.shape === 'disc') {
+                el('path', { d: 'M90 20 Q250 150 290 168 M510 20 Q350 150 310 168' }, engChain);
+                el('circle', { cx: cx, cy: 176, r: 10, fill: 'none', stroke: chainFor[s.metal], 'stroke-width': 4 }, engPiece);
+                el('circle', { cx: cx, cy: 300, r: 118, fill: fill, stroke: 'rgba(0,0,0,.12)' }, engPiece);
+                el('circle', { cx: cx, cy: 300, r: 104, fill: 'none', stroke: 'rgba(255,255,255,.55)', 'stroke-width': 1.5 }, engPiece);
+                top = 300;
+            } else {
+                el('path', { d: 'M90 20 Q250 140 292 160 M510 20 Q350 140 308 160' }, engChain);
+                el('circle', { cx: cx, cy: 168, r: 10, fill: 'none', stroke: chainFor[s.metal], 'stroke-width': 4 }, engPiece);
+                el('path', { d: 'M300 420 C 230 368, 150 318, 150 250 C 150 205, 186 180, 222 180 C 258 180, 284 200, 300 226 C 316 200, 342 180, 378 180 C 414 180, 450 205, 450 250 C 450 318, 370 368, 300 420 Z', fill: fill, stroke: 'rgba(0,0,0,.12)' }, engPiece);
+                top = 278;
+            }
+            var txt = engInput.value.trim() || 'Your name';
+            var family = { script: "'Great Vibes', cursive", serif: "'Playfair Display', serif", block: "'Quicksand', sans-serif" }[s.style];
+            var base = { script: 58, serif: 44, block: 36 }[s.style];
+            var maxW = { bar: 320, disc: 190, heart: 220 }[s.shape];
+            var size = Math.min(base, maxW / Math.max(txt.length, 1) * (s.style === 'script' ? 2.3 : s.style === 'block' ? 1.45 : 1.75));
+            engText.textContent = s.style === 'block' ? txt.toUpperCase() : txt;
+            engText.setAttribute('y', top);
+            engText.setAttribute('font-family', family);
+            engText.setAttribute('font-size', size.toFixed(1));
+            engText.setAttribute('letter-spacing', s.style === 'block' ? '0.18em' : '0');
+            engText.setAttribute('font-style', s.style === 'serif' ? 'italic' : 'normal');
+            engText.setAttribute('fill', inkFor[s.metal]);
+            engText.style.opacity = engInput.value.trim() ? 1 : .45;
+            document.getElementById('engCount').textContent = engInput.value.length + ' / 12';
+            var p = engPrices[s.shape] + (engInput.value.trim() ? 5 : 0);
+            document.getElementById('engPrice').innerHTML = EUR.format(p) + '<small>' + (engInput.value.trim() ? 'incl. engraving ' + EUR.format(5) : 'engraving adds ' + EUR.format(5)) + '</small>';
+        }
+        engInput.addEventListener('input', drawEngraving);
+        segGroup('engStyle', function (v) { engState.style = v; drawEngraving(); });
+        segGroup('engShape', function (v) { engState.shape = v; drawEngraving(); });
+        segGroup('engMetal', function (v) { engState.metal = v; drawEngraving(); });
+        document.getElementById('engAdd').addEventListener('click', function () {
+            var t = engInput.value.trim();
+            toast('engToast', t ? 'Added to bag with engraving “' + t + '” (demo).' : 'Type an engraving first, or add the piece without one.');
+        });
+        if (document.fonts) document.fonts.ready.then(drawEngraving);
+        drawEngraving();
+
+        /* ================= 2. Birthstone dial ================= */
+        var stones = [
+            ['January', 'Garnet', '#8a1f2b', 'Protection & loyalty', 'Deep red', '6.5–7.5', 'Travellers wore garnet as a light in the dark.', 9],
+            ['February', 'Amethyst', '#8e5bbd', 'Clarity & calm', 'Violet', '7', 'Its Greek name means “not intoxicated”: a stone for a clear head.', 6],
+            ['March', 'Aquamarine', '#79c3d3', 'Calm & courage', 'Sea blue', '7.5–8', 'Named after seawater, aquamarine was carried by sailors for a safe passage home.', 7],
+            ['April', 'Diamond', '#dfe8ee', 'Strength & love', 'Clear', '10', 'The hardest natural material, the classic stone for a promise.', 11],
+            ['May', 'Emerald', '#1f8a5b', 'Growth & renewal', 'Green', '7.5–8', 'The green of spring, linked to rebirth since ancient Egypt.', 5],
+            ['June', 'Moonstone', '#cfd6e6', 'Intuition & hope', 'Milky blue', '6–6.5', 'Its soft blue sheen moves as the light moves, like the moon.', 4],
+            ['July', 'Ruby', '#b3122e', 'Passion & energy', 'Crimson', '9', 'Long called the king of gems for its rich red glow.', 8],
+            ['August', 'Peridot', '#9cc33b', 'Light & joy', 'Lime green', '6.5–7', 'Formed deep in the earth and even found in meteorites.', 6],
+            ['September', 'Sapphire', '#1f4fa8', 'Wisdom & truth', 'Royal blue', '9', 'A symbol of loyalty, and the stone in many engagement rings.', 10],
+            ['October', 'Pink tourmaline', '#e889a8', 'Compassion', 'Pink', '7–7.5', 'Tourmaline grows in more colours than almost any other gem.', 5],
+            ['November', 'Citrine', '#e2a33c', 'Warmth & success', 'Golden', '7', 'Called the merchant’s stone, kept for good fortune.', 6],
+            ['December', 'Blue topaz', '#6fb6e3', 'Peace & friendship', 'Sky blue', '8', 'A cool winter blue, said to calm the mind.', 7]
+        ];
+        var dial = document.getElementById('dial'), ring = document.getElementById('dialRing');
+        var gemIdx = 2, items = [];
+        function gemSvg(svg, color, big) {
+            svg.innerHTML = '';
+            var g = el('g', {}, svg);
+            var light = 'rgba(255,255,255,.55)', dark = 'rgba(0,0,0,.22)';
+            el('polygon', { points: '50,6 88,34 72,94 28,94 12,34', fill: color }, g);
+            el('polygon', { points: '50,6 66,34 34,34', fill: light }, g);
+            el('polygon', { points: '12,34 34,34 28,94', fill: dark }, g);
+            el('polygon', { points: '88,34 66,34 72,94', fill: 'rgba(0,0,0,.1)' }, g);
+            el('polygon', { points: '34,34 66,34 50,94', fill: 'rgba(255,255,255,.18)' }, g);
+            if (big) el('circle', { cx: 40, cy: 24, r: 3, fill: '#fff', opacity: .9 }, g);
+            el('polygon', { points: '50,6 88,34 72,94 28,94 12,34', fill: 'none', stroke: 'rgba(0,0,0,.18)', 'stroke-width': 1.2 }, g);
+        }
+        stones.forEach(function (s, i) {
+            var b = document.createElement('button');
+            b.type = 'button'; b.className = 'dial__item';
+            b.setAttribute('aria-label', s[0] + ': ' + s[1]);
+            var sv = document.createElementNS(NS, 'svg'); sv.setAttribute('viewBox', '0 0 100 100'); sv.setAttribute('aria-hidden', 'true');
+            gemSvg(sv, s[2]); b.appendChild(sv);
+            var lab = document.createElement('span'); lab.textContent = s[0].slice(0, 3).toUpperCase(); b.appendChild(lab);
+            b.addEventListener('click', function () { setGem(i); });
+            ring.appendChild(b); items.push(b);
+        });
+        function layoutDial() {
+            var r = ring.offsetWidth / 2 - 6;
+            items.forEach(function (b, i) {
+                var a = (i - gemIdx) * 30 - 90;
+                var x = Math.cos(a * Math.PI / 180) * r, y = Math.sin(a * Math.PI / 180) * r;
+                b.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+                b.style.transition = 'transform .7s cubic-bezier(.2,.7,.2,1), box-shadow .25s';
+            });
+        }
+        function setGem(i) {
+            gemIdx = (i + 12) % 12; var s = stones[gemIdx];
+            items.forEach(function (b, k) { b.setAttribute('aria-pressed', String(k === gemIdx)); });
+            var big = document.getElementById('bigGem'); gemSvg(big, s[2], true);
+            big.style.transform = 'scale(.85) rotate(-8deg)'; requestAnimationFrame(function () { requestAnimationFrame(function () { big.style.transform = 'none'; }); });
+            document.getElementById('gemMonth').textContent = s[0];
+            document.getElementById('gemName').textContent = s[1];
+            document.getElementById('gemMeaning').textContent = s[3];
+            document.getElementById('gemColor').textContent = s[4];
+            document.getElementById('gemHard').textContent = s[5] + ' Mohs';
+            document.getElementById('gemStory').textContent = s[6];
+            document.getElementById('gemCount').textContent = s[7];
+            document.getElementById('gemShop').textContent = 'Shop ' + s[0];
+            layoutDial();
+        }
+        dial.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); setGem(gemIdx + 1); items[gemIdx].focus(); }
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); setGem(gemIdx - 1); items[gemIdx].focus(); }
+        });
+        window.addEventListener('resize', layoutDial);
+        setGem(2);
+
+        /* ================= 3. Charm builder ================= */
+        var CHARMS = {
+            heart: { name: 'Heart', price: 12.95, draw: function (g, c) { el('path', { d: 'M0 22 C -14 12 -20 4 -20 -4 C -20 -12 -14 -16 -8 -16 C -4 -16 -1 -14 0 -10 C 1 -14 4 -16 8 -16 C 14 -16 20 -12 20 -4 C 20 4 14 12 0 22 Z', fill: c }, g); } },
+            star: { name: 'Star', price: 11.95, draw: function (g, c) { el('polygon', { points: '0,-20 5,-6 20,-6 8,3 12,18 0,9 -12,18 -8,3 -20,-6 -5,-6', fill: c }, g); } },
+            moon: { name: 'Moon', price: 11.95, draw: function (g, c) { el('path', { d: 'M6 -19 A 20 20 0 1 0 6 19 A 15 15 0 1 1 6 -19 Z', fill: c }, g); } },
+            clover: { name: 'Clover', price: 13.95, draw: function (g, c) { [[-7, -7], [7, -7], [-7, 7], [7, 7]].forEach(function (p) { el('circle', { cx: p[0], cy: p[1], r: 8, fill: c }, g); }); } },
+            stone: { name: 'Birthstone', price: 14.95, draw: function (g, c) { el('circle', { r: 17, fill: c }, g); el('circle', { r: 10, fill: stones[gemIdx][2] }, g); el('circle', { cx: -3, cy: -4, r: 2.5, fill: '#fff', opacity: .8 }, g); } },
+            initial: { name: 'Initial', price: 13.95, draw: function (g, c) { el('circle', { r: 18, fill: c }, g); el('circle', { r: 14.5, fill: 'none', stroke: 'rgba(255,255,255,.6)', 'stroke-width': 1 }, g); var t = el('text', { 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': 'Playfair Display, serif', 'font-size': 19, fill: '#6e4f1c' }, g); t.textContent = (document.getElementById('initial').value || 'A').toUpperCase(); } }
+        };
+        var BASE = 29.95, SLOTS = 5, hung = ['heart', null, 'initial', null, null];
+        var slotsG = document.getElementById('slots'), chainPath = document.getElementById('chainPath');
+        var goldFill = '#d7b066';
+        function drawCharms(dropIdx) {
+            slotsG.innerHTML = '';
+            var L = chainPath.getTotalLength();
+            for (var i = 0; i < SLOTS; i++) {
+                var pt = chainPath.getPointAtLength(L * (0.14 + i * 0.18));
+                var g = el('g', { class: 'slot', tabindex: 0, role: 'button', transform: 'translate(' + pt.x.toFixed(1) + ',' + pt.y.toFixed(1) + ')', 'aria-label': hung[i] ? 'Remove ' + CHARMS[hung[i]].name + ' charm' : 'Empty link ' + (i + 1) }, slotsG);
+                el('circle', { class: 'slot-ring', r: 6, fill: 'none', stroke: '#c9a25a', 'stroke-width': 2.5 }, g);
+                if (hung[i]) {
+                    var sway = el('g', { class: 'charm-sway', style: 'animation-delay:' + (-i * .7) + 's' }, g);
+                    var inner = el('g', { class: i === dropIdx ? 'charm-drop' : '' }, sway);
+                    el('line', { x1: 0, y1: 6, x2: 0, y2: 22, stroke: '#c9a25a', 'stroke-width': 2 }, inner);
+                    var c = el('g', { transform: 'translate(0,46)' }, inner);
+                    CHARMS[hung[i]].draw(c, goldFill);
+                } else {
+                    el('text', { y: 32, 'text-anchor': 'middle', 'font-size': 11, 'font-family': 'Quicksand, sans-serif', fill: 'var(--ink-soft)' }, g).textContent = '+';
+                }
+                (function (idx) {
+                    var act = function () { if (hung[idx]) { hung[idx] = null; drawCharms(); } };
+                    g.addEventListener('click', act);
+                    g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); } });
+                })(i);
+            }
+            var n = hung.filter(Boolean).length;
+            var total = BASE + hung.reduce(function (a, k) { return a + (k ? CHARMS[k].price : 0); }, 0);
+            document.getElementById('charmPrice').innerHTML = EUR.format(total) + '<small>Bracelet ' + EUR.format(BASE) + ' · ' + n + ' charm' + (n === 1 ? '' : 's') + ' · ' + (SLOTS - n) + ' links free</small>';
+        }
+        var list = document.getElementById('charmList');
+        Object.keys(CHARMS).forEach(function (k) {
+            var b = document.createElement('button'); b.type = 'button'; b.className = 'charm-btn';
+            var sv = document.createElementNS(NS, 'svg'); sv.setAttribute('viewBox', '-25 -25 50 50'); sv.setAttribute('aria-hidden', 'true');
+            CHARMS[k].draw(sv, goldFill); b.appendChild(sv);
+            b.insertAdjacentHTML('beforeend', '<b>' + CHARMS[k].name + '</b><small>' + EUR.format(CHARMS[k].price) + '</small>');
+            b.addEventListener('click', function () {
+                var free = hung.indexOf(null);
+                if (free === -1) { toast('charmToast', 'All five links are taken. Tap a charm on the bracelet to free one.'); return; }
+                hung[free] = k; drawCharms(free);
+            });
+            list.appendChild(b);
+        });
+        document.getElementById('initial').addEventListener('input', function () { drawCharms(); });
+        document.getElementById('charmClear').addEventListener('click', function () { hung = [null, null, null, null, null]; drawCharms(); });
+        document.getElementById('charmAdd').addEventListener('click', function () {
+            var n = hung.filter(Boolean).length;
+            toast('charmToast', n ? 'Bracelet with ' + n + ' charm' + (n === 1 ? '' : 's') + ' added as one bundle (demo).' : 'Add at least one charm first.');
+        });
+        drawCharms();
+
+        /* ================= 4. Layering guide ================= */
+        var LENGTHS = [
+            [36, 'Choker', 'Sits at the base of the neck', '#b98d45'],
+            [40, 'Collar', 'Just above the collarbone', '#d0a55a'],
+            [42, 'Princess short', 'On the collarbone', '#8c6a3c'],
+            [45, 'Princess', 'Just below the collarbone', '#c48a6a'],
+            [50, 'Matinee', 'Above the neckline of a top', '#9aa1aa'],
+            [60, 'Opera', 'On the chest', '#7a5a22']
+        ];
+        var chosen = [40, 45, 50];
+        var lenList = document.getElementById('lenList'), chainsG = document.getElementById('chains'), ticks = document.getElementById('lenTicks');
+        function depthFor(cm) { return 150 + (cm - 36) * 9.2; }
+        function drawLayers() {
+            chainsG.innerHTML = ''; ticks.innerHTML = '';
+            chosen.slice().sort(function (a, b) { return a - b; }).forEach(function (cm) {
+                var L = LENGTHS.find(function (x) { return x[0] === cm; });
+                var y = depthFor(cm), spread = 150 + (cm - 36) * 2.6;
+                el('path', { d: 'M' + (300 - spread) + ' 120 Q 300 ' + (2 * y - 120) + ' ' + (300 + spread) + ' 120', fill: 'none', stroke: L[3], 'stroke-width': 2.6, 'stroke-dasharray': cm >= 50 ? '1 0' : '6 2.5', 'stroke-linecap': 'round' }, chainsG);
+                if (cm === 45 || cm === 60) el('circle', { cx: 300, cy: y + 9, r: cm === 60 ? 11 : 7, fill: L[3], stroke: 'rgba(255,255,255,.6)', 'stroke-width': 1.5 }, chainsG);
+                if (cm === 40) el('path', { d: 'M300 ' + (y + 2) + ' l6 8 l-6 8 l-6 -8 z', fill: L[3] }, chainsG);
+                el('line', { x1: 548, y1: y, x2: 584, y2: y, stroke: L[3], 'stroke-width': 2 }, ticks);
+                el('text', { x: 544, y: y + 4, 'text-anchor': 'end', fill: '#3a2a14' }, ticks).textContent = cm + ' cm';
+            });
+            lenList.querySelectorAll('.len').forEach(function (b) { b.setAttribute('aria-pressed', String(chosen.indexOf(+b.dataset.cm) > -1)); });
+            var s = chosen.slice().sort(function (a, b) { return a - b; }), note = document.getElementById('lenNote'), tight = [];
+            for (var i = 1; i < s.length; i++) if (s[i] - s[i - 1] < 5) tight.push(s[i - 1] + ' & ' + s[i] + ' cm');
+            if (!s.length) { note.className = 'note note--ok'; note.textContent = 'Choose a length to see where it sits.'; }
+            else if (tight.length) { note.className = 'note note--warn'; note.textContent = 'Close together: ' + tight.join(', ') + '. Leave about 5 cm between chains so they do not tangle.'; }
+            else if (s.length === 1) { note.className = 'note note--ok'; note.textContent = s[0] + ' cm: ' + LENGTHS.find(function (x) { return x[0] === s[0]; })[2].toLowerCase() + '.'; }
+            else { note.className = 'note note--ok'; note.textContent = 'Good spacing. ' + s.length + ' layers from ' + s[0] + ' to ' + s[s.length - 1] + ' cm sit apart without tangling.'; }
+        }
+        LENGTHS.forEach(function (L) {
+            var b = document.createElement('button'); b.type = 'button'; b.className = 'len'; b.dataset.cm = L[0];
+            b.innerHTML = '<i style="background:' + L[3] + '"></i><span><b>' + L[0] + ' cm</b><small>' + L[1] + '</small></span>';
+            b.addEventListener('click', function () {
+                var at = chosen.indexOf(L[0]);
+                if (at > -1) chosen.splice(at, 1);
+                else { if (chosen.length >= 3) chosen.shift(); chosen.push(L[0]); }
+                drawLayers();
+            });
+            lenList.appendChild(b);
+        });
+        drawLayers();
+
+        /* ================= 5. Gift finder ================= */
+        var Q = [
+            { q: 'Who is the gift for?', key: 'who', opts: [['her', 'Her', 'Partner, sister, friend'], ['him', 'Him', 'Partner, dad, brother'], ['mum', 'Mum', 'Or grandma'], ['me', 'Myself', 'A treat, no reason needed']] },
+            { q: 'What is the moment?', key: 'when', opts: [['birthday', 'Birthday', 'Make it about their month'], ['anniv', 'Anniversary', 'A date to remember'], ['memory', 'A keepsake', 'Someone or something special'], ['just', 'Just because', 'Small and thoughtful']] },
+            { q: 'What would you like to spend?', key: 'budget', opts: [['low', 'Under €30', 'Small gifts and charms'], ['mid', '€30 – €60', 'Most engraved pieces'], ['high', 'Over €60', 'Sets and statement pieces']] }
+        ];
+        var COLL = {
+            engravable: ['Engravable Jewelry', 'Add a name, date or coordinates.', 'heart'],
+            fingerprint: ['Fingerprint Jewelry', 'Their own fingerprint, engraved for good.', 'initial'],
+            birthstone: ['Birthstone Rings', 'Their birth month in a coloured stone.', 'stone'],
+            charms: ['Charms', 'Start a bracelet they can keep adding to.', 'star'],
+            men: ['Gentlemen', 'Signet rings, rope bracelets and ID tags.', 'moon'],
+            earring: ['Earring Sets', 'Ready-styled sets, gift boxed.', 'clover'],
+            handchain: ['Handchains', 'Delicate and a little unexpected.', 'star'],
+            permanent: ['Permanent Jewelry', 'Welded on, worn every day.', 'clover']
+        };
+        var answers = {}, step = 0, quiz = document.getElementById('quiz');
+        function pick() {
+            var a = answers, out = [];
+            if (a.who === 'him') out.push('men');
+            if (a.when === 'birthday') out.push('birthstone');
+            if (a.when === 'anniv' || a.when === 'memory') out.push('engravable');
+            if (a.when === 'memory' || a.who === 'mum') out.push('fingerprint');
+            if (a.budget === 'low') out.push('charms');
+            if (a.budget === 'high' && a.who !== 'him') out.push('earring');
+            if (a.who === 'me') out.push('permanent', 'handchain');
+            ['engravable', 'charms', 'handchain', 'earring'].forEach(function (k) { out.push(k); });
+            return out.filter(function (k, i) { return out.indexOf(k) === i; }).slice(0, 3);
+        }
+        function renderQuiz() {
+            var pct = Math.min(step, Q.length) / Q.length * 100, html = '<div class="quiz__bar"><span style="width:' + pct + '%"></span></div>';
+            if (step < Q.length) {
+                var s = Q[step];
+                html += '<div class="fade-in"><p class="quiz__step">Question ' + (step + 1) + ' of ' + Q.length + '</p><h3>' + s.q + '</h3><div class="opts">' +
+                    s.opts.map(function (o) { return '<button type="button" class="opt" data-v="' + o[0] + '"><b>' + o[1] + '</b><small>' + o[2] + '</small></button>'; }).join('') +
+                    '</div><div class="quiz__nav"><button type="button" class="linkish" id="qBack"' + (step ? '' : ' disabled') + '>Back</button><span class="quiz__step">' + (step ? 'Step ' + (step + 1) : '') + '</span></div></div>';
+            } else {
+                var recs = pick();
+                html += '<div class="fade-in"><p class="quiz__step">Your shortlist</p><h3>Three places to start</h3><div class="recs">' +
+                    recs.map(function (k) { var c = COLL[k]; return '<article class="rec"><div class="rec__art"><svg viewBox="-25 -25 50 50" aria-hidden="true" data-charm="' + c[2] + '"></svg></div><div class="rec__body"><b>' + c[0] + '</b><p>' + c[1] + '</p><span>Shop collection →</span></div></article>'; }).join('') +
+                    '</div><div class="quiz__nav"><button type="button" class="linkish" id="qBack">Back</button><button type="button" class="btn btn--ghost" id="qAgain">Start again</button></div></div>';
+            }
+            quiz.innerHTML = html;
+            quiz.querySelectorAll('svg[data-charm]').forEach(function (sv) { CHARMS[sv.dataset.charm].draw(sv, '#c49a55'); });
+            quiz.querySelectorAll('.opt').forEach(function (b) { b.addEventListener('click', function () { answers[Q[step].key] = b.dataset.v; step++; renderQuiz(); var f = quiz.querySelector('.opt, #qAgain'); if (f) f.focus({ preventScroll: true }); }); });
+            var back = document.getElementById('qBack'); if (back) back.addEventListener('click', function () { step = Math.max(0, step - 1); renderQuiz(); });
+            var again = document.getElementById('qAgain'); if (again) again.addEventListener('click', function () { answers = {}; step = 0; renderQuiz(); });
+        }
+        renderQuiz();
+
+        /* ================= 6. Ring size finder ================= */
+        var circ = document.getElementById('circ');
+        var UK = 'F G H I J K L M N O P Q R S T U V W X Y Z'.split(' ');
+        function ringUpdate() {
+            var c = parseFloat(circ.value), d = c / Math.PI;
+            var us = Math.round(((d - 11.63) / 0.8128) * 2) / 2;
+            var ukIdx = Math.round((c - 44.2) / 1.25);
+            document.getElementById('circV').textContent = c.toFixed(1).replace('.0', '') + ' mm';
+            document.getElementById('szEU').textContent = Math.round(c);
+            document.getElementById('szUS').textContent = us < 3 ? '< 3' : (us > 13 ? '> 13' : String(us).replace('.5', '½'));
+            document.getElementById('szUK').textContent = UK[Math.max(0, Math.min(UK.length - 1, ukIdx))];
+            var r = 34 + (d - 14) * 9.5;
+            document.getElementById('ringBand').setAttribute('r', r.toFixed(1));
+            var dl = document.getElementById('ringDia'); dl.setAttribute('x1', (150 - r).toFixed(1)); dl.setAttribute('x2', (150 + r).toFixed(1));
+            document.getElementById('ringDiaT').textContent = d.toFixed(1) + ' mm inside';
+            var tip = document.getElementById('szTip');
+            if (c % 1 !== 0) { tip.className = 'note note--warn'; tip.textContent = 'You are between two EU sizes (' + Math.floor(c) + ' and ' + Math.ceil(c) + '). Choose ' + Math.ceil(c) + ': fingers are a little bigger in the evening and in warm weather.'; }
+            else { tip.className = 'note note--ok'; tip.textContent = 'EU ' + Math.round(c) + ' fits a finger of ' + c + ' mm around. Wide bands (over 6 mm) feel tighter, so go one size up for those.'; }
+        }
+        circ.addEventListener('input', ringUpdate);
+        ringUpdate();
+    })();
+</script>

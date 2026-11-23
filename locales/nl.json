@@ -15,7 +15,8 @@
     "pause_video": "Video pauzeren",
     "play_video": "Video afspelen",
     "showcase_video": "Showcase-video",
-    "skip_to_text": "Ga naar inhoud"
+    "skip_to_text": "Ga naar inhoud",
+    "loading": "Laden"
   },
   "blogs": {
     "article": {
@@ -838,7 +839,14 @@
       "remove_photo": "Foto verwijderen",
       "verified_buyer": "Geverifieerde koper",
       "write_review": "Schrijf een beoordeling",
-      "your_rating": "Jouw beoordeling"
+      "your_rating": "Jouw beoordeling",
+      "login_title": "Meld u aan om een beoordeling te schrijven",
+      "login_lead": "Alleen ingelogde klanten kunnen een beoordeling achterlaten. Je naam en e-mailadres worden automatisch aan je beoordeling toegevoegd.",
+      "login_button": "Inloggen",
+      "register_button": "Account aanmaken",
+      "unavailable": "Beoordelingen kunnen nu niet worden verzonden. Probeer het later opnieuw.",
+      "reviewing_as": "Beoordelen als {{ name }} ({{ email }})",
+      "field_product_fixed": "Sieradestuk"
     },
     "wishlist": {
       "add": "Bewaren in verlanglijst",
@@ -924,6 +932,21 @@
       "shipping_title": "Snelle verzending",
       "waterproof_text": "Douchen & zwemmen met 2 jaar garantie",
       "waterproof_title": "100% waterproof"
+    },
+    "arc_showcase": {
+      "carousel": "Collectiecarrousel",
+      "collection": "Collectie",
+      "previous": "Vorige collectie",
+      "next": "Volgende collectie"
+    },
+    "collection_slider": {
+      "previous": "Vorige producten",
+      "next": "Volgende producten"
+    },
+    "scroll_splits": {
+      "label": "Ons verhaal",
+      "go_to": "Toon deel {{ number }} van {{ total }}",
+      "open_link": "Collectie bekijken"
     }
   },
   "shopify": {

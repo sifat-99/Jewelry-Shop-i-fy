@@ -66,6 +66,90 @@
         "overlay_opacity": 0
       }
     },
+    "richtext_intro": {
+      "type": "section-richtext",
+      "settings": {
+        "color_scheme": "",
+        "heading": "Luxury & personal jewelry",
+        "text": "<p>Discover our exclusive collection of jewelry that brings together affordability and quality. Our stainless steel jewelry is recyclable, does not discolour and continues to shine.</p>",
+        "content_width": 800,
+        "padding_top": 35,
+        "padding_bottom": 25
+      }
+    },
+    "scroll_splits": {
+      "type": "scroll-splits",
+      "blocks": {
+        "ss_1": {
+          "type": "split",
+          "settings": {
+            "color_scheme": "",
+            "left_type": "content",
+            "left_link": "",
+            "right_type": "image",
+            "right_image": "shopify://shop_images/Split_images_1.webp",
+            "right_link": "",
+            "eyebrow": "",
+            "heading": "Meaning you can wear, quality you can trust",
+            "accent_text": "quality",
+            "text": "<p>Every piece is finished in real 18k gold plating over hypoallergenic stainless steel, designed for the life you actually live. Shower with it, sleep in it, wear it every day: it stays beautiful.</p>",
+            "button_label": "Shop now",
+            "button_link": "shopify://collections/all"
+          }
+        },
+        "ss_2": {
+          "type": "split",
+          "settings": {
+            "color_scheme": "",
+            "left_type": "image",
+            "left_image": "shopify://shop_images/Mens_Engravable.webp",
+            "left_link": "",
+            "right_type": "content",
+            "right_link": "",
+            "eyebrow": "",
+            "heading": "Engraved with your story",
+            "accent_text": "your story",
+            "text": "<p>Add a name, a date or the coordinates of a place that matters. Each engraving is made to order and checked by hand before it leaves the atelier.</p>",
+            "button_label": "Personalise yours",
+            "button_link": "shopify://collections/engravable-jewelry"
+          }
+        },
+        "ss_3": {
+          "type": "split",
+          "settings": {
+            "color_scheme": "",
+            "left_type": "image",
+            "left_image": "shopify://shop_images/Black_Friday_Character.webp",
+            "left_video": "shopify://files/videos/Yellow Modern Black Friday Sale Videos (4).mp4",
+            "left_image_mobile": "shopify://shop_images/Test.jpg",
+            "left_link": "shopify://collections/sale-collection",
+            "right_type": "image",
+            "right_image": "shopify://shop_images/Black_Fridat.webp",
+            "right_video": "shopify://files/videos/Gold_hand_chain_on_hand_7bde86de.mp4",
+            "right_image_mobile": "shopify://shop_images/test_cha.jpg",
+            "right_link": "shopify://collections/sale-collection",
+            "eyebrow": "",
+            "heading": "Made to be worn every day",
+            "accent_text": "every day",
+            "text": "",
+            "button_label": "Shop Now",
+            "button_link": "shopify://collections/sale-collection"
+          }
+        }
+      },
+      "block_order": [
+        "ss_1",
+        "ss_2",
+        "ss_3"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "accent": "",
+        "label": "",
+        "show_dots": false,
+        "mobile_media_first": true
+      }
+    },
     "featured_collection": {
       "type": "section-collection",
       "name": "New Arrivals Section",
@@ -73,6 +157,12 @@
         "color_scheme": "",
         "title": "NEW ARRIVALS",
         "subtitle": "",
+        "layout": "grid",
+        "split_text": "<p>A curated selection of newly arrived pieces, made to bring a little everyday elegance.</p>",
+        "split_note": "*Limited seasonal drop",
+        "split_image_link": "",
+        "split_limit": 12,
+        "split_columns": 3,
         "collection": "new",
         "use_product_collection": true,
         "limit": 4,
@@ -80,7 +170,7 @@
         "rows_by_screen": false,
         "grid_columns_desktop": 4,
         "grid_columns_1024": 3,
-        "grid_columns_960": 3,
+        "grid_columns_960": 2,
         "grid_columns_768": 2,
         "grid_columns_650": "2",
         "grid_columns_mobile": "2",
@@ -90,13 +180,107 @@
         "padding_bottom": 25
       }
     },
-    "richtext_intro": {
+    "arc_showcase": {
+      "type": "arc-showcase",
+      "blocks": {
+        "arc_card_1": {
+          "type": "slide",
+          "settings": {
+            "collection": "chains",
+            "title": "",
+            "link": ""
+          }
+        },
+        "arc_card_2": {
+          "type": "slide",
+          "settings": {
+            "collection": "rings",
+            "title": "",
+            "link": ""
+          }
+        },
+        "arc_card_3": {
+          "type": "slide",
+          "settings": {
+            "collection": "earrings",
+            "title": "",
+            "link": ""
+          }
+        },
+        "arc_card_4": {
+          "type": "slide",
+          "settings": {
+            "collection": "bracelets",
+            "title": "",
+            "link": ""
+          }
+        },
+        "arc_card_5": {
+          "type": "slide",
+          "settings": {
+            "collection": "handchains",
+            "title": "",
+            "link": ""
+          }
+        },
+        "arc_card_6": {
+          "type": "slide",
+          "settings": {
+            "collection": "fingerprint-jewelry",
+            "title": "",
+            "link": ""
+          }
+        },
+        "arc_card_7": {
+          "type": "slide",
+          "settings": {
+            "collection": "bangles",
+            "title": "",
+            "link": ""
+          }
+        },
+        "arc_card_8": {
+          "type": "slide",
+          "settings": {
+            "collection": "earring-sets",
+            "title": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "arc_card_1",
+        "arc_card_2",
+        "arc_card_3",
+        "arc_card_4",
+        "arc_card_5",
+        "arc_card_6",
+        "arc_card_7",
+        "arc_card_8"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "eyebrow": "",
+        "heading": "Trending now",
+        "view_all_label": "View all",
+        "view_all_link": "",
+        "motion": "auto",
+        "scroll_distance": 55,
+        "autoplay_speed": 5,
+        "start_index": 1,
+        "bg_top": "#f6e6d3",
+        "bg_bottom": "#e9c6a6",
+        "glow": "#f9dccd",
+        "accent": ""
+      }
+    },
+    "richtext_engraving": {
       "type": "section-richtext",
       "settings": {
         "color_scheme": "",
-        "heading": "Luxury & personal jewelry",
-        "text": "<p>Discover our exclusive collection of jewelry that brings together affordability and quality. Our stainless steel jewelry is recyclable, does not discolour and continues to shine.</p>",
-        "content_width": 800,
+        "heading": "JEWELRY WITH A PERSONAL TOUCH",
+        "text": "<p>Personalized jewelry crafted to last a lifetime. Choose a name, initials, or a special date and make each piece truly yours. Perfect as a meaningful gift or cherished keepsake. Subtle, elegant, and unique.</p>",
+        "content_width": 700,
         "padding_top": 35,
         "padding_bottom": 25
       }
@@ -209,26 +393,16 @@
         "grid_height": "medium",
         "tile_aspect_ratio": "3_2",
         "mobile_layout": "stacked",
-        "grid_gap": 14,
+        "grid_gap": 16,
         "tile_radius": 0,
         "padding_top": 20,
         "padding_bottom": 30,
         "overlay_opacity": 0
       }
     },
-    "richtext_engraving": {
-      "type": "section-richtext",
-      "settings": {
-        "color_scheme": "",
-        "heading": "JEWELRY WITH A PERSONAL TOUCH",
-        "text": "<p>Personalized jewelry crafted to last a lifetime. Choose a name, initials, or a special date and make each piece truly yours. Perfect as a meaningful gift or cherished keepsake. Subtle, elegant, and unique.</p>",
-        "content_width": 700,
-        "padding_top": 35,
-        "padding_bottom": 25
-      }
-    },
     "split_engravable": {
       "type": "collection-split",
+      "disabled": true,
       "settings": {
         "color_scheme": "scheme-1",
         "design_style": "classic",
@@ -498,9 +672,9 @@
       "type": "sale",
       "name": "Sale",
       "settings": {
-        "image": "shopify://shop_images/Discount_Image_Enhanced_3x1_Filled.webp",
+        "image": "shopify://shop_images/Banner_for_sale.webp",
         "desktop_focal": "top right",
-        "image_mobile": "shopify://shop_images/Mobile_Version_Enhanced_3x4_72e30c94-c741-4833-82ba-dbd4376de2f0.webp",
+        "image_mobile": "shopify://shop_images/Sale_mobile_banner.webp",
         "mobile_focal": "center center",
         "desktop_height": 460,
         "mobile_height": 380,
@@ -541,10 +715,12 @@
   },
   "order": [
     "slideshow",
-    "featured_collection",
     "richtext_intro",
-    "mosaic_grid",
+    "scroll_splits",
+    "featured_collection",
+    "arc_showcase",
     "richtext_engraving",
+    "mosaic_grid",
     "split_engravable",
     "parallax_showcase",
     "section_richtext_PtYik4",

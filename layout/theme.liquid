@@ -35,7 +35,6 @@
 
   <!-- Fonts & Stylesheets -->
   {% render 'theme-typography', part: 'head' %}
-  {{ 'font-settings.css' | asset_url | stylesheet_tag }}
   {% render 'css-variables' %}
   {{ 'theme.css' | asset_url | stylesheet_tag }}
   {{ 'banner.css' | asset_url | stylesheet_tag }}
@@ -66,7 +65,6 @@
     .dp__clip { overflow: hidden !important; height: 100% !important; width: 100% !important; }
     .dp__col { width: 100% !important; }
     .dp__col-track { width: 100% !important; }
-    .dp-pg, product-grid-item.dp-pg { width: 100% !important; box-sizing: border-box !important; }
 
     /* Global Product Grid Fallback Constraints before JS/Hydration */
     .lv-product-grid {
@@ -272,7 +270,11 @@
       assign s_round_text = settings.round_button_text | default: s_text
 
       if pal_on
-        assign s_background_gradient = ''
+        # The palette only manages schemes 1-5; extra schemes (e.g. scheme-6 "champagne glow") keep their own gradient.
+        case scheme.id
+          when 'scheme-1', 'scheme-2', 'scheme-3', 'scheme-4', 'scheme-5'
+            assign s_background_gradient = ''
+        endcase
         assign s_accent = p_accent
         case scheme.id
           when 'scheme-1'
@@ -529,6 +531,9 @@
 
         /* Global Universal Button Setting Overrides (theme settings) */
         background-color: {{ s_background }};
+        {%- if s_background_gradient != blank %}
+        background-image: {{ s_background_gradient }};
+        {%- endif %}
         color: {{ s_text }};
       }
       .color-{{ scheme.id }} .btn--primary,
@@ -657,13 +662,6 @@
     .header__menu__inner .menu__item .navlink--toplevel {
       opacity: 1 !important;
       color: var(--text, #111111) !important;
-    }
-    .header__menu__inner:hover .menu__item:not(:hover) .navlink--toplevel {
-      opacity: 0.72 !important;
-    }
-    .header__menu__inner .menu__item:hover .navlink--toplevel {
-      opacity: 1 !important;
-      color: var(--text, #000000) !important;
     }
     .header__desktop__button svg,
     .header__mobile__button svg {
@@ -912,12 +910,20 @@
 
   {{ content_for_header }}
 
+  {%- comment -%} Product card styles: printed once per page (not once per card). {%- endcomment -%}
+  {% render 'product-card-styles' %}
+
   <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'banner.js' | asset_url }}" defer="defer"></script>
 </head>
 <body id="{{ page_title | handle }}" class="template-{{ template.name | handle }}">
+  {%- comment -%} Shared SVG definitions for the loader: printed once per page. {%- endcomment -%}
+  {% render 'lv-loader-defs' %}
   {% sections 'header-group' %}
+
+  {%- comment -%} Product card styles + behaviour: printed once per page (not once per card). {%- endcomment -%}
+  {% render 'product-card-scripts' %}
 
   <main id="MainContent" class="main-content" role="main">
     {{ content_for_layout }}

@@ -106,7 +106,9 @@
               <a href="{{ child_link.url }}" class="lv-dropdown-img-link" aria-label="{{ child_link.title | escape }}">
                 <div class="lv-dropdown-img-wrap" style="aspect-ratio: {{ aspect_ratio_css }}; border-radius: {{ card_radius }}px;">
                   {%- if child_image != blank -%}
-                    {{ child_image | image_url: width: 1000 | image_tag: alt: child_link.title, widths: '320, 480, 700, 1000', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy', class: 'lv-dropdown-img' }}
+                    {%- capture lv_menu_img -%}{{ child_image | image_url: width: 1000 | image_tag: alt: child_link.title, widths: '320, 480, 700, 1000', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy', class: 'lv-dropdown-img' }}{%- endcapture -%}
+                    {%- comment -%} Performance: menu pictures load on hover/focus (or shortly after the page has loaded), not with the page. {%- endcomment -%}
+                    {{ lv_menu_img | replace: ' srcset="', ' data-srcset="' | replace: ' src="', ' data-src="' | replace: '<img ', '<img data-lv-deferred ' }}
                   {%- endif -%}
                   {%- if overlay_opacity > 0 and child_image != blank -%}
                     <div class="lv-dropdown-overlay" style="background-color: rgba(0, 0, 0, {{ overlay_opacity | divided_by: 100.0 }}); border-radius: {{ card_radius }}px;"></div>
@@ -137,7 +139,9 @@
         </div>
         <a href="{{ link.url }}" class="lv-dropdown-editorial__image" aria-label="{{ link.title | escape }}" style="aspect-ratio: {{ aspect_ratio_css }};">
           {%- if promo_img != blank -%}
-            {{ promo_img | image_url: width: 1600 | image_tag: alt: link.title, widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 55vw, 100vw', loading: 'lazy' }}
+            {%- capture lv_menu_img -%}{{ promo_img | image_url: width: 1600 | image_tag: alt: link.title, widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 55vw, 100vw', loading: 'lazy' }}{%- endcapture -%}
+            {%- comment -%} Performance: menu pictures load on hover/focus (or shortly after the page has loaded), not with the page. {%- endcomment -%}
+            {{ lv_menu_img | replace: ' srcset="', ' data-srcset="' | replace: ' src="', ' data-src="' | replace: '<img ', '<img data-lv-deferred ' }}
           {%- endif -%}
         </a>
       </div>
@@ -148,7 +152,9 @@
           <a href="{{ product.url }}" class="lv-dropdown-product">
             <span class="lv-dropdown-product__image">
               {%- if product.featured_image != blank -%}
-                {{ product.featured_image | image_url: width: 700 | image_tag: alt: product.featured_image.alt, widths: '240, 360, 480, 700', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy' }}
+                {%- capture lv_menu_img -%}{{ product.featured_image | image_url: width: 700 | image_tag: alt: product.featured_image.alt, widths: '240, 360, 480, 700', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy' }}{%- endcapture -%}
+                {%- comment -%} Performance: menu pictures load on hover/focus (or shortly after the page has loaded), not with the page. {%- endcomment -%}
+                {{ lv_menu_img | replace: ' srcset="', ' data-srcset="' | replace: ' src="', ' data-src="' | replace: '<img ', '<img data-lv-deferred ' }}
               {%- endif -%}
             </span>
             <span class="lv-dropdown-product__title">{{ product.title }}</span>
@@ -176,7 +182,9 @@
         <div class="lv-split-promo-wrap">
           <a href="{{ link.url }}" class="lv-dropdown-editorial__image" aria-label="{{ link.title | escape }}" style="aspect-ratio: {{ aspect_ratio_css }};">
             {%- if promo_img != blank -%}
-              {{ promo_img | image_url: width: 1000 | image_tag: alt: link.title, widths: '320, 480, 700, 1000', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy', class: 'lv-dropdown-img' }}
+              {%- capture lv_menu_img -%}{{ promo_img | image_url: width: 1000 | image_tag: alt: link.title, widths: '320, 480, 700, 1000', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy', class: 'lv-dropdown-img' }}{%- endcapture -%}
+              {%- comment -%} Performance: menu pictures load on hover/focus (or shortly after the page has loaded), not with the page. {%- endcomment -%}
+              {{ lv_menu_img | replace: ' srcset="', ' data-srcset="' | replace: ' src="', ' data-src="' | replace: '<img ', '<img data-lv-deferred ' }}
             {%- endif -%}
           </a>
         </div>
@@ -213,7 +221,9 @@
           <div class="dropdown__family dropdown__family--grandchild">
             {%- if child_image != blank -%}
               <a href="{{ child_link.url }}" class="lv-dropdown-collection-image" aria-label="{{ child_link.title | escape }}" style="aspect-ratio: {{ aspect_ratio_css }}; border-radius: {{ card_radius }}px;">
-                {{ child_image | image_url: width: 800 | image_tag: alt: child_link.title, widths: '240, 360, 540, 800', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy', class: 'lv-dropdown-img' }}
+                {%- capture lv_menu_img -%}{{ child_image | image_url: width: 800 | image_tag: alt: child_link.title, widths: '240, 360, 540, 800', sizes: '(min-width: 990px) 22vw, 50vw', loading: 'lazy', class: 'lv-dropdown-img' }}{%- endcapture -%}
+                {%- comment -%} Performance: menu pictures load on hover/focus (or shortly after the page has loaded), not with the page. {%- endcomment -%}
+                {{ lv_menu_img | replace: ' srcset="', ' data-srcset="' | replace: ' src="', ' data-src="' | replace: '<img ', '<img data-lv-deferred ' }}
               </a>
             {%- endif -%}
             <a href="{{ child_link.url }}" class="navlink navlink--child{% if child_link.active %} navlink--active{% endif %}">

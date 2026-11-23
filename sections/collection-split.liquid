@@ -590,6 +590,16 @@
                 else
                   assign desktop_img_url = default_banner
                 endif
+
+                # Performance: only a split banner near the top of the page is loaded eagerly with high priority.
+                # Further down it is lazy-loaded, so it no longer competes with the hero for bandwidth
+                # (and the hidden mobile/desktop twin is not downloaded at all).
+                assign cs_img_loading = 'lazy'
+                assign cs_img_priority = 'auto'
+                if section.index == nil or section.index <= 2
+                  assign cs_img_loading = 'eager'
+                  assign cs_img_priority = 'high'
+                endif
               -%}
 
               {%- if section.settings.image_mobile != blank -%}
@@ -600,8 +610,8 @@
                   alt="{{ section.settings.title | default: cs_default_banner_alt | escape }}"
                   width="{{ section.settings.image_mobile.width | default: 1200 }}"
                   height="{{ section.settings.image_mobile.height | default: 1200 }}"
-                  loading="eager"
-                  fetchpriority="high"
+                  loading="{{ cs_img_loading }}"
+                  fetchpriority="{{ cs_img_priority }}"
                   decoding="async"
                   class="collection-split__img collection-split__img--mobile"
                 >
@@ -612,8 +622,8 @@
                   alt="{{ section.settings.title | default: cs_default_banner_alt | escape }}"
                   width="{{ section.settings.image.width | default: 1956 }}"
                   height="{{ section.settings.image.height | default: 1956 }}"
-                  loading="eager"
-                  fetchpriority="high"
+                  loading="{{ cs_img_loading }}"
+                  fetchpriority="{{ cs_img_priority }}"
                   decoding="async"
                   class="collection-split__img collection-split__img--desktop"
                 >
@@ -625,8 +635,8 @@
                   alt="{{ section.settings.title | default: cs_default_banner_alt | escape }}"
                   width="{{ section.settings.image.width | default: 1956 }}"
                   height="{{ section.settings.image.height | default: 1956 }}"
-                  loading="eager"
-                  fetchpriority="high"
+                  loading="{{ cs_img_loading }}"
+                  fetchpriority="{{ cs_img_priority }}"
                   decoding="async"
                   class="collection-split__img"
                 >

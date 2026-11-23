@@ -3,6 +3,7 @@
     "close": "Close",
     "close_dialog": "Close dialog",
     "close_modal": "Close modal",
+    "loading": "Loading",
     "pause_video": "Pause video",
     "play_video": "Play video",
     "showcase_video": "Showcase video",
@@ -922,6 +923,21 @@
       "shipping_title": "Fast shipping",
       "waterproof_text": "Wear in water with 2-year warranty",
       "waterproof_title": "100% waterproof"
+    },
+    "arc_showcase": {
+      "carousel": "Collections carousel",
+      "collection": "Collection",
+      "previous": "Previous collection",
+      "next": "Next collection"
+    },
+    "collection_slider": {
+      "previous": "Previous products",
+      "next": "Next products"
+    },
+    "scroll_splits": {
+      "label": "Our story",
+      "go_to": "Show part {{ number }} of {{ total }}",
+      "open_link": "Open collection"
     }
   }
 }

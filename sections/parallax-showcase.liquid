@@ -383,9 +383,9 @@
                 {%- for i in (1..2) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
               {%- endif -%}
             </div>
-            <div class="dp__col-track" aria-hidden="true" style="display: flex; flex-direction: column; gap: {{ gap }}px; width: 100%;">
+            <div class="dp__col-track" aria-hidden="true"{% if cards_a != blank %} data-dp-dup{% endif %} style="display: flex; flex-direction: column; gap: {{ gap }}px; width: 100%;">
               {%- if cards_a != blank -%}
-                {{ cards_a }}
+                {%- comment -%} Seamless-loop copy: cloned from the first track by the script below, shortly before the section scrolls into view. {%- endcomment -%}
               {%- else -%}
                 {%- for i in (1..2) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
               {%- endif -%}
@@ -404,7 +404,11 @@
             </header>
             <div class="dp__media" data-dp-media>
               {%- if section.settings.media_type == 'video' and section.settings.video != blank -%}
-                {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true, preload: 'metadata', image_size: '1200x', class: 'dp__video' }}
+                {%- capture dp_video_html -%}
+                  {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true, preload: 'metadata', image_size: '1200x', class: 'dp__video' }}
+                {%- endcapture -%}
+                {%- comment -%} The poster <img> that video_tag prints has no alt attribute; the video is decorative, so it gets an empty one. {%- endcomment -%}
+                {{ dp_video_html | replace: '<img ', '<img alt="" ' }}
               {%- elsif section.settings.image != blank -%}
                 <img class="dp__img" src="{{ section.settings.image | image_url: width: 1200 }}" srcset="{{ section.settings.image | image_url: width: 700 }} 700w, {{ section.settings.image | image_url: width: 1000 }} 1000w, {{ section.settings.image | image_url: width: 1400 }} 1400w, {{ section.settings.image | image_url: width: 2000 }} 2000w" sizes="(min-width: 801px) 44vw, 92vw" alt="{{ section.settings.image.alt | default: section.settings.heading | escape }}" width="{{ section.settings.image.width }}" height="{{ section.settings.image.height }}" loading="eager">
               {%- else -%}
@@ -429,9 +433,9 @@
                 {%- for i in (3..4) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
               {%- endif -%}
             </div>
-            <div class="dp__col-track" aria-hidden="true" style="display: flex; flex-direction: column; gap: var(--dp-gap); width: 100%;">
+            <div class="dp__col-track" aria-hidden="true"{% if cards_b != blank %} data-dp-dup{% endif %} style="display: flex; flex-direction: column; gap: var(--dp-gap); width: 100%;">
               {%- if cards_b != blank -%}
-                {{ cards_b }}
+                {%- comment -%} Seamless-loop copy: cloned from the first track by the script below, shortly before the section scrolls into view. {%- endcomment -%}
               {%- else -%}
                 {%- for i in (3..4) -%}{%- render 'product-grid-item', fallback_index: i, card_border_radius: radius, extra_class: 'dp-pg' -%}{%- endfor -%}
               {%- endif -%}
@@ -467,13 +471,17 @@
               {{ mobile_cards_1 }}
               {%- if half < 4 -%}{{ mobile_cards_1 }}{%- endif -%}
             </div>
-            <div class="dp__mobile-group" aria-hidden="true">
-              {{ mobile_cards_1 }}
-              {%- if half < 4 -%}{{ mobile_cards_1 }}{%- endif -%}
+            <div class="dp__mobile-group" aria-hidden="true"{% if cards_a != blank %} data-dp-dup{% endif %}>
+              {%- if cards_a == blank -%}
+                {{ mobile_cards_1 }}
+                {%- if half < 4 -%}{{ mobile_cards_1 }}{%- endif -%}
+              {%- endif -%}
             </div>
-            <div class="dp__mobile-group" aria-hidden="true">
-              {{ mobile_cards_1 }}
-              {%- if half < 4 -%}{{ mobile_cards_1 }}{%- endif -%}
+            <div class="dp__mobile-group" aria-hidden="true"{% if cards_a != blank %} data-dp-dup{% endif %}>
+              {%- if cards_a == blank -%}
+                {{ mobile_cards_1 }}
+                {%- if half < 4 -%}{{ mobile_cards_1 }}{%- endif -%}
+              {%- endif -%}
             </div>
           </div>
         </div>
@@ -485,13 +493,17 @@
               {{ mobile_cards_2 }}
               {%- if half < 4 -%}{{ mobile_cards_2 }}{%- endif -%}
             </div>
-            <div class="dp__mobile-group" aria-hidden="true">
-              {{ mobile_cards_2 }}
-              {%- if half < 4 -%}{{ mobile_cards_2 }}{%- endif -%}
+            <div class="dp__mobile-group" aria-hidden="true"{% if cards_b != blank %} data-dp-dup{% endif %}>
+              {%- if cards_b == blank -%}
+                {{ mobile_cards_2 }}
+                {%- if half < 4 -%}{{ mobile_cards_2 }}{%- endif -%}
+              {%- endif -%}
             </div>
-            <div class="dp__mobile-group" aria-hidden="true">
-              {{ mobile_cards_2 }}
-              {%- if half < 4 -%}{{ mobile_cards_2 }}{%- endif -%}
+            <div class="dp__mobile-group" aria-hidden="true"{% if cards_b != blank %} data-dp-dup{% endif %}>
+              {%- if cards_b == blank -%}
+                {{ mobile_cards_2 }}
+                {%- if half < 4 -%}{{ mobile_cards_2 }}{%- endif -%}
+              {%- endif -%}
             </div>
           </div>
         </div>
@@ -772,8 +784,44 @@
       });
     });
 
+    /* 6. Lazy seamless-loop copies.
+       The first copy of every loop (desktop column track / mobile marquee row) is rendered by the server.
+       The extra copies are identical, so they are cloned here shortly before the section scrolls into view
+       instead of being sent in the page HTML (about 36 fewer product cards to download and parse). */
+    var dupArmed = false;
+    var dupFilled = { desktop: false, mobile: false };
+    function fillDuplicates() {
+      var mode = isDesktop() ? 'desktop' : 'mobile';
+      if (!dupArmed || dupFilled[mode]) return;
+      dupFilled[mode] = true;
+      var sel = mode === 'desktop' ? '.dp__col [data-dp-dup]' : '.dp__mobile-track [data-dp-dup]';
+      root.querySelectorAll(sel).forEach(function (dup) {
+        var src = dup.parentNode.firstElementChild;
+        if (src && src !== dup) dup.innerHTML = src.innerHTML;
+        /* The copy is aria-hidden, so its links and buttons must not be reachable with the keyboard
+           (they stay clickable with the mouse / touch). */
+        dup.querySelectorAll('a[href], button, input, select, textarea, [tabindex]').forEach(function (el) {
+          el.setAttribute('tabindex', '-1');
+        });
+      });
+      if (mode === 'mobile') {
+        mobileItems.forEach(function (item) { item.loopWidth = 0; syncMobileItem(item); });
+        startMobileLoop();
+      }
+    }
+    function armDuplicates() { dupArmed = true; fillDuplicates(); }
+    if ('IntersectionObserver' in window) {
+      var dupIO = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) { dupIO.disconnect(); armDuplicates(); }
+      }, { rootMargin: '1500px 0px' });
+      dupIO.observe(root);
+    } else {
+      armDuplicates();
+    }
+
     /* 5. Responsive Resize Handling */
     window.addEventListener('resize', function () {
+      fillDuplicates();
       updateHeights();
       if (isDesktop()) {
         initDesktop();

@@ -1,0 +1,1014 @@
+{%- comment -%}
+  Arc showcase: a full-screen section with collection cards fanned out along a curved arc.
+  The centre card is the active one; its collection name is shown large above the arc, and a rounded
+  dome with the section heading closes the bottom (the side cards slide behind it).
+
+  Motion (setting "Motion"):
+  - scroll: the section pins to the screen and scrolling the page turns the arc one collection at a time.
+            After the last collection the page simply continues. It follows the page scroll (it does not
+            capture wheel events), so mouse wheel, trackpad, touch, keyboard and the scrollbar all work.
+  - auto:   a normal full-screen section that turns on its own (paused on hover / focus / off screen).
+  In both modes visitors can also drag / swipe sideways, use the keyboard arrows or click a side card.
+
+  Card image: the block image when one is chosen, otherwise the collection image.
+  Cards are rendered by Liquid; without JavaScript they show as a static fan.
+{%- endcomment -%}
+{%- liquid
+  assign slides = section.blocks | where: 'type', 'slide'
+  assign slide_count = slides.size
+  assign heading = section.settings.heading
+  assign view_label = section.settings.view_all_label
+  assign mode = section.settings.motion | default: 'auto'
+
+  assign autoplay = false
+  if mode == 'auto'
+    assign autoplay = true
+  endif
+
+  assign start_idx = 0
+  if mode == 'auto'
+    assign start_idx = section.settings.start_index | minus: 1
+    if start_idx >= slide_count
+      assign start_idx = 0
+    endif
+  endif
+
+  assign region_label = heading
+  if region_label == blank
+    assign region_label = 'sections.arc_showcase.carousel' | t
+  endif
+-%}
+
+<arc-showcase
+  class="arc-showcase arc-showcase--{{ mode }} color-{{ section.settings.color_scheme | default: 'scheme-1' }}"
+  data-mode="{{ mode }}"
+  data-autoplay="{{ autoplay }}"
+  data-autoplay-delay="{{ section.settings.autoplay_speed | times: 1000 }}"
+  data-scroll-step="{{ section.settings.scroll_distance }}"
+  data-start="{{ start_idx }}"
+  style="
+    --arc-bg-1: {{ section.settings.bg_top }};
+    --arc-bg-2: {{ section.settings.bg_bottom }};
+    --arc-glow: {{ section.settings.glow }};
+    --arc-accent: {{ section.settings.accent | default: 'var(--lv-accent-deep, #806745)' }};
+    --arc-start: {{ start_idx }};
+  "
+  role="region"
+  aria-roledescription="{{ 'sections.arc_showcase.carousel' | t }}"
+  aria-label="{{ region_label | escape }}"
+>
+  <div class="arc-showcase__pin" data-arc-pin>
+    <div class="arc-showcase__sky" aria-hidden="true"></div>
+
+    <div class="arc-showcase__header">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="arc-showcase__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      <p class="arc-showcase__title" data-arc-title aria-live="polite">
+        {%- if slide_count > 0 -%}
+          {%- assign first_slide = slides[start_idx] -%}
+          {{ first_slide.settings.title | default: first_slide.settings.collection.title | escape }}
+        {%- endif -%}
+      </p>
+    </div>
+
+    <div class="arc-showcase__stage" data-arc-stage>
+      {%- for block in slides -%}
+        {%- liquid
+          assign col = block.settings.collection
+          assign card_title = block.settings.title | default: col.title
+          if card_title == blank
+            assign card_title = 'sections.arc_showcase.collection' | t
+          endif
+          assign card_url = block.settings.link | default: col.url | default: routes.all_products_collection_url
+          assign card_img = block.settings.image | default: col.image
+        -%}
+        <a
+          href="{{ card_url }}"
+          class="arc-showcase__card{% if forloop.index0 == start_idx %} is-active{% endif %}"
+          aria-label="{{ card_title | escape }}"
+          data-arc-card
+          data-title="{{ card_title | escape }}"
+          style="--i: {{ forloop.index0 }};"
+          {{ block.shopify_attributes }}
+        >
+          <span class="arc-showcase__frame">
+            {%- if card_img != blank -%}
+              {{
+                card_img
+                | image_url: width: 900
+                | image_tag:
+                  widths: '360, 540, 720, 900',
+                  sizes: '(min-width: 990px) 26vw, (min-width: 750px) 36vw, 64vw',
+                  loading: 'lazy',
+                  alt: card_title,
+                  class: 'arc-showcase__img'
+              }}
+            {%- else -%}
+              {%- capture ph -%}collection-{{ forloop.index | modulo: 6 | plus: 1 }}{%- endcapture -%}
+              {{ ph | placeholder_svg_tag: 'arc-showcase__img arc-showcase__img--ph' }}
+            {%- endif -%}
+          </span>
+        </a>
+      {%- endfor -%}
+    </div>
+
+    <div class="arc-showcase__arch">
+      <div class="arc-showcase__dome" aria-hidden="true"></div>
+      <div class="arc-showcase__arch-inner">
+      <button type="button" class="arc-showcase__nav" data-arc-prev aria-label="{{ 'sections.arc_showcase.previous' | t }}">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="arc-showcase__arch-text">
+        {%- if heading != blank -%}
+          <h2 class="arc-showcase__heading">{{ heading | escape }}</h2>
+        {%- endif -%}
+        {%- if view_label != blank -%}
+          <a
+            class="arc-showcase__view-all"
+            href="{{ section.settings.view_all_link | default: routes.collections_url }}"
+            {% if section.settings.view_all_link == blank %}data-arc-follow{% endif %}
+          >
+            <span>{{ view_label | escape }}</span>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+          </a>
+        {%- endif -%}
+      </div>
+      <button type="button" class="arc-showcase__nav" data-arc-next aria-label="{{ 'sections.arc_showcase.next' | t }}">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      </div>
+    </div>
+  </div>
+</arc-showcase>
+
+{% stylesheet %}
+  .arc-showcase {
+    /* set by the script: height of the sticky header, so the pinned panel sits right under it */
+    --arc-top: 0px;
+    --arc-screen: calc(100vh - var(--arc-top));
+    /* visible height of the dome and the diameter of the circle it is cut from */
+    --arc-arch-h: clamp(150px, 13vw, 250px);
+    --arc-dome-d: 144vw;
+    /* how far the centre card tucks under the dome */
+    --arc-tuck: clamp(26px, 3vw, 48px);
+    /* card size follows the screen height so the whole arc always fits on one screen */
+    --arc-card-h: clamp(190px, min(27vw, calc(var(--arc-screen) - var(--arc-arch-h) - 210px)), 520px);
+    --arc-card-w: calc(var(--arc-card-h) / 1.1);
+    --arc-arch-color: rgb(var(--color-background, 255, 255, 255));
+    position: relative;
+    display: block;
+    color: rgb(var(--color-foreground, 26, 26, 26));
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @supports (height: 100svh) {
+    .arc-showcase {
+      --arc-screen: calc(100svh - var(--arc-top));
+    }
+  }
+
+  /* Full-screen panel; in scroll mode it stays pinned while the page scrolls through the collections */
+  .arc-showcase__pin {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: var(--arc-screen);
+    min-height: 500px;
+    overflow: hidden;
+    overflow: clip;
+    isolation: isolate;
+  }
+
+  .arc-showcase--scroll.is-ready .arc-showcase__pin {
+    position: sticky;
+    top: var(--arc-top);
+  }
+
+  /* Theme champagne backdrop with a soft glow behind the active card */
+  .arc-showcase__sky {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(55% 50% at 50% 55%, var(--arc-glow) 0%, transparent 72%),
+      radial-gradient(40% 40% at 10% 20%, color-mix(in srgb, var(--arc-glow) 60%, transparent) 0%, transparent 70%),
+      radial-gradient(38% 38% at 90% 24%, color-mix(in srgb, var(--arc-bg-2) 75%, transparent) 0%, transparent 70%),
+      linear-gradient(180deg, var(--arc-bg-1) 0%, var(--arc-bg-2) 100%);
+  }
+
+  /* takes the free space above the cards; the title sits in its middle */
+  .arc-showcase__header {
+    position: relative;
+    z-index: 3;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+    padding: 20px 20px clamp(16px, 3vh, 36px);
+    text-align: center;
+  }
+
+  .arc-showcase__eyebrow {
+    margin: 0 0 10px;
+    font-family: var(--FONT-STACK-ACCENT, var(--FONT-STACK-BODY, sans-serif));
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--arc-accent);
+  }
+
+  .arc-showcase__title {
+    margin: 0;
+    min-height: 1.1em;
+    font-family: var(--FONT-STACK-HEADING, 'Playfair Display', Georgia, serif);
+    font-size: clamp(38px, min(4.4vw, 8vh), 84px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+
+  .arc-showcase__title.is-switching {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  /* ---------- Arc stage: its bottom edge is where the dome starts ---------- */
+  .arc-showcase__stage {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    height: calc(var(--arc-card-h) - var(--arc-tuck) + 12px);
+    touch-action: pan-y;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .arc-showcase__stage.is-dragging {
+    cursor: grabbing;
+  }
+
+  .arc-showcase__card {
+    --d: calc(var(--i) - var(--arc-start, 0));
+    position: absolute;
+    left: 50%;
+    /* the centre card ends a little below the top of the dome */
+    top: 12px;
+    width: var(--arc-card-w);
+    height: var(--arc-card-h);
+    margin-left: calc(var(--arc-card-w) / -2);
+    padding: clamp(8px, 1vw, 16px);
+    box-sizing: border-box;
+    background: #fff;
+    box-shadow: 0 18px 40px rgba(64, 42, 18, 0.13), 0 2px 6px rgba(64, 42, 18, 0.05);
+    transform-origin: 50% 50%;
+    /* static fallback before the script runs: a gentle fan around the first card */
+    transform: translate3d(calc(var(--d) * var(--arc-card-w) * 1.1), calc(var(--d) * var(--d) * 24px), 0) rotate(calc(var(--d) * 14deg));
+    will-change: transform;
+    -webkit-user-drag: none;
+    text-decoration: none;
+    outline: none;
+  }
+
+  .arc-showcase__frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--arc-bg-2) 40%, #fff);
+  }
+
+  .arc-showcase__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .arc-showcase__img--ph {
+    fill: color-mix(in srgb, var(--arc-accent) 35%, transparent);
+  }
+
+  /* Signature double offset thin outline on the active card */
+  .arc-showcase__card::before,
+  .arc-showcase__card::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border: 1px solid rgb(var(--color-foreground, 26, 26, 26));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.45s ease;
+  }
+
+  .arc-showcase__card::after {
+    inset: -7px;
+  }
+
+  .arc-showcase__card.is-active::before,
+  .arc-showcase__card.is-active::after {
+    opacity: 1;
+  }
+
+  .arc-showcase__card.is-active::after {
+    transform: rotate(-1.6deg);
+  }
+
+  .arc-showcase__card:focus-visible::before {
+    opacity: 1;
+    border-color: var(--arc-accent);
+    border-width: 2px;
+  }
+
+  /* ---------- Rounded dome ---------- */
+  .arc-showcase__arch {
+    position: relative;
+    z-index: 4;
+    flex: none;
+    height: var(--arc-arch-h);
+  }
+
+  /* A large circle whose top shows as the dome; a soft shade along the curve like a raised surface */
+  .arc-showcase__dome {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: var(--arc-dome-d);
+    height: var(--arc-dome-d);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--arc-arch-color) 90%, #8f7f6c) 0px,
+      color-mix(in srgb, var(--arc-arch-color) 96%, #8f7f6c) 34px,
+      var(--arc-arch-color) 110px
+    );
+    box-shadow: 0 -10px 34px rgba(64, 42, 18, 0.08);
+    pointer-events: none;
+  }
+
+  /* arrows on both sides of the heading, inside the dome */
+  .arc-showcase__arch-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(18px, 4vw, 64px);
+    padding: calc(var(--arc-arch-h) * 0.3) 16px 0;
+  }
+
+  .arc-showcase__arch-text {
+    position: relative;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .arc-showcase__nav {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+  }
+
+  .arc-showcase__nav:hover {
+    background: var(--arc-accent);
+    border-color: var(--arc-accent);
+    color: #fff;
+  }
+
+  .arc-showcase__nav:active {
+    transform: scale(0.94);
+  }
+
+  .arc-showcase__nav:focus-visible {
+    outline: 2px solid var(--arc-accent);
+    outline-offset: 3px;
+  }
+
+  .arc-showcase__heading {
+    margin: 0 0 14px;
+    font-family: var(--FONT-STACK-HEADING, 'Playfair Display', Georgia, serif);
+    font-size: clamp(22px, 2.1vw, 34px);
+    font-weight: 400;
+    line-height: 1.2;
+    color: inherit;
+  }
+
+  .arc-showcase__view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 2px;
+    font-size: 13px;
+    color: inherit;
+    text-decoration: none;
+    transition: gap 0.25s ease, color 0.25s ease;
+  }
+
+  .arc-showcase__view-all:hover {
+    gap: 10px;
+    color: var(--arc-accent);
+  }
+
+  /* tablets: bigger cards, narrower dome */
+  @media (min-width: 750px) and (max-width: 1100px) {
+    .arc-showcase {
+      --arc-card-h: clamp(220px, min(44vw, calc(var(--arc-screen) - var(--arc-arch-h) - 210px)), 460px);
+      --arc-dome-d: 175vw;
+    }
+  }
+
+  @media (max-width: 749px) {
+    .arc-showcase {
+      --arc-arch-h: 128px;
+      --arc-dome-d: 220vw;
+      --arc-tuck: 22px;
+      --arc-card-h: clamp(190px, min(80vw, calc(var(--arc-screen) - var(--arc-arch-h) - 190px)), 420px);
+    }
+
+    .arc-showcase__pin {
+      min-height: 460px;
+    }
+
+    .arc-showcase__arch-inner {
+      gap: 14px;
+      padding-top: calc(var(--arc-arch-h) * 0.26);
+    }
+
+    .arc-showcase__nav {
+      width: 40px;
+      height: 40px;
+    }
+
+    .arc-showcase__heading {
+      margin-bottom: 8px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .arc-showcase__title,
+    .arc-showcase__card::before,
+    .arc-showcase__card::after {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    if (customElements.get('arc-showcase')) return;
+
+    var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
+
+    /* Scroll position -> card position, with a short rest on every collection */
+    function magnet(raw) {
+      var base = Math.floor(raw);
+      var f = raw - base;
+      var t = clamp((f - 0.18) / 0.64, 0, 1);
+      return base + t * t * (3 - 2 * t);
+    }
+
+    class ArcShowcase extends HTMLElement {
+      connectedCallback() {
+        this.pin = this.querySelector('[data-arc-pin]');
+        this.stage = this.querySelector('[data-arc-stage]');
+        this.cards = Array.prototype.slice.call(this.querySelectorAll('[data-arc-card]'));
+        this.titleEl = this.querySelector('[data-arc-title]');
+        this.followLink = this.querySelector('[data-arc-follow]');
+        this.total = this.cards.length;
+        if (!this.stage || this.total === 0) return;
+
+        this.scrollMode = this.getAttribute('data-mode') === 'scroll' && this.total > 1;
+        this.stepVh = clamp(parseFloat(this.getAttribute('data-scroll-step')) || 55, 20, 150);
+        var start = parseInt(this.getAttribute('data-start'), 10) || 0;
+        this.target = this.current = clamp(start, 0, this.total - 1);
+        this.activeIdx = -1;
+        this.raf = null;
+        this.scrollRaf = null;
+        this.visible = false;
+        this.hovering = false;
+        this.focused = false;
+        this.drag = null;
+        /* continuous rotation: one card every "seconds per card" */
+        this.speed = 1000 / Math.max(parseInt(this.getAttribute('data-autoplay-delay'), 10) || 5000, 1000);
+        this.autoOn = !this.scrollMode && this.getAttribute('data-autoplay') === 'true' && this.total > 1;
+        this.resumeAt = 0;
+        this.editorHold = false;
+        this.lastT = 0;
+        this.timer = null;
+        this.headerEls = Array.prototype.slice.call(document.querySelectorAll('.shopify-section-group-header-group, [data-header-wrapper]'));
+
+        this.tick = this.tick.bind(this);
+        this.onResize = this.onResize.bind(this);
+        this.onScroll = this.onScroll.bind(this);
+
+        this.classList.add('is-ready');
+        this.measure();
+        if (this.scrollMode) this.target = this.current = this.scrollTarget();
+        this.render();
+        this.bind();
+      }
+
+      disconnectedCallback() {
+        cancelAnimationFrame(this.raf);
+        cancelAnimationFrame(this.scrollRaf);
+        clearTimeout(this.timer);
+        window.removeEventListener('resize', this.onResize);
+        window.removeEventListener('scroll', this.onScroll);
+        if (this.io) this.io.disconnect();
+      }
+
+      /* Height of the sticky header that is currently on screen */
+      headerOffset() {
+        var bottom = 0;
+        this.headerEls.forEach(function (h) {
+          var pos = getComputedStyle(h).position;
+          if (pos !== 'sticky' && pos !== 'fixed') return;
+          var r = h.getBoundingClientRect();
+          if (r.height > 0 && r.top <= 1) bottom = Math.max(bottom, Math.round(r.bottom));
+        });
+        return Math.min(bottom, Math.round(window.innerHeight * 0.3));
+      }
+
+      measure() {
+        this.top = this.headerOffset();
+        this.style.setProperty('--arc-top', this.top + 'px');
+
+        var w = this.stage.clientWidth || window.innerWidth;
+        this.mobile = w < 750;
+        this.cardW = this.cards[0].offsetWidth || 300;
+        /* Radius of the circle the cards ride on and the angle between two neighbours */
+        this.step = this.mobile ? 18 : 16;
+        this.radius = this.cardW * (this.mobile ? 3.3 : 4);
+        this.maxSide = this.mobile ? 2.4 : 3.3;
+
+        if (this.scrollMode) {
+          this.stepPx = Math.round(window.innerHeight * this.stepVh / 100);
+          this.travel = this.stepPx * (this.total - 1);
+          this.style.height = (this.pin.offsetHeight + this.travel) + 'px';
+        }
+      }
+
+      onResize() {
+        this.measure();
+        if (this.scrollMode) this.target = this.current = this.scrollTarget();
+        this.render();
+      }
+
+      /* ---------- scroll mode ---------- */
+      scrollTarget() {
+        var rect = this.getBoundingClientRect();
+        return magnet(clamp((this.top - rect.top) / this.stepPx, 0, this.total - 1));
+      }
+
+      onScroll() {
+        if (this.scrollRaf) return;
+        var self = this;
+        this.scrollRaf = requestAnimationFrame(function () {
+          self.scrollRaf = null;
+          var rect = self.getBoundingClientRect();
+          if (rect.bottom < -50 || rect.top > window.innerHeight + 50) return;
+          var top = self.headerOffset();
+          if (Math.abs(top - self.top) > 1) {
+            self.top = top;
+            self.style.setProperty('--arc-top', top + 'px');
+            self.style.height = (self.pin.offsetHeight + self.travel) + 'px';
+          }
+          if (self.drag && self.drag.active) return;
+          self.target = self.scrollTarget();
+          self.wake();
+        });
+      }
+
+      scrollToIndex(idx, smooth) {
+        var rect = this.getBoundingClientRect();
+        var y = window.scrollY + rect.top - this.top + clamp(idx, 0, this.total - 1) * this.stepPx;
+        window.scrollTo({ top: Math.round(y), behavior: smooth && !REDUCED.matches ? 'smooth' : 'auto' });
+      }
+
+      /* ---------- events ---------- */
+      bind() {
+        var self = this;
+
+        this.cards.forEach(function (card, idx) {
+          card.addEventListener('click', function (e) {
+            if (self.moved) { e.preventDefault(); return; }
+            if (Math.abs(self.offset(idx, self.current)) > 0.45) {
+              e.preventDefault();
+              self.goTo(idx);
+            }
+          });
+          card.addEventListener('dragstart', function (e) { e.preventDefault(); });
+        });
+
+        /* Drag / swipe sideways (vertical swipes keep scrolling the page) */
+        this.stage.addEventListener('pointerdown', function (e) {
+          if (e.button !== 0) return;
+          self.drag = { x: e.clientX, y: e.clientY, startTarget: self.target, id: e.pointerId, active: false };
+          self.moved = false;
+        });
+        this.stage.addEventListener('pointermove', function (e) {
+          var d = self.drag;
+          if (!d || d.id !== e.pointerId) return;
+          var dx = e.clientX - d.x;
+          var dy = e.clientY - d.y;
+          if (!d.active) {
+            if (Math.abs(dx) < 6 || Math.abs(dx) < Math.abs(dy)) return;
+            d.active = true;
+            self.moved = true;
+            self.stage.classList.add('is-dragging');
+            try { self.stage.setPointerCapture(e.pointerId); } catch (err) {}
+          }
+          var t = d.startTarget - dx / (self.cardW * 1.05);
+          self.target = self.scrollMode ? clamp(t, 0, self.total - 1) : t;
+          self.wake();
+        });
+        var end = function (e) {
+          var d = self.drag;
+          if (!d || (e && d.id !== e.pointerId)) return;
+          self.drag = null;
+          self.stage.classList.remove('is-dragging');
+          if (d.active) {
+            self.target = Math.round(self.target);
+            if (self.scrollMode) self.scrollToIndex(self.target, false);
+            self.wake();
+            setTimeout(function () { self.moved = false; }, 0);
+          }
+          self.schedule();
+        };
+        this.stage.addEventListener('pointerup', end);
+        this.stage.addEventListener('pointercancel', end);
+        /* only the stage's own capture: a touch's implicit capture on the card also fires (and bubbles) when we take it over */
+        this.stage.addEventListener('lostpointercapture', function (e) { if (e.target === self.stage) end(e); });
+
+        /* Auto mode: horizontal trackpad scroll turns the arc (vertical scroll is left to the page) */
+        if (!this.scrollMode) {
+          var wheelSnap = null;
+          this.stage.addEventListener('wheel', function (e) {
+            if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || Math.abs(e.deltaX) < 1) return;
+            e.preventDefault();
+            self.target += e.deltaX / (self.cardW * 2.2);
+            self.wake();
+            clearTimeout(wheelSnap);
+            wheelSnap = setTimeout(function () { self.target = Math.round(self.target); self.wake(); }, 160);
+          }, { passive: false });
+        }
+
+        this.addEventListener('keydown', function (e) {
+          if (e.key === 'ArrowRight') { e.preventDefault(); self.go(1); }
+          else if (e.key === 'ArrowLeft') { e.preventDefault(); self.go(-1); }
+        });
+
+        /* arrows */
+        var prev = this.querySelector('[data-arc-prev]');
+        var next = this.querySelector('[data-arc-next]');
+        if (prev) prev.addEventListener('click', function () { self.go(-1); });
+        if (next) next.addEventListener('click', function () { self.go(1); });
+
+        /* pause only while a card is pointed at or focused (the section itself fills the screen) */
+        this.stage.addEventListener('mouseover', function (e) {
+          if (!e.target.closest('[data-arc-card]')) return;
+          if (!self.hovering && self.autoOn) self.target = Math.round(self.target); /* settle on a card */
+          self.hovering = true; self.schedule();
+        });
+        this.stage.addEventListener('mouseleave', function () { self.hovering = false; self.schedule(); });
+        this.stage.addEventListener('focusin', function () { self.focused = true; self.target = Math.round(self.target); self.schedule(); });
+        this.stage.addEventListener('focusout', function () { self.focused = false; self.schedule(); });
+        document.addEventListener('visibilitychange', function () { self.schedule(); });
+
+        if ('IntersectionObserver' in window) {
+          this.io = new IntersectionObserver(function (entries) {
+            self.visible = entries[0].isIntersecting;
+            self.schedule();
+          }, { threshold: 0.2 });
+          this.io.observe(this);
+        } else {
+          this.visible = true;
+        }
+
+        /* Theme editor: selecting a card block brings it to the centre */
+        document.addEventListener('shopify:block:select', function (e) {
+          var idx = self.cards.indexOf(e.target);
+          if (idx > -1) { self.editorHold = true; self.goTo(idx, true); }
+        });
+        document.addEventListener('shopify:block:deselect', function (e) {
+          if (self.cards.indexOf(e.target) > -1) { self.editorHold = false; self.schedule(); }
+        });
+
+        window.addEventListener('resize', this.onResize, { passive: true });
+        if (this.scrollMode) window.addEventListener('scroll', this.onScroll, { passive: true });
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { self.onResize(); });
+        this.schedule();
+      }
+
+      offset(idx, pos) {
+        var n = this.total;
+        var d = (((idx - pos) % n) + n) % n;
+        if (d > n / 2) d -= n;
+        return d;
+      }
+
+      go(dir) {
+        if (this.scrollMode) {
+          this.goTo(clamp(Math.round(this.target) + dir, 0, this.total - 1));
+          return;
+        }
+        /* next / previous whole card, then a short pause before the slow rotation carries on */
+        this.target = Math.round(this.current) + dir; /* the card next to the one in the centre */
+        this.resumeAt = performance.now() + 2200;
+        this.wake();
+        this.schedule();
+      }
+
+      goTo(idx, instant) {
+        if (this.scrollMode) {
+          this.scrollToIndex(idx, !instant);
+          return;
+        }
+        var d = this.offset(idx, Math.round(this.target));
+        this.target = Math.round(this.target) + d;
+        if (instant) this.current = this.target;
+        this.wake();
+        this.schedule();
+      }
+
+      /* the slow rotation runs while the section is on screen and nobody is pointing at, dragging or editing it */
+      drifting(now) {
+        return this.autoOn && !REDUCED.matches && this.visible && !this.hovering && !this.focused &&
+          !this.drag && !document.hidden && !this.editorHold && now >= this.resumeAt;
+      }
+
+      schedule() {
+        if (this.drifting(performance.now()) || this.resumeAt > performance.now()) this.wake();
+      }
+
+      wake() {
+        if (!this.raf) { this.lastT = 0; this.raf = requestAnimationFrame(this.tick); }
+      }
+
+      tick(now) {
+        this.raf = null;
+        var dt = this.lastT ? Math.min(0.1, (now - this.lastT) / 1000) : 0.016;
+        this.lastT = now;
+        var drift = this.drifting(now);
+        if (drift) this.target += this.speed * dt;
+        /* keep the numbers small on a page left open for a long time */
+        if (this.target > this.total * 1000) { this.target -= this.total * 1000; this.current -= this.total * 1000; }
+        var ease = REDUCED.matches ? 1 : (this.drag ? 0.35 : 0.14);
+        this.current += (this.target - this.current) * ease;
+        if (Math.abs(this.target - this.current) < 0.0008) this.current = this.target;
+        this.render();
+        var waiting = this.autoOn && now < this.resumeAt;
+        if (drift || waiting || this.current !== this.target || this.drag) this.raf = requestAnimationFrame(this.tick);
+      }
+
+      render() {
+        var self = this;
+        var R = this.radius;
+        this.cards.forEach(function (card, idx) {
+          var d = self.offset(idx, self.current);
+          var a = d * self.step * Math.PI / 180;
+          var x = R * Math.sin(a);
+          var y = R * (1 - Math.cos(a));
+          var abs = Math.abs(d);
+          var hidden = abs > self.maxSide;
+          card.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) rotate(' + (d * self.step).toFixed(3) + 'deg)';
+          card.style.zIndex = String(20 - Math.round(abs * 2));
+          card.style.opacity = hidden ? '0' : (abs > self.maxSide - 0.6 ? String(Math.max(0, (self.maxSide - abs) / 0.6)) : '1');
+          card.style.visibility = hidden ? 'hidden' : '';
+          var active = abs < 0.45;
+          card.classList.toggle('is-active', active);
+          card.setAttribute('tabindex', active ? '0' : '-1');
+          if (hidden) card.setAttribute('aria-hidden', 'true');
+          else card.removeAttribute('aria-hidden');
+        });
+
+        var activeIdx = ((Math.round(this.current) % this.total) + this.total) % this.total;
+        if (activeIdx !== this.activeIdx) {
+          var first = this.activeIdx === -1;
+          this.activeIdx = activeIdx;
+          var card = this.cards[activeIdx];
+          var title = card.getAttribute('data-title') || '';
+          if (this.followLink) this.followLink.setAttribute('href', card.getAttribute('href'));
+          if (this.titleEl) {
+            if (first || REDUCED.matches) {
+              this.titleEl.textContent = title;
+            } else {
+              var el = this.titleEl;
+              el.classList.add('is-switching');
+              clearTimeout(this.titleTimer);
+              this.titleTimer = setTimeout(function () {
+                el.textContent = title;
+                el.classList.remove('is-switching');
+              }, 160);
+            }
+          }
+        }
+      }
+    }
+
+    customElements.define('arc-showcase', ArcShowcase);
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Arc showcase",
+  "tag": "section",
+  "class": "section-arc-showcase",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme (dome and text)",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Small label above the title"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading in the dome",
+      "default": "Trending now"
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "Link label",
+      "default": "View all"
+    },
+    {
+      "type": "url",
+      "id": "view_all_link",
+      "label": "Link",
+      "info": "Leave empty to link to the collection in the centre."
+    },
+    {
+      "type": "header",
+      "content": "Motion"
+    },
+    {
+      "type": "select",
+      "id": "motion",
+      "label": "Motion",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Turn slowly on its own"
+        },
+        {
+          "value": "scroll",
+          "label": "Turn while scrolling the page"
+        }
+      ],
+      "default": "auto",
+      "info": "On its own: the cards keep turning slowly; the arrows move one card. Scrolling: the section stays on screen while the page scroll turns through every collection."
+    },
+    {
+      "type": "range",
+      "id": "scroll_distance",
+      "label": "Scroll per collection",
+      "min": 30,
+      "max": 120,
+      "step": 5,
+      "unit": "%",
+      "default": 55,
+      "info": "Share of the screen height scrolled to move one collection.",
+      "visible_if": "{{ section.settings.motion == 'scroll' }}"
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Rotation speed (seconds per card)",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "unit": "s",
+      "default": 5,
+      "visible_if": "{{ section.settings.motion == 'auto' }}",
+      "info": "Higher is slower."
+    },
+    {
+      "type": "range",
+      "id": "start_index",
+      "label": "Start with card",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 1,
+      "visible_if": "{{ section.settings.motion == 'auto' }}"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_top",
+      "label": "Background top",
+      "default": "#f6e6d3"
+    },
+    {
+      "type": "color",
+      "id": "bg_bottom",
+      "label": "Background bottom",
+      "default": "#e9c6a6"
+    },
+    {
+      "type": "color",
+      "id": "glow",
+      "label": "Glow behind the centre card",
+      "default": "#f9dccd"
+    },
+    {
+      "type": "color",
+      "id": "accent",
+      "label": "Accent (hover and focus)",
+      "info": "Leave empty to use the theme accent."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Optional. The collection image is used when empty."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "info": "Optional. The collection title is used when empty."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Optional. The collection page is used when empty."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Arc showcase",
+      "blocks": [
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

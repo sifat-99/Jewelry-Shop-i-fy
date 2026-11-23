@@ -132,8 +132,12 @@
     position: absolute; inset: 0; z-index: 6; display: flex; align-items: center; justify-content: center;
     border-radius: var(--pv-gallery-radius, 0px); pointer-events: none;
     transition: opacity .35s ease, visibility .35s ease;
+    transition: opacity .35s ease, visibility .35s ease, display .35s allow-discrete;
+    /* Performance: a loader that is off screen is not rendered, so its ~10 SVG animations stop costing style work */
+    content-visibility: auto;
   }
-  .lv-loader-overlay.is-done { opacity: 0; visibility: hidden; }
+  /* Performance: once the fade finished a finished loader leaves rendering completely (its animations stop) */
+  .lv-loader-overlay.is-done { opacity: 0; visibility: hidden; display: none; }
   {%- endif %}
 
   /* Card loader overlay & badge sizing */
@@ -141,9 +145,11 @@
     position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center;
     border-radius: inherit; pointer-events: none;
     transition: opacity .35s ease, visibility .35s ease;
+    transition: opacity .35s ease, visibility .35s ease, display .35s allow-discrete;
+    content-visibility: auto;
   }
   .lv-card-media-wrap.lv-ready .lv-loader-overlay {
-    opacity: 0 !important; visibility: hidden !important; pointer-events: none !important;
+    opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; display: none !important;
   }
   .lv-loader-badge--card {
     width: 110px !important;

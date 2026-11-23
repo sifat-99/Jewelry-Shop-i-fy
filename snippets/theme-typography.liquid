@@ -208,9 +208,16 @@
     endfor
   -%}
   {%- if gf_specs != blank -%}
+    {%- comment -%}
+      Performance: the Google Fonts stylesheet used to be a normal render-blocking <link rel="stylesheet">, so the first paint
+      waited for a request to another domain (about 1.6 s in Lighthouse). It is now preloaded and applied as soon as it
+      arrives; text shows in the fallback font first (font-display: swap) and then switches. Without JavaScript the
+      <noscript> link loads it the normal way.
+    {%- endcomment -%}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?{{ gf_specs }}&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?{{ gf_specs }}&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?{{ gf_specs }}&display=swap"></noscript>
   {%- endif -%}
   {%- if need_shopify_heading or need_shopify_body -%}
     <style>

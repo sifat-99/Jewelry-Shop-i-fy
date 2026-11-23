@@ -1,0 +1,50 @@
+{% doc %}
+  Renders one image or video for a side of the Scroll story splits section (sections/scroll-splits.liquid).
+  A video wins over the image. With neither, a placeholder is shown.
+
+  @param {object} [video] - Shopify video to play (muted, looping, played by the section script)
+  @param {image} [image] - Image to show when there is no video
+  @param {string} [extra_class] - Extra class, e.g. ss-hide-m / ss-hide-d to show it on one screen size only
+  @param {string} [alt] - Alt text fallback
+  @param {string} [loading] - lazy (default) or eager
+  @param {string} [sizes] - sizes attribute for the image
+
+  @example
+  {% render 'scroll-split-media', image: block.settings.left_image, extra_class: 'ss-hide-m', sizes: '50vw' %}
+{% enddoc %}
+{%- liquid
+  assign el_class = 'ss-media__el ' | append: extra_class
+  assign el_loading = loading | default: 'lazy'
+  assign el_sizes = sizes | default: '(min-width: 990px) 50vw, 100vw'
+  # a desktop-only or mobile-only video loads nothing up front; the section script plays the visible one
+  assign el_preload = 'metadata'
+  if extra_class contains 'ss-hide'
+    assign el_preload = 'none'
+  endif
+-%}
+{%- if video != blank -%}
+  {%- capture video_html -%}
+    {{ video | video_tag: autoplay: false, loop: true, muted: true, controls: false, playsinline: true, preload: el_preload, image_size: '1400x', class: el_class }}
+  {%- endcapture -%}
+  {{ video_html | replace: '<video ', '<video data-ss-video ' | replace: '<img ', '<img alt="" ' }}
+{%- elsif image != blank -%}
+  {%- liquid
+    assign focal = image.presentation.focal_point | default: '50% 50%'
+    assign img_style = '--fp-d: ' | append: focal | append: ';'
+    assign img_alt = image.alt | default: alt
+  -%}
+  {{
+    image
+    | image_url: width: 2000
+    | image_tag:
+      widths: '600, 900, 1200, 1600, 2000',
+      sizes: el_sizes,
+      loading: el_loading,
+      alt: img_alt,
+      class: el_class,
+      style: img_style
+  }}
+{%- else -%}
+  {%- assign ph_class = el_class | append: ' ss-media__el--ph' -%}
+  {{ 'lifestyle-2' | placeholder_svg_tag: ph_class }}
+{%- endif -%}

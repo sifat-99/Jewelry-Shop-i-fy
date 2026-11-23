@@ -47,9 +47,9 @@
       "type": "sale",
       "name": "Sale",
       "settings": {
-        "image": "shopify://shop_images/Discount_Image_Enhanced_3x1_4d7bd8b5-5f24-486c-b214-60ea8bf163a0.webp",
+        "image": "shopify://shop_images/Banner_for_sale.webp",
         "desktop_focal": "top right",
-        "image_mobile": "shopify://shop_images/Mobile_Version_Enhanced_3x4_72e30c94-c741-4833-82ba-dbd4376de2f0.webp",
+        "image_mobile": "shopify://shop_images/Sale_mobile_banner.webp",
         "mobile_focal": "center center",
         "desktop_height": 460,
         "mobile_height": 380,

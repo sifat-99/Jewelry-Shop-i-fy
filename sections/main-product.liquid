@@ -1024,7 +1024,10 @@
                         </button>
                       {%- endif -%}
                     {%- when 'video' -%}
-                      {{ media | video_tag: controls: true, loop: true, muted: true, playsinline: true, image_size: '1400x', class: 'pg__media' }}
+                      {%- capture pg_video_html -%}
+                        {{ media | video_tag: controls: true, loop: true, muted: true, playsinline: true, image_size: '1400x', class: 'pg__media' }}
+                      {%- endcapture -%}
+                      {{ pg_video_html | replace: '<img ', '<img alt="" ' }}
                     {%- when 'external_video' -%}
                       {{ media | external_video_tag }}
                     {%- when 'model' -%}

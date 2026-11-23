@@ -1,0 +1,442 @@
+{% doc %}
+  Global behaviour for every product card (snippets/product-grid-item.liquid):
+  quick add, size pills, image arrows, drag to scroll.
+
+  Rendered ONCE per page from layout/theme.liquid. All handlers are delegated on
+  the document, so a single copy serves every card, including cards that are
+  inserted later by AJAX. Do not render this snippet from the card itself.
+
+  @example
+  {% render 'product-card-scripts' %}
+{% enddoc %}
+<script>
+  /* Deferred images: 2nd (hover) card image (snippets/product-grid-item.liquid) and mega menu pictures
+     (snippets/header-mega-menu.liquid). They are not downloaded while the page itself is loading. */
+  (function () {
+    function hydrate(img) {
+      if (!img || !img.hasAttribute('data-lv-deferred')) return;
+      img.removeAttribute('data-lv-deferred');
+      var ss = img.getAttribute('data-srcset');
+      if (ss) img.setAttribute('srcset', ss);
+      var s = img.getAttribute('data-src');
+      if (s) img.setAttribute('src', s);
+    }
+    function hydrateIn(el) {
+      var wrap = el && el.closest && el.closest('.lv-card-media-wrap, .lv-product-card, .menu__item');
+      if (wrap) wrap.querySelectorAll('img[data-lv-deferred]').forEach(hydrate);
+    }
+    window.lvHydrateCardImages = hydrateIn;
+    ['mouseover', 'touchstart', 'focusin', 'pointerdown'].forEach(function (type) {
+      document.addEventListener(type, function (e) { hydrateIn(e.target); }, { passive: true, capture: true });
+    });
+    /* After the page has loaded: prepare hover images of cards that are on / near the screen */
+    function watch() {
+      if (!('IntersectionObserver' in window)) {
+        document.querySelectorAll('img[data-lv-deferred]').forEach(hydrate);
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { hydrate(en.target); io.unobserve(en.target); }
+        });
+      }, { rootMargin: '300px 0px' });
+      var scan = function () {
+        document.querySelectorAll('img[data-lv-deferred]:not([data-lv-watch])').forEach(function (img) {
+          img.setAttribute('data-lv-watch', '');
+          io.observe(img);
+        });
+      };
+      scan();
+      /* menu pictures: fetch quietly a moment after load, so dropdowns open with their images ready */
+      setTimeout(function () {
+        document.querySelectorAll('img[data-lv-deferred]').forEach(function (img) {
+          if (!img.closest('.lv-card-media-wrap, .lv-product-card')) hydrate(img);
+        });
+      }, 1500);
+      var t = null;
+      window.addEventListener('scroll', function () { if (!t) t = setTimeout(function () { t = null; scan(); }, 400); }, { passive: true });
+    }
+    if (document.readyState === 'complete') watch();
+    else window.addEventListener('load', function () { setTimeout(watch, 200); });
+  })();
+
+  if (!window.lvCardInteractionsInitialized) {
+    window.lvCardInteractionsInitialized = true;
+
+    // Helper to add variant to cart via AJAX & open drawer
+    function lvAddToCart(variantId, callback) {
+      if (!variantId) {
+        if (callback) callback(false);
+        return;
+      }
+      if (typeof window.addToCartAjax === 'function') {
+        window.addToCartAjax(variantId, 1)
+          .then(function() {
+            if (callback) callback(true);
+          })
+          .catch(function(err) {
+            console.error('AJAX add error:', err);
+            if (callback) callback(false);
+          });
+      } else {
+        var cartAddUrl = (window.theme && window.theme.routes && window.theme.routes.cart_add_url ? window.theme.routes.cart_add_url : {{ routes.cart_add_url | json }}) + '.js';
+        fetch(cartAddUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: variantId, quantity: 1 })
+        })
+        .then(function(res) {
+          if (!res.ok) throw new Error('Add to cart failed');
+          return res.json();
+        })
+        .then(function(item) {
+          if (typeof window.openCartDrawer === 'function') {
+            window.openCartDrawer();
+          }
+          document.dispatchEvent(new CustomEvent('theme:cart:reload', { bubbles: true }));
+          if (callback) callback(true);
+        })
+        .catch(function(err) {
+          console.error('Direct add error:', err);
+          if (callback) callback(false);
+        });
+      }
+    }
+
+    // Helper to update navigation arrows on a sizes bar
+    function updateBarArrows(bar) {
+      if (!bar) return;
+      var track = bar.querySelector('.lv-card-bar-sizes');
+      if (!track) return;
+      var prev = bar.querySelector('.lv-card-size-nav-prev');
+      var next = bar.querySelector('.lv-card-size-nav-next');
+
+      var isOverflowing = (track.scrollWidth > track.clientWidth + 2);
+      if (isOverflowing) {
+        track.classList.remove('is-centered');
+        if (prev) {
+          if (track.scrollLeft > 4) {
+            prev.classList.remove('is-hidden');
+          } else {
+            prev.classList.add('is-hidden');
+          }
+        }
+        if (next) {
+          if (track.scrollLeft + track.clientWidth < track.scrollWidth - 4) {
+            next.classList.remove('is-hidden');
+          } else {
+            next.classList.add('is-hidden');
+          }
+        }
+      } else {
+        track.classList.add('is-centered');
+        if (prev) prev.classList.add('is-hidden');
+        if (next) next.classList.add('is-hidden');
+      }
+    }
+
+    // Drag-to-scroll variables
+    var activeDragTrack = null;
+    var dragStartX = 0;
+    var dragScrollLeft = 0;
+    var isDraggingVariant = false;
+
+    // Mouse wheel horizontal scroll conversion
+    document.addEventListener('wheel', function(e) {
+      var track = e.target.closest('.lv-card-bar-sizes');
+      if (track && track.scrollWidth > track.clientWidth) {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          e.preventDefault();
+          track.scrollLeft += e.deltaY;
+          var bar = track.closest('.lv-card-sizes-bar');
+          if (bar) updateBarArrows(bar);
+        }
+      }
+    }, { passive: false });
+
+    // Drag-to-scroll on desktop
+    document.addEventListener('mousedown', function(e) {
+      var track = e.target.closest('.lv-card-bar-sizes');
+      if (track && !e.target.closest('.lv-card-size-nav') && !e.target.closest('.lv-card-size-grid-btn')) {
+        activeDragTrack = track;
+        dragStartX = e.pageX;
+        dragScrollLeft = track.scrollLeft;
+        isDraggingVariant = false;
+      }
+    });
+
+    document.addEventListener('mousemove', function(e) {
+      if (!activeDragTrack) return;
+      var delta = e.pageX - dragStartX;
+      if (Math.abs(delta) > 5) {
+        isDraggingVariant = true;
+        activeDragTrack.scrollLeft = dragScrollLeft - delta;
+        var bar = activeDragTrack.closest('.lv-card-sizes-bar');
+        if (bar) updateBarArrows(bar);
+      }
+    });
+
+    document.addEventListener('mouseup', function(e) {
+      if (activeDragTrack) {
+        activeDragTrack = null;
+        setTimeout(function() {
+          isDraggingVariant = false;
+        }, 50);
+      }
+    });
+
+    // Update arrows on scroll inside tracks
+    document.addEventListener('scroll', function(e) {
+      if (e.target && e.target.classList && e.target.classList.contains('lv-card-bar-sizes')) {
+        var bar = e.target.closest('.lv-card-sizes-bar');
+        if (bar) updateBarArrows(bar);
+      }
+    }, true);
+
+    function syncAllCardBars() {
+      document.querySelectorAll('.lv-card-sizes-bar').forEach(updateBarArrows);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', syncAllCardBars);
+    } else {
+      syncAllCardBars();
+    }
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(syncAllCardBars);
+    }
+    var lvResizeTimer = null;
+    window.addEventListener('resize', function() {
+      clearTimeout(lvResizeTimer);
+      lvResizeTimer = setTimeout(syncAllCardBars, 120);
+    });
+
+    // Initial check on hover/focus across card or quick-add bar
+    document.addEventListener('mouseover', function(e) {
+      var bar = e.target.closest('.lv-card-sizes-bar');
+      if (!bar) {
+        var wrap = e.target.closest('.lv-card-media-wrap');
+        if (wrap) bar = wrap.querySelector('.lv-card-sizes-bar');
+      }
+      if (bar) {
+        updateBarArrows(bar);
+      }
+    });
+    document.addEventListener('focusin', function(e) {
+      var bar = e.target.closest('.lv-card-sizes-bar');
+      if (bar) {
+        updateBarArrows(bar);
+      }
+    });
+
+    // Reset manual slider override when leaving a card at slide 0, and promote 2nd image loading on hover
+    document.addEventListener('mouseover', function(e) {
+      var wrap = e.target.closest('.lv-card-media-wrap');
+      if (!wrap) return;
+      var card = wrap.closest('.lv-product-card[data-second-image="true"]');
+      if (card) {
+        var secondSlide = wrap.querySelector('.card-media-slide[data-slide-index="1"][loading="lazy"]');
+        if (secondSlide) secondSlide.setAttribute('loading', 'eager');
+      }
+    });
+    document.addEventListener('mouseout', function(e) {
+      var wrap = e.target.closest('.lv-card-media-wrap');
+      if (!wrap) return;
+      if (e.relatedTarget && wrap.contains(e.relatedTarget)) return;
+      var slider = wrap.querySelector('.card-media-slider[data-manual-nav="true"]');
+      if (slider && slider.getAttribute('data-current-index') === '0') {
+        slider.removeAttribute('data-manual-nav');
+      }
+    });
+
+    // Click Delegation
+    document.addEventListener('click', function(e) {
+      // 0. Engravable products: the hover bar opens the variant + engraving popup instead of adding directly
+      var quickWrap = e.target.closest('.lv-card-quick-add-wrap');
+      if (quickWrap && !e.target.closest('.lv-card-size-nav')) {
+        var mediaWrap = quickWrap.closest('.lv-card-media-wrap');
+        var engMini = mediaWrap ? mediaWrap.querySelector('[data-lv-mini-add][data-eng="true"]') : null;
+        if (engMini && typeof window.lvOpenMiniAdd === 'function') {
+          e.preventDefault();
+          e.stopPropagation();
+          if (engMini.getAttribute('data-eng-action') === 'page' && engMini.getAttribute('data-url')) {
+            window.location.href = engMini.getAttribute('data-url');
+            return;
+          }
+          var clickedPill = e.target.closest('.lv-card-size-pill');
+          window.lvOpenMiniAdd(engMini, quickWrap, clickedPill ? clickedPill.getAttribute('data-variant-id') : null);
+          return;
+        }
+      }
+
+      // 1. Direct Add to Cart Button (Product with no size variants)
+      var directBtn = e.target.closest('.lv-card-direct-add-btn');
+      if (directBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (directBtn.classList.contains('is-loading')) return;
+
+        var variantId = directBtn.getAttribute('data-variant-id');
+        var addingTextEl = directBtn.querySelector('.lv-card-adding-text');
+        var defaultAddingText = {{ 'products.product.adding' | t | default: 'Adding...' | json }};
+        var addedText = {{ 'products.product.added' | t | default: 'Added ✓' | json }};
+
+        directBtn.classList.add('is-loading');
+        if (addingTextEl) addingTextEl.textContent = defaultAddingText;
+
+        lvAddToCart(variantId, function(success) {
+          if (success !== false && addingTextEl) {
+            addingTextEl.textContent = addedText;
+          }
+          setTimeout(function() {
+            directBtn.classList.remove('is-loading');
+            if (addingTextEl) addingTextEl.textContent = defaultAddingText;
+          }, 900);
+        });
+        return;
+      }
+
+      // 2. Sizes Bar Interactions (Arrows, Size Pills, and Mobile 1st/2nd Tap)
+      var sizesBar = e.target.closest('.lv-card-sizes-bar');
+      if (sizesBar) {
+        var isOpen = sizesBar.classList.contains('is-open');
+
+        // Nav Arrows (Prev/Next)
+        var navPrev = e.target.closest('.lv-card-size-nav-prev');
+        if (navPrev) {
+          e.preventDefault();
+          e.stopPropagation();
+          var wrap = navPrev.closest('.lv-card-bar-sizes-wrap');
+          var track = wrap ? wrap.querySelector('.lv-card-bar-sizes') : null;
+          if (track) {
+            var prevStep = Math.max(96, Math.round(track.clientWidth * 0.72));
+            track.scrollBy({ left: -prevStep, behavior: 'smooth' });
+            setTimeout(function() { updateBarArrows(sizesBar); }, 350);
+          }
+          return;
+        }
+
+        var navNext = e.target.closest('.lv-card-size-nav-next');
+        if (navNext) {
+          e.preventDefault();
+          e.stopPropagation();
+          var wrap = navNext.closest('.lv-card-bar-sizes-wrap');
+          var track = wrap ? wrap.querySelector('.lv-card-bar-sizes') : null;
+          if (track) {
+            var nextStep = Math.max(96, Math.round(track.clientWidth * 0.72));
+            track.scrollBy({ left: nextStep, behavior: 'smooth' });
+            setTimeout(function() { updateBarArrows(sizesBar); }, 350);
+          }
+          return;
+        }
+
+        // Check if a size pill was tapped/clicked
+        var sizePill = e.target.closest('.lv-card-size-pill');
+        if (sizePill) {
+          // If on a touch device and the bar was NOT already open, DO NOT add to cart on 1st tap!
+          // Instead, 1st tap simply opens the sizes bar to reveal all options!
+          var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.matchMedia('(hover: none)').matches;
+          if (isTouchDevice && !isOpen) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.querySelectorAll('.lv-card-sizes-bar.is-open').forEach(function(b) {
+              if (b !== sizesBar) b.classList.remove('is-open');
+            });
+            sizesBar.classList.add('is-open');
+            updateBarArrows(sizesBar);
+            return;
+          }
+
+          if (isDraggingVariant) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          e.preventDefault();
+          e.stopPropagation();
+          if (sizePill.classList.contains('is-sold-out')) return;
+
+          var variantId = sizePill.getAttribute('data-variant-id');
+          var text = sizePill.querySelector('.lv-card-size-text');
+          var spinner = sizePill.querySelector('.lv-card-size-spinner');
+          if (spinner) spinner.style.display = 'inline-flex';
+          if (text) text.style.display = 'none';
+
+          lvAddToCart(variantId, function() {
+            if (spinner) spinner.style.display = 'none';
+            if (text) text.style.display = 'inline';
+          });
+          return;
+        }
+
+        // Tap on the bar itself (1st tap to open and reveal variants)
+        if (!isOpen) {
+          e.preventDefault();
+          e.stopPropagation();
+          document.querySelectorAll('.lv-card-sizes-bar.is-open').forEach(function(b) {
+            if (b !== sizesBar) b.classList.remove('is-open');
+          });
+          sizesBar.classList.add('is-open');
+          updateBarArrows(sizesBar);
+          return;
+        }
+      }
+
+      // Close open sizes bars when tapping outside
+      if (!e.target.closest('.lv-card-sizes-bar')) {
+        document.querySelectorAll('.lv-card-sizes-bar.is-open').forEach(function(bar) {
+          bar.classList.remove('is-open');
+        });
+      }
+
+      // 7. Image Slider Arrow Navigation
+      var navArrow = e.target.closest('.lv-card-nav-arrow');
+      if (navArrow) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        var cardMedia = navArrow.closest('.lv-card-media-wrap');
+        if (!cardMedia) return;
+        var slider = cardMedia.querySelector('.card-media-slider');
+        if (!slider) return;
+        var slides = slider.querySelectorAll('.card-media-slide');
+        if (slides.length <= 1) return;
+
+        var currIdx = parseInt(slider.getAttribute('data-current-index') || '0', 10);
+        if (isNaN(currIdx)) currIdx = 0;
+        var total = slides.length;
+        var card = cardMedia.closest('.lv-product-card');
+        if (
+          card &&
+          card.getAttribute('data-second-image') === 'true' &&
+          !slider.hasAttribute('data-manual-nav') &&
+          currIdx === 0 &&
+          window.matchMedia &&
+          window.matchMedia('(hover: hover)').matches &&
+          cardMedia.matches(':hover')
+        ) {
+          currIdx = 1;
+        }
+        slider.setAttribute('data-manual-nav', 'true');
+        var nextIdx;
+
+        if (navArrow.classList.contains('card-nav-next')) {
+          nextIdx = (currIdx + 1) % total;
+        } else {
+          nextIdx = (currIdx - 1 + total) % total;
+        }
+
+        slides.forEach(function(slide, idx) {
+          if (idx === nextIdx) {
+            slide.classList.add('is-active');
+          } else {
+            slide.classList.remove('is-active');
+          }
+        });
+
+        slider.setAttribute('data-current-index', nextIdx);
+        return;
+      }
+    });
+  }
+</script>

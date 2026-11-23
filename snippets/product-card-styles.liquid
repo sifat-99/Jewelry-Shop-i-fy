@@ -1,0 +1,759 @@
+{% doc %}
+  Global styles for every product card (snippets/product-grid-item.liquid).
+
+  Rendered ONCE per page from layout/theme.liquid. Before this file existed the same
+  ~27 KB of CSS was printed inside every single card, which made the home page
+  several megabytes heavy. Do not render this snippet from the card itself.
+
+  @example
+  {% render 'product-card-styles' %}
+{% enddoc %}
+<style>
+  .lv-product-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--FONT-STACK-BODY, sans-serif);
+  }
+  .dp-pg, product-grid-item.dp-pg {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .lv-card-media-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--bg-accent, var(--bg));
+    border-radius: var(--card-radius, 4px);
+    margin-bottom: 12px;
+  }
+  .lv-card-img-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    text-decoration: none;
+  }
+  .card-media-slider {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .card-media-slide {
+    position: absolute;
+    /* overscan 2px: hides the faint edge line some product photos carry on their top/left border */
+    inset: -2px;
+    width: calc(100% + 4px);
+    max-width: none;
+    height: calc(100% + 4px);
+    object-fit: cover;
+    object-position: center;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1;
+    pointer-events: none;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: auto;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.4s ease;
+  }
+  .card-media-slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 2;
+    pointer-events: auto;
+  }
+
+  /* Hover animation (Theme settings > Product Card > Hover animation / Show 2nd image). Pointer devices only. */
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .lv-product-card[data-hover*="lift"] {
+      transition: transform 0.5s cubic-bezier(0.22, 0.8, 0.3, 1);
+      will-change: transform;
+    }
+    .lv-product-card[data-hover*="lift"]:hover { transform: translateY(-5px); }
+    .lv-product-card[data-hover*="lift"] .lv-card-media-wrap { transition: box-shadow 0.5s ease; }
+    .lv-product-card[data-hover*="lift"]:hover .lv-card-media-wrap { box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.24); }
+    .lv-product-card[data-hover*="zoom"]:not([data-second-image="true"]) .card-media-slide {
+      transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.9s cubic-bezier(0.22, 0.8, 0.3, 1);
+    }
+    .lv-product-card[data-hover*="zoom"]:not([data-second-image="true"]) .lv-card-media-wrap:hover .card-media-slide.is-active { transform: scale(1.06); }
+    .lv-product-card .product__grid__title { transition: letter-spacing 0.4s ease; }
+    .lv-product-card[data-hover*="lift"]:hover .product__grid__title { letter-spacing: 0.1em !important; }
+  }
+  @media (hover: hover) {
+    .lv-product-card[data-second-image="true"] .card-media-slide[data-slide-index="1"] {
+      visibility: visible;
+      pointer-events: none;
+      transition: opacity 0.38s ease;
+    }
+    .lv-product-card[data-second-image="true"] .lv-card-media-wrap:hover .card-media-slider[data-current-index="0"]:not([data-manual-nav="true"]) .card-media-slide[data-slide-index="1"] {
+      opacity: 1;
+      z-index: 3;
+      pointer-events: auto;
+    }
+  }
+  .lv-product-card[data-hover="none"] .lv-card-media-wrap:hover .card-media-slide.is-active,
+  .lv-product-card[data-second-image="true"] .lv-card-media-wrap:hover .card-media-slide { transform: translateZ(0); }
+
+  /* 1. Ribbon Discount Badge (Top-Left) */
+
+  /* ==========================================================================
+     2. RIGHT SIDE ROUND ACTION BUTTONS (Wishlist & Quick View)
+     Middle-left circular expanding fill on hover (350ms ease-in-out)
+     ========================================================================== */
+
+  .lv-card-side-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 20;
+  }
+
+  @media (hover: hover) {
+    .lv-card-side-actions { opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
+    .lv-card-media-wrap:hover .lv-card-side-actions,
+    .lv-card-media-wrap:focus-within .lv-card-side-actions,
+    .lv-card-media-wrap.lv-has-wishlist-item .lv-card-side-actions { opacity: 1; transform: none; pointer-events: auto; }
+  }
+  @media (hover: none) {
+    .lv-card-side-actions { opacity: 1; transform: none; pointer-events: auto; }
+  }
+
+  .lv-card-action-btn {
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 50% !important;
+    isolation: isolate !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    background-color: var(--round-btn-bg) !important;
+    color: var(--round-btn-text) !important;
+    border: 1px solid var(--round-btn-border) !important;
+    box-shadow: 0 2px 8px var(--round-btn-shadow) !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    transform: none !important;
+    transition: border-color 350ms ease-in-out, box-shadow 350ms ease-in-out !important;
+  }
+
+  /* Circle Expanding Fill Originating from Middle-Left (0% 50%) */
+  .lv-card-action-btn::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    border-radius: 50% !important;
+    background-color: var(--round-btn-hover-bg) !important;
+    opacity: 0 !important;
+    transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  .lv-card-nav-arrow::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    border-radius: inherit !important;
+    background-color: {{ settings.card_arrow_hover_background | default: '#2b2622' }} !important;
+    opacity: 0 !important;
+    transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  .lv-card-action-btn:hover::before {
+    opacity: 1 !important;
+  }
+
+  {%- if settings.card_arrow_hover_effect == 'circle_fill' -%}
+    .lv-card-nav-arrow:hover::before {
+      opacity: 1 !important;
+    }
+  {%- else -%}
+    .lv-card-nav-arrow::before {
+      display: none !important;
+    }
+  {%- endif -%}
+
+  .lv-card-action-btn:hover {
+    border-color: var(--round-btn-hover-border, var(--round-btn-hover-bg)) !important;
+    box-shadow: 0 4px 14px var(--round-btn-shadow) !important;
+    transform: none !important;
+  }
+
+  .lv-card-action-btn svg {
+    position: relative !important;
+    z-index: 1 !important;
+    color: var(--round-btn-text) !important;
+    stroke: currentColor !important;
+    transition: color 350ms ease-in-out, stroke 350ms ease-in-out, fill 350ms ease-in-out !important;
+  }
+
+  .lv-card-action-btn:hover svg {
+    color: var(--round-btn-hover-text) !important;
+    stroke: currentColor !important;
+  }
+
+  /* Wishlist Active State */
+  .card-wishlist-btn.is-active svg.icon-wishlist-outline {
+    display: none !important;
+  }
+  .card-wishlist-btn.is-active svg.icon-wishlist-solid {
+    display: block !important;
+    color: #e53935 !important;
+    stroke: #e53935 !important;
+    fill: #e53935 !important;
+  }
+  .card-wishlist-btn.is-active:hover svg.icon-wishlist-solid {
+    color: var(--round-btn-hover-text) !important;
+    stroke: var(--round-btn-hover-text) !important;
+    fill: var(--round-btn-hover-text) !important;
+  }
+
+  /* ==========================================================================
+     3. MIDDLE LEFT & RIGHT IMAGE NAVIGATION ARROWS
+     ========================================================================== */
+
+  .lv-card-nav-arrow {
+    position: absolute !important;
+    top: {{ settings.card_arrow_vertical_position | default: 50 }}% !important;
+    transform: translateY(-50%) !important;
+    width: {{ settings.card_arrow_button_size | default: 40 }}px !important;
+    height: {{ settings.card_arrow_button_size | default: 40 }}px !important;
+    overflow: hidden !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    isolation: isolate !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    background-color: {% if settings.card_arrow_background_enabled == false %}transparent{% else %}{{ settings.card_arrow_background | default: '#ffffff' }}{% endif %} !important;
+    color: {{ settings.card_arrow_icon_color | default: '#111111' }} !important;
+    border: {{ settings.card_arrow_border_width | default: 1 }}px solid {{ settings.card_arrow_border_color | default: '#d8d4ce' }} !important;
+    box-shadow: {% if settings.card_arrow_show_shadow == false %}none{% else %}0 2px 8px rgba(0, 0, 0, 0.14){% endif %} !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    z-index: 18 !important;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--btn-animation-duration, 350ms) ease, visibility var(--btn-animation-duration, 350ms) ease, background-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), border-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), box-shadow var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+  .lv-card-nav-arrow svg {
+    position: relative !important;
+    z-index: 1 !important;
+    width: {{ settings.card_arrow_icon_size | default: 18 }}px !important;
+    height: {{ settings.card_arrow_icon_size | default: 18 }}px !important;
+    color: {{ settings.card_arrow_icon_color | default: '#111111' }} !important;
+    stroke: currentColor !important;
+    transition: color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), stroke var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), fill var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+  .card-nav-prev {
+    left: {{ settings.card_arrow_horizontal_inset | default: 8 }}px !important;
+  }
+  .card-nav-next {
+    right: {{ settings.card_arrow_horizontal_inset | default: 8 }}px !important;
+  }
+  .lv-card-media-wrap:hover .lv-card-nav-arrow {
+    opacity: 1;
+    visibility: visible;
+  }
+  {%- if settings.card_arrows_always_visible -%}
+    @media (min-width: 768px) {
+      .lv-card-nav-arrow {
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+    }
+  {%- endif -%}
+  {%- if settings.card_arrow_hover_effect != 'none' -%}
+    .lv-card-nav-arrow:hover {
+      border-color: {{ settings.card_arrow_hover_border_color | default: '#2b2622' }} !important;
+      box-shadow: {% if settings.card_arrow_show_shadow == false %}none{% else %}0 4px 14px rgba(0, 0, 0, 0.16){% endif %} !important;
+      transform: translateY(-50%) !important;
+      {%- if settings.card_arrow_hover_effect == 'color_change' -%}
+        background-color: {% if settings.card_arrow_background_enabled == false %}transparent{% else %}{{ settings.card_arrow_hover_background | default: '#2b2622' }}{% endif %} !important;
+      {%- endif -%}
+    }
+    .lv-card-nav-arrow:hover svg {
+      color: {{ settings.card_arrow_hover_icon_color | default: '#ffffff' }} !important;
+      stroke: currentColor !important;
+    }
+  {%- endif -%}
+
+  /* ==========================================================================
+     4. FLOATING WHITE BAR QUICK ADD & SIZE VARIANT SELECTOR
+     Matches user design (Image 1 'ADD' and Image 2 sizes '16 17 18')
+     Desktop: Slides up on card hover; transforms to size pills on bar hover
+     Mobile: Visible at bottom, tap to toggle sizes, guaranteed zero overlap
+     ========================================================================== */
+
+  .lv-card-quick-add-wrap {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    z-index: 18;
+    box-sizing: border-box;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 280ms cubic-bezier(0.25, 1, 0.5, 1), transform 280ms cubic-bezier(0.25, 1, 0.5, 1);
+    pointer-events: none;
+  }
+
+  .lv-card-media-wrap:hover .lv-card-quick-add-wrap,
+  .lv-card-media-wrap:focus-within .lv-card-quick-add-wrap {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .lv-card-action-bar {
+    position: relative !important;
+    width: 100% !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    background: var(--btn-regular-bg, #000000) !important;
+    color: var(--btn-regular-text, #ffffff) !important;
+    border: 1px solid var(--btn-regular-border, #000000) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    padding: 0 8px !important;
+    text-decoration: none !important;
+    transition: box-shadow var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)), border-color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+
+  /* Direct Add Button with Signature 350ms Left-to-Right Sliding Hover Animation */
+  .lv-card-direct-add-btn {
+    isolation: isolate !important;
+    background-color: var(--btn-regular-bg, #000000) !important;
+  }
+  .lv-card-direct-add-btn::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: var(--btn-regular-hover-bg, #000000) !important;
+    border-radius: inherit !important;
+    z-index: 1 !important;
+    opacity: 0 !important;
+    transition: opacity var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+    pointer-events: none !important;
+  }
+  .lv-card-direct-add-btn:hover::before {
+    opacity: 1 !important;
+  }
+  .lv-card-direct-add-btn:hover {
+    border-color: var(--btn-regular-hover-border, #000000) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+  }
+  .lv-card-direct-add-btn .lv-card-bar-label,
+  .lv-card-direct-add-btn .lv-card-bar-label span,
+  .lv-card-direct-add-btn .btn__text-content {
+    position: relative !important;
+    z-index: 2 !important;
+    color: var(--btn-regular-text, #ffffff) !important;
+    transition: color var(--btn-animation-duration, 450ms) var(--btn-ease, cubic-bezier(0.65, 0, 0.35, 1)) !important;
+  }
+  .lv-card-direct-add-btn:hover .lv-card-bar-label,
+  .lv-card-direct-add-btn:hover .lv-card-bar-label span,
+  .lv-card-direct-add-btn:hover .btn__text-content,
+  .lv-card-direct-add-btn:hover span {
+    color: var(--btn-regular-hover-text, #ffffff) !important;
+  }
+
+  /* Initial 'Add to Cart' label inside bar */
+  .lv-card-bar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--TYPE-STACK-BUTTON, sans-serif);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--btn-regular-text, #111111);
+    transition: opacity 220ms ease, transform 220ms ease, color 350ms ease-in-out;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Size Options Wrapper inside bar (Hidden initially, reveals on bar hover/active) */
+  .lv-card-bar-sizes-wrap {
+    position: absolute !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    opacity: 0 !important;
+    transform: translateY(4px) !important;
+    transition: opacity 220ms ease, transform 220ms ease !important;
+    pointer-events: none !important;
+    z-index: 3 !important;
+    background: var(--bg, #ffffff) !important;
+    overflow: hidden !important;
+    border-radius: inherit !important;
+  }
+
+  /* On Desktop ONLY: Hovering the bar reveals sizes */
+  @media (hover: hover) {
+    .lv-card-sizes-bar:hover .lv-card-bar-label {
+      opacity: 0 !important;
+      transform: translateY(-4px) !important;
+    }
+    .lv-card-sizes-bar:hover .lv-card-bar-sizes-wrap {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      pointer-events: auto !important;
+    }
+  }
+
+  /* While the size list is showing, the bar frame uses the global border color (same as the size pills inside it) */
+  .lv-card-sizes-bar.is-open,
+  .lv-card-media-wrap.lv-mp-open .lv-card-sizes-bar {
+    border-color: var(--lv-border) !important;
+  }
+  @media (hover: hover) {
+    .lv-card-sizes-bar:hover {
+      border-color: var(--lv-border) !important;
+    }
+  }
+
+  /* On Mobile or Explicit Tap: .is-open class reveals sizes */
+  .lv-card-sizes-bar.is-open .lv-card-bar-label {
+    opacity: 0 !important;
+    transform: translateY(-4px) !important;
+  }
+  .lv-card-sizes-bar.is-open .lv-card-bar-sizes-wrap {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+  }
+
+  /* Keep the hover bar visible while its variant popup is open (the pointer is inside the popup, not on the card) */
+  .lv-card-media-wrap.lv-mp-open .lv-card-quick-add-wrap { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .lv-card-media-wrap.lv-mp-open .lv-card-sizes-bar .lv-card-bar-label { opacity: 0 !important; transform: translateY(-4px) !important; }
+  .lv-card-media-wrap.lv-mp-open .lv-card-sizes-bar .lv-card-bar-sizes-wrap { opacity: 1 !important; transform: translateY(0) !important; pointer-events: auto !important; }
+
+  .lv-card-bar-sizes {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 0 8px !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-behavior: smooth !important;
+    scroll-padding-inline: 26px !important;
+    box-sizing: border-box !important;
+    justify-content: flex-start !important;
+    user-select: none !important;
+    cursor: grab !important;
+  }
+  .lv-card-bar-sizes:active {
+    cursor: grabbing !important;
+  }
+  .lv-card-bar-sizes::-webkit-scrollbar {
+    display: none !important;
+  }
+  .lv-card-bar-sizes.is-centered {
+    justify-content: center !important;
+  }
+
+  /* Chevron Scroll Arrows */
+  .lv-card-size-nav {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 24px !important;
+    z-index: 6 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    color: var(--text, #111111) !important;
+    background: transparent !important;
+    transition: opacity 180ms ease, color 180ms ease !important;
+    pointer-events: auto !important;
+  }
+  .lv-card-size-nav-prev {
+    left: 0 !important;
+    background: linear-gradient(90deg, var(--bg, #ffffff) 80%, transparent) !important;
+    padding-right: 6px !important;
+  }
+  .lv-card-size-nav-next {
+    right: 0 !important;
+    background: linear-gradient(-90deg, var(--bg, #ffffff) 80%, transparent) !important;
+    padding-left: 6px !important;
+  }
+  .lv-card-size-nav:hover {
+    color: var(--text, #000000) !important;
+  }
+  .lv-card-size-nav svg {
+    transition: transform 150ms ease !important;
+  }
+  .lv-card-size-nav:hover svg {
+    transform: scale(1.25) !important;
+  }
+  .lv-card-size-nav.is-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Size Pill Button */
+  .lv-card-size-pill {
+    position: relative !important;
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    flex-shrink: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    min-width: 32px !important;
+    max-width: none !important;
+    height: 30px !important;
+    padding: 0 10px !important;
+    margin: 0 !important;
+    background: var(--bg, #ffffff) !important;
+    border: 1px solid var(--lv-border) !important;
+    border-radius: var(--btn-radius, 0px) !important;
+    color: var(--text, #111111) !important;
+    font-family: var(--TYPE-STACK-BUTTON, sans-serif) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, transform 150ms ease !important;
+  }
+  .lv-card-size-text {
+    white-space: nowrap !important;
+    line-height: 1 !important;
+  }
+
+  /* High contrast black hover on size pills */
+  .lv-card-size-pill:hover,
+  .lv-card-size-pill.is-active {
+    background-color: var(--btn-selected-bg, #000000) !important;
+    color: var(--btn-selected-text, #ffffff) !important;
+    border-color: var(--btn-selected-border, #000000) !important;
+  }
+
+  .lv-card-size-pill:active {
+    transform: scale(0.94) !important;
+  }
+
+  .lv-card-size-pill.is-sold-out {
+    opacity: 0.3 !important;
+    text-decoration: line-through !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+  }
+
+  /* Spinner & Adding State */
+  @keyframes lv-card-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .lv-card-size-spinner {
+    position: relative !important;
+    z-index: 3 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+  }
+  .lv-card-size-spinner svg {
+    animation: lv-card-spin 0.75s linear infinite;
+    display: block;
+    stroke: currentColor;
+  }
+
+  /* Direct Add to Cart Adding State */
+  .lv-card-adding-state {
+    position: relative !important;
+    z-index: 3 !important;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    color: var(--btn-regular-text, #ffffff) !important;
+    font-family: var(--TYPE-STACK-BUTTON, sans-serif);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .lv-card-adding-state svg {
+    animation: lv-card-spin 0.75s linear infinite;
+    display: block;
+    flex-shrink: 0;
+    stroke: currentColor !important;
+  }
+  .lv-card-direct-add-btn:hover .lv-card-adding-state,
+  .lv-card-direct-add-btn.is-loading .lv-card-adding-state {
+    color: var(--btn-regular-hover-text, #ffffff) !important;
+  }
+  .lv-card-direct-add-btn.is-loading {
+    pointer-events: none !important;
+    cursor: wait !important;
+  }
+  .lv-card-direct-add-btn.is-loading .lv-card-bar-label {
+    display: none !important;
+  }
+  .lv-card-direct-add-btn.is-loading .lv-card-adding-state {
+    display: inline-flex !important;
+  }
+
+  /* Direct Add to Cart Hover Fill */
+  .lv-card-direct-add-btn:hover .lv-card-bar-label {
+    opacity: 1 !important;
+  }
+
+  /* ==========================================================================
+     5. MOBILE RESPONSIVE LAYOUT (Zero Overlaps Guaranteed!)
+     ========================================================================== */
+
+  @media (max-width: 767px) {
+    /* Side actions (Wishlist & Quick View) positioned at top-right */
+    .lv-card-side-actions {
+      top: 8px !important;
+      right: 8px !important;
+      flex-direction: row !important;
+      gap: 6px !important;
+      z-index: 20 !important;
+    }
+    .lv-card-action-btn {
+      width: 30px !important;
+      height: 30px !important;
+    }
+    .lv-card-action-btn svg {
+      width: 14px !important;
+      height: 14px !important;
+    }
+
+    /* Discount ribbon badge at top-left */
+
+    /* Middle image navigation arrows */
+    .lv-card-nav-arrow {
+      top: {{ settings.card_arrow_vertical_position | default: 50 }}% !important;
+      transform: translateY(-50%) !important;
+      width: {{ settings.card_arrow_button_size_mobile | default: 34 }}px !important;
+      height: {{ settings.card_arrow_button_size_mobile | default: 34 }}px !important;
+      z-index: 16 !important;
+    }
+    .lv-card-nav-arrow.card-nav-prev {
+      left: {{ settings.card_arrow_horizontal_inset_mobile | default: 4 }}px !important;
+    }
+    .lv-card-nav-arrow.card-nav-next {
+      right: {{ settings.card_arrow_horizontal_inset_mobile | default: 4 }}px !important;
+    }
+    .lv-card-nav-arrow svg {
+      width: {{ settings.card_arrow_icon_size_mobile | default: 16 }}px !important;
+      height: {{ settings.card_arrow_icon_size_mobile | default: 16 }}px !important;
+    }
+    .hide-on-mobile {
+      display: none !important;
+    }
+
+    /* Bottom Quick Add Bar - ALWAYS cleanly positioned at bottom without overlapping */
+    .lv-card-quick-add-wrap {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      pointer-events: auto !important;
+      bottom: 8px !important;
+      left: 8px !important;
+      right: 8px !important;
+      z-index: 18 !important;
+    }
+    .lv-card-action-bar {
+      height: 34px !important;
+      min-height: 34px !important;
+      padding: 0 4px !important;
+    }
+    .lv-card-bar-label {
+      font-size: 11px !important;
+      letter-spacing: 0.1em !important;
+    }
+    .lv-card-size-nav {
+      width: 20px !important;
+    }
+    .lv-card-size-nav-prev {
+      background: linear-gradient(90deg, var(--bg, #ffffff) 62%, transparent) !important;
+      padding-right: 4px !important;
+    }
+    .lv-card-size-nav-next {
+      background: linear-gradient(-90deg, var(--bg, #ffffff) 62%, transparent) !important;
+      padding-left: 4px !important;
+    }
+    .lv-card-size-pill {
+      flex: 0 0 auto !important;
+      flex-shrink: 0 !important;
+      width: auto !important;
+      min-width: 26px !important;
+      max-width: none !important;
+      height: 26px !important;
+      font-size: 10px !important;
+      padding: 0 7px !important;
+    }
+  }
+
+  .product__grid__price[data-price-design] .price-item--regular {
+    display: inline-block;
+    font-family: var(--FONT-STACK-BODY, sans-serif);
+    font-size: var(--card-price-size, 15px);
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text, #171717);
+  }
+  .product__grid__price[data-price-design="editorial_serif"] .price-item--regular {
+    font-family: var(--FONT-STACK-HEADING-ITALIC, var(--FONT-STACK-HEADING, Georgia, serif));
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  .product__grid__price[data-price-design="modern_bold"] .price-item--regular { font-weight: 700; }
+  .product__grid__price[data-price-design="gold_accent"] .price-item--regular {
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--lv-accent, #c5a76a);
+  }
+  .product__grid__price[data-on-sale="true"] .price-item--regular { color: #8c2b3f; }
+  .product__grid__price .price-item--compare,
+  s.price-item.price-item--compare {
+    font-family: var(--FONT-STACK-BODY, sans-serif);
+    font-size: 12px;
+    line-height: 1.35;
+    color: #3b3b3b !important;
+    opacity: 1 !important;
+  }
+</style>
